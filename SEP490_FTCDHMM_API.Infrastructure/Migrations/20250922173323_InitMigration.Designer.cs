@@ -12,8 +12,8 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250920193011_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250922173323_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
