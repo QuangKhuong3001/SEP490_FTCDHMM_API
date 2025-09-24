@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
+namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
     public interface IRepository<T> where T : class
     {

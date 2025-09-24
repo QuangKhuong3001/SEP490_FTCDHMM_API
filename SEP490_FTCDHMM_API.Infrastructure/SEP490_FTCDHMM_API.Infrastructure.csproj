@@ -14,13 +14,12 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="MailKit" Version="4.13.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
+
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\SEP490_FTCDHMM_API.Application\SEP490_FTCDHMM_API.Application.csproj" />
 		<ProjectReference Include="..\SEP490_FTCDHMM_API.Domain\SEP490_FTCDHMM_API.Domain.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Identity\" />
 	</ItemGroup>
 </Project>

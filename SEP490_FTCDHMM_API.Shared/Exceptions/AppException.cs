@@ -11,7 +11,7 @@
 
         public AppException(AppResponseCode code, string? customMessage) : base(customMessage ?? code.Message)
         {
-            ResponseCode = new AppResponseCode(code.Status, customMessage ?? code.Message);
+            ResponseCode = new AppResponseCode(code.Status, code.Code, customMessage ?? code.Message);
         }
     }
 }

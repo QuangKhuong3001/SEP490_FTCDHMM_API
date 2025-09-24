@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace SEP490_FTCDHMM_API.Shared.Utils
 {
-    public class Generate
+    public static class Generate
     {
         private static readonly Random _random = new Random();
 
@@ -24,6 +25,19 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
             }
 
             return result.ToString();
+        }
+
+        public static string GenerateNumericOtp(int length)
+        {
+            var bytes = new byte[length];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+            var sb = new StringBuilder();
+            foreach (var b in bytes)
+            {
+                sb.Append((b % 10).ToString());
+            }
+            return sb.ToString();
         }
     }
 }

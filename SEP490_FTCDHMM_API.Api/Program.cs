@@ -1,12 +1,16 @@
-using Microsoft.EntityFrameworkCore;
-using SEP490_FTCDHMM_API.Infrastructure.Data;
+using SEP490_FTCDHMM_API.Api.Configurations;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

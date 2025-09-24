@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SEP490_FTCDHMM_API.Domain\SEP490_FTCDHMM_API.Domain.csproj" />
-    <ProjectReference Include="..\SEP490_FTCDHMM_API.Infrastructure\SEP490_FTCDHMM_API.Infrastructure.csproj" />
-    <ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SEP490_FTCDHMM_API.Domain\SEP490_FTCDHMM_API.Domain.csproj" />
+		<ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
+	</ItemGroup>
 
 </Project>

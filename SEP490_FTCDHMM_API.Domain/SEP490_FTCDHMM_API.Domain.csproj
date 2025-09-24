@@ -7,15 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Common\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
+		<ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
