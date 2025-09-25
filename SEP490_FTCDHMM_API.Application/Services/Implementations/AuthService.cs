@@ -52,7 +52,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                Gender = dto.Gender,
                 PhoneNumber = dto.PhoneNumber,
                 RoleId = customerRole!.Id
             };
