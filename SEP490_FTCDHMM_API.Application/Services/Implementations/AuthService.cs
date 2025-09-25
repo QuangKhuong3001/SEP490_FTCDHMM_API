@@ -53,6 +53,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!createResult.Succeeded)
                 return (false, createResult.Errors.Select(e => e.Description));
 
+            if (createResult.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, Role.Customer);
+            }
+            else
+            {
+                return (false, createResult.Errors.Select(e => e.Description));
+            }
+
             int otpLenght = OtpConstants.Length;
             int otpExpireMinutes = OtpConstants.ExpireMinutes;
             string code = Generate.GenerateNumericOtp(otpLenght);

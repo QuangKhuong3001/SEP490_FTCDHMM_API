@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Api.Filters
+namespace SEP490_FTCDHMM_API.Api.Attributes
 {
     public class DisallowAuthenticatedAttribute : Attribute, IAuthorizationFilter
     {
