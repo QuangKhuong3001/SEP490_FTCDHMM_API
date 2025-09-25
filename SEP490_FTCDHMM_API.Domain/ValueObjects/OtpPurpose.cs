@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Domain.ValueObjects
+﻿using SEP490_FTCDHMM_API.Shared.Exceptions;
+
+namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 {
     public record OtpPurpose(string Value)
     {
@@ -12,7 +14,7 @@
             {
                 "ConfirmAccountEmail" => ConfirmAccountEmail,
                 "ForgotPassword" => ForgotPassword,
-                _ => null!
+                _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
     }
 }

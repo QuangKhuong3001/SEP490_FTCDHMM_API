@@ -14,5 +14,10 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces
 
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+
+        Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
+            int page, int pageSize,
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null);
     }
 }

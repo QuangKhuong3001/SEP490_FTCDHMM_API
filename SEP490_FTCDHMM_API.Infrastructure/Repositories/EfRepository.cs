@@ -59,5 +59,27 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         {
             return await _dbContext.Set<T>().AnyAsync(predicate);
         }
+
+        public async Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
+            int page, int pageSize,
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (orderBy != null)
+                query = orderBy(query);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
     }
 }

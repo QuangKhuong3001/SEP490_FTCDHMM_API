@@ -8,6 +8,7 @@
         public static readonly AppResponseCode EMAIL_NOT_CONFIRMED = new(400, "EMAIL_NOT_CONFIRMED", "Email not confirmed");
         public static readonly AppResponseCode ACCOUNT_LOCKED = new(400, "ACCOUNT_LOCKED", "Account locked");
         public static readonly AppResponseCode INVALID_ACCOUNT_INFORMATION = new(400, "INVALID_ACCOUNT_INFORMATION", "Invalid account information");
+        public static readonly AppResponseCode INVALID_USER_STATUS = new(400, "INVALID_USER_STATUS ", "Invalid user status");
         public static readonly AppResponseCode OTP_INVALID = new(400, "OTP_INVALID", "OTP is invalid or expired");
         public static readonly AppResponseCode PASSWORD_CANNOT_BE_SAME_AS_OLD = new(400, "PASSWORD_CANNOT_BE_SAME_AS_OLD", "Password cannot be same as old");
         public static readonly AppResponseCode UNAUTHORIZED = new(401, "UNAUTHORIZED", "Unauthorized");
@@ -18,5 +19,7 @@
         public static readonly AppResponseCode EMAIL_ALREADY_EXISTS = new(409, "EMAIL_ALREADY_EXISTS", "Email already exists");
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(421, "SERVICE_NOT_AVAILABLE", "Service Not Available");
         public static readonly AppResponseCode UNKNOW_ERROR = new(500, "UNKNOW_ERROR", "Unknow error");
+        public static readonly AppResponseCode NO_PERMISSION = new(403, "NO_PERMISSION", "No permission");
+
     }
 }

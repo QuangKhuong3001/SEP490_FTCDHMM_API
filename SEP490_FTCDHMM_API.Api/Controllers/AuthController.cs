@@ -2,8 +2,8 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
-using SEP490_FTCDHMM_API.Api.Filters;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;

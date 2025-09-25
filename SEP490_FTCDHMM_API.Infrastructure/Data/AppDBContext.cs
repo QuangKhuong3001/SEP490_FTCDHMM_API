@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Infrastructure.Configurations;
+using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Data
 {
@@ -18,6 +20,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
 
             modelBuilder.ApplyConfiguration(new EmailOtpConfiguration());
             modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+
+            modelBuilder.Ignore<IdentityUserRole<string>>();
+            modelBuilder.Ignore<IdentityUserClaim<string>>();
+            modelBuilder.Ignore<IdentityRoleClaim<string>>();
+            modelBuilder.Ignore<IdentityUserLogin<string>>();
+            modelBuilder.Ignore<IdentityUserToken<string>>();
+
+            modelBuilder.SeedRoles();
+
         }
     }
 }

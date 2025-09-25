@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SEP490_FTCDHMM_API.Api.Mappings;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -45,6 +46,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             // Auto Mapping
             services.AddAutoMapper(typeof(AuthMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(CommonMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
             // Config JWT
             services.AddAuthentication(options =>
