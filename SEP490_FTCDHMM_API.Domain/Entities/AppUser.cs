@@ -10,5 +10,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public required Gender Gender { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAtUtc { get; set; }
+
+        public string RoleId { get; set; } = null!;
+        public IdentityRole Role { get; set; } = null!;
     }
 }

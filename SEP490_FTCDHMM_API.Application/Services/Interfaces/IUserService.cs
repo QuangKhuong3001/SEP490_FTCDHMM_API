@@ -6,6 +6,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
     public interface IUserService
     {
         Task<PagedResult<UserDto>> GetCustomerListAsync(PaginationParams pagination);
-
+        Task<LockResultDto> LockCustomerAccount(LockRequestDto dto);
+        Task<UnlockResultDto> UnLockCustomerAccount(UnlockRequestDto dto);
     }
 }

@@ -19,5 +19,7 @@
         public static readonly AppResponseCode EMAIL_ALREADY_EXISTS = new(409, "EMAIL_ALREADY_EXISTS", "Email already exists");
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(421, "SERVICE_NOT_AVAILABLE", "Service Not Available");
         public static readonly AppResponseCode UNKNOW_ERROR = new(500, "UNKNOW_ERROR", "Unknow error");
+        public static readonly AppResponseCode NO_PERMISSION = new(403, "NO_PERMISSION", "No permission");
+
     }
 }

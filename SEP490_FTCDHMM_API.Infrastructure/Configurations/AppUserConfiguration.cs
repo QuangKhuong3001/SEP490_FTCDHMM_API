@@ -32,5 +32,11 @@ internal class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 
         builder.Property(u => u.UpdatedAtUtc)
             .IsRequired(false);
+
+        builder.HasOne(u => u.Role)
+               .WithMany()
+               .HasForeignKey(u => u.RoleId)
+               .IsRequired();
+
     }
 }

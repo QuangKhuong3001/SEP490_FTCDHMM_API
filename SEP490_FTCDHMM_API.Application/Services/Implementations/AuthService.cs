@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Data;
+using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -13,6 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
@@ -20,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
 
         public AuthService(UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             SignInManager<AppUser> signInManager,
             IOtpRepository otpRepo,
             IMailService mailService,
@@ -27,6 +30,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _signInManager = signInManager;
             _otpRepo = otpRepo;
             _mailService = mailService;
@@ -40,6 +44,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (existing != null)
                 throw new AppException(AppResponseCode.EMAIL_ALREADY_EXISTS);
 
+            var customerRole = await _roleManager.FindByNameAsync(Role.Customer);
+
             var user = new AppUser
             {
                 UserName = dto.Email,
@@ -48,19 +54,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 LastName = dto.LastName,
                 Gender = dto.Gender,
                 PhoneNumber = dto.PhoneNumber,
+                RoleId = customerRole!.Id
             };
             var createResult = await _userManager.CreateAsync(user, dto.Password);
             if (!createResult.Succeeded)
                 return (false, createResult.Errors.Select(e => e.Description));
-
-            if (createResult.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, Role.Customer);
-            }
-            else
-            {
-                return (false, createResult.Errors.Select(e => e.Description));
-            }
 
             int otpLenght = OtpConstants.Length;
             int otpExpireMinutes = OtpConstants.ExpireMinutes;

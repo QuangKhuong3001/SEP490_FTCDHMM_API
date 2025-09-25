@@ -5,6 +5,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -48,5 +49,46 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
+        public async Task<LockResultDto> LockCustomerAccount(LockRequestDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            if (user.Role.Name != Role.Customer)
+                throw new AppException(AppResponseCode.NO_PERMISSION);
+
+            user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+
+            await _userRepository.UpdateAsync(user);
+
+            return new LockResultDto
+            {
+                Email = user.Email!,
+                LockoutEnd = user.LockoutEnd
+            };
+        }
+
+        public async Task<UnlockResultDto> UnLockCustomerAccount(UnlockRequestDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            if (user.Role.Name != Role.Customer)
+                throw new AppException(AppResponseCode.NO_PERMISSION);
+
+            if (user.LockoutEnd <= DateTime.UtcNow)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            user.LockoutEnd = null;
+
+            await _userRepository.UpdateAsync(user);
+
+            return new UnlockResultDto
+            {
+                Email = user.Email!,
+            };
+        }
     }
 }
