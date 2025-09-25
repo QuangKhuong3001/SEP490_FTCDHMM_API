@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
 {
@@ -12,9 +11,6 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
         [Required(ErrorMessage = "Last name is required")]
         [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
         public string LastName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Gender is required")]
-        public Gender Gender { get; set; } = Gender.Other;
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
