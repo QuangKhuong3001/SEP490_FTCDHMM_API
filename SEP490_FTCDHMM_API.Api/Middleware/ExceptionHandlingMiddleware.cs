@@ -29,6 +29,7 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
                 var response = new
                 {
                     statusCode = ex.ResponseCode.Status,
+                    code = ex.ResponseCode.Code,
                     message = ex.Message
                 };
 
@@ -44,6 +45,7 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
                 var response = new
                 {
                     statusCode = 500,
+                    code = "INTERNAL SERVER ERROR",
                     message = "Internal Server Error"
                 };
 

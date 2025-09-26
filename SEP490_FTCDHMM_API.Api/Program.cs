@@ -1,4 +1,5 @@
 using SEP490_FTCDHMM_API.Api.Configurations;
+using SEP490_FTCDHMM_API.Api.Middleware;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
