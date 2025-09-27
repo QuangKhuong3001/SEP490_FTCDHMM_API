@@ -7,9 +7,9 @@ using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Data
 {
-    public class AppDBContext : IdentityDbContext<AppUser>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>
     {
-        public AppDBContext(DbContextOptions<AppDBContext> options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
         public DbSet<EmailOtp> EmailOtps { get; set; }
@@ -18,17 +18,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new EmailOtpConfiguration());
-            modelBuilder.ApplyConfiguration(new AppUserConfiguration());
-
             modelBuilder.Ignore<IdentityUserRole<string>>();
-            modelBuilder.Ignore<IdentityUserClaim<string>>();
-            modelBuilder.Ignore<IdentityRoleClaim<string>>();
-            modelBuilder.Ignore<IdentityUserLogin<string>>();
-            modelBuilder.Ignore<IdentityUserToken<string>>();
+
+            modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+            modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new EmailOtpConfiguration());
 
             modelBuilder.SeedRoles();
-
         }
     }
 }

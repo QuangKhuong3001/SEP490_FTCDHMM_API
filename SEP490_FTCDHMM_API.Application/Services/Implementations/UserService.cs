@@ -3,42 +3,50 @@ using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
-    internal class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly RoleManager<AppRole> _roleManager;
+        private readonly IOtpRepository _otpRepository;
+        private readonly IMailService _mailService;
+        private readonly IEmailTemplateService _emailTemplateService;
 
-        public UserService(IUserRepository userRepository, UserManager<AppUser> userManager, IMapper mapper)
+        public UserService(IUserRepository userRepository,
+            UserManager<AppUser> userManager,
+            IMapper mapper,
+            RoleManager<AppRole> roleManager,
+            IOtpRepository otpRepository,
+            IMailService mailService,
+            IEmailTemplateService emailTemplateService)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _mapper = mapper;
+            _roleManager = roleManager;
+            _otpRepository = otpRepository;
+            _mailService = mailService;
+            _emailTemplateService = emailTemplateService;
         }
 
-        public async Task<PagedResult<UserDto>> GetCustomerListAsync(PaginationParams pagination)
+        public async Task<PagedResult<UserDto>> GetCustomerList(PaginationParams pagination)
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
-        pagination.Page, pagination.PageSize,
-        orderBy: q => q.OrderBy(u => u.CreatedAtUtc));
+                pagination.Page, pagination.PageSize,
+                u => u.Role.Name == Role.Customer,
+                q => q.OrderBy(u => u.CreatedAtUtc));
 
-            var result = new List<UserDto>();
-
-            foreach (var user in customers)
-            {
-                var dto = _mapper.Map<UserDto>(user);
-
-                if (await _userManager.IsInRoleAsync(user, Role.Customer))
-                {
-                    result.Add(dto);
-                }
-            }
+            var result = _mapper.Map<List<UserDto>>(customers);
 
             return new PagedResult<UserDto>
             {
@@ -51,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<LockResultDto> LockCustomerAccount(LockRequestDto dto)
         {
-            var user = await _userManager.FindByIdAsync(dto.UserId);
+            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -71,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<UnlockResultDto> UnLockCustomerAccount(UnlockRequestDto dto)
         {
-            var user = await _userManager.FindByIdAsync(dto.UserId);
+            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -88,6 +96,123 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return new UnlockResultDto
             {
                 Email = user.Email!,
+            };
+        }
+
+        public async Task<PagedResult<UserDto>> GetModeratorList(PaginationParams pagination)
+        {
+            var (modetators, totalCount) = await _userRepository.GetPagedAsync(
+                pagination.Page, pagination.PageSize,
+                u => u.Role.Name == Role.Moderator,
+                q => q.OrderBy(u => u.CreatedAtUtc));
+
+            var result = _mapper.Map<List<UserDto>>(modetators);
+
+            return new PagedResult<UserDto>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                Page = pagination.Page,
+                PageSize = pagination.PageSize
+            };
+        }
+        public async Task<LockResultDto> LockModeratorAccount(LockRequestDto dto)
+        {
+            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            if (user.Role.Name != Role.Moderator)
+                throw new AppException(AppResponseCode.NO_PERMISSION);
+
+            user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+
+            await _userRepository.UpdateAsync(user);
+
+            return new LockResultDto
+            {
+                Email = user.Email!,
+                LockoutEnd = user.LockoutEnd
+            };
+        }
+        public async Task<UnlockResultDto> UnLockModeratorAccount(UnlockRequestDto dto)
+        {
+            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            if (user.Role.Name != Role.Moderator)
+                throw new AppException(AppResponseCode.NO_PERMISSION);
+
+            if (user.LockoutEnd <= DateTime.UtcNow)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            user.LockoutEnd = null;
+
+            await _userRepository.UpdateAsync(user);
+
+            return new UnlockResultDto
+            {
+                Email = user.Email!,
+            };
+        }
+
+        public async Task<CreateModeratorAccountResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
+        {
+            var existing = await _userManager.FindByEmailAsync(dto.Email);
+            if (existing != null)
+                throw new AppException(AppResponseCode.EMAIL_ALREADY_EXISTS);
+
+            var moderatorRole = await _roleManager.FindByNameAsync(Role.Moderator);
+
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                FirstName = ModeratorAccountConstants.FirstName,
+                LastName = ModeratorAccountConstants.LastName,
+                RoleId = moderatorRole!.Id
+            };
+
+            string password = Generate.GeneratePassword(ModeratorAccountConstants.PasswordLength);
+
+            var createResult = await _userManager.CreateAsync(user, password);
+            if (!createResult.Succeeded)
+                return new CreateModeratorAccountResult
+                {
+                    Success = false,
+                    Errors = createResult.Errors.Select(e => e.Description)
+                };
+
+            string otpCode = Generate.GenerateNumericOtp(OtpConstants.Length);
+            string hashedCode = HashHelper.ComputeSha256Hash(otpCode);
+
+            var otp = new EmailOtp
+            {
+                UserId = user.Id,
+                Code = hashedCode,
+                Purpose = OtpPurpose.ConfirmAccountEmail,
+                CreatedAtUtc = DateTime.UtcNow,
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(ModeratorAccountConstants.OtpExpireDays)
+            };
+            await _otpRepository.AddAsync(otp);
+
+            var localExpireTime = TimeZoneInfo.ConvertTimeFromUtc(otp.ExpiresAtUtc, TimeZoneInfo.Local);
+            var placeholders = new Dictionary<string, string>
+                    {
+                        { "UserName", dto.Email },
+                        { "OtpCode", otpCode },
+                        { "Password", password },
+                        { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
+                    };
+
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ModeratorCreated, placeholders);
+
+            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+
+            return new CreateModeratorAccountResult
+            {
+                Success = true,
             };
         }
     }

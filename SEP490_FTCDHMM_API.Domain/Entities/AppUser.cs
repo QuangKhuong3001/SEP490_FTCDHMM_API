@@ -12,6 +12,6 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public DateTime? UpdatedAtUtc { get; set; }
 
         public string RoleId { get; set; } = null!;
-        public IdentityRole Role { get; set; } = null!;
+        public AppRole Role { get; set; } = null!;
     }
 }

@@ -14,7 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
 
         public AuthService(UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<AppRole> roleManager,
             SignInManager<AppUser> signInManager,
             IOtpRepository otpRepo,
             IMailService mailService,
@@ -38,7 +38,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _emailTemplateService = emailTemplateService;
         }
 
-        public async Task<(bool Success, IEnumerable<string> Errors)> RegisterAsync(RegisterDto dto)
+        public async Task<(bool Success, IEnumerable<string> Errors)> Register(RegisterDto dto)
         {
             var existing = await _userManager.FindByEmailAsync(dto.Email);
             if (existing != null)
@@ -59,10 +59,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!createResult.Succeeded)
                 return (false, createResult.Errors.Select(e => e.Description));
 
-            int otpLenght = OtpConstants.Length;
-            int otpExpireMinutes = OtpConstants.ExpireMinutes;
-            string code = Generate.GenerateNumericOtp(otpLenght);
-            string hashedCode = HashHelper.ComputeSha256Hash(code);
+            string otpCode = Generate.GenerateNumericOtp(OtpConstants.Length);
+            string hashedCode = HashHelper.ComputeSha256Hash(otpCode);
 
             var otp = new EmailOtp
             {
@@ -70,7 +68,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Code = hashedCode,
                 Purpose = OtpPurpose.ConfirmAccountEmail,
                 CreatedAtUtc = DateTime.UtcNow,
-                ExpiresAtUtc = DateTime.UtcNow.AddMinutes(otpExpireMinutes)
+                ExpiresAtUtc = DateTime.UtcNow.AddMinutes(OtpConstants.ExpireMinutes)
             };
             await _otpRepo.AddAsync(otp);
 
@@ -78,45 +76,44 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var placeholders = new Dictionary<string, string>
                     {
                         { "UserName", dto.Email },
-                        { "OtpCode", code },
+                        { "OtpCode", otpCode },
                         { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
                     };
 
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(otp.Purpose.ToString(), placeholders);
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ConfirmAccountEmail, placeholders);
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody);
 
             return (true, Array.Empty<string>());
         }
 
-        public async Task<string?> LoginAsync(LoginDto dto)
+        public async Task<string?> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var result = await _signInManager.PasswordSignInAsync(user.UserName!, dto.Password, isPersistent: true, lockoutOnFailure: true);
-
-            if (result.IsLockedOut)
-            {
-                throw new AppException(AppResponseCode.ACCOUNT_LOCKED);
-            }
-
-            if (result.Succeeded)
-            {
-                if (!user.EmailConfirmed)
-                    throw new AppException(AppResponseCode.EMAIL_NOT_CONFIRMED);
-
-                var token = _jwtService.GenerateToken(user);
-                return token;
-            }
-            else
-            {
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            if (!isPasswordValid)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-            }
+
+            if (await _userManager.IsLockedOutAsync(user))
+                throw new AppException(AppResponseCode.ACCOUNT_LOCKED);
+
+            if (!user.EmailConfirmed)
+                throw new AppException(AppResponseCode.EMAIL_NOT_CONFIRMED);
+
+            var role = await _roleManager.FindByIdAsync(user.RoleId);
+            if (role == null)
+                throw new AppException(AppResponseCode.ROLE_NOT_FOUND);
+
+            var token = _jwtService.GenerateToken(user, role.Name!);
+
+            return token;
         }
 
-        public async Task VerifyEmailOtpAsync(OtpVerifyDto dto)
+
+        public async Task VerifyEmailOtp(OtpVerifyDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -155,7 +152,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task ResendOtpAsync(ResendOtpDto dto, OtpPurpose purpose)
+        public async Task ResendOtp(ResendOtpDto dto, OtpPurpose purpose)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -190,12 +187,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
                     };
 
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(purpose.ToString(), placeholders);
+            if (purpose == OtpPurpose.ConfirmAccountEmail)
+            {
+                var emailTemplateType = EmailTemplateType.ConfirmAccountEmail;
+                var htmlBody = await _emailTemplateService.RenderTemplateAsync(emailTemplateType, placeholders);
+                await _mailService.SendEmailAsync(dto.Email, htmlBody);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            }
+            else if (purpose == OtpPurpose.ForgotPassword)
+            {
+                var emailTemplateType = EmailTemplateType.ForgotPassword;
+                var htmlBody = await _emailTemplateService.RenderTemplateAsync(emailTemplateType, placeholders);
+                await _mailService.SendEmailAsync(dto.Email, htmlBody);
+
+            }
+
         }
 
-        public async Task ForgotPasswordRequestAsync(ForgotPasswordRequestDto dto)
+        public async Task ForgotPasswordRequest(ForgotPasswordRequestDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -225,12 +234,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
                     };
 
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(otp.Purpose.ToString(), placeholders);
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ForgotPassword, placeholders);
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody);
         }
 
-        public async Task<string> VerifyOtpForPasswordResetAsync(VerifyOtpForPasswordResetDto dto)
+        public async Task<string> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -260,7 +269,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return token;
         }
 
-        public async Task<(bool Success, IEnumerable<string> Errors)> ResetPasswordWithTokenAsync(ResetPasswordWithTokenDto dto)
+        public async Task<(bool Success, IEnumerable<string> Errors)> ResetPasswordWithToken(ResetPasswordWithTokenDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -276,7 +285,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return (true, Array.Empty<string>());
         }
 
-        public async Task<(bool Success, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, ChangePasswordDto dto)
+        public async Task<(bool Success, IEnumerable<string> Errors)> ChangePassword(string userId, ChangePasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)

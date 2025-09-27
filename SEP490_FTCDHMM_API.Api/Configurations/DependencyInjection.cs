@@ -23,17 +23,17 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             var domain = jwtSettings["Issuer"];
 
             // Connect with SQL Server
-            services.AddDbContext<AppDBContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("MyCnn")));
 
             // Config Identity
-            services.AddIdentity<AppUser, IdentityRole>(options =>
+            services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(365);
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
             })
-            .AddEntityFrameworkStores<AppDBContext>()
+            .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
 
@@ -95,6 +95,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //Otp
             services.AddScoped<IOtpRepository, OtpRepository>();
+
+            // User
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
 
 

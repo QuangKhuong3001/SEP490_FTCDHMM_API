@@ -7,7 +7,6 @@
     using Microsoft.IdentityModel.Tokens;
     using SEP490_FTCDHMM_API.Application.Interfaces;
     using SEP490_FTCDHMM_API.Domain.Entities;
-    using SEP490_FTCDHMM_API.Domain.ValueObjects;
     using SEP490_FTCDHMM_API.Shared.Exceptions;
 
     public class JwtAuthService : IJwtAuthService
@@ -19,15 +18,14 @@
             _configuration = configuration;
         }
 
-        public string GenerateToken(AppUser user)
+        public string GenerateToken(AppUser user, string roleName)
         {
-            var claims = new[]{
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? ""),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(AppClaimTypes.UserId, user.Id)
-            };
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Name, user.UserName!),
+        new Claim(ClaimTypes.Role, roleName)
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -36,12 +34,12 @@
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
-                signingCredentials: creds
-            );
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {

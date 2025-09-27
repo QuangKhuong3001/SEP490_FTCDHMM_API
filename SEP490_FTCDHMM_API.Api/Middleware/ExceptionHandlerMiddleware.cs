@@ -2,12 +2,12 @@
 
 namespace SEP490_FTCDHMM_API.Api.Middleware
 {
-    public class ExceptionHandlingMiddleware
+    public class ExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        private readonly ILogger<ExceptionHandlerMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -21,16 +21,15 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
             }
             catch (AppException ex)
             {
-                _logger.LogWarning("AppException caught: {Status} - {Message}", ex.ResponseCode.Status, ex.Message);
+                _logger.LogWarning("AppException caught: {Status} - {Message}", ex.ResponseCode.StatusCode, ex.Message);
 
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = ex.ResponseCode.Status;
+                context.Response.StatusCode = ex.ResponseCode.StatusCode;
 
                 var response = new
                 {
-                    statusCode = ex.ResponseCode.Status,
                     code = ex.ResponseCode.Code,
-                    message = ex.Message
+                    statusCode = ex.ResponseCode.StatusCode,
                 };
 
                 await context.Response.WriteAsJsonAsync(response);
@@ -44,9 +43,8 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
 
                 var response = new
                 {
-                    statusCode = 500,
-                    code = "INTERNAL SERVER ERROR",
-                    message = "Internal Server Error"
+                    code = AppResponseCode.UNKNOWN_ERROR.Code,
+                    statusCode = AppResponseCode.UNKNOWN_ERROR.StatusCode,
                 };
 
                 await context.Response.WriteAsJsonAsync(response);

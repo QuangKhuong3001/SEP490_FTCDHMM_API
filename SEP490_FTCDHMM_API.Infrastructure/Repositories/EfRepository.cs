@@ -7,14 +7,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 {
     public class EfRepository<T> : IRepository<T> where T : class
     {
-        private readonly AppDBContext _dbContext;
+        private readonly AppDbContext _dbContext;
 
-        public EfRepository(AppDBContext dbContext)
+        public EfRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(string id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }

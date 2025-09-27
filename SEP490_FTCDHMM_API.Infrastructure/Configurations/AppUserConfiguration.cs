@@ -24,9 +24,7 @@ internal class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                 g => g.Value,
                 v => Gender.From(v)
             )
-            .IsRequired()
-            .HasMaxLength(10);
-
+            .HasDefaultValueSql("'Other'");
         builder.Property(u => u.CreatedAtUtc)
            .HasDefaultValueSql("GETDATE()");
 
@@ -37,6 +35,5 @@ internal class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                .WithMany()
                .HasForeignKey(u => u.RoleId)
                .IsRequired();
-
     }
 }
