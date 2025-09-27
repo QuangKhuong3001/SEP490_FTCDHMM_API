@@ -18,7 +18,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Ignore Identity tables that conflict with our custom role system
             modelBuilder.Ignore<IdentityUserRole<string>>();
+            modelBuilder.Ignore<IdentityUserClaim<string>>();
+            modelBuilder.Ignore<IdentityRoleClaim<string>>();
+            modelBuilder.Ignore<IdentityUserLogin<string>>();
+            modelBuilder.Ignore<IdentityUserToken<string>>();
 
             modelBuilder.ApplyConfiguration(new AppUserConfiguration());
             modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
