@@ -22,41 +22,76 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("getCustomers")]
         [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> GetCustomerList(PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
 
-            var result = await _userService.GetCustomerListAsync(appDto);
+            var result = await _userService.GetCustomerList(appDto);
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("lockCustomer")]
         [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> LockCustomer(LockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
 
             var result = await _userService.LockCustomerAccount(appDto);
-            return Ok(new
-            {
-                message = $"User {result.Email} locked until {result.LockoutEnd:yyyy-MM-dd HH:mm:ss} UTC"
-            });
+            return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("unlockCustomer")]
         [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> UnLockCustomer(UnlockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
 
             var result = await _userService.UnLockCustomerAccount(appDto);
-            return Ok(new
-            {
-                message = $"User {result.Email} unlocked"
-            });
+            return Ok(result);
         }
 
+
+        [HttpGet("getModerators")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> GetModeratorList(PaginationParams dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
+
+            var result = await _userService.GetModeratorList(appDto);
+            return Ok(result);
+        }
+
+        [HttpPut("lockModerator")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> LockModerator(LockRequestDto dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
+
+            var result = await _userService.LockModeratorAccount(appDto);
+            return Ok(result);
+        }
+
+        [HttpPut("unlockModerator")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> UnLockModerator(UnlockRequestDto dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
+
+            var result = await _userService.UnLockModeratorAccount(appDto);
+            return Ok(result);
+        }
+
+        [HttpPost("createModerator")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.CreateModeratorAccountDto>(dto);
+
+            var result = await _userService.CreateModeratorAccount(appDto);
+            if (!result.Success) return BadRequest(new { success = false, result.Errors });
+            return Ok();
+        }
     }
 }

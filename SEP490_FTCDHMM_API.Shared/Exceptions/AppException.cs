@@ -4,14 +4,9 @@
     {
         public AppResponseCode ResponseCode { get; }
 
-        public AppException(AppResponseCode code) : base(code.Message)
+        public AppException(AppResponseCode code)
         {
-            ResponseCode = code;
-        }
-
-        public AppException(AppResponseCode code, string? customMessage) : base(customMessage ?? code.Message)
-        {
-            ResponseCode = new AppResponseCode(code.Status, code.Code, customMessage ?? code.Message);
+            ResponseCode = new AppResponseCode(code.StatusCode, code.Code);
         }
     }
 }

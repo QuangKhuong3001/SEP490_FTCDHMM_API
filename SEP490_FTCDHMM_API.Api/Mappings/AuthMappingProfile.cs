@@ -8,6 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public AuthMappingProfile()
         {
             CreateMap<APIDtos.AuthDTOs.RegisterDto, ApplicationDtos.AuthDTOs.RegisterDto>();
+            CreateMap<APIDtos.AuthDTOs.LoginDto, ApplicationDtos.AuthDTOs.LoginDto>();
         }
     }
 }

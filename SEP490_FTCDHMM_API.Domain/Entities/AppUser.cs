@@ -7,11 +7,11 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public required Gender Gender { get; set; }
+        public Gender Gender { get; set; } = Gender.Other;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAtUtc { get; set; }
 
         public string RoleId { get; set; } = null!;
-        public IdentityRole Role { get; set; } = null!;
+        public AppRole Role { get; set; } = null!;
     }
 }

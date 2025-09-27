@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
@@ -18,10 +18,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
                 .Where(v => v != null)
                 .ToList();
 
-            var roles = new List<IdentityRole>();
+            var roles = new List<AppRole>();
             foreach (var roleName in roleNames!)
             {
-                roles.Add(new IdentityRole
+                roles.Add(new AppRole
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = roleName!,
@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
                 });
             }
 
-            builder.Entity<IdentityRole>().HasData(roles);
+            builder.Entity<AppRole>().HasData(roles);
         }
     }
 }

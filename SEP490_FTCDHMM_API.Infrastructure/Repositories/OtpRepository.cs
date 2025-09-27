@@ -8,9 +8,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 {
     public class OtpRepository : EfRepository<EmailOtp>, IOtpRepository
     {
-        private readonly AppDBContext _dbContext;
+        private readonly AppDbContext _dbContext;
 
-        public OtpRepository(AppDBContext dbContext) : base(dbContext)
+        public OtpRepository(AppDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }

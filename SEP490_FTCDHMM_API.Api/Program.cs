@@ -1,5 +1,7 @@
-using SEP490_FTCDHMM_API.Api.Configurations;
+﻿using SEP490_FTCDHMM_API.Api.Configurations;
+using SEP490_FTCDHMM_API.Api.Middleware;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var config = services.GetRequiredService<IConfiguration>();
+
+    await DataSeeder.SeedAdminAsync(services, config);
+}
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

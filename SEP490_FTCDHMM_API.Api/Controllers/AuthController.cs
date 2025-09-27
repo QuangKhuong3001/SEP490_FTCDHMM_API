@@ -31,9 +31,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.RegisterDto>(dto);
 
-            var (success, errors) = await _authService.RegisterAsync(appDto);
+            var (success, errors) = await _authService.Register(appDto);
             if (!success) return BadRequest(new { success = false, errors });
-            return Ok(new { message = "Registered. Check your email for OTP." });
+            return Ok();
         }
 
         [DisallowAuthenticated]
@@ -42,8 +42,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.OtpVerifyDto>(dto);
 
-            await _authService.VerifyEmailOtpAsync(appDto);
-            return Ok(new { message = "Email confirmed." });
+            await _authService.VerifyEmailOtp(appDto);
+            return Ok();
         }
 
         [DisallowAuthenticated]
@@ -55,13 +55,13 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var purposeKey = (purpose ?? string.Empty).Trim().ToLowerInvariant();
             OtpPurpose parsedPurpose = purposeKey switch
             {
-                "confirm" or "confirmemail" => OtpPurpose.ConfirmAccountEmail,
-                "forgot" or "forgotpassword" or "reset" => OtpPurpose.ForgotPassword,
+                "ConfirmAccountEmail" => OtpPurpose.ConfirmAccountEmail,
+                "ForgotPassword" or "reset" => OtpPurpose.ForgotPassword,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION),
             };
 
-            await _authService.ResendOtpAsync(appDto, parsedPurpose);
-            return Ok(new { message = "OTP resent." });
+            await _authService.ResendOtp(appDto, parsedPurpose);
+            return Ok();
         }
 
         [DisallowAuthenticated]
@@ -70,7 +70,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.LoginDto>(dto);
 
-            var token = await _authService.LoginAsync(appDto);
+            var token = await _authService.Login(appDto);
             return Ok(new { token });
         }
 
@@ -80,8 +80,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>(dto);
 
-            await _authService.ForgotPasswordRequestAsync(appDto);
-            return Ok(new { message = "If the email exists, an OTP has been sent." });
+            await _authService.ForgotPasswordRequest(appDto);
+            return Ok();
         }
 
         [DisallowAuthenticated]
@@ -90,7 +90,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>(dto);
 
-            var token = await _authService.VerifyOtpForPasswordResetAsync(appDto);
+            var token = await _authService.VerifyOtpForPasswordReset(appDto);
             return Ok(new { token });
         }
 
@@ -100,9 +100,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>(dto);
 
-            var (success, errors) = await _authService.ResetPasswordWithTokenAsync(appDto);
+            var (success, errors) = await _authService.ResetPasswordWithToken(appDto);
             if (!success) return BadRequest(new { success = false, errors });
-            return Ok(new { message = "Password has been reset." });
+            return Ok();
         }
 
 
@@ -114,12 +114,12 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var userId = User.FindFirstValue(AppClaimTypes.UserId);
 
-            var result = await _authService.ChangePasswordAsync(userId!, appDto);
+            var result = await _authService.ChangePassword(userId!, appDto);
 
             if (!result.Success)
                 return BadRequest(new { errors = result.Errors });
 
-            return Ok(new { message = "Password changed successfully." });
+            return Ok();
         }
     }
 
