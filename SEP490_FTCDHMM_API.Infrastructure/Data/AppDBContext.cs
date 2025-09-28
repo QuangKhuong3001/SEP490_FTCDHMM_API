@@ -18,17 +18,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure custom AppUser-AppRole relationship while keeping Identity tables
-            modelBuilder.Entity<AppUser>()
-                .HasOne(u => u.Role)
-                .WithMany()
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
-
-            // Keep Identity tables but configure them properly
-            modelBuilder.Entity<IdentityUserRole<string>>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId });
-
             modelBuilder.ApplyConfiguration(new AppUserConfiguration());
             modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
             modelBuilder.ApplyConfiguration(new EmailOtpConfiguration());
