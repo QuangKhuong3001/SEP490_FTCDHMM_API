@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # ASP.NET Core appsettings files
 appsettings*.json
 appsettings*.Development.json
+/SEP490_FTCDHMM_API.Api/appsettings.json

@@ -22,4 +22,10 @@
 		<ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>
