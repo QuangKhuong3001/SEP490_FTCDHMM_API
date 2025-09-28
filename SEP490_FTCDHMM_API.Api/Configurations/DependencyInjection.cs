@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("MyCnn")));
 
-            // Config Identity
+            // Config Identity with Custom User Store
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(365);
@@ -34,6 +34,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 options.Lockout.AllowedForNewUsers = true;
             })
             .AddEntityFrameworkStores<AppDbContext>()
+            .AddUserStore<SEP490_FTCDHMM_API.Infrastructure.Identity.CustomUserStore>()
             .AddDefaultTokenProviders();
 
 

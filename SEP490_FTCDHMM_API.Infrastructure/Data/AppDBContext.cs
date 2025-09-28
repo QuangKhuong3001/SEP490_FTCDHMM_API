@@ -18,12 +18,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Ignore Identity tables that conflict with our custom role system
-            modelBuilder.Ignore<IdentityUserRole<string>>();
-            modelBuilder.Ignore<IdentityUserClaim<string>>();
-            modelBuilder.Ignore<IdentityRoleClaim<string>>();
-            modelBuilder.Ignore<IdentityUserLogin<string>>();
-            modelBuilder.Ignore<IdentityUserToken<string>>();
+            // Configure custom AppUser-AppRole relationship while keeping Identity tables
+            modelBuilder.Entity<AppUser>()
+                .HasOne(u => u.Role)
+                .WithMany()
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes
+
+            // Keep Identity tables but configure them properly
+            modelBuilder.Entity<IdentityUserRole<string>>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
 
             modelBuilder.ApplyConfiguration(new AppUserConfiguration());
             modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
