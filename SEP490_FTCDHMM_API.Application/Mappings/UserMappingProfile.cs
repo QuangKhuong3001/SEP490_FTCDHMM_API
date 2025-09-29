@@ -12,5 +12,9 @@ public class UserMappingProfile : Profile
                 src.LockoutEnd.HasValue && src.LockoutEnd.Value > DateTime.UtcNow
                 ? UserStatus.Locked
                 : (src.EmailConfirmed ? UserStatus.Verified : UserStatus.Unverified)));
+        CreateMap<AppUser, ProfileDto>()
+
+            .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.Value));
+
     }
 }

@@ -112,7 +112,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ChangePasswordDto>(dto);
 
-            var userId = User.FindFirstValue(AppClaimTypes.UserId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var result = await _authService.ChangePassword(userId!, appDto);
 

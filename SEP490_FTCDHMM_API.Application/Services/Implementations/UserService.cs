@@ -215,5 +215,30 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Success = true,
             };
         }
+        public async Task<ProfileDto> GetProfileAsync(string userId)
+        {
+            var user = await _userRepository.GetUserByIdWithRoleAsync(userId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            var profile = _mapper.Map<ProfileDto>(user);
+            return profile;
+        }
+
+        public async Task UpdateProfileAsync(string userId, UpdateProfileDto dto)
+        {
+            var user = await _userRepository.GetUserByIdWithRoleAsync(userId);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.Gender = Gender.From(dto.Gender);
+            user.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _userRepository.UpdateAsync(user);
+        }
+
     }
 }
