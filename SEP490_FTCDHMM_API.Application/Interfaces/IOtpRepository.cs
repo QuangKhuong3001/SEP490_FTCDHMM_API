@@ -5,6 +5,6 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
     public interface IOtpRepository : IRepository<EmailOtp>
     {
-        Task<EmailOtp?> GetLatestAsync(string userId, OtpPurpose purpose);
+        Task<EmailOtp?> GetLatestAsync(Guid userId, OtpPurpose purpose);
     }
 }

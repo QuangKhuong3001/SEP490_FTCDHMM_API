@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
     public class LockRequestDto
     {
         [Required(ErrorMessage = "Missing UserId")]
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
 
         [Required(ErrorMessage = "Missing Time")]
         [Range(2, int.MaxValue, ErrorMessage = "Day must be greater than 1")]

@@ -2,6 +2,6 @@
 {
     public class UnlockRequestDto
     {
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
     }
 }

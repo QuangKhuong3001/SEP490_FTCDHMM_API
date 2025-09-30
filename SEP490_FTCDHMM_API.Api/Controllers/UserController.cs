@@ -22,8 +22,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Policy = PermissionPolicies.Customer_View)]
         [HttpGet("getCustomers")]
-        [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> GetCustomerList(PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
@@ -33,7 +33,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("lockCustomer")]
-        [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> LockCustomer(LockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
@@ -43,7 +42,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("unlockCustomer")]
-        [Authorize(Roles = Role.Moderator)]
         public async Task<IActionResult> UnLockCustomer(UnlockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
@@ -52,9 +50,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-
         [HttpGet("getModerators")]
-        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> GetModeratorList(PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
@@ -64,7 +60,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("lockModerator")]
-        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> LockModerator(LockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
@@ -74,7 +69,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("unlockModerator")]
-        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> UnLockModerator(UnlockRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
@@ -84,7 +78,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost("createModerator")]
-        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.CreateModeratorAccountDto>(dto);

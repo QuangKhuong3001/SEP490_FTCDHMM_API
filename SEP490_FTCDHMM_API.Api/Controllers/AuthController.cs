@@ -48,15 +48,15 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("resend-otp")]
-        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDto dto, [FromQuery] string purpose = "ConfirmEmail")
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDto dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpDto>(dto);
 
-            var purposeKey = (purpose ?? string.Empty).Trim().ToLowerInvariant();
+            var purposeKey = (purpose ?? string.Empty).Trim().ToUpperInvariant();
             OtpPurpose parsedPurpose = purposeKey switch
             {
-                "ConfirmAccountEmail" => OtpPurpose.ConfirmAccountEmail,
-                "ForgotPassword" or "reset" => OtpPurpose.ForgotPassword,
+                "VERIFYACCOUNTEMAIL" => OtpPurpose.VerifyAccountEmail,
+                "FORGOTPASSWORD" => OtpPurpose.ForgotPassword,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION),
             };
 
@@ -101,7 +101,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>(dto);
 
             var (success, errors) = await _authService.ResetPasswordWithToken(appDto);
-            if (!success) return BadRequest(new { success = false, errors });
+            if (!success)
+                return BadRequest(new { success = false, errors });
             return Ok();
         }
 
@@ -112,12 +113,12 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ChangePasswordDto>(dto);
 
-            var userId = User.FindFirstValue(AppClaimTypes.UserId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var result = await _authService.ChangePassword(userId!, appDto);
+            var (Success, Errors) = await _authService.ChangePassword(userId!, appDto);
 
-            if (!result.Success)
-                return BadRequest(new { errors = result.Errors });
+            if (!Success)
+                return BadRequest(new { errors = Errors });
 
             return Ok();
         }

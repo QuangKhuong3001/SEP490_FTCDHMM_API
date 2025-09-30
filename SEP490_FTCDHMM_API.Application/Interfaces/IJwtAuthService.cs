@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
     public interface IJwtAuthService
     {
-        string GenerateToken(AppUser user, string roleName);
+        string GenerateToken(AppUser user, AppRole Role);
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }
 

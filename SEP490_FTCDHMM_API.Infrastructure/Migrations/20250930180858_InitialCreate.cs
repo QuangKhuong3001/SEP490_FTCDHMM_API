@@ -17,9 +17,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "AppRole",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NormalizedName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,16 +29,28 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Permission",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permission", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AppUser",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'Other'"),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -69,7 +83,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -85,12 +99,36 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AppRolePermission",
+                columns: table => new
+                {
+                    PermissionsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RolesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppRolePermission", x => new { x.PermissionsId, x.RolesId });
+                    table.ForeignKey(
+                        name: "FK_AppRolePermission_AppRole_RolesId",
+                        column: x => x.RolesId,
+                        principalTable: "AppRole",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AppRolePermission_Permission_PermissionsId",
+                        column: x => x.PermissionsId,
+                        principalTable: "Permission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -112,7 +150,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,7 +167,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -156,7 +194,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Attempts = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsDisabled = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,20 +209,33 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "AppRole",
-                columns: new[] { "Id", "Name", "NormalizedName" },
+                columns: new[] { "Id", "ConcurrencyStamp", "IsActive", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "729b2e37-e417-4caf-ac79-de8c7f3f28ca", "Customer", "CUSTOMER" },
-                    { "805b6d46-1b62-4b41-a77d-ed3614a8b9fe", "Admin", "ADMIN" },
-                    { "f6ed7f3b-38c8-40d3-a94b-8b1363c55ecf", "Moderator", "MODERATOR" }
+                    { new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), null, true, "Admin", "ADMIN" },
+                    { new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"), null, true, "Customer", "CUSTOMER" },
+                    { new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"), null, true, "Moderator", "MODERATOR" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Permission",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("58f211a8-1e64-c797-cb94-34ff7945f590"), "ModeratorManagement" },
+                    { new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b"), "CustomerManagement" }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AppRole",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppRolePermission_RolesId",
+                table: "AppRolePermission",
+                column: "RolesId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -228,6 +279,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AppRolePermission");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -241,6 +295,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmailOtp");
+
+            migrationBuilder.DropTable(
+                name: "Permission");
 
             migrationBuilder.DropTable(
                 name: "AppUser");

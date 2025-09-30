@@ -14,19 +14,47 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<T?> GetByIdAsync(string id)
+        public async Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbContext.Set<T>().FindAsync(id);
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
         }
 
-        public async Task<IReadOnlyList<T>> ListAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return await _dbContext.Set<T>().ToListAsync();
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.ToListAsync();
         }
 
-        public async Task<IReadOnlyList<T>> ListAsync(Expression<Func<T, bool>> predicate)
+
+        public async Task<IReadOnlyList<T>> GetAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
-            return await _dbContext.Set<T>().Where(predicate).ToListAsync();
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            if (includes != null && includes.Length > 0)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.Where(predicate).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -34,6 +62,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             await _dbContext.Set<T>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return entity;
+        }
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbContext.AddRangeAsync(entities);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)

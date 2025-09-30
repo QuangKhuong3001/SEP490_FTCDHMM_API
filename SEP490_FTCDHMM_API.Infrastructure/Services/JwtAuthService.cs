@@ -3,6 +3,7 @@
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
+    using System.Text.Json;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
     using SEP490_FTCDHMM_API.Application.Interfaces;
@@ -18,14 +19,23 @@
             _configuration = configuration;
         }
 
-        public string GenerateToken(AppUser user, string roleName)
+        public string GenerateToken(AppUser user, AppRole role)
         {
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Name, user.UserName!),
-        new Claim(ClaimTypes.Role, roleName)
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.Role, role.Name!)
+            };
+
+            var permissions = role.RolePermissions
+                .Where(rp => rp.IsActive)
+                .Select(rp => $"{rp.PermissionAction.PermissionDomain.Name}:{rp.PermissionAction.Name}")
+                .ToList();
+
+            var permissionsJson = JsonSerializer.Serialize(permissions);
+
+            claims.Add(new Claim("Permissions", permissionsJson));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -39,7 +49,6 @@
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {

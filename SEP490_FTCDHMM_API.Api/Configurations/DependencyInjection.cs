@@ -1,9 +1,10 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SEP490_FTCDHMM_API.Api.Mappings;
+using SEP490_FTCDHMM_API.Api.Authorization;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -12,6 +13,8 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using ApiMapping = SEP490_FTCDHMM_API.Api.Mappings;
+using ApplicationMapping = SEP490_FTCDHMM_API.Application.Mappings;
 
 namespace SEP490_FTCDHMM_API.Api.Configurations
 {
@@ -45,9 +48,13 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             });
 
             // Auto Mapping
-            services.AddAutoMapper(typeof(AuthMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(CommonMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApiMapping.AuthMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApiMapping.CommonMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApiMapping.UserMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApiMapping.RoleMappingProfile).Assembly);
+
+            services.AddAutoMapper(typeof(ApplicationMapping.UserMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApplicationMapping.RoleMappingProfile).Assembly);
 
             // Config JWT
             services.AddAuthentication(options =>
@@ -84,6 +91,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 };
             });
 
+            //Role and Permission
+            services.AddSingleton<IAuthorizationHandler, ModulePermissionHandler>();
+            services.AddSingleton<IAuthorizationPolicyProvider, ModulePolicyProvider>();
+
             // DI External Service
             services.AddScoped<SEP490_FTCDHMM_API.Application.Interfaces.IMailService, SEP490_FTCDHMM_API.Infrastructure.Services.MailService>();
             services.AddScoped<IEmailTemplateService, EmailTemplateService>();
@@ -100,7 +111,16 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            //role
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
 
+            //permission
+            services.AddScoped<IPermissionActionRepository, PermissionActionRepository>();
+            services.AddScoped<IPermissionDomainRepository, PermissionDomainRepository>();
+
+            //role-permission
+            services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
         }
     }

@@ -19,18 +19,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
             if (adminConfig == null)
                 throw new AppException(AppResponseCode.MISSING_ADMIN_ACCOUNT_CONFIG);
 
-            var adminRole = await roleManager.FindByNameAsync(Role.Admin);
+            var adminRole = await roleManager.FindByNameAsync(RoleValue.Admin.Name);
             if (adminRole == null)
             {
                 adminRole = new AppRole
                 {
-                    Name = Role.Admin,
-                    NormalizedName = Role.Admin.ToUpper()
+                    IsActive = true,
+                    Name = RoleValue.Admin.Name,
+                    NormalizedName = RoleValue.Admin.Name.ToUpper()
                 };
                 var roleResult = await roleManager.CreateAsync(adminRole);
                 if (!roleResult.Succeeded)
                 {
-                    throw new AppException(AppResponseCode.ROLE_NOT_FOUND);
+                    throw new AppException(AppResponseCode.NOT_FOUND);
                 }
             }
 

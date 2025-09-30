@@ -4,7 +4,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 {
     public record EmailTemplateType(string Value)
     {
-        public static readonly EmailTemplateType ConfirmAccountEmail = new("ConfirmAccountEmail");
+        public static readonly EmailTemplateType VerifyAccountEmail = new("VerifyAccountEmail");
         public static readonly EmailTemplateType ForgotPassword = new("ForgotPassword");
         public static readonly EmailTemplateType ModeratorCreated = new("ModeratorCreated");
 
@@ -13,7 +13,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
         public static EmailTemplateType From(string value) =>
             value switch
             {
-                "ConfirmAccountEmail" => ConfirmAccountEmail,
+                "VerifyAccountEmail" => VerifyAccountEmail,
                 "ForgotPassword" => ForgotPassword,
                 "ModeratorCreated" => ModeratorCreated,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)

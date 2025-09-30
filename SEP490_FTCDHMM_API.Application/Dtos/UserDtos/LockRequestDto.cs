@@ -2,7 +2,7 @@
 {
     public class LockRequestDto
     {
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
         public int Day { get; set; } = 1;
     }
 }

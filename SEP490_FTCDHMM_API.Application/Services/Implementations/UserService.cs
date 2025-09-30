@@ -17,7 +17,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
-        private readonly RoleManager<AppRole> _roleManager;
+        private readonly IRoleRepository _roleRepository;
         private readonly IOtpRepository _otpRepository;
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
@@ -25,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public UserService(IUserRepository userRepository,
             UserManager<AppUser> userManager,
             IMapper mapper,
-            RoleManager<AppRole> roleManager,
+            IRoleRepository roleRepository,
             IOtpRepository otpRepository,
             IMailService mailService,
             IEmailTemplateService emailTemplateService)
@@ -33,7 +33,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userRepository = userRepository;
             _userManager = userManager;
             _mapper = mapper;
-            _roleManager = roleManager;
+            _roleRepository = roleRepository;
             _otpRepository = otpRepository;
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
@@ -43,7 +43,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
-                u => u.Role.Name == Role.Customer,
+                u => u.Role.Name == RoleValue.Customer.Name,
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserDto>>(customers);
@@ -59,11 +59,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<LockResultDto> LockCustomerAccount(LockRequestDto dto)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != Role.Customer)
+            if (user.Role.Name != RoleValue.Customer.Name)
                 throw new AppException(AppResponseCode.NO_PERMISSION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
@@ -79,11 +79,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<UnlockResultDto> UnLockCustomerAccount(UnlockRequestDto dto)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != Role.Customer)
+            if (user.Role.Name != RoleValue.Customer.Name)
                 throw new AppException(AppResponseCode.NO_PERMISSION);
 
             if (user.LockoutEnd <= DateTime.UtcNow)
@@ -103,7 +103,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (modetators, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
-                u => u.Role.Name == Role.Moderator,
+                u => u.Role.Name == RoleValue.Moderator.Name,
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserDto>>(modetators);
@@ -118,11 +118,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task<LockResultDto> LockModeratorAccount(LockRequestDto dto)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != Role.Moderator)
+            if (user.Role.Name != RoleValue.Moderator.Name)
                 throw new AppException(AppResponseCode.NO_PERMISSION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
@@ -137,11 +137,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task<UnlockResultDto> UnLockModeratorAccount(UnlockRequestDto dto)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(dto.UserId);
+            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != Role.Moderator)
+            if (user.Role.Name != RoleValue.Moderator.Name)
                 throw new AppException(AppResponseCode.NO_PERMISSION);
 
             if (user.LockoutEnd <= DateTime.UtcNow)
@@ -163,7 +163,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (existing != null)
                 throw new AppException(AppResponseCode.EMAIL_ALREADY_EXISTS);
 
-            var moderatorRole = await _roleManager.FindByNameAsync(Role.Moderator);
+            var moderatorRole = await _roleRepository.FindByNameAsync(RoleValue.Moderator.Name);
 
             var user = new AppUser
             {
@@ -171,7 +171,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = dto.Email,
                 FirstName = ModeratorAccountConstants.FirstName,
                 LastName = ModeratorAccountConstants.LastName,
-                RoleId = moderatorRole!.Id
+                RoleId = moderatorRole!.Id,
             };
 
             string password = Generate.GeneratePassword(ModeratorAccountConstants.PasswordLength);
@@ -191,7 +191,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 UserId = user.Id,
                 Code = hashedCode,
-                Purpose = OtpPurpose.ConfirmAccountEmail,
+                Purpose = OtpPurpose.VerifyAccountEmail,
                 CreatedAtUtc = DateTime.UtcNow,
                 ExpiresAtUtc = DateTime.UtcNow.AddDays(ModeratorAccountConstants.OtpExpireDays)
             };

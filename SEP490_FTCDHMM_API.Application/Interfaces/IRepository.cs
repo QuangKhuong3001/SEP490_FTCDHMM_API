@@ -4,11 +4,12 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
     public interface IRepository<T> where T : class
     {
-        Task<T?> GetByIdAsync(string id);
-        Task<IReadOnlyList<T>> ListAsync();
-        Task<IReadOnlyList<T>> ListAsync(Expression<Func<T, bool>> predicate);
+        Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes);
+        Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
+        Task<IReadOnlyList<T>> GetAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
 
         Task<T> AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entities);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
 

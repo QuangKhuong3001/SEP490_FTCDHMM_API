@@ -4,6 +4,5 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
     public interface IUserRepository : IRepository<AppUser>
     {
-        Task<AppUser?> GetUserByIdWithRoleAsync(string userId);
     }
 }

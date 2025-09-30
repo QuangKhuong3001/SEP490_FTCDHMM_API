@@ -14,7 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<AppRole> _roleManager;
+        private readonly IRoleRepository _roleRepository;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
 
         public AuthService(UserManager<AppUser> userManager,
-            RoleManager<AppRole> roleManager,
+            IRoleRepository roleRepository,
             SignInManager<AppUser> signInManager,
             IOtpRepository otpRepo,
             IMailService mailService,
@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
+            _roleRepository = roleRepository;
             _signInManager = signInManager;
             _otpRepo = otpRepo;
             _mailService = mailService;
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (existing != null)
                 throw new AppException(AppResponseCode.EMAIL_ALREADY_EXISTS);
 
-            var customerRole = await _roleManager.FindByNameAsync(Role.Customer);
+            var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);
 
             var user = new AppUser
             {
@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 PhoneNumber = dto.PhoneNumber,
-                RoleId = customerRole!.Id
+                RoleId = customerRole!.Id,
             };
             var createResult = await _userManager.CreateAsync(user, dto.Password);
             if (!createResult.Succeeded)
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 UserId = user.Id,
                 Code = hashedCode,
-                Purpose = OtpPurpose.ConfirmAccountEmail,
+                Purpose = OtpPurpose.VerifyAccountEmail,
                 CreatedAtUtc = DateTime.UtcNow,
                 ExpiresAtUtc = DateTime.UtcNow.AddMinutes(OtpConstants.ExpireMinutes)
             };
@@ -80,7 +80,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
                     };
 
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ConfirmAccountEmail, placeholders);
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody);
 
@@ -103,11 +103,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!user.EmailConfirmed)
                 throw new AppException(AppResponseCode.EMAIL_NOT_CONFIRMED);
 
-            var role = await _roleManager.FindByIdAsync(user.RoleId);
-            if (role == null)
-                throw new AppException(AppResponseCode.ROLE_NOT_FOUND);
+            var role = await _roleRepository.GetRoleWithPermissionsAsync(user.RoleId);
 
-            var token = _jwtService.GenerateToken(user, role.Name!);
+            if (role == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var token = _jwtService.GenerateToken(user, role);
 
             return token;
         }
@@ -119,7 +120,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var otp = await _otpRepo.GetLatestAsync(user.Id, OtpPurpose.ConfirmAccountEmail);
+            var otp = await _otpRepo.GetLatestAsync(user.Id, OtpPurpose.VerifyAccountEmail);
             if (otp == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
@@ -158,9 +159,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.EmailConfirmed && purpose == OtpPurpose.ConfirmAccountEmail)
+            if (user.EmailConfirmed && purpose == OtpPurpose.VerifyAccountEmail)
             {
                 throw new AppException(AppResponseCode.INVALID_ACTION);
+            }
+
+            var oldOtp = await _otpRepo.GetLatestAsync(user.Id, purpose);
+            if (oldOtp != null)
+            {
+                await _otpRepo.DeleteAsync(oldOtp);
             }
 
             int otpLength = OtpConstants.Length;
@@ -187,9 +194,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
                     };
 
-            if (purpose == OtpPurpose.ConfirmAccountEmail)
+            if (purpose == OtpPurpose.VerifyAccountEmail)
             {
-                var emailTemplateType = EmailTemplateType.ConfirmAccountEmail;
+                var emailTemplateType = EmailTemplateType.VerifyAccountEmail;
                 var htmlBody = await _emailTemplateService.RenderTemplateAsync(emailTemplateType, placeholders);
                 await _mailService.SendEmailAsync(dto.Email, htmlBody);
 

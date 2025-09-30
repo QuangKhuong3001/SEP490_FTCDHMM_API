@@ -1,29 +1,31 @@
 ﻿using AutoMapper;
 using APIDtos = SEP490_FTCDHMM_API.Api.Dtos;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
-
-public class AuthMappingProfile : Profile
+namespace SEP490_FTCDHMM_API.Api.Mappings
 {
-    public AuthMappingProfile()
+    public class AuthMappingProfile : Profile
     {
-        //register
-        CreateMap<APIDtos.AuthDTOs.RegisterDto, ApplicationDtos.AuthDTOs.RegisterDto>();
+        public AuthMappingProfile()
+        {
+            //register
+            CreateMap<APIDtos.AuthDTOs.RegisterDto, ApplicationDtos.AuthDTOs.RegisterDto>();
 
-        //verifyEmail
-        CreateMap<APIDtos.AuthDTOs.OtpVerifyDto, ApplicationDtos.AuthDTOs.OtpVerifyDto>();
+            //verifyEmail
+            CreateMap<APIDtos.AuthDTOs.OtpVerifyDto, ApplicationDtos.AuthDTOs.OtpVerifyDto>();
 
-        //resentOtp
-        CreateMap<APIDtos.AuthDTOs.ResendOtpDto, ApplicationDtos.AuthDTOs.ResendOtpDto>();
+            //resentOtp
+            CreateMap<APIDtos.AuthDTOs.ResendOtpDto, ApplicationDtos.AuthDTOs.ResendOtpDto>();
 
-        //login
-        CreateMap<APIDtos.AuthDTOs.LoginDto, ApplicationDtos.AuthDTOs.LoginDto>();
+            //login
+            CreateMap<APIDtos.AuthDTOs.LoginDto, ApplicationDtos.AuthDTOs.LoginDto>();
 
-        //changePassword
-        CreateMap<APIDtos.AuthDTOs.ChangePasswordDto, ApplicationDtos.AuthDTOs.ChangePasswordDto>();
+            //changePassword
+            CreateMap<APIDtos.AuthDTOs.ChangePasswordDto, ApplicationDtos.AuthDTOs.ChangePasswordDto>();
 
-        //forgotPassword
-        CreateMap<APIDtos.AuthDTOs.ForgotPasswordRequestDto, ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>();
-        CreateMap<APIDtos.AuthDTOs.VerifyOtpForPasswordResetDto, ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>();
-        CreateMap<APIDtos.AuthDTOs.ResetPasswordWithTokenDto, ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>();
+            //forgotPassword
+            CreateMap<APIDtos.AuthDTOs.ForgotPasswordRequestDto, ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>();
+            CreateMap<APIDtos.AuthDTOs.VerifyOtpForPasswordResetDto, ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>();
+            CreateMap<APIDtos.AuthDTOs.ResetPasswordWithTokenDto, ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>();
+        }
     }
 }
