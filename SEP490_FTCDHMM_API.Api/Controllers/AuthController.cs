@@ -52,7 +52,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpDto>(dto);
 
-            var purposeKey = (purpose ?? string.Empty).Trim().ToLowerInvariant();
+            var purposeKey = (purpose ?? string.Empty).Trim();
             OtpPurpose parsedPurpose = purposeKey switch
             {
                 "ConfirmAccountEmail" => OtpPurpose.ConfirmAccountEmail,
