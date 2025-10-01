@@ -15,9 +15,4 @@
 
         public override string ToString() => Name;
     }
-
-    public static class RoleConstants
-    {
-        public const string Admin = "Admin";
-    }
 }

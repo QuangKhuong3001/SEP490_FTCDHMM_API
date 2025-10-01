@@ -96,9 +96,16 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddSingleton<IAuthorizationPolicyProvider, ModulePolicyProvider>();
 
             // DI External Service
+
+            //Mail
             services.AddScoped<SEP490_FTCDHMM_API.Application.Interfaces.IMailService, SEP490_FTCDHMM_API.Infrastructure.Services.MailService>();
             services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+
+            //Jwt&&Identity
             services.AddScoped<IJwtAuthService, JwtAuthService>();
+
+            //S3
+            services.AddSingleton<IS3Service, S3Service>();
 
             // DI Internal Service
             // Auth

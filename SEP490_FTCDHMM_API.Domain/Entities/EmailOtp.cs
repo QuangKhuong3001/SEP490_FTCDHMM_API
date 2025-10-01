@@ -12,7 +12,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public int Attempts { get; set; } = 0;
         public bool IsDisabled { get; set; } = false;
 
-        public required Guid UserId { get; set; }
-        public AppUser User { get; set; } = default!;
+        public required Guid SentToId { get; set; }
+        public AppUser SentTo { get; set; } = default!;
     }
 }

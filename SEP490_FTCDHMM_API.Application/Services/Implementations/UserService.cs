@@ -189,7 +189,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var otp = new EmailOtp
             {
-                UserId = user.Id,
+                SentToId = user.Id,
                 Code = hashedCode,
                 Purpose = OtpPurpose.VerifyAccountEmail,
                 CreatedAtUtc = DateTime.UtcNow,
