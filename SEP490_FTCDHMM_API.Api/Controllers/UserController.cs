@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Policy = PermissionPolicies.Customer_View)]
+        [Authorize(Policy = PermissionPolicies.CustomerManagement_View)]
         [HttpGet("getCustomers")]
         public async Task<IActionResult> GetCustomerList(PaginationParams dto)
         {
@@ -32,6 +32,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
         [HttpPut("lockCustomer")]
         public async Task<IActionResult> LockCustomer(LockRequestDto dto)
         {
@@ -41,6 +42,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
         [HttpPut("unlockCustomer")]
         public async Task<IActionResult> UnLockCustomer(UnlockRequestDto dto)
         {
@@ -50,6 +52,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.ModeratorManagement_View)]
         [HttpGet("getModerators")]
         public async Task<IActionResult> GetModeratorList(PaginationParams dto)
         {
@@ -59,6 +62,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
         [HttpPut("lockModerator")]
         public async Task<IActionResult> LockModerator(LockRequestDto dto)
         {
@@ -68,6 +72,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
         [HttpPut("unlockModerator")]
         public async Task<IActionResult> UnLockModerator(UnlockRequestDto dto)
         {
@@ -77,6 +82,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Create)]
         [HttpPost("createModerator")]
         public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
         {
@@ -86,26 +92,37 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!result.Success) return BadRequest(new { success = false, result.Errors });
             return Ok();
         }
+
+        [Authorize]
         [HttpGet("profile")]
-        [Authorize(Roles = Role.Customer)]
         public async Task<IActionResult> GetProfile()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
 
             var profile = await _userService.GetProfileAsync(userId!);
             return Ok(profile);
         }
 
+        [Authorize]
         [HttpPut("profile")]
-        [Authorize(Roles = Role.Customer)]
         public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UpdateProfileDto>(dto);
 
             await _userService.UpdateProfileAsync(userId!, appDto);
             return Ok();
         }
-
     }
 }

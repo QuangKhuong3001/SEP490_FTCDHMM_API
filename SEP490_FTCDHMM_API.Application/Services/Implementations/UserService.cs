@@ -215,9 +215,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Success = true,
             };
         }
-        public async Task<ProfileDto> GetProfileAsync(string userId)
+        public async Task<ProfileDto> GetProfileAsync(Guid userId)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -225,9 +225,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return profile;
         }
 
-        public async Task UpdateProfileAsync(string userId, UpdateProfileDto dto)
+        public async Task UpdateProfileAsync(Guid userId, UpdateProfileDto dto)
         {
-            var user = await _userRepository.GetUserByIdWithRoleAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 

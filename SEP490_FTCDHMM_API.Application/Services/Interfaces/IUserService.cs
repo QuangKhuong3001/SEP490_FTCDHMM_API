@@ -12,8 +12,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<LockResultDto> LockModeratorAccount(LockRequestDto dto);
         Task<UnlockResultDto> UnLockModeratorAccount(UnlockRequestDto dto);
         Task<CreateModeratorAccountResult> CreateModeratorAccount(CreateModeratorAccountDto dto);
-        Task<ProfileDto> GetProfileAsync(string userId);
-        Task UpdateProfileAsync(string userId, UpdateProfileDto dto);
+        Task<ProfileDto> GetProfileAsync(Guid userId);
+        Task UpdateProfileAsync(Guid userId, UpdateProfileDto dto);
 
     }
 }

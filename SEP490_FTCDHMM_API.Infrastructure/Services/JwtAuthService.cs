@@ -23,9 +23,9 @@
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Role, roleName)
+                new Claim(ClaimTypes.Role, role.Name!)
             };
 
             var permissions = role.RolePermissions
