@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Domain.ValueObjects
+﻿namespace SEP490_FTCDHMM_API.Domain.Constants
 {
     public static class PermissionPolicies
     {

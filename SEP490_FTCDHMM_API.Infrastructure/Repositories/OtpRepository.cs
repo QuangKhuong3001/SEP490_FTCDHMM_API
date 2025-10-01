@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         public async Task<EmailOtp?> GetLatestAsync(Guid userId, OtpPurpose purpose)
         {
             return await _dbContext.EmailOtps
-                .Where(o => o.UserId == userId && o.Purpose == purpose)
+                .Where(o => o.SentToId == userId && o.Purpose == purpose)
                 .OrderByDescending(o => o.CreatedAtUtc)
                 .FirstOrDefaultAsync();
         }

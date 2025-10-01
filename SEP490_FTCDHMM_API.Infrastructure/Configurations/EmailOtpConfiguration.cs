@@ -40,9 +40,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Configurations
             builder.Property(e => e.IsDisabled)
                    .HasDefaultValue(false);
 
-            builder.HasOne(e => e.User)
+            builder.HasOne(e => e.SentTo)
                    .WithMany()
-                   .HasForeignKey(e => e.UserId)
+                   .HasForeignKey(e => e.SentToId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
