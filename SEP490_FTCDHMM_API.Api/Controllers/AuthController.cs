@@ -6,7 +6,6 @@ using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 using APIDtos = SEP490_FTCDHMM_API.Api.Dtos;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
@@ -53,12 +52,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpDto>(dto);
 
             var purposeKey = (purpose ?? string.Empty).Trim().ToUpperInvariant();
-            OtpPurpose parsedPurpose = purposeKey switch
-            {
-                "VERIFYACCOUNTEMAIL" => OtpPurpose.VerifyAccountEmail,
-                "FORGOTPASSWORD" => OtpPurpose.ForgotPassword,
-                _ => throw new AppException(AppResponseCode.INVALID_ACTION),
-            };
+            OtpPurpose parsedPurpose = OtpPurpose.From(purpose!);
 
             await _authService.ResendOtp(appDto, parsedPurpose);
             return Ok();
