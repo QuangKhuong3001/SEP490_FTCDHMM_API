@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.Common;
@@ -6,7 +7,6 @@ using SEP490_FTCDHMM_API.Api.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
-
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -86,5 +86,26 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!result.Success) return BadRequest(new { success = false, result.Errors });
             return Ok();
         }
+        [HttpGet("profile")]
+        [Authorize(Roles = Role.Customer)]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+            var profile = await _userService.GetProfileAsync(userId!);
+            return Ok(profile);
+        }
+
+        [HttpPut("profile")]
+        [Authorize(Roles = Role.Customer)]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UpdateProfileDto>(dto);
+
+            await _userService.UpdateProfileAsync(userId!, appDto);
+            return Ok();
+        }
+
     }
 }

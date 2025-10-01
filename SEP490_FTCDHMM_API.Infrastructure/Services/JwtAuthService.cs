@@ -23,16 +23,15 @@
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Role, role.Name!)
+                new Claim(ClaimTypes.Role, roleName)
             };
 
             var permissions = role.RolePermissions
                 .Where(rp => rp.IsActive)
                 .Select(rp => $"{rp.PermissionAction.PermissionDomain.Name}:{rp.PermissionAction.Name}")
                 .ToList();
-
             var permissionsJson = JsonSerializer.Serialize(permissions);
 
             claims.Add(new Claim("Permissions", permissionsJson));
