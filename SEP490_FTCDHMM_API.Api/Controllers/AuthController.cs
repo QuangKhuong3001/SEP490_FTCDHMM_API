@@ -6,7 +6,6 @@ using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
-using APIDtos = SEP490_FTCDHMM_API.Api.Dtos;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
@@ -26,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.RegisterDto>(dto);
 
@@ -37,7 +36,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("verify-email-otp")]
-        public async Task<IActionResult> VerifyEmailOtp([FromBody] APIDtos.AuthDTOs.OtpVerifyDto dto)
+        public async Task<IActionResult> VerifyEmailOtp(OtpVerifyDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.OtpVerifyDto>(dto);
 
@@ -47,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("resend-otp")]
-        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDto dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
+        public async Task<IActionResult> ResendOtp(ResendOtpDto dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpDto>(dto);
 
@@ -60,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        public async Task<IActionResult> Login(LoginDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.LoginDto>(dto);
 
@@ -70,7 +69,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>(dto);
 
@@ -80,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("verify-otp-for-password-reset")]
-        public async Task<IActionResult> VerifyOtpForPasswordReset([FromBody] VerifyOtpForPasswordResetDto dto)
+        public async Task<IActionResult> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>(dto);
 
@@ -90,7 +89,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordWithTokenDto dto)
+        public async Task<IActionResult> ResetPassword(ResetPasswordWithTokenDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>(dto);
 
@@ -103,7 +102,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ChangePasswordDto>(dto);
 

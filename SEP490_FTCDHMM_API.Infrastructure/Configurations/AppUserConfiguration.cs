@@ -38,6 +38,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Configurations
                    .WithMany()
                    .HasForeignKey(u => u.RoleId)
                    .IsRequired();
+
+            builder.HasOne(u => u.Avatar)
+            .WithOne()
+            .HasForeignKey<AppUser>(u => u.AvatarId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

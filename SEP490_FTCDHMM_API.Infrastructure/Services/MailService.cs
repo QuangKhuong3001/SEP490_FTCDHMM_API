@@ -1,24 +1,28 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
     public class MailService : IMailService
     {
-        private readonly IConfiguration _config;
         private readonly ILogger _logger;
-        private readonly string _appName;
+        private readonly EmailSettings _emailSettings;
+        private readonly AppSettings _appSettings;
 
-        public MailService(IConfiguration config, ILogger<MailService> logger)
+        public MailService(
+            IOptions<EmailSettings> emailOptions,
+            IOptions<AppSettings> appOptions,
+            ILogger<MailService> logger)
         {
-            _config = config;
             _logger = logger;
-            _appName = _config["AppName"]!;
+            _emailSettings = emailOptions.Value;
+            _appSettings = appOptions.Value;
         }
 
         public async Task SendEmailAsync(string email, string htmlMessage)
@@ -26,16 +30,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(_config["EmailSettings:SenderName"], _config["EmailSettings:SenderEmail"]));
+                message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail));
                 message.To.Add(MailboxAddress.Parse(email));
-                message.Subject = _appName;
+                message.Subject = _appSettings.AppName;
 
                 var bodyBuilder = new BodyBuilder { HtmlBody = htmlMessage };
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new SmtpClient();
-                await client.ConnectAsync(_config["EmailSettings:SmtpServer"], int.Parse(_config["EmailSettings:Port"]!), SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(_config["EmailSettings:SenderEmail"], _config["EmailSettings:Password"]);
+                await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
             }

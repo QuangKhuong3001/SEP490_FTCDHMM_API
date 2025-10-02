@@ -1,22 +1,23 @@
-﻿namespace SEP490_FTCDHMM_API.Infrastructure.Services
-{
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Security.Claims;
-    using System.Text;
-    using System.Text.Json;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.IdentityModel.Tokens;
-    using SEP490_FTCDHMM_API.Application.Interfaces;
-    using SEP490_FTCDHMM_API.Domain.Entities;
-    using SEP490_FTCDHMM_API.Shared.Exceptions;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
+namespace SEP490_FTCDHMM_API.Infrastructure.Services
+{
     public class JwtAuthService : IJwtAuthService
     {
-        private readonly IConfiguration _configuration;
+        private readonly JwtSettings _settings;
 
-        public JwtAuthService(IConfiguration configuration)
+        public JwtAuthService(IOptions<JwtSettings> options)
         {
-            _configuration = configuration;
+            _settings = options.Value;
         }
 
         public string GenerateToken(AppUser user, AppRole role)
@@ -32,18 +33,17 @@
                 .Where(rp => rp.IsActive)
                 .Select(rp => $"{rp.PermissionAction.PermissionDomain.Name}:{rp.PermissionAction.Name}")
                 .ToList();
-            var permissionsJson = JsonSerializer.Serialize(permissions);
 
-            claims.Add(new Claim("Permissions", permissionsJson));
+            claims.Add(new Claim("Permissions", JsonSerializer.Serialize(permissions)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _settings.Issuer,
+                audience: _settings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddDays(_settings.ExpiryDays),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -56,7 +56,7 @@
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key)),
                 ValidateLifetime = false
             };
 

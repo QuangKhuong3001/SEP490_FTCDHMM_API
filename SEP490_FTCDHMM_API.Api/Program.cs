@@ -26,10 +26,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
     });
 
-builder.Services.AddAuthorization(options =>
-{
-
-});
+builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

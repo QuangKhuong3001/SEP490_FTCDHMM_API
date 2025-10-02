@@ -11,6 +11,9 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAtUtc { get; set; }
 
+        public Guid? AvatarId { get; set; }
+        public Image? Avatar { get; set; } = null!;
+
         public Guid RoleId { get; set; }
         public AppRole Role { get; set; } = null!;
     }

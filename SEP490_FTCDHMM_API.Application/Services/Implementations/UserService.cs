@@ -21,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IOtpRepository _otpRepository;
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IS3ImageService _s3ImageService;
 
         public UserService(IUserRepository userRepository,
             UserManager<AppUser> userManager,
@@ -28,7 +29,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IRoleRepository roleRepository,
             IOtpRepository otpRepository,
             IMailService mailService,
-            IEmailTemplateService emailTemplateService)
+            IEmailTemplateService emailTemplateService,
+            IS3ImageService s3ImageService)
         {
             _userRepository = userRepository;
             _userManager = userManager;
@@ -37,6 +39,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _otpRepository = otpRepository;
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
+            _s3ImageService = s3ImageService;
         }
 
         public async Task<PagedResult<UserDto>> GetCustomerList(PaginationParams pagination)
@@ -63,9 +66,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != RoleValue.Customer.Name)
-                throw new AppException(AppResponseCode.NO_PERMISSION);
-
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
 
             await _userRepository.UpdateAsync(user);
@@ -82,9 +82,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            if (user.Role.Name != RoleValue.Customer.Name)
-                throw new AppException(AppResponseCode.NO_PERMISSION);
 
             if (user.LockoutEnd <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -122,9 +119,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.Role.Name != RoleValue.Moderator.Name)
-                throw new AppException(AppResponseCode.NO_PERMISSION);
-
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
 
             await _userRepository.UpdateAsync(user);
@@ -140,9 +134,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            if (user.Role.Name != RoleValue.Moderator.Name)
-                throw new AppException(AppResponseCode.NO_PERMISSION);
 
             if (user.LockoutEnd <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -217,11 +208,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task<ProfileDto> GetProfileAsync(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role, u => u.Avatar!);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var profile = _mapper.Map<ProfileDto>(user);
+            profile.Avatar = _s3ImageService.GeneratePreSignedUrl(user.Avatar?.Key ?? null);
             return profile;
         }
 
@@ -236,6 +228,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
             user.UpdatedAtUtc = DateTime.UtcNow;
+
+            if (dto.Avatar != null && dto.Avatar.Length > 0)
+            {
+                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.Avatars, user);
+                user.AvatarId = uploadedImage.Id;
+            }
+
 
             await _userRepository.UpdateAsync(user);
         }

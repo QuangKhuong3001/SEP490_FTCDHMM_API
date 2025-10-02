@@ -28,6 +28,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new EmailOtpConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionConfiguration());
             modelBuilder.ApplyConfiguration(new AppRolePermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new ImageConfiguration());
 
             modelBuilder.SeedRoles();
             modelBuilder.SeedPermissions();

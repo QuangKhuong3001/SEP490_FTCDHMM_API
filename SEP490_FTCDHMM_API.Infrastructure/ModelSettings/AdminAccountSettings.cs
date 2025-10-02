@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
+﻿namespace SEP490_FTCDHMM_API.Infrastructure.ModelSettings
 {
     public class AdminAccountSettings
     {

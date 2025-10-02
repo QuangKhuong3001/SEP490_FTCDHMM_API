@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,7 @@ using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
+using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -48,13 +50,12 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             });
 
             // Auto Mapping
-            services.AddAutoMapper(typeof(ApiMapping.AuthMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(ApiMapping.CommonMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(ApiMapping.UserMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(ApiMapping.RoleMappingProfile).Assembly);
-
-            services.AddAutoMapper(typeof(ApplicationMapping.UserMappingProfile).Assembly);
-            services.AddAutoMapper(typeof(ApplicationMapping.RoleMappingProfile).Assembly);
+            services.AddAutoMapper(typeof(ApiMapping.AuthMappingProfile).Assembly,
+                typeof(ApiMapping.CommonMappingProfile).Assembly,
+                typeof(ApiMapping.UserMappingProfile).Assembly,
+                typeof(ApiMapping.RoleMappingProfile).Assembly,
+                typeof(ApplicationMapping.UserMappingProfile).Assembly,
+                typeof(ApplicationMapping.RoleMappingProfile).Assembly);
 
             // Config JWT
             services.AddAuthentication(options =>
@@ -95,6 +96,12 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddSingleton<IAuthorizationHandler, ModulePermissionHandler>();
             services.AddSingleton<IAuthorizationPolicyProvider, ModulePolicyProvider>();
 
+            //bind settings value
+            services.Configure<AwsS3Settings>(configuration.GetSection("AWS"));
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            services.Configure<AppSettings>(configuration.GetSection("Application"));
+            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+
             // DI External Service
 
             //Mail
@@ -105,7 +112,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IJwtAuthService, JwtAuthService>();
 
             //S3
-            services.AddSingleton<IS3Service, S3Service>();
+            services.AddScoped<IS3ImageService, S3ImageService>();
+            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonS3>();
 
             // DI Internal Service
             // Auth

@@ -110,7 +110,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
