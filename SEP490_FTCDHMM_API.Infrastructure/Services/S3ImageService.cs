@@ -2,6 +2,7 @@
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -104,6 +105,69 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             };
 
             return _s3Client.GetPreSignedURL(request);
+        }
+
+        public async Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url, Guid uploadedById)
+        {
+            using var http = new HttpClient();
+            using var resp = await http.GetAsync(url);
+            resp.EnsureSuccessStatusCode();
+
+            var contentType = resp.Content.Headers.ContentType?.MediaType ?? "image/jpeg";
+            var bytes = await resp.Content.ReadAsByteArrayAsync();
+
+            var id = Guid.NewGuid();
+            var ext = contentType switch
+            {
+                "image/png" => ".png",
+                "image/gif" => ".gif",
+                _ => ".jpg"
+            };
+            var fileName = $"{id}{ext}";
+            var key = $"{folder}/{fileName}";
+
+            using var ms = new MemoryStream(bytes);
+            var upload = new TransferUtilityUploadRequest
+            {
+                InputStream = ms,
+                Key = key,
+                BucketName = _settings.BucketName,
+                ContentType = contentType,
+            };
+            var transfer = new TransferUtility(_s3Client);
+            await transfer.UploadAsync(upload);
+
+            var image = new Image
+            {
+                Id = id,
+                Key = key,
+                FileName = fileName,
+                ContentType = contentType,
+                CreatedAt = DateTime.UtcNow,
+                UploadedById = uploadedById
+            };
+
+            _dbContext.Images.Add(image);
+            await _dbContext.SaveChangesAsync();
+            return image;
+        }
+
+        public async Task DeleteImageAsync(Guid imageId)
+        {
+            var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
+            if (image == null)
+                throw new Exception("Image not found");
+
+            var deleteRequest = new DeleteObjectRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = image.Key
+            };
+
+            await _s3Client.DeleteObjectAsync(deleteRequest);
+
+            _dbContext.Images.Remove(image);
+            await _dbContext.SaveChangesAsync();
         }
 
         private bool IsImage(IFormFile file)
