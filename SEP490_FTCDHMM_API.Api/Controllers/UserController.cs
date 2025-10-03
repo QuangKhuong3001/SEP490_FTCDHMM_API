@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_View)]
         [HttpGet("getCustomers")]
-        public async Task<IActionResult> GetCustomerList(PaginationParams dto)
+        public async Task<IActionResult> GetCustomerList([FromQuery] PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
 
@@ -54,7 +54,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_View)]
         [HttpGet("getModerators")]
-        public async Task<IActionResult> GetModeratorList(PaginationParams dto)
+        public async Task<IActionResult> GetModeratorList([FromQuery] PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
 

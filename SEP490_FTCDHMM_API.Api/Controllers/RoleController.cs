@@ -33,7 +33,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(PaginationParams dto)
+        public async Task<IActionResult> Get([FromQuery] PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
 
