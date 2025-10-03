@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
+using SEP490_FTCDHMM_API.Api.Dtos.GoogleAuthDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
@@ -16,11 +18,13 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
+        private readonly IGoogleAuthService _googleAuthService;
 
-        public AuthController(IAuthService authService, IMapper mapper)
+        public AuthController(IAuthService authService, IMapper mapper, IGoogleAuthService googleAuthService)
         {
             _authService = authService;
             _mapper = mapper;
+            _googleAuthService = googleAuthService;
         }
 
         [DisallowAuthenticated]
@@ -115,6 +119,26 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             return Ok();
         }
-    }
 
+
+        [DisallowAuthenticated]
+        [HttpPost("google/code")]
+        public async Task<IActionResult> GoogleLoginWithCode(GoogleCodeLoginRequest dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.GoogleAuthDtos.GoogleCodeLoginRequest>(dto);
+
+            var token = await _authService.GoogleLoginWithCodeAsync(appDto);
+            return Ok(new { token });
+        }
+
+        [DisallowAuthenticated]
+        [HttpPost("google/id-token")]
+        public async Task<IActionResult> GoogleLoginWithIdToken(GoogleIdTokenLoginRequest dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.GoogleAuthDtos.GoogleIdTokenLoginRequest>(dto);
+
+            var token = await _authService.GoogleLoginWithIdTokenAsync(appDto);
+            return Ok(new { token });
+        }
+    }
 }
