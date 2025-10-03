@@ -25,6 +25,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             {
                 ["code"] = dto.Code!,
                 ["client_id"] = _settings.ClientId,
+                ["client_secret"] = _settings.ClientSecret,
                 ["redirect_uri"] = _settings.RedirectUri,
                 ["grant_type"] = "authorization_code",
                 ["code_verifier"] = dto.CodeVerifier!
