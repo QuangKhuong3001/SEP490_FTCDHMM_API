@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
-using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -76,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             if (!string.IsNullOrWhiteSpace(picture) && user.AvatarId == null)
             {
-                var avatar = await _s3ImageService.MirrorExternalImageAsync(StorageFolder.AVATARS, picture, user.Id);
+                var avatar = await _s3ImageService.MirrorExternalImageAsync(StorageFolder.Avatars, picture, user.Id);
                 user.Avatar = avatar;
                 await _userManager.UpdateAsync(user);
             }

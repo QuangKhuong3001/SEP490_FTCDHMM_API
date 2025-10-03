@@ -3,7 +3,7 @@ using System.Text.Json;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services

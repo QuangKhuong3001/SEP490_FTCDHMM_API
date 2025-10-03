@@ -270,7 +270,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
-                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.AVATARS, user);
+                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.Avatars, user);
 
                 if (user.AvatarId.HasValue)
                 {
@@ -281,81 +281,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _userRepository.UpdateAsync(user);
-        }
-
-        public async Task FollowUserAsync(Guid followerId, Guid followeeId)
-        {
-            if (followerId == followeeId)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            var exist = await _userFollowRepository.ExistsAsync(u => u.FollowerId == followerId && u.FolloweeId == followeeId);
-
-            if (exist)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            var follow = new UserFollow
-            {
-                FollowerId = followerId,
-                FolloweeId = followeeId,
-                CreatedAtUtc = DateTime.UtcNow
-            };
-
-            await _userFollowRepository.AddAsync(follow);
-        }
-
-
-        public async Task UnfollowUserAsync(Guid followerId, Guid followeeId)
-        {
-            var follows = await _userFollowRepository.GetAllAsync(
-                f => f.FollowerId == followerId && f.FolloweeId == followeeId
-            );
-
-            var follow = follows.FirstOrDefault();
-            if (follow == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            await _userFollowRepository.DeleteAsync(follow);
-        }
-
-
-        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
-        {
-            var followers = await _userFollowRepository.GetAllAsync(
-                f => f.FolloweeId == userId,
-                f => f.Follower!,
-                f => f.Follower!.Avatar!
-                );
-            var followerUsers = followers.Select(f => f.Follower!).ToList();
-
-
-            var result = _mapper.Map<List<UserFollowResponse>>(followerUsers);
-
-            foreach (var userFollow in result)
-            {
-                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
-                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
-            }
-
-            return _mapper.Map<List<UserResponse>>(followerUsers);
-        }
-
-        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
-        {
-            var followings = await _userFollowRepository.GetAllAsync(
-                u => u.FollowerId == userId,
-                f => f.Followee!
-            );
-
-            var followingUsers = followings.Select(f => f.Followee!).ToList();
-            var result = _mapper.Map<List<UserFollowResponse>>(followingUsers);
-
-            foreach (var userFollow in result)
-            {
-                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
-                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
-            }
-
-            return _mapper.Map<List<UserResponse>>(followingUsers);
         }
 
     }
