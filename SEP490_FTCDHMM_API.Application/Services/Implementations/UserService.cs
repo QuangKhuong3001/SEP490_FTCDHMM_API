@@ -232,9 +232,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
                 var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.Avatars, user);
+
+                if (user.AvatarId.HasValue)
+                {
+                    await _s3ImageService.DeleteImageAsync(user.AvatarId.Value);
+                }
+
                 user.AvatarId = uploadedImage.Id;
             }
-
 
             await _userRepository.UpdateAsync(user);
         }

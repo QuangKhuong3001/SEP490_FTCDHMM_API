@@ -101,6 +101,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<AppSettings>(configuration.GetSection("Application"));
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+            services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
 
             // DI External Service
 
@@ -115,6 +116,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IS3ImageService, S3ImageService>();
             services.AddDefaultAWSOptions(configuration.GetAWSOptions());
             services.AddAWSService<IAmazonS3>();
+
+            //Google
+            services.AddHttpClient<IGoogleAuthService, GoogleAuthService>();
+            services.AddScoped<IGoogleProvisioningService, GoogleProvisioningService>();
 
             // DI Internal Service
             // Auth

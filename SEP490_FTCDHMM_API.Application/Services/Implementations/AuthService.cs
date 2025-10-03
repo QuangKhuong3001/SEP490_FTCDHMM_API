@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
+using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -20,6 +21,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IMailService _mailService;
         private readonly IJwtAuthService _jwtService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IGoogleAuthService _googleAuthService;
+        private readonly IGoogleProvisioningService _googleProvisioningService;
 
         public AuthService(UserManager<AppUser> userManager,
             IRoleRepository roleRepository,
@@ -27,6 +30,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IOtpRepository otpRepo,
             IMailService mailService,
             IJwtAuthService jwtService,
+            IGoogleProvisioningService googleProvisioningService,
+            IGoogleAuthService googleAuthService,
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
@@ -35,6 +40,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _otpRepo = otpRepo;
             _mailService = mailService;
             _jwtService = jwtService;
+            _googleAuthService = googleAuthService;
+            _googleProvisioningService = googleProvisioningService;
             _emailTemplateService = emailTemplateService;
         }
 
@@ -87,7 +94,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return (true, Array.Empty<string>());
         }
 
-        public async Task<string?> Login(LoginDto dto)
+        public async Task<string> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -305,6 +312,43 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             return (true, Array.Empty<string>());
+        }
+
+        public async Task<string> GoogleLoginWithCodeAsync(GoogleCodeLoginRequest dto)
+        {
+            var tokens = await _googleAuthService.ExchangeCodeForTokenAsync(new GoogleCodeLoginRequest
+            {
+                Code = dto.Code,
+                CodeVerifier = dto.CodeVerifier
+            });
+            if (tokens == null) throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE);
+
+            var payload = await _googleAuthService.ValidateIdTokenAsync(tokens.IdToken);
+
+            var info = await _googleAuthService.FetchUserInfoWithPeopleApiAsync(tokens.AccessToken);
+
+            var user = await _googleProvisioningService.FindOrProvisionFromGoogleAsync(new GoogleProvisionRequest
+            {
+                Payload = payload,
+                UserInfo = info,
+                GoogleRefreshToken = tokens.RefreshToken
+            });
+
+            return _jwtService.GenerateToken(user, user.Role);
+        }
+
+        public async Task<string> GoogleLoginWithIdTokenAsync(GoogleIdTokenLoginRequest dto)
+        {
+            var payload = await _googleAuthService.ValidateIdTokenAsync(dto.IdToken);
+
+            var user = await _googleProvisioningService.FindOrProvisionFromGoogleAsync(new GoogleProvisionRequest
+            {
+                Payload = payload,
+                UserInfo = null,
+                GoogleRefreshToken = null
+            });
+
+            return _jwtService.GenerateToken(user, user.Role);
         }
     }
 }

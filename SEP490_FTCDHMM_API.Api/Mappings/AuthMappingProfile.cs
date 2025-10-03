@@ -26,6 +26,12 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<APIDtos.AuthDTOs.ForgotPasswordRequestDto, ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>();
             CreateMap<APIDtos.AuthDTOs.VerifyOtpForPasswordResetDto, ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>();
             CreateMap<APIDtos.AuthDTOs.ResetPasswordWithTokenDto, ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>();
+
+            //gg
+            CreateMap<APIDtos.GoogleAuthDtos.GoogleCodeLoginRequest, ApplicationDtos.GoogleAuthDtos.GoogleCodeLoginRequest>();
+            CreateMap<APIDtos.GoogleAuthDtos.GoogleIdTokenLoginRequest, ApplicationDtos.GoogleAuthDtos.GoogleIdTokenLoginRequest>();
+
+
         }
     }
 }
