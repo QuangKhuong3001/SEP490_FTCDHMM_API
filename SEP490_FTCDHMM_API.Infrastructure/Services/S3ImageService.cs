@@ -185,6 +185,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             if (header[0] == 0x89 && header[1] == 0x50 &&
                 header[2] == 0x4E && header[3] == 0x47) return true;
 
+            // GIF
+            if (header[0] == 0x47 && header[1] == 0x49 &&
+                header[2] == 0x46 && header[3] == 0x38) return true;
+
             return false;
         }
 
