@@ -16,7 +16,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<PermissionAction> Permissions { get; set; }
         public DbSet<AppRolePermission> AppRolePermissions { get; set; }
         public DbSet<Image> Images { get; set; }
-
+        public DbSet<UserFollow> UserFollows { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,10 +29,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new PermissionConfiguration());
             modelBuilder.ApplyConfiguration(new AppRolePermissionConfiguration());
             modelBuilder.ApplyConfiguration(new ImageConfiguration());
-
+            modelBuilder.ApplyConfiguration(new UserFollowConfiguration());
             modelBuilder.SeedRoles();
             modelBuilder.SeedPermissions();
             modelBuilder.SeedRolePermissions();
+
+            modelBuilder.ApplyConfiguration(new UserFollowConfiguration());
         }
     }
 }

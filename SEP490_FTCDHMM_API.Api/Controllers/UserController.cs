@@ -124,5 +124,40 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             await _userService.UpdateProfileAsync(userId!, appDto);
             return Ok();
         }
+        [Authorize]
+        [HttpPost("follow/{followeeId}")]
+        public async Task<IActionResult> FollowUser(Guid followeeId)
+        {
+            var followerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _userService.FollowUserAsync(followerId, followeeId);
+            return Ok(new { message = "Theo dõi thành công." });
+        }
+
+        [Authorize]
+        [HttpDelete("unfollow/{followeeId}")]
+        public async Task<IActionResult> UnfollowUser(Guid followeeId)
+        {
+            var followerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _userService.UnfollowUserAsync(followerId, followeeId);
+            return Ok(new { message = "Bỏ theo dõi thành công." });
+        }
+
+        [Authorize]
+        [HttpGet("followers")]
+        public async Task<IActionResult> GetFollowers()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _userService.GetFollowersAsync(userId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("following")]
+        public async Task<IActionResult> GetFollowing()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _userService.GetFollowingAsync(userId);
+            return Ok(result);
+        }
     }
 }

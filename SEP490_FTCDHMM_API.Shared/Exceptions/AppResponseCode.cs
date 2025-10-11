@@ -20,5 +20,7 @@
         public static readonly AppResponseCode ROLE_ALREADY_EXISTS = new(418, "ROLE_ALREADY_EXISTS");
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(416, "SERVICE_NOT_AVAILABLE");
         public static readonly AppResponseCode UNKNOWN_ERROR = new(500, "UNKNOWN_ERROR");
+
+
     }
 }

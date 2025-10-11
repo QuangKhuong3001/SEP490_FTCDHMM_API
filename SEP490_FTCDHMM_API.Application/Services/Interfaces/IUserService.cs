@@ -14,6 +14,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<CreateModeratorAccountResult> CreateModeratorAccount(CreateModeratorAccountDto dto);
         Task<ProfileDto> GetProfileAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileDto dto);
-
+        Task FollowUserAsync(Guid followerId, Guid followeeId);
+        Task UnfollowUserAsync(Guid followerId, Guid followeeId);
+        Task<List<UserDto>> GetFollowersAsync(Guid userId);
+        Task<List<UserDto>> GetFollowingAsync(Guid userId);
     }
 }

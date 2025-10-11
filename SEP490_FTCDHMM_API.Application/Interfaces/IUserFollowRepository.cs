@@ -2,7 +2,7 @@
 
 namespace SEP490_FTCDHMM_API.Application.Interfaces
 {
-    public interface IUserRepository : IRepository<AppUser>
+    public interface IUserFollowRepository : IRepository<UserFollow>
     {
 
     }
