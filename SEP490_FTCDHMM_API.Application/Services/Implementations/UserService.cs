@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -284,7 +285,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<List<UserDto>> GetFollowersAsync(Guid userId)
+        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
@@ -294,10 +295,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var followerUsers = followers.Select(f => f.Follower).ToList();
 
-            return _mapper.Map<List<UserDto>>(followerUsers);
+            return _mapper.Map<List<UserResponse>>(followerUsers);
         }
 
-        public async Task<List<UserDto>> GetFollowingAsync(Guid userId)
+        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
@@ -306,7 +307,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 
-            return _mapper.Map<List<UserDto>>(followingUsers);
+            return _mapper.Map<List<UserResponse>>(followingUsers);
         }
 
     }

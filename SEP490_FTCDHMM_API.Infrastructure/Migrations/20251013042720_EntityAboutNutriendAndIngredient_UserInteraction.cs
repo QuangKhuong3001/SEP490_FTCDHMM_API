@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addEntityAboutNutrientAndIngredient : Migration
+    public partial class EntityAboutNutriendAndIngredient_UserInteraction : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,6 +69,29 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NutrientUnits", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserFollows",
+                columns: table => new
+                {
+                    FollowerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FolloweeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFollows", x => new { x.FollowerId, x.FolloweeId });
+                    table.ForeignKey(
+                        name: "FK_UserFollows_AppUser_FolloweeId",
+                        column: x => x.FolloweeId,
+                        principalTable: "AppUser",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserFollows_AppUser_FollowerId",
+                        column: x => x.FollowerId,
+                        principalTable: "AppUser",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -291,6 +314,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "IX_Nutrients_UnitId",
                 table: "Nutrients",
                 column: "UnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserFollows_FolloweeId",
+                table: "UserFollows",
+                column: "FolloweeId");
         }
 
         /// <inheritdoc />
@@ -301,6 +329,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "IngredientNutrients");
+
+            migrationBuilder.DropTable(
+                name: "UserFollows");
 
             migrationBuilder.DropTable(
                 name: "IngredientCategories");
