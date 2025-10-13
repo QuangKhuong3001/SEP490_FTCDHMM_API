@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -94,7 +96,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return (true, Array.Empty<string>());
         }
 
-        public async Task<string> Login(LoginDto dto)
+        public async Task<string> Login(LoginRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)

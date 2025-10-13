@@ -21,13 +21,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<IngredientNutrient> IngredientNutrients { get; set; }
         public DbSet<Nutrient> Nutrients { get; set; }
         public DbSet<NutrientUnit> NutrientUnits { get; set; }
-        public DbSet<UserFollow> UserFollows { get; set; }
-        public DbSet<Ingredient> Ingredients { get; set; }
-        public DbSet<IngredientCategory> IngredientCategories { get; set; }
-        public DbSet<IngredientCategoryAssignment> IngredientCategoryAssignments { get; set; }
-        public DbSet<IngredientNutrient> IngredientNutrients { get; set; }
-        public DbSet<Nutrient> Nutrients { get; set; }
-        public DbSet<NutrientUnit> NutrientUnits { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

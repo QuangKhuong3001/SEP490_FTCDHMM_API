@@ -1,7 +1,7 @@
 
 {
     "region" : "ap-southeast-1",
-    "configuration" : "Debug",
+    "configuration" : "Release",
     "framework"     : "net8.0",
     "self-contained" : false,
     "application"    : "FitFoodAPI",

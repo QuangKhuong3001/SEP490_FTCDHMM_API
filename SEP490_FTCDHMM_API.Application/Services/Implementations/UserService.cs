@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -270,7 +269,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
-                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.Avatars, user);
+                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.AVATARS, user);
 
                 if (user.AvatarId.HasValue)
                 {
