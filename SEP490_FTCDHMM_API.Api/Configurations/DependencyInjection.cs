@@ -1,20 +1,27 @@
 ﻿using System.Text;
 using Amazon.S3;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
+using SEP490_FTCDHMM_API.Infrastructure.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using StackExchange.Redis;
 using ApiMapping = SEP490_FTCDHMM_API.Api.Mappings;
 using ApplicationMapping = SEP490_FTCDHMM_API.Application.Mappings;
 
@@ -30,6 +37,14 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             // Connect with SQL Server
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("MyCnn")));
+
+
+            //cache
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var redisConnection = configuration.GetConnectionString("Redis");
+                return ConnectionMultiplexer.Connect(redisConnection!);
+            });
 
             // Config Identity
             services.AddIdentity<AppUser, AppRole>(options =>
@@ -96,6 +111,29 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddSingleton<IAuthorizationHandler, ModulePermissionHandler>();
             services.AddSingleton<IAuthorizationPolicyProvider, ModulePolicyProvider>();
 
+            //batch/job module
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseRecommendedSerializerSettings()
+                      .UseSqlServerStorage(configuration.GetConnectionString("MyCnn"), new SqlServerStorageOptions
+                      {
+                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                          QueuePollInterval = TimeSpan.Zero,
+                          UseRecommendedIsolationLevel = true,
+                          DisableGlobalLocks = true
+                      });
+            });
+
+            //            RecurringJob.AddOrUpdate<IngredientPopularityJob>(
+            //    job => job.ExecuteAsync(),
+            //    Cron.Daily(2, 0)
+            //);
+
+            services.AddHangfireServer();
+
             //bind settings value
             services.Configure<AwsS3Settings>(configuration.GetSection("AWS"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
@@ -105,8 +143,17 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             // DI External Service
 
+            //redis
+            services.AddScoped<ICacheService, RedisCacheService>();
+
+            //usda
+            //services.AddScoped<IUsdaApiService, UsdaApiService>();
+
+            //rollback 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             //Mail
-            services.AddScoped<SEP490_FTCDHMM_API.Application.Interfaces.IMailService, SEP490_FTCDHMM_API.Infrastructure.Services.MailService>();
+            services.AddScoped<IMailService, SEP490_FTCDHMM_API.Infrastructure.Services.MailService>();
             services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
             //Jwt&&Identity
@@ -142,6 +189,16 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //role-permission
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+
+            //ingredient
+            services.AddScoped<IIngredientRepository, IngredientRepository>();
+            services.AddScoped<IIngredientService, IngredientService>();
+
+            //ingredientCategory
+            services.AddScoped<IIngredientCategoryRepository, IngredientCategoryRepository>();
+
+            //nutrient
+            services.AddScoped<INutrientRepository, NutrientRepository>();
 
         }
     }

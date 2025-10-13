@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RoleDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -33,7 +33,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task CreateRole(CreateRoleDto dto)
+        public async Task CreateRole(CreateRoleRequest dto)
         {
             var existing = await _roleRepository.ExistsAsync(r => r.Name == dto.Name);
 
@@ -42,7 +42,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var role = new AppRole
             {
-                Id = Guid.NewGuid(),
                 NormalizedName = dto.Name.ToUpperInvariant(),
                 IsActive = true,
                 Name = dto.Name
@@ -75,13 +74,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _roleRepository.DeleteAsync(role);
         }
 
-        public async Task<PagedResult<RoleDto>> GetAllRoles(PaginationParams pagination)
+        public async Task<PagedResult<RoleResponse>> GetAllRoles(PaginationParams pagination)
         {
             var (roles, totalCount) = await _roleRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize);
 
-            var result = _mapper.Map<List<RoleDto>>(roles);
-            return new PagedResult<RoleDto>
+            var result = _mapper.Map<List<RoleResponse>>(roles);
+            return new PagedResult<RoleResponse>
             {
                 Items = result,
                 TotalCount = totalCount,
@@ -116,7 +115,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _roleRepository.UpdateAsync(role);
         }
 
-        public async Task UpdateRolePermissions(RolePermissionSettingDto dto)
+        public async Task UpdateRolePermissions(RolePermissionSettingRequest dto)
         {
             var rolePermissions = await _rolePermissionRepository
                 .GetAllAsync(rp => rp.RoleId == dto.RoleId);
@@ -135,16 +134,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task<List<PermissionDomainDto>> GetRolePermissions(Guid roleId)
+        public async Task<List<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
         {
             var domains = await _permissionDomainRepository.GetAllAsync(d => d.Actions);
 
             var rolePermissions = await _rolePermissionRepository.GetAllAsync(rp => rp.RoleId == roleId);
 
-            var result = domains.Select(d => new PermissionDomainDto
+            var result = domains.Select(d => new PermissionDomainRequest
             {
                 DomainName = d.Name,
-                Actions = d.Actions.Select(a => new PermissionActionDto
+                Actions = d.Actions.Select(a => new PermissionActionRequest
                 {
                     ActionId = a.Id,
                     ActionName = a.Name,

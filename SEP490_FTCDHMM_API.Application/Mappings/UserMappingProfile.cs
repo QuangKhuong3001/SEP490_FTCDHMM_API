@@ -9,7 +9,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<AppUser, UserDto>().
+            CreateMap<AppUser, UserResponse>().
                 ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.LockoutEnd.HasValue && src.LockoutEnd.Value > DateTime.UtcNow
                     ? UserStatus.Locked : (src.EmailConfirmed ? UserStatus.Verified : UserStatus.Unverified)));

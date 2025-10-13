@@ -14,6 +14,10 @@
         public static readonly PermissionValue Customer_Update = new("CustomerManagement", "Update");
         public static readonly PermissionValue Customer_Delete = new("CustomerManagement", "Delete");
 
+        public static readonly PermissionValue Ingredient_Create = new("Ingredient", "Create");
+        public static readonly PermissionValue Ingredient_Update = new("Ingredient", "Update");
+        public static readonly PermissionValue Ingredient_Delete = new("Ingredient", "Delete");
+
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -21,7 +25,10 @@
             Moderator_Update,
             Moderator_Delete,
             Customer_Create,
-            Customer_Update
+            Customer_Update,
+            Ingredient_Create,
+            Ingredient_Update,
+            Ingredient_Delete
         };
     }
 }

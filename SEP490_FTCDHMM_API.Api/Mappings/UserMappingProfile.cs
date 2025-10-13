@@ -9,12 +9,12 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public UserMappingProfile()
         {
             //user manangement
-            CreateMap<APIDtos.UserDtos.LockRequestDto, ApplicationDtos.UserDtos.LockRequestDto>();
-            CreateMap<APIDtos.UserDtos.UnlockRequestDto, ApplicationDtos.UserDtos.UnlockRequestDto>();
-            CreateMap<APIDtos.UserDtos.CreateModeratorAccountDto, ApplicationDtos.UserDtos.CreateModeratorAccountDto>();
+            CreateMap<APIDtos.UserDtos.LockRequest, ApplicationDtos.UserDtos.LockRequest>();
+            CreateMap<APIDtos.UserDtos.UnlockRequest, ApplicationDtos.UserDtos.UnlockRequest>();
+            CreateMap<APIDtos.UserDtos.CreateModeratorAccountRequest, ApplicationDtos.UserDtos.CreateModeratorAccountRequest>();
 
             //profile
-            CreateMap<APIDtos.UserDtos.UpdateProfileDto, ApplicationDtos.UserDtos.UpdateProfileDto>();
+            CreateMap<APIDtos.UserDtos.UpdateProfileRequest, ApplicationDtos.UserDtos.UpdateProfileRequest>();
         }
     }
 }

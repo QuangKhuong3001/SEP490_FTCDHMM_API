@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -42,16 +44,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _s3ImageService = s3ImageService;
         }
 
-        public async Task<PagedResult<UserDto>> GetCustomerList(PaginationParams pagination)
+        public async Task<PagedResult<UserResponse>> GetCustomerList(PaginationParams pagination)
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
                 u => u.Role.Name == RoleValue.Customer.Name,
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
-            var result = _mapper.Map<List<UserDto>>(customers);
+            var result = _mapper.Map<List<UserResponse>>(customers);
 
-            return new PagedResult<UserDto>
+            return new PagedResult<UserResponse>
             {
                 Items = result,
                 TotalCount = totalCount,
@@ -60,7 +62,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<LockResultDto> LockCustomerAccount(LockRequestDto dto)
+        public async Task<LockResponse> LockCustomerAccount(LockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
@@ -70,14 +72,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _userRepository.UpdateAsync(user);
 
-            return new LockResultDto
+            return new LockResponse
             {
                 Email = user.Email!,
                 LockoutEnd = user.LockoutEnd
             };
         }
 
-        public async Task<UnlockResultDto> UnLockCustomerAccount(UnlockRequestDto dto)
+        public async Task<UnlockResponse> UnLockCustomerAccount(UnlockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
@@ -90,22 +92,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _userRepository.UpdateAsync(user);
 
-            return new UnlockResultDto
+            return new UnlockResponse
             {
                 Email = user.Email!,
             };
         }
 
-        public async Task<PagedResult<UserDto>> GetModeratorList(PaginationParams pagination)
+        public async Task<PagedResult<UserResponse>> GetModeratorList(PaginationParams pagination)
         {
             var (modetators, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
                 u => u.Role.Name == RoleValue.Moderator.Name,
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
-            var result = _mapper.Map<List<UserDto>>(modetators);
+            var result = _mapper.Map<List<UserResponse>>(modetators);
 
-            return new PagedResult<UserDto>
+            return new PagedResult<UserResponse>
             {
                 Items = result,
                 TotalCount = totalCount,
@@ -113,7 +115,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = pagination.PageSize
             };
         }
-        public async Task<LockResultDto> LockModeratorAccount(LockRequestDto dto)
+        public async Task<LockResponse> LockModeratorAccount(LockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
@@ -123,13 +125,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _userRepository.UpdateAsync(user);
 
-            return new LockResultDto
+            return new LockResponse
             {
                 Email = user.Email!,
                 LockoutEnd = user.LockoutEnd
             };
         }
-        public async Task<UnlockResultDto> UnLockModeratorAccount(UnlockRequestDto dto)
+        public async Task<UnlockResponse> UnLockModeratorAccount(UnlockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
             if (user == null)
@@ -142,13 +144,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _userRepository.UpdateAsync(user);
 
-            return new UnlockResultDto
+            return new UnlockResponse
             {
                 Email = user.Email!,
             };
         }
 
-        public async Task<CreateModeratorAccountResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
+        public async Task<CreateModeratorAccountResponse> CreateModeratorAccount(CreateModeratorAccountRequest dto)
         {
             var existing = await _userManager.FindByEmailAsync(dto.Email);
             if (existing != null)
@@ -169,7 +171,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var createResult = await _userManager.CreateAsync(user, password);
             if (!createResult.Succeeded)
-                return new CreateModeratorAccountResult
+                return new CreateModeratorAccountResponse
                 {
                     Success = false,
                     Errors = createResult.Errors.Select(e => e.Description)
@@ -201,7 +203,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody);
 
-            return new CreateModeratorAccountResult
+            return new CreateModeratorAccountResponse
             {
                 Success = true,
             };
@@ -217,7 +219,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return profile;
         }
 
-        public async Task UpdateProfileAsync(Guid userId, UpdateProfileDto dto)
+        public async Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
@@ -231,7 +233,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
-                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.Avatars, user);
+                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.AVATARS, user);
 
                 if (user.AvatarId.HasValue)
                 {

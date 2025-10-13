@@ -8,11 +8,11 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public RoleMappingProfile()
         {
             //create
-            CreateMap<APIDtos.RoleDtos.CreateRole, ApplicationDtos.RoleDtos.CreateRoleDto>();
+            CreateMap<APIDtos.RoleDtos.CreateRole, ApplicationDtos.RoleDtos.CreateRoleRequest>();
 
             //PermissionSetting
-            CreateMap<APIDtos.RoleDtos.PermissionToggleDto, ApplicationDtos.RoleDtos.PermissionToggleDto>();
-            CreateMap<APIDtos.RoleDtos.RolePermissionSettingDto, ApplicationDtos.RoleDtos.RolePermissionSettingDto>();
+            CreateMap<APIDtos.RoleDtos.PermissionToggleRequest, ApplicationDtos.RoleDtos.PermissionToggleRequest>();
+            CreateMap<APIDtos.RoleDtos.RolePermissionSettingDto, ApplicationDtos.RoleDtos.RolePermissionSettingRequest>();
         }
     }
 }

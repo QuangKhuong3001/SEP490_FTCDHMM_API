@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services

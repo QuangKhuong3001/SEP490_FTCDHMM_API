@@ -8,23 +8,23 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public AuthMappingProfile()
         {
             //register
-            CreateMap<APIDtos.AuthDTOs.RegisterDto, ApplicationDtos.AuthDTOs.RegisterDto>();
+            CreateMap<APIDtos.AuthDTOs.RegisterRequest, ApplicationDtos.AuthDTOs.RegisterDto>();
 
             //verifyEmail
-            CreateMap<APIDtos.AuthDTOs.OtpVerifyDto, ApplicationDtos.AuthDTOs.OtpVerifyDto>();
+            CreateMap<APIDtos.AuthDTOs.OtpVerifyRequest, ApplicationDtos.AuthDTOs.OtpVerifyRequest>();
 
             //resentOtp
-            CreateMap<APIDtos.AuthDTOs.ResendOtpDto, ApplicationDtos.AuthDTOs.ResendOtpDto>();
+            CreateMap<APIDtos.AuthDTOs.ResendOtpRequest, ApplicationDtos.AuthDTOs.ResendOtpRequest>();
 
             //login
-            CreateMap<APIDtos.AuthDTOs.LoginDto, ApplicationDtos.AuthDTOs.LoginDto>();
+            CreateMap<APIDtos.AuthDTOs.LoginRequest, ApplicationDtos.AuthDTOs.LoginRequest>();
 
             //changePassword
-            CreateMap<APIDtos.AuthDTOs.ChangePasswordDto, ApplicationDtos.AuthDTOs.ChangePasswordDto>();
+            CreateMap<APIDtos.AuthDTOs.ChangePasswordRequest, ApplicationDtos.AuthDTOs.ChangePasswordRequest>();
 
             //forgotPassword
-            CreateMap<APIDtos.AuthDTOs.ForgotPasswordRequestDto, ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>();
-            CreateMap<APIDtos.AuthDTOs.VerifyOtpForPasswordResetDto, ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>();
+            CreateMap<APIDtos.AuthDTOs.ForgotPasswordRequest, ApplicationDtos.AuthDTOs.ForgotPasswordRequest>();
+            CreateMap<APIDtos.AuthDTOs.VerifyOtpForPasswordResetRequest, ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetRequest>();
             CreateMap<APIDtos.AuthDTOs.ResetPasswordWithTokenDto, ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>();
 
             //gg
