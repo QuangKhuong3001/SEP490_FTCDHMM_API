@@ -13,6 +13,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<UnlockResponse> UnLockModeratorAccount(UnlockRequest dto);
         Task<CreateModeratorAccountResponse> CreateModeratorAccount(CreateModeratorAccountRequest dto);
         Task<ProfileDto> GetProfileAsync(Guid userId);
+        Task FollowUserAsync(Guid followerId, Guid followeeId);
+        Task UnfollowUserAsync(Guid followerId, Guid followeeId);
+        Task<List<UserDto>> GetFollowersAsync(Guid userId);
+        Task<List<UserDto>> GetFollowingAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto);
 
     }

@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<Nutrient> Nutrients { get; set; }
         public DbSet<NutrientUnit> NutrientUnits { get; set; }
 
-
+        public DbSet<UserFollow> UserFollows { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

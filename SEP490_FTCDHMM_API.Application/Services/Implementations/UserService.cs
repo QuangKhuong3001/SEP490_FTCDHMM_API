@@ -24,6 +24,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IS3ImageService _s3ImageService;
+        private readonly IUserFollowRepository _userFollowRepository;
 
         public UserService(IUserRepository userRepository,
             UserManager<AppUser> userManager,
@@ -32,7 +33,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IOtpRepository otpRepository,
             IMailService mailService,
             IEmailTemplateService emailTemplateService,
-            IS3ImageService s3ImageService)
+            IS3ImageService s3ImageService,
+            IUserFollowRepository userFollowRepository)
         {
             _userRepository = userRepository;
             _userManager = userManager;
@@ -42,6 +44,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
             _s3ImageService = s3ImageService;
+            _userFollowRepository = userFollowRepository;
         }
 
         public async Task<PagedResult<UserResponse>> GetCustomerList(PaginationParams pagination)
@@ -244,6 +247,66 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task FollowUserAsync(Guid followerId, Guid followeeId)
+        {
+            if (followerId == followeeId)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var exist = await _userFollowRepository.ExistsAsync(u => u.FollowerId == followerId && u.FolloweeId == followeeId);
+
+            if (exist)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var follow = new UserFollow
+            {
+                FollowerId = followerId,
+                FolloweeId = followeeId,
+                CreatedAtUtc = DateTime.UtcNow
+            };
+
+            await _userFollowRepository.AddAsync(follow);
+        }
+
+
+        public async Task UnfollowUserAsync(Guid followerId, Guid followeeId)
+        {
+            var follows = await _userFollowRepository.GetAllAsync(
+                f => f.FollowerId == followerId && f.FolloweeId == followeeId
+            );
+
+            var follow = follows.FirstOrDefault();
+            if (follow == null)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            await _userFollowRepository.DeleteAsync(follow);
+        }
+
+
+        public async Task<List<UserDto>> GetFollowersAsync(Guid userId)
+        {
+            var followers = await _userFollowRepository.GetAllAsync(
+                u => u.FolloweeId == userId,
+                u => u.Follower
+            );
+
+
+            var followerUsers = followers.Select(f => f.Follower).ToList();
+
+            return _mapper.Map<List<UserDto>>(followerUsers);
+        }
+
+        public async Task<List<UserDto>> GetFollowingAsync(Guid userId)
+        {
+            var followings = await _userFollowRepository.GetAllAsync(
+                u => u.FollowerId == userId,
+                u => u.Followee
+            );
+
+            var followingUsers = followings.Select(f => f.Followee).ToList();
+
+            return _mapper.Map<List<UserDto>>(followingUsers);
         }
 
     }

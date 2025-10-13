@@ -190,6 +190,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //role-permission
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
+            //user interaction
+            services.AddScoped<IUserFollowRepository, UserFollowRepository>();
+
             //ingredient
             services.AddScoped<IIngredientRepository, IngredientRepository>();
             services.AddScoped<IIngredientService, IngredientService>();

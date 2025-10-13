@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251010225833_v1")]
+    partial class v1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,24 +240,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
-                            IsActive = true
-                        },
-                        new
-                        {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -303,24 +288,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
-                            IsActive = false
-                        },
-                        new
-                        {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -365,24 +332,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
                             IsActive = false
                         });
                 });
@@ -559,7 +508,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<Guid?>("UploadedById")
+                    b.Property<Guid>("UploadedById")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -567,526 +516,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("UploadedById");
 
                     b.ToTable("Image", (string)null);
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<Guid>("ImageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("LastUpdatedUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<double>("PopularityScore")
-                        .HasColumnType("float");
-
-                    b.Property<int>("SearchCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsageFrequency")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ImageId");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Ingredients");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("IngredientCategories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("3741c8e7-ce2b-c477-4e45-169cec441664"),
-                            Name = "Rau củ quả"
-                        },
-                        new
-                        {
-                            Id = new Guid("36e6cb97-3dc3-c518-e22c-4d2804e5a65d"),
-                            Name = "Hải sản"
-                        },
-                        new
-                        {
-                            Id = new Guid("e7f53468-c971-6d4d-7e56-1e50702495fd"),
-                            Name = "Thịt"
-                        },
-                        new
-                        {
-                            Id = new Guid("5b8fd31b-bca6-bd0f-4bd4-1008a83f4385"),
-                            Name = "Trứng"
-                        },
-                        new
-                        {
-                            Id = new Guid("7814e36f-6b23-5d6b-f0b7-bc34f75fa315"),
-                            Name = "Ngũ cốc"
-                        },
-                        new
-                        {
-                            Id = new Guid("0b391ac2-8440-b318-afc4-045c61aee15c"),
-                            Name = "Gia vị"
-                        },
-                        new
-                        {
-                            Id = new Guid("db5072d7-9bc0-6d4a-8d33-3b18239c40f6"),
-                            Name = "Dầu mỡ"
-                        },
-                        new
-                        {
-                            Id = new Guid("0ef727db-5be6-f820-ec21-5d1d34876db5"),
-                            Name = "Đồ uống"
-                        },
-                        new
-                        {
-                            Id = new Guid("bcfbe809-1ee1-771d-e271-0f959bfd67f6"),
-                            Name = "Đồ ngọt"
-                        },
-                        new
-                        {
-                            Id = new Guid("2510563b-4a1a-36f8-3eee-0081aeb1b15c"),
-                            Name = "Đồ hộp / chế biến sẵn"
-                        },
-                        new
-                        {
-                            Id = new Guid("447e8fa6-250f-0c6c-190e-d7ec87e91745"),
-                            Name = "Nguyên liệu khác"
-                        });
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategoryAssignment", b =>
-                {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("IngredientId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("IngredientCategoryAssignments", (string)null);
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientNutrient", b =>
-                {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("NutrientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("Max")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("decimal(10,3)");
-
-                    b.Property<decimal>("Median")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("decimal(10,3)");
-
-                    b.Property<decimal?>("Min")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("decimal(10,3)");
-
-                    b.HasKey("IngredientId", "NutrientId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("NutrientId");
-
-                    b.ToTable("IngredientNutrients", (string)null);
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid>("UnitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("VietnameseName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("Nutrients", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("d58dca3f-be87-c7d0-5396-223e9ced53a8"),
-                            Name = "Calories",
-                            UnitId = new Guid("93d2464a-59b3-7951-21fe-5dc36fe13c45"),
-                            VietnameseName = "Năng lượng"
-                        },
-                        new
-                        {
-                            Id = new Guid("4e7a667e-4012-d80e-9276-1cd44d4e7fbd"),
-                            Name = "Protein",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất đạm"
-                        },
-                        new
-                        {
-                            Id = new Guid("73cd094d-61aa-61ce-d021-9ffa9b9ebbad"),
-                            Name = "Fat",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Tổng chất béo"
-                        },
-                        new
-                        {
-                            Id = new Guid("feca7dbc-1254-74f3-c7e0-ff7b786515d0"),
-                            Name = "Carbohydrate",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Tinh bột"
-                        },
-                        new
-                        {
-                            Id = new Guid("e19cd21d-2c38-e38f-7c55-f643fd65daf9"),
-                            Name = "Dietary Fiber",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất xơ"
-                        },
-                        new
-                        {
-                            Id = new Guid("dbe42ec4-51b1-f98d-66fe-6fed6bdcad0a"),
-                            Name = "Sugars",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường"
-                        },
-                        new
-                        {
-                            Id = new Guid("f2e0b30a-40ad-f850-5251-36fd00dc462e"),
-                            Name = "Cholesterol",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Cholesterol"
-                        },
-                        new
-                        {
-                            Id = new Guid("ba6906e3-9e16-e3df-06c5-f3b628919649"),
-                            Name = "Sodium",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Natri"
-                        },
-                        new
-                        {
-                            Id = new Guid("ed0c64a9-afc7-216a-a83e-8aebc743e462"),
-                            Name = "Calcium",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Canxi"
-                        },
-                        new
-                        {
-                            Id = new Guid("968aface-8106-d49e-09dc-761ca6080887"),
-                            Name = "Iron",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Sắt"
-                        },
-                        new
-                        {
-                            Id = new Guid("f3c5dea5-8442-1e88-a8bb-d71679c86ede"),
-                            Name = "Magnesium",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Magie"
-                        },
-                        new
-                        {
-                            Id = new Guid("88264feb-65c1-6808-c47c-44e3ebe1f725"),
-                            Name = "Phosphorus",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Phốt pho"
-                        },
-                        new
-                        {
-                            Id = new Guid("67dc4e3a-958b-9f2b-ba70-d7e6690b8f2d"),
-                            Name = "Potassium",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Kali"
-                        },
-                        new
-                        {
-                            Id = new Guid("5e08cf55-2b60-6f26-ef65-305553ffb09b"),
-                            Name = "Vitamin A",
-                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
-                            VietnameseName = "Vitamin A"
-                        },
-                        new
-                        {
-                            Id = new Guid("4345a4c7-9cd2-6519-5892-9dcc40bb9ecc"),
-                            Name = "Vitamin C",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin C"
-                        },
-                        new
-                        {
-                            Id = new Guid("c8cd2a0b-6458-d98b-0ebf-0243cf575556"),
-                            Name = "Vitamin D",
-                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
-                            VietnameseName = "Vitamin D"
-                        },
-                        new
-                        {
-                            Id = new Guid("40d7e2f9-a5da-064c-fe4d-28febe860039"),
-                            Name = "Vitamin E",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin E"
-                        },
-                        new
-                        {
-                            Id = new Guid("7df9ddde-bcce-958a-2a38-85778c6cfb7b"),
-                            Name = "Vitamin K",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin K"
-                        },
-                        new
-                        {
-                            Id = new Guid("422833be-5c43-e625-7a6a-6a74c32794a6"),
-                            Name = "Vitamin B1 (Thiamin)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B1"
-                        },
-                        new
-                        {
-                            Id = new Guid("ac960903-ad9f-dfae-e0b3-35628565a3cb"),
-                            Name = "Vitamin B2 (Riboflavin)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B2"
-                        },
-                        new
-                        {
-                            Id = new Guid("bc5e858f-8aaa-e3f1-c7ae-bf691e5fa88e"),
-                            Name = "Vitamin B3 (Niacin)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B3"
-                        },
-                        new
-                        {
-                            Id = new Guid("4e465394-2d14-2a0a-7a00-5db0bc9e4597"),
-                            Name = "Vitamin B6",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B6"
-                        },
-                        new
-                        {
-                            Id = new Guid("ff39565c-1b2f-7db1-4f47-7b9ca86221f6"),
-                            Name = "Folate (Folic Acid)",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Axit folic"
-                        },
-                        new
-                        {
-                            Id = new Guid("3a9a556f-7285-4572-28aa-67447560ece8"),
-                            Name = "Vitamin B12",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin B12"
-                        },
-                        new
-                        {
-                            Id = new Guid("7dd02ec7-0bde-e9d2-4f7b-99e3184f139e"),
-                            Name = "Zinc",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Kẽm"
-                        },
-                        new
-                        {
-                            Id = new Guid("fa0f09a4-fbbd-3da5-76b0-748a0d87ce21"),
-                            Name = "Copper",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Đồng"
-                        },
-                        new
-                        {
-                            Id = new Guid("c52f37b6-b8ba-c587-72d7-d3f5dc8044d6"),
-                            Name = "Manganese",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Mangan"
-                        },
-                        new
-                        {
-                            Id = new Guid("55fb9dc4-6bf0-06b4-e2c5-ca786f557d38"),
-                            Name = "Selenium",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Selen"
-                        });
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.NutrientUnit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NutrientUnits", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            Description = "Used for macronutrients like protein, fat, carbs",
-                            Name = "Gram",
-                            Symbol = "g"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            Description = "Used for minerals and vitamins",
-                            Name = "Milligram",
-                            Symbol = "mg"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            Description = "Used for trace vitamins like B12",
-                            Name = "Microgram",
-                            Symbol = "µg"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000004"),
-                            Description = "Unit of energy (Calories)",
-                            Name = "Kilocalorie",
-                            Symbol = "kcal"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000005"),
-                            Description = "Alternative energy unit",
-                            Name = "Kilojoule",
-                            Symbol = "kJ"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000006"),
-                            Description = "Used for liquid nutrients",
-                            Name = "Milliliter",
-                            Symbol = "mL"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000007"),
-                            Description = "Used for large liquid volumes",
-                            Name = "Liter",
-                            Symbol = "L"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000008"),
-                            Description = "Used for vitamin activity (A, D, E, K)",
-                            Name = "International Unit",
-                            Symbol = "IU"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000009"),
-                            Description = "Percentage of daily value",
-                            Name = "Percent",
-                            Symbol = "%"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000010"),
-                            Description = "No measurable unit",
-                            Name = "None",
-                            Symbol = ""
-                        },
-                        new
-                        {
-                            Id = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            Description = "Đơn vị dùng cho các đại dưỡng chất như protein, chất béo, tinh bột.",
-                            Name = "Gram (Gam)",
-                            Symbol = "g"
-                        },
-                        new
-                        {
-                            Id = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            Description = "Đơn vị dùng cho khoáng chất và vitamin thông thường.",
-                            Name = "Milligram (Miligam)",
-                            Symbol = "mg"
-                        },
-                        new
-                        {
-                            Id = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            Description = "Đơn vị dùng cho vitamin vi lượng như B12, K, Folate...",
-                            Name = "Microgram (Micromet)",
-                            Symbol = "µg"
-                        },
-                        new
-                        {
-                            Id = new Guid("93d2464a-59b3-7951-21fe-5dc36fe13c45"),
-                            Description = "Đơn vị năng lượng thường gọi là calo.",
-                            Name = "Kilocalorie (Kcal)",
-                            Symbol = "kcal"
-                        },
-                        new
-                        {
-                            Id = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
-                            Description = "Dùng cho hoạt tính của vitamin A, D, E, K.",
-                            Name = "International Unit (Đơn vị quốc tế)",
-                            Symbol = "IU"
-                        });
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.PermissionAction", b =>
@@ -1157,24 +586,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                             Id = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
                             Name = "Delete",
                             PermissionDomainId = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b")
-                        },
-                        new
-                        {
-                            Id = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
-                        },
-                        new
-                        {
-                            Id = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
-                        },
-                        new
-                        {
-                            Id = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
                         });
                 });
 
@@ -1202,11 +613,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b"),
                             Name = "CustomerManagement"
-                        },
-                        new
-                        {
-                            Id = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb"),
-                            Name = "Ingredient"
                         });
                 });
 
@@ -1317,69 +723,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "UploadedBy")
                         .WithMany()
                         .HasForeignKey("UploadedById")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("UploadedBy");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Image");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategoryAssignment", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategory", "Category")
-                        .WithMany("IngredientCategoryAssignments")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", "Ingredient")
-                        .WithMany("IngredientCategoryAssignments")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Ingredient");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientNutrient", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", "Ingredient")
-                        .WithMany("IngredientNutrients")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", "Nutrient")
-                        .WithMany("IngredientNutrients")
-                        .HasForeignKey("NutrientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Nutrient");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.NutrientUnit", "Unit")
-                        .WithMany("Nutrients")
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.PermissionAction", b =>
@@ -1415,28 +762,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.AppRole", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>
-                {
-                    b.Navigation("IngredientCategoryAssignments");
-
-                    b.Navigation("IngredientNutrients");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategory", b =>
-                {
-                    b.Navigation("IngredientCategoryAssignments");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", b =>
-                {
-                    b.Navigation("IngredientNutrients");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.NutrientUnit", b =>
-                {
-                    b.Navigation("Nutrients");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.AppUser", b =>
