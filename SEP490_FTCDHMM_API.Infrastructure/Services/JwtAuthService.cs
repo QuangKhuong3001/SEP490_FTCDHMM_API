@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Shared.Exceptions;

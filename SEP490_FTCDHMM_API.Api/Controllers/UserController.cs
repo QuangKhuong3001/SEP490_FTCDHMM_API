@@ -34,9 +34,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
         [HttpPut("lockCustomer")]
-        public async Task<IActionResult> LockCustomer(LockRequestDto dto)
+        public async Task<IActionResult> LockCustomer(LockRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
             var result = await _userService.LockCustomerAccount(appDto);
             return Ok(result);
@@ -44,9 +44,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
         [HttpPut("unlockCustomer")]
-        public async Task<IActionResult> UnLockCustomer(UnlockRequestDto dto)
+        public async Task<IActionResult> UnLockCustomer(UnlockRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequest>(dto);
 
             var result = await _userService.UnLockCustomerAccount(appDto);
             return Ok(result);
@@ -64,9 +64,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
         [HttpPut("lockModerator")]
-        public async Task<IActionResult> LockModerator(LockRequestDto dto)
+        public async Task<IActionResult> LockModerator(LockRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequestDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
             var result = await _userService.LockModeratorAccount(appDto);
             return Ok(result);
@@ -74,9 +74,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
         [HttpPut("unlockModerator")]
-        public async Task<IActionResult> UnLockModerator(UnlockRequestDto dto)
+        public async Task<IActionResult> UnLockModerator(UnlockRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequestDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequest>(dto);
 
             var result = await _userService.UnLockModeratorAccount(appDto);
             return Ok(result);
@@ -84,9 +84,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_Create)]
         [HttpPost("createModerator")]
-        public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountDto dto)
+        public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.CreateModeratorAccountDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.CreateModeratorAccountRequest>(dto);
 
             var result = await _userService.CreateModeratorAccount(appDto);
             if (!result.Success) return BadRequest(new { success = false, result.Errors });
@@ -110,7 +110,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest dto)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
@@ -119,7 +120,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UpdateProfileDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UpdateProfileRequest>(dto);
 
             await _userService.UpdateProfileAsync(userId!, appDto);
             return Ok();

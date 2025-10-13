@@ -4,7 +4,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
 {
     public class EmailOtp
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public required string Code { get; set; }
         public required OtpPurpose Purpose { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

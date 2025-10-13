@@ -62,7 +62,21 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
                 sb.Append(_all[_random.Next(_all.Length)]);
             }
 
-            return new string(sb.ToString().OrderBy(c => Guid.NewGuid()).ToArray());
+            var chars = sb.ToString().ToCharArray();
+
+            Shuffle(chars);
+
+
+            return new string(chars);
+        }
+
+        private static void Shuffle(char[] array)
+        {
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                int j = _random.Next(i + 1);
+                (array[i], array[j]) = (array[j], array[i]);
+            }
         }
     }
 }

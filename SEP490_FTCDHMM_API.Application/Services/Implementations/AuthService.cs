@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -94,7 +96,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return (true, Array.Empty<string>());
         }
 
-        public async Task<string> Login(LoginDto dto)
+        public async Task<string> Login(LoginRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -121,7 +123,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task VerifyEmailOtp(OtpVerifyDto dto)
+        public async Task VerifyEmailOtp(OtpVerifyRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -160,7 +162,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task ResendOtp(ResendOtpDto dto, OtpPurpose purpose)
+        public async Task ResendOtp(ResendOtpRequest dto, OtpPurpose purpose)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -218,7 +220,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         }
 
-        public async Task ForgotPasswordRequest(ForgotPasswordRequestDto dto)
+        public async Task ForgotPasswordRequest(ForgotPasswordRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -253,7 +255,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _mailService.SendEmailAsync(dto.Email, htmlBody);
         }
 
-        public async Task<string> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetDto dto)
+        public async Task<string> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
@@ -299,7 +301,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return (true, Array.Empty<string>());
         }
 
-        public async Task<(bool Success, IEnumerable<string> Errors)> ChangePassword(string userId, ChangePasswordDto dto)
+        public async Task<(bool Success, IEnumerable<string> Errors)> ChangePassword(string userId, ChangePasswordRequest dto)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)

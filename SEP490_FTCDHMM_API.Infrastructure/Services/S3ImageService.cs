@@ -4,7 +4,7 @@ using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
@@ -29,13 +29,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder, AppUser uploadedBy)
+        public async Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder, AppUser? uploadedBy)
         {
             if (!IsImage(file))
                 throw new AppException(AppResponseCode.INVALID_FILE);
 
+            var id = Guid.NewGuid();
             var extension = Path.GetExtension(file.FileName);
-            var key = $"{folder}/{Guid.NewGuid()}{extension}";
+            var key = $"{folder}/{id}{extension}";
 
             using var stream = file.OpenReadStream();
             var transfer = new TransferUtility(_s3Client);
@@ -43,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             var image = new Image
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 Key = key,
                 FileName = file.FileName,
                 ContentType = file.ContentType,
@@ -61,6 +62,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
         {
             var images = new List<Image>();
             var transfer = new TransferUtility(_s3Client);
+            var id = Guid.NewGuid();
 
             foreach (var file in files)
             {
@@ -68,14 +70,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     throw new AppException(AppResponseCode.INVALID_FILE);
 
                 var extension = Path.GetExtension(file.FileName);
-                var key = $"{folder}/{Guid.NewGuid()}{extension}";
+                var key = $"{folder}/{id}{extension}";
 
                 using var stream = file.OpenReadStream();
                 await transfer.UploadAsync(stream, _settings.BucketName, key);
 
                 var image = new Image
                 {
-                    Id = Guid.NewGuid(),
+                    Id = id,
                     Key = key,
                     FileName = file.FileName,
                     ContentType = file.ContentType,

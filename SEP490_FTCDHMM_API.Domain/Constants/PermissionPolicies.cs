@@ -11,6 +11,11 @@
         public const string CustomerManagement_Update = "CustomerManagement:Update";
         public const string CustomerManagement_Delete = "CustomerManagement:Delete";
         public const string CustomerManagement_Create = "CustomerManagement:Create";
+
+        public const string Ingredient_Create = "Ingredient:Create";
+        public const string Ingredient_Update = "Ingredient:Update";
+        public const string Ingredient_Delete = "Ingredient:Delete";
+
     }
 
 }

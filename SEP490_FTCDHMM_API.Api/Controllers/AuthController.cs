@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Api.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.RegisterDto>(dto);
 
@@ -40,9 +40,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("verify-email-otp")]
-        public async Task<IActionResult> VerifyEmailOtp(OtpVerifyDto dto)
+        public async Task<IActionResult> VerifyEmailOtp(OtpVerifyRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.OtpVerifyDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.OtpVerifyRequest>(dto);
 
             await _authService.VerifyEmailOtp(appDto);
             return Ok();
@@ -50,9 +50,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("resend-otp")]
-        public async Task<IActionResult> ResendOtp(ResendOtpDto dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
+        public async Task<IActionResult> ResendOtp(ResendOtpRequest dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpRequest>(dto);
 
             var purposeKey = (purpose ?? string.Empty).Trim().ToUpperInvariant();
             OtpPurpose parsedPurpose = OtpPurpose.From(purpose!);
@@ -63,9 +63,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto dto)
+        public async Task<IActionResult> Login(LoginRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.LoginDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.LoginRequest>(dto);
 
             var token = await _authService.Login(appDto);
             return Ok(new { token });
@@ -73,9 +73,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto dto)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ForgotPasswordRequestDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ForgotPasswordRequest>(dto);
 
             await _authService.ForgotPasswordRequest(appDto);
             return Ok();
@@ -83,9 +83,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [DisallowAuthenticated]
         [HttpPost("verify-otp-for-password-reset")]
-        public async Task<IActionResult> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetDto dto)
+        public async Task<IActionResult> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetRequest>(dto);
 
             var token = await _authService.VerifyOtpForPasswordReset(appDto);
             return Ok(new { token });
@@ -106,9 +106,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ChangePasswordDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ChangePasswordRequest>(dto);
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

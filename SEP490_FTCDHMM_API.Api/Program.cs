@@ -1,7 +1,9 @@
-﻿using SEP490_FTCDHMM_API.Api.Configurations;
+﻿using Hangfire;
+using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
+using SEP490_FTCDHMM_API.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,11 +43,13 @@ using (var scope = app.Services.CreateScope())
     await DataSeeder.SeedAdminAsync(services, config);
 }
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    Authorization = new[] { new HangfireAuthFilter() }
+});
 
 app.UseHttpsRedirection();
 

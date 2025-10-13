@@ -1,0 +1,12 @@
+﻿using System.Security.Claims;
+using SEP490_FTCDHMM_API.Domain.Entities;
+
+namespace SEP490_FTCDHMM_API.Application.Interfaces.SystemServices
+{
+    public interface IJwtAuthService
+    {
+        string GenerateToken(AppUser user, AppRole Role);
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+    }
+
+}

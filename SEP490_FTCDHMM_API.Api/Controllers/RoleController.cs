@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateRole dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.RoleDtos.CreateRoleDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.RoleDtos.CreateRoleRequest>(dto);
 
             await _roleService.CreateRole(appDto);
             return Ok();
@@ -55,10 +55,10 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [HttpPut("{roleId}/permissions")]
+        [HttpPut("{roleId:guid}/permissions")]
         public async Task<IActionResult> UpdateRolePermissions(Guid roleId, RolePermissionSettingDto dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.RoleDtos.RolePermissionSettingDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.RoleDtos.RolePermissionSettingRequest>(dto);
             appDto.RoleId = roleId;
 
             await _roleService.UpdateRolePermissions(appDto);
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [HttpGet("{roleId}/permissions")]
+        [HttpGet("{roleId:guid}/permissions")]
         public async Task<IActionResult> GetRolePermissions(Guid roleId)
         {
             var result = await _roleService.GetRolePermissions(roleId);
