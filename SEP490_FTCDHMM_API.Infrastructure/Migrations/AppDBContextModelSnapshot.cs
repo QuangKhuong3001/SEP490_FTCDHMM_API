@@ -1417,6 +1417,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("RolePermissions");
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.AppUser", b =>
+                {
+                    b.Navigation("Followers");
+
+                    b.Navigation("Following");
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>
                 {
                     b.Navigation("IngredientCategoryAssignments");

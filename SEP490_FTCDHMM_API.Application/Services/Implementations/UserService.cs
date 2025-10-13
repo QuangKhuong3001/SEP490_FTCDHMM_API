@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -280,6 +281,66 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task FollowUserAsync(Guid followerId, Guid followeeId)
+        {
+            if (followerId == followeeId)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var exist = await _userFollowRepository.ExistsAsync(u => u.FollowerId == followerId && u.FolloweeId == followeeId);
+
+            if (exist)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var follow = new UserFollow
+            {
+                FollowerId = followerId,
+                FolloweeId = followeeId,
+                CreatedAtUtc = DateTime.UtcNow
+            };
+
+            await _userFollowRepository.AddAsync(follow);
+        }
+
+
+        public async Task UnfollowUserAsync(Guid followerId, Guid followeeId)
+        {
+            var follows = await _userFollowRepository.GetAllAsync(
+                f => f.FollowerId == followerId && f.FolloweeId == followeeId
+            );
+
+            var follow = follows.FirstOrDefault();
+            if (follow == null)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            await _userFollowRepository.DeleteAsync(follow);
+        }
+
+
+        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
+        {
+            var followers = await _userFollowRepository.GetAllAsync(
+                u => u.FolloweeId == userId,
+                u => u.Follower
+            );
+
+
+            var followerUsers = followers.Select(f => f.Follower).ToList();
+
+            return _mapper.Map<List<UserResponse>>(followerUsers);
+        }
+
+        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
+        {
+            var followings = await _userFollowRepository.GetAllAsync(
+                u => u.FollowerId == userId,
+                u => u.Followee
+            );
+
+            var followingUsers = followings.Select(f => f.Followee).ToList();
+
+            return _mapper.Map<List<UserResponse>>(followingUsers);
         }
 
     }
