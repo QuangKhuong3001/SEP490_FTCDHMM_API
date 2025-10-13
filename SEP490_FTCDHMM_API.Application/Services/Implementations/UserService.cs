@@ -52,7 +52,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
-                u => u.Role.Name == RoleValue.Customer.Name,
+                u => u.Role.Name == RoleValue.Customer.Name &&
+                     (string.IsNullOrEmpty(pagination.Search) ||
+                      (u.FirstName != null && u.FirstName.Contains(pagination.Search!)) ||
+                      (u.LastName != null && u.LastName.Contains(pagination.Search!)) ||
+                      (u.Email != null && u.Email.Contains(pagination.Search!))),
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserResponse>>(customers);
@@ -106,7 +110,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (modetators, totalCount) = await _userRepository.GetPagedAsync(
                 pagination.Page, pagination.PageSize,
-                u => u.Role.Name == RoleValue.Moderator.Name,
+                u => u.Role.Name == RoleValue.Moderator.Name &&
+                     (string.IsNullOrEmpty(pagination.Search) ||
+                      (u.FirstName != null && u.FirstName.Contains(pagination.Search!)) ||
+                      (u.LastName != null && u.LastName.Contains(pagination.Search!)) ||
+                      (u.Email != null && u.Email.Contains(pagination.Search!))),
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserResponse>>(modetators);
