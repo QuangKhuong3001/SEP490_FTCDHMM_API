@@ -16,8 +16,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task UpdateProfileAsync(Guid userId, UpdateProfileDto dto);
         Task FollowUserAsync(Guid followerId, Guid followeeId);
         Task UnfollowUserAsync(Guid followerId, Guid followeeId);
-        Task<List<UserFollowResponse>> GetFollowersAsync(Guid userId);
-        Task<List<UserFollowResponse>> GetFollowingAsync(Guid userId);
+        Task<List<UserResponse>> GetFollowersAsync(Guid userId);
+        Task<List<UserResponse>> GetFollowingAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto);
 
     }

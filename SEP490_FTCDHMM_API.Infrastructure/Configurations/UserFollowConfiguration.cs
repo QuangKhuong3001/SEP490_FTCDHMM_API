@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SEP490_FTCDHMM_API.Domain.Entities;
-namespace SEP490_FTCDHMM_API.Infrastructure.Configurations
+namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
     public class UserFollowConfiguration : IEntityTypeConfiguration<UserFollow>
     {

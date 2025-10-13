@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -287,7 +288,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<List<UserFollowResponse>> GetFollowersAsync(Guid userId)
+        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 f => f.FolloweeId == userId,
@@ -305,10 +306,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
             }
 
-            return result;
+            return _mapper.Map<List<UserResponse>>(followerUsers);
         }
 
-        public async Task<List<UserFollowResponse>> GetFollowingAsync(Guid userId)
+        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
@@ -324,7 +325,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
             }
 
-            return result;
+            return _mapper.Map<List<UserResponse>>(followingUsers);
         }
 
     }
