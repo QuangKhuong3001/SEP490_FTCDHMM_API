@@ -8,5 +8,8 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public string? Avatar { get; set; }
+        public int FollowersCount { get; set; }
+        public int FollowingCount { get; set; }
+        public bool IsFollowing { get; set; }
     }
 }
