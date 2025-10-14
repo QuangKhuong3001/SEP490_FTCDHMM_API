@@ -124,14 +124,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("profile/{userId}")]
-        public async Task<IActionResult> GetUserProfile(Guid userId)
-        {
-            var profile = await _userService.GetProfileAsync(userId);
-            return Ok(profile);
-        }
-
-        [Authorize]
         [HttpPut("profile")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest dto)
