@@ -223,7 +223,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Success = true,
             };
         }
-        public async Task<ProfileDto> GetProfileAsync(Guid userId)
+        public async Task<ProfileDto> GetProfileAsync(Guid userId, Guid? currentUserId = null)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role, u => u.Avatar!);
             if (user == null)
@@ -231,6 +231,28 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var profile = _mapper.Map<ProfileDto>(user);
             profile.Avatar = _s3ImageService.GeneratePreSignedUrl(user.Avatar?.Key ?? null);
+
+            // Get followers count
+            var followersCount = await _userFollowRepository.CountAsync(f => f.FolloweeId == userId);
+            profile.FollowersCount = followersCount;
+
+            // Get following count
+            var followingCount = await _userFollowRepository.CountAsync(f => f.FollowerId == userId);
+            profile.FollowingCount = followingCount;
+
+            // Check if current user is following this profile
+            if (currentUserId.HasValue && currentUserId.Value != userId)
+            {
+                var isFollowing = await _userFollowRepository.ExistsAsync(
+                    f => f.FollowerId == currentUserId.Value && f.FolloweeId == userId
+                );
+                profile.IsFollowing = isFollowing;
+            }
+            else
+            {
+                profile.IsFollowing = false;
+            }
+
             return profile;
         }
 
