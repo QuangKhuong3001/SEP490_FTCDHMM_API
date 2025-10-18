@@ -18,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(dest => dest.Gender,
                     opt => opt.MapFrom(src => src.Gender.Value));
 
+            CreateMap<AppUser, UserFollowResponse>();
         }
     }
 }

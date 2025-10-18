@@ -23,6 +23,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IS3ImageService _s3ImageService;
         private readonly IUserFollowRepository _userFollowRepository;
+        private readonly IImageRepository _imageRepository;
 
         public UserService(IUserRepository userRepository,
             UserManager<AppUser> userManager,
@@ -30,12 +31,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IRoleRepository roleRepository,
             IOtpRepository otpRepository,
             IMailService mailService,
+            IImageRepository imageRepository,
             IEmailTemplateService emailTemplateService,
             IS3ImageService s3ImageService,
             IUserFollowRepository userFollowRepository)
         {
             _userRepository = userRepository;
             _userManager = userManager;
+            _imageRepository = imageRepository;
             _mapper = mapper;
             _roleRepository = roleRepository;
             _otpRepository = otpRepository;
@@ -277,29 +280,44 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<List<UserDto>> GetFollowersAsync(Guid userId)
+        public async Task<List<UserFollowResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
-                u => u.FolloweeId == userId,
-                u => u.Follower
-            );
+                f => f.FolloweeId == userId,
+                f => f.Follower!,
+                f => f.Follower!.Avatar!
+                );
+            var followerUsers = followers.Select(f => f.Follower!).ToList();
 
 
-            var followerUsers = followers.Select(f => f.Follower).ToList();
+            var result = _mapper.Map<List<UserFollowResponse>>(followerUsers);
 
-            return _mapper.Map<List<UserDto>>(followerUsers);
+            foreach (var userFollow in result)
+            {
+                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
+                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
+            }
+
+            return result;
         }
 
-        public async Task<List<UserDto>> GetFollowingAsync(Guid userId)
+        public async Task<List<UserFollowResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
-                u => u.Followee
+                f => f.Followee!
             );
 
-            var followingUsers = followings.Select(f => f.Followee).ToList();
+            var followingUsers = followings.Select(f => f.Followee!).ToList();
+            var result = _mapper.Map<List<UserFollowResponse>>(followingUsers);
 
-            return _mapper.Map<List<UserDto>>(followingUsers);
+            foreach (var userFollow in result)
+            {
+                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
+                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
+            }
+
+            return result;
         }
 
     }

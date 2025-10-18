@@ -139,6 +139,18 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
             services.AddScoped<IUserFollowRepository, UserFollowRepository>();
+
+            //ingredient
+            services.AddScoped<IIngredientRepository, IngredientRepository>();
+            services.AddScoped<IIngredientService, IngredientService>();
+
+            //ingredientCategory
+            services.AddScoped<IIngredientCategoryRepository, IngredientCategoryRepository>();
+
+            //nutrient
+            services.AddScoped<INutrientRepository, NutrientRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
+
         }
     }
 }
