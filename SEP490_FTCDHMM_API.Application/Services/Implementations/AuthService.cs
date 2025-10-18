@@ -303,6 +303,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<(bool Success, IEnumerable<string> Errors)> ChangePassword(string userId, ChangePasswordRequest dto)
         {
+            if (dto.CurrentPassword == dto.NewPassword)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
