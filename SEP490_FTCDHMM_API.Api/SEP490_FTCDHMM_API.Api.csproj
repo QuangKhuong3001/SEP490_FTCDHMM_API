@@ -23,9 +23,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="EmailTemplates\ForgotPassword.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\ModeratorCreated.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\VerifyAccountEmail.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

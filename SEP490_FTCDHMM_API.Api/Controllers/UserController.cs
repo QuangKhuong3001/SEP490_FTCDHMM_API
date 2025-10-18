@@ -98,8 +98,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> GetProfile()
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-                return Unauthorized();
 
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();

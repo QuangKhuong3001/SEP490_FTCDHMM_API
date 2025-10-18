@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TestController : ControllerBase
 {
-    private readonly IDistributedCache _cache;
-    public TestController(IDistributedCache cache)
+    private readonly ICacheService _cache;
+
+    public TestController(ICacheService cache)
     {
         _cache = cache;
     }
@@ -14,12 +15,8 @@ public class TestController : ControllerBase
     [HttpGet("redis")]
     public async Task<IActionResult> TestRedis()
     {
-        await _cache.SetStringAsync("fitfood", "Redis Connected OK!", new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-        });
-
-        var value = await _cache.GetStringAsync("fitfood");
+        await _cache.SetAsync("fitfood", "Redis Connected OK!", TimeSpan.FromMinutes(1));
+        var value = await _cache.GetAsync<string>("fitfood");
         return Ok(new { redis_value = value });
     }
 }

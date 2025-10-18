@@ -76,6 +76,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
+            if (user.Role.Name != RoleValue.Customer.Name)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
 
             await _userRepository.UpdateAsync(user);
@@ -93,7 +96,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.LockoutEnd <= DateTime.UtcNow)
+            if (user.Role.Name != RoleValue.Customer.Name)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            if (user.LockoutEnd > DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
@@ -133,6 +139,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
+            if (user.Role.Name != RoleValue.Moderator.Name)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
 
             await _userRepository.UpdateAsync(user);
@@ -149,7 +158,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.LockoutEnd <= DateTime.UtcNow)
+
+            if (user.Role.Name != RoleValue.Moderator.Name)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            if (user.LockoutEnd > DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
@@ -220,13 +233,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Success = true,
             };
         }
-        public async Task<ProfileDto> GetProfileAsync(Guid userId, Guid? currentUserId = null)
+        public async Task<ProfileResponse> GetProfileAsync(Guid userId, Guid? currentUserId = null)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role, u => u.Avatar!);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var profile = _mapper.Map<ProfileDto>(user);
+            var profile = _mapper.Map<ProfileResponse>(user);
             profile.Avatar = _s3ImageService.GeneratePreSignedUrl(user.Avatar?.Key ?? null);
 
             // Get followers count
