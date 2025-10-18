@@ -200,6 +200,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //nutrient
             services.AddScoped<INutrientRepository, NutrientRepository>();
+            //Follow
+            services.AddScoped<IImageRepository, ImageRepository>();
+            services.AddScoped<IUserFollowRepository, UserFollowRepository>();
 
         }
     }

@@ -4,6 +4,6 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
 {
     public interface IImageRepository : IRepository<Image>
     {
-        Task<string> GetAvatarKeyByUserId(Guid userId);
+        Task<string?> GetAvatarKeyByUserId(Guid userId);
     }
 }

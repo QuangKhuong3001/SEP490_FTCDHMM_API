@@ -318,29 +318,44 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
+        public async Task<List<UserFollowResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
-                u => u.FolloweeId == userId,
-                u => u.Follower
-            );
+                f => f.FolloweeId == userId,
+                f => f.Follower!,
+                f => f.Follower!.Avatar!
+                );
 
 
-            var followerUsers = followers.Select(f => f.Follower).ToList();
+            var followerUsers = followers.Select(f => f.Follower!).ToList();
 
-            return _mapper.Map<List<UserResponse>>(followerUsers);
+            var result = _mapper.Map<List<UserFollowResponse>>(followerUsers);
+            foreach (var userFollow in result)
+            {
+                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
+                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
+            }
+            return result;
         }
 
-        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
+        public async Task<List<UserFollowResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
-                u => u.FollowerId == userId,
-                u => u.Followee
-            );
+                f => f.FollowerId == userId,
+                f => f.Followee!,
+                f => f.Followee!.Avatar!
+                 );
 
-            var followingUsers = followings.Select(f => f.Followee).ToList();
 
-            return _mapper.Map<List<UserResponse>>(followingUsers);
+            var followingUsers = followings.Select(f => f.Followee!).ToList();
+            var result = _mapper.Map<List<UserFollowResponse>>(followingUsers);
+
+            foreach (var userFollow in result)
+            {
+                var key = await _imageRepository.GetAvatarKeyByUserId(userId);
+                userFollow.AvatarUrl = _s3ImageService.GeneratePreSignedUrl(key);
+            }
+            return result;
         }
 
     }
