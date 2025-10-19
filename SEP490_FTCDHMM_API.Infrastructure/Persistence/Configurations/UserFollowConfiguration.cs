@@ -7,6 +7,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserFollow> builder)
         {
+            builder.ToTable("UserFollows");
+
             builder.HasKey(uf => new { uf.FollowerId, uf.FolloweeId });
 
             builder.HasOne(uf => uf.Follower)

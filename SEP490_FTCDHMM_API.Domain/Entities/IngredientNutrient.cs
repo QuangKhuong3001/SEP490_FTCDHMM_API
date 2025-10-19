@@ -2,7 +2,7 @@
 {
     public class IngredientNutrient
     {
-        public Guid IngredientId { get; set; } = Guid.NewGuid();
+        public Guid IngredientId { get; set; }
         public Ingredient Ingredient { get; set; } = null!;
         public Guid NutrientId { get; set; }
         public Nutrient Nutrient { get; set; } = null!;

@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<AppRole> builder)
         {
-            builder.ToTable(nameof(AppRole));
+            builder.ToTable("Roles");
 
             builder.HasKey(r => r.Id);
 

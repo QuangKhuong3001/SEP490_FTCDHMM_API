@@ -8,6 +8,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Ingredient> builder)
         {
+            builder.ToTable("Ingredients");
             builder.HasKey(i => i.Id);
 
             builder.Property(i => i.Name)
@@ -33,6 +34,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(i => i.LastUpdatedUtc)
                 .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.HasMany(i => i.Categories)
+                .WithMany(c => c.Ingredients)
+                .UsingEntity(j => j.ToTable("IngredientCategoryLink"));
         }
     }
 }

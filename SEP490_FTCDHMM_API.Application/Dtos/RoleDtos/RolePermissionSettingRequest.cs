@@ -2,7 +2,6 @@
 {
     public class RolePermissionSettingRequest
     {
-        public Guid RoleId { get; set; }
         public List<PermissionToggleRequest> Permissions { get; set; } = new();
     }
 }

@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -20,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     {
         private readonly IIngredientRepository _ingredientRepository;
         private readonly IIngredientCategoryRepository _ingredientCategoryRepository;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly IS3ImageService _s3ImageService;
         private readonly INutrientRepository _nutrientRepository;
         private readonly IMapper _mapper;
@@ -29,22 +31,40 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly TimeSpan _ttl = TimeSpan.FromMinutes(10);
         private const int MinLenth = 2;
 
-        public IngredientService(
-            IIngredientRepository ingredientRepository,
+        public IngredientService(IIngredientRepository ingredientRepository,
             IIngredientCategoryRepository ingredientCategoryRepository,
-            INutrientRepository nutrientRepository,
+            IRecipeRepository recipeRepository,
             IS3ImageService s3ImageService,
-            IUnitOfWork unitOfWork,
-            ICacheService cache,
-            IMapper mapper)
+            INutrientRepository nutrientRepository,
+            IMapper mapper, IUnitOfWork unitOfWork,
+            ICacheService cache)
         {
             _ingredientRepository = ingredientRepository;
             _ingredientCategoryRepository = ingredientCategoryRepository;
-            _nutrientRepository = nutrientRepository;
+            _recipeRepository = recipeRepository;
             _s3ImageService = s3ImageService;
-            _unitOfWork = unitOfWork;
+            _nutrientRepository = nutrientRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
             _cache = cache;
+        }
+
+        private async Task HasNutrientsRequied(List<Guid> nutrientIds)
+        {
+            var requiredNames = new[] { "Calories", "Protein", "Fat", "Carbohydrate" };
+
+            var requiredNutrients = await _nutrientRepository.GetAllAsync(n => requiredNames.Contains(n.Name));
+            var requiredNutrientIds = requiredNutrients.Select(r => r.Id);
+
+            var missingRequired = requiredNutrientIds.Except(nutrientIds).ToList();
+            if (missingRequired.Any())
+                throw new AppException(AppResponseCode.MISSING_REQUIRED_NUTRIENTS);
+        }
+
+        private static void ValidateValueInput(NutrientRequest n)
+        {
+            if ((n.Min > n.Max) || (n.Min > n.Median) || (n.Median > n.Max))
+                throw new AppException(AppResponseCode.INVALID_ACTION);
         }
 
         public async Task<PagedResult<IngredientResponse>> GetList(IngredientFilterRequest dto)
@@ -56,16 +76,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 filter = i =>
                     ((dto.CategoryIds == null || !dto.CategoryIds.Any()) ||
-                        i.IngredientCategoryAssignments.Any(a => dto.CategoryIds.Contains(a.CategoryId))) &&
-
+                    i.Categories.Any(c => dto.CategoryIds.Contains(c.Id))) &&
                     (!dto.UpdatedFrom.HasValue || i.LastUpdatedUtc >= dto.UpdatedFrom) &&
                     (!dto.UpdatedTo.HasValue || i.LastUpdatedUtc <= dto.UpdatedTo);
             }
 
 
             var (ingredients, totalCount) = await _ingredientRepository.GetPagedAsync(
-                page: dto.PageNumber,
-                pageSize: dto.PageSize,
+                pageNumber: dto.PaginationParams.PageNumber,
+                pageSize: dto.PaginationParams.PageSize,
                 filter: filter,
                 orderBy: q => q.OrderByKeyword(dto.Keyword,
                                            i => i.Name,
@@ -73,8 +92,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 keyword: dto.Keyword,
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
-                    .Include(i => i.IngredientCategoryAssignments)
-                        .ThenInclude(a => a.Category)
+                    .Include(i => i.Categories)
             );
 
             var result = _mapper.Map<List<IngredientResponse>>(ingredients);
@@ -83,8 +101,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Items = result,
                 TotalCount = totalCount,
-                Page = dto.PageNumber,
-                PageSize = dto.PageSize
+                PageNumber = dto.PaginationParams.PageNumber,
+                PageSize = dto.PaginationParams.PageSize
             };
         }
 
@@ -96,39 +114,38 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!await _ingredientCategoryRepository.IdsExistAsync(dto.IngredientCategoryIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            foreach (var n in dto.Nutrients)
+            {
+                IngredientService.ValidateValueInput(n);
+            }
+
             var nutrientIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
             if (!await _nutrientRepository.IdsExistAsync(nutrientIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            var requiredNames = new[] { "Calories", "Protein", "Fat", "Carbohydrate" };
-            var allNutrients = await _nutrientRepository.GetAllAsync();
-            var requiredIds = allNutrients
-                .Where(n => requiredNames.Contains(n.Name))
-                .Select(n => n.Id)
-                .ToList();
-
-            var missingRequired = requiredIds.Except(nutrientIds).ToList();
-            if (missingRequired.Any())
-                throw new AppException(AppResponseCode.MISSING_REQUIRED_NUTRIENTS);
+            await HasNutrientsRequied(nutrientIds);
 
             var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image, StorageFolder.INGREDIENTS, null);
+
+            var categories = await _ingredientCategoryRepository
+                .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
+
+            if (categories.Any(c => c.isDeleted))
+                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var ingredient = new Ingredient
             {
                 Name = dto.Name.Trim(),
                 Description = dto.Description?.Trim(),
                 Image = uploadedImage,
-                LastUpdatedUtc = DateTime.UtcNow
+                LastUpdatedUtc = DateTime.UtcNow,
+                Categories = categories.ToList()
             };
-
-            ingredient.IngredientCategoryAssignments = dto.IngredientCategoryIds
-                .Select(id => new IngredientCategoryAssignment { CategoryId = id, Ingredient = ingredient })
-                .ToList();
 
             ingredient.IngredientNutrients = dto.Nutrients
                 .Select(n => new IngredientNutrient
                 {
-                    Ingredient = ingredient,
+                    IngredientId = ingredient.Id,
                     NutrientId = n.NutrientId,
                     Min = n.Min,
                     Max = n.Max,
@@ -145,7 +162,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (ingredient == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            //Miss Content  var used = wait to develop recipe module, its user can delete which one no use 
+            if (await _recipeRepository.ExistsAsync(c => c.Ingredients.Contains(ingredient)))
+                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             await _ingredientRepository.DeleteAsync(ingredient);
         }
@@ -159,7 +177,26 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (ingredient == null)
                     throw new AppException(AppResponseCode.NOT_FOUND);
 
+                var nutrientIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
+                if (!await _nutrientRepository.IdsExistAsync(nutrientIds))
+                    throw new AppException(AppResponseCode.NOT_FOUND);
+
+                await HasNutrientsRequied(nutrientIds);
+
+                foreach (var n in dto.Nutrients)
+                {
+                    IngredientService.ValidateValueInput(n);
+                }
+
                 ingredient.LastUpdatedUtc = DateTime.UtcNow;
+
+                var categories = await _ingredientCategoryRepository
+                .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
+
+                if (categories.Any(c => c.isDeleted))
+                    throw new AppException(AppResponseCode.INVALID_ACTION);
+
+                ingredient.Categories = categories.ToList();
 
                 if (!string.IsNullOrEmpty(dto.Description))
                     ingredient.Description = dto.Description.Trim();
@@ -179,36 +216,34 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     });
                 }
 
-                if (dto.Nutrients != null)
+                var existing = ingredient.IngredientNutrients.ToList();
+                var newIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
+
+                var toRemove = existing.Where(x => !newIds.Contains(x.NutrientId)).ToList();
+                foreach (var removeItem in toRemove)
                 {
-                    var allNutrients = await _nutrientRepository.GetAllAsync();
-                    var nutrientIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
+                    ingredient.IngredientNutrients.Remove(removeItem);
+                }
 
-                    if (!await _nutrientRepository.IdsExistAsync(nutrientIds))
-                        throw new AppException(AppResponseCode.NOT_FOUND);
-
-                    var existing = ingredient.IngredientNutrients.ToList();
-
-                    foreach (var nutrientDto in dto.Nutrients)
+                foreach (var nutrientDto in dto.Nutrients)
+                {
+                    var existingEntity = existing.FirstOrDefault(x => x.NutrientId == nutrientDto.NutrientId);
+                    if (existingEntity != null)
                     {
-                        var existingEntity = existing.FirstOrDefault(x => x.NutrientId == nutrientDto.NutrientId);
-                        if (existingEntity != null)
+                        existingEntity.Min = nutrientDto.Min;
+                        existingEntity.Max = nutrientDto.Max;
+                        existingEntity.Median = nutrientDto.Median;
+                    }
+                    else
+                    {
+                        ingredient.IngredientNutrients.Add(new IngredientNutrient
                         {
-                            existingEntity.Min = nutrientDto.Min;
-                            existingEntity.Max = nutrientDto.Max;
-                            existingEntity.Median = nutrientDto.Median;
-                        }
-                        else
-                        {
-                            ingredient.IngredientNutrients.Add(new IngredientNutrient
-                            {
-                                IngredientId = ingredient.Id,
-                                NutrientId = nutrientDto.NutrientId,
-                                Min = nutrientDto.Min,
-                                Max = nutrientDto.Max,
-                                Median = nutrientDto.Median
-                            });
-                        }
+                            IngredientId = ingredient.Id,
+                            NutrientId = nutrientDto.NutrientId,
+                            Min = nutrientDto.Min,
+                            Max = nutrientDto.Max,
+                            Median = nutrientDto.Median
+                        });
                     }
                 }
 
@@ -224,17 +259,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     .Include(i => i.IngredientNutrients)
                         .ThenInclude(n => n.Nutrient)
                             .ThenInclude(n => n.Unit)
-                    .Include(i => i.IngredientCategoryAssignments)
-                        .ThenInclude(a => a.Category)
+                    .Include(i => i.Categories)
             );
 
             if (ingredient == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            var ImageUrl = _s3ImageService.GeneratePreSignedUrl(ingredient.Image.Key);
-
             var result = _mapper.Map<IngredientDetailsResponse>(ingredient);
-            result.ImageUrl = ImageUrl!;
 
             return result;
         }

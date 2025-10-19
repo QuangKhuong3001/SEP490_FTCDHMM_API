@@ -2,7 +2,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SEP490_FTCDHMM_API.Api.Dtos.Common;
 using SEP490_FTCDHMM_API.Api.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -24,61 +23,57 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_View)]
         [HttpGet("getCustomers")]
-        public async Task<IActionResult> GetCustomerList([FromQuery] PaginationParams dto)
+        public async Task<IActionResult> GetCustomerList([FromQuery] UserFilterRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
 
             var result = await _userService.GetCustomerList(appDto);
             return Ok(result);
         }
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
-        [HttpPut("lockCustomer")]
-        public async Task<IActionResult> LockCustomer(LockRequest dto)
+        [HttpPut("lockCustomer/{userId:guid}")]
+        public async Task<IActionResult> LockCustomer(Guid userId, LockRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
-            var result = await _userService.LockCustomerAccount(appDto);
+            var result = await _userService.LockCustomerAccount(userId, appDto);
             return Ok(result);
         }
 
         [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
-        [HttpPut("unlockCustomer")]
-        public async Task<IActionResult> UnLockCustomer(UnlockRequest dto)
+        [HttpPut("unlockCustomer/{userId:guid}")]
+        public async Task<IActionResult> UnLockCustomer(Guid userId)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequest>(dto);
-
-            var result = await _userService.UnLockCustomerAccount(appDto);
+            var result = await _userService.UnLockCustomerAccount(userId);
             return Ok(result);
         }
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_View)]
         [HttpGet("getModerators")]
-        public async Task<IActionResult> GetModeratorList([FromQuery] PaginationParams dto)
+        public async Task<IActionResult> GetModeratorList([FromQuery] UserFilterRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
 
             var result = await _userService.GetModeratorList(appDto);
             return Ok(result);
         }
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
-        [HttpPut("lockModerator")]
-        public async Task<IActionResult> LockModerator(LockRequest dto)
+        [HttpPut("lockModerator/{userId:guid}")]
+        public async Task<IActionResult> LockModerator(Guid userId, LockRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
-            var result = await _userService.LockModeratorAccount(appDto);
+            var result = await _userService.LockModeratorAccount(userId, appDto);
             return Ok(result);
         }
 
         [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
-        [HttpPut("unlockModerator")]
-        public async Task<IActionResult> UnLockModerator(UnlockRequest dto)
+        [HttpPut("unlockModerator/{userId:guid}")]
+        public async Task<IActionResult> UnLockModerator(Guid userId)
         {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UnlockRequest>(dto);
-
-            var result = await _userService.UnLockModeratorAccount(appDto);
+            var result = await _userService.UnLockModeratorAccount(userId);
             return Ok(result);
         }
 

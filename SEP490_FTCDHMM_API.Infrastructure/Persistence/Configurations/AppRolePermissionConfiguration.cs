@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<AppRolePermission> builder)
         {
-            builder.ToTable(nameof(AppRolePermission));
+            builder.ToTable("RolePermissions");
 
             builder.HasKey(rp => new { rp.RoleId, rp.PermissionActionId });
 

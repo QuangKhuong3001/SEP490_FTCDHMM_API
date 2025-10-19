@@ -9,7 +9,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EmailOtp> builder)
         {
-            builder.ToTable(nameof(EmailOtp));
+            builder.ToTable("EmailOtps");
 
             builder.HasKey(e => e.Id);
 

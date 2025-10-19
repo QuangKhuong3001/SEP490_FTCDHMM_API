@@ -366,3 +366,4 @@ FodyWeavers.xsd
 appsettings*.json
 appsettings*.Development.json
 /SEP490_FTCDHMM_API.Api/appsettings.json
+/SEP490_FTCDHMM_API.Api/appsettings.Production.json

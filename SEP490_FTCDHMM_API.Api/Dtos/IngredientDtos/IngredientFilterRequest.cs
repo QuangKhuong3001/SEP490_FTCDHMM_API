@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
+﻿using SEP490_FTCDHMM_API.Api.Dtos.Common;
+
+namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
 {
     public class IngredientFilterRequest
     {
@@ -6,9 +8,7 @@
         public List<Guid>? CategoryIds { get; set; }
         public DateTime? UpdatedFrom { get; set; }
         public DateTime? UpdatedTo { get; set; }
-
-        public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
+        public required PaginationParams PaginationParams { get; set; }
     }
 
 }

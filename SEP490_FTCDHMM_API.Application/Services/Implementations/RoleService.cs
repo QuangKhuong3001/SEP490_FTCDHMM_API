@@ -77,16 +77,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<PagedResult<RoleResponse>> GetAllRoles(PaginationParams pagination)
         {
             var (roles, totalCount) = await _roleRepository.GetPagedAsync(
-                pagination.Page, pagination.PageSize);
+                pagination.PageNumber, pagination.PageSize);
 
             var result = _mapper.Map<List<RoleResponse>>(roles);
             return new PagedResult<RoleResponse>
             {
                 Items = result,
                 TotalCount = totalCount,
-                Page = pagination.Page,
+                PageNumber = pagination.PageNumber,
                 PageSize = pagination.PageSize
             };
+        }
+
+        public async Task<RoleNameResponse> GetActivateRoles()
+        {
+            var roles = await _roleRepository.GetAllAsync(r => r.IsActive);
+
+            var result = _mapper.Map<RoleNameResponse>(roles);
+            return result;
         }
 
         public async Task ActiveRole(Guid roleId)
@@ -111,14 +119,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (role.IsActive == false)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
+            var existingUserInRole = await _userRepository.ExistsAsync(x => x.RoleId == roleId);
+            if (existingUserInRole)
+            {
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+            }
+
             role.IsActive = false;
             await _roleRepository.UpdateAsync(role);
         }
 
-        public async Task UpdateRolePermissions(RolePermissionSettingRequest dto)
+        public async Task UpdateRolePermissions(Guid roleId, RolePermissionSettingRequest dto)
         {
             var rolePermissions = await _rolePermissionRepository
-                .GetAllAsync(rp => rp.RoleId == dto.RoleId);
+                .GetAllAsync(rp => rp.RoleId == roleId);
 
             if (rolePermissions == null || !rolePermissions.Any())
                 throw new AppException(AppResponseCode.NOT_FOUND);

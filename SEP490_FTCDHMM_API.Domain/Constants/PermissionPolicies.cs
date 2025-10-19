@@ -16,6 +16,13 @@
         public const string Ingredient_Update = "Ingredient:Update";
         public const string Ingredient_Delete = "Ingredient:Delete";
 
+        public const string Label_Delete = "Label:Delete";
+        public const string Label_Create = "Label:Create";
+        public const string Label_Update = "Label:Update";
+
+        public const string IngredientCategory_Create = "Label:Create";
+        public const string IngredientCategory_Delete = "Label:Delete";
+
     }
 
 }

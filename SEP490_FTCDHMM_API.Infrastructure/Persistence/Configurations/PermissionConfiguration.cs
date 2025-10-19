@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PermissionAction> builder)
         {
-            builder.ToTable(nameof(PermissionAction));
+            builder.ToTable("PermissionActions");
 
             builder.HasKey(p => p.Id);
 

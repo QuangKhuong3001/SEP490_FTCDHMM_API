@@ -2,7 +2,6 @@
 {
     public class LockRequest
     {
-        public Guid UserId { get; set; }
         public int Day { get; set; } = 1;
     }
 }

@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Image> builder)
         {
-            builder.ToTable(nameof(Image));
+            builder.ToTable("Images");
 
             builder.HasKey(i => i.Id);
 

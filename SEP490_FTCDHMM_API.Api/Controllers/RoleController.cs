@@ -59,10 +59,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> UpdateRolePermissions(Guid roleId, RolePermissionSettingDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.RoleDtos.RolePermissionSettingRequest>(dto);
-            appDto.RoleId = roleId;
 
-            await _roleService.UpdateRolePermissions(appDto);
-
+            await _roleService.UpdateRolePermissions(roleId, appDto);
             return Ok();
         }
 

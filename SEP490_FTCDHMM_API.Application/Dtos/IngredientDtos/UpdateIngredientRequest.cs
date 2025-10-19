@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos
     {
         public string? Description { get; set; }
         public IFormFile? Image { get; set; }
-        public List<NutrientRequest>? Nutrients { get; set; }
-
+        public required List<NutrientRequest> Nutrients { get; set; }
+        public required List<Guid> IngredientCategoryIds { get; set; }
     }
 }

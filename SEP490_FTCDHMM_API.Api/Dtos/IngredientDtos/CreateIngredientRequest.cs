@@ -13,7 +13,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Missing Ingredient Category")]
-        public List<Guid> IngredientCategoryIds { get; set; } = new();
+        public required List<Guid> IngredientCategoryIds { get; set; }
 
         [Required(ErrorMessage = "Missing Image")]
         public required IFormFile Image { get; set; }

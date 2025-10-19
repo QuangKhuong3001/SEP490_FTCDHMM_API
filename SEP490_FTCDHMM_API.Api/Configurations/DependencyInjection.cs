@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
-using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -200,9 +199,30 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //ingredientCategory
             services.AddScoped<IIngredientCategoryRepository, IngredientCategoryRepository>();
+            services.AddScoped<IIngredientCategoryService, IngredientCategoryService>();
 
             //nutrient
             services.AddScoped<INutrientRepository, NutrientRepository>();
+
+            //label
+            services.AddScoped<ILabelRepository, LabelRepository>();
+            services.AddScoped<ILabelService, LabelService>();
+
+            //recipe
+            services.AddScoped<IRecipeRepository, RecipeRepository>();
+            services.AddScoped<IRecipeService, RecipeService>();
+
+            //userRecipeView
+            services.AddScoped<IUserRecipeViewRepository, UserRecipeViewRepository>();
+
+            //userSaveRecipe
+            services.AddScoped<IUserSaveRecipeRepository, UserSaveRecipeRepository>();
+
+            //userFavoriteRecipe
+            services.AddScoped<IUserFavoriteRecipeRepository, UserFavoriteRecipeRepository>();
+
+            //cookingstep
+            services.AddScoped<ICookingStepRepository, CookingStepRepository>();
 
         }
     }

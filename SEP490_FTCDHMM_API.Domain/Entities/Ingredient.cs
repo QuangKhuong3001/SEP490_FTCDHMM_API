@@ -14,9 +14,10 @@
         public Guid ImageId { get; set; }
         public required Image Image { get; set; }
 
-        public ICollection<IngredientCategoryAssignment> IngredientCategoryAssignments { get; set; }
-                    = new List<IngredientCategoryAssignment>();
+        public ICollection<IngredientCategory> Categories { get; set; } = new List<IngredientCategory>();
 
         public ICollection<IngredientNutrient> IngredientNutrients { get; set; } = new List<IngredientNutrient>();
+        public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
+
     }
 }

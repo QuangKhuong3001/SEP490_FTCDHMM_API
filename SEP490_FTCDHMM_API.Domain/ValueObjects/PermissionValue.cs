@@ -18,6 +18,13 @@
         public static readonly PermissionValue Ingredient_Update = new("Ingredient", "Update");
         public static readonly PermissionValue Ingredient_Delete = new("Ingredient", "Delete");
 
+        public static readonly PermissionValue Label_Create = new("Label", "Create");
+        public static readonly PermissionValue Label_Update = new("Label", "Update");
+        public static readonly PermissionValue Label_Delete = new("Label", "Delete");
+
+        public static readonly PermissionValue IngredientCategory_Crete = new("IngredientCategory", "Create");
+        public static readonly PermissionValue IngredientCategory_Delete = new("IngredientCategory", "Delete");
+
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -28,7 +35,12 @@
             Customer_Update,
             Ingredient_Create,
             Ingredient_Update,
-            Ingredient_Delete
+            Ingredient_Delete,
+            Label_Create,
+            Label_Delete,
+            Label_Update,
+            IngredientCategory_Crete,
+            IngredientCategory_Crete
         };
     }
 }

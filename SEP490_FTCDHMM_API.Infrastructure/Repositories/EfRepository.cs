@@ -118,7 +118,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         }
 
         public async Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
-            int page,
+            int pageNumber,
             int pageSize,
             Expression<Func<T, bool>>? filter = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
@@ -164,7 +164,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             var totalCount = await query.CountAsync();
 
             var items = await query
-                .Skip((page - 1) * pageSize)
+                .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 

@@ -9,9 +9,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
-            builder.ToTable(nameof(AppUser));
+            builder.ToTable("Users");
 
             builder.HasKey(u => u.Id);
+
+            builder.Property(u => u.Email)
+               .IsRequired()
+               .HasMaxLength(256);
 
             builder.Property(u => u.FirstName)
                 .IsRequired()
@@ -40,9 +44,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .IsRequired();
 
             builder.HasOne(u => u.Avatar)
-            .WithOne()
-            .HasForeignKey<AppUser>(u => u.AvatarId)
-            .OnDelete(DeleteBehavior.Restrict);
+                    .WithOne()
+                    .HasForeignKey<AppUser>(u => u.AvatarId)
+                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
         Task<bool> IdsExistAsync(List<Guid> ids);
         Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
-            int page,
+            int pageNumber,
             int pageSize,
             Expression<Func<T, bool>>? filter = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,

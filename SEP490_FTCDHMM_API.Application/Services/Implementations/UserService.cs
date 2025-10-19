@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -48,15 +47,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userFollowRepository = userFollowRepository;
         }
 
-        public async Task<PagedResult<UserResponse>> GetCustomerList(PaginationParams pagination)
+        public async Task<PagedResult<UserResponse>> GetCustomerList(UserFilterRequest request)
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
-                pagination.Page, pagination.PageSize,
+                request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
                 u => u.Role.Name == RoleValue.Customer.Name &&
-                     (string.IsNullOrEmpty(pagination.Search) ||
-                      (u.FirstName != null && u.FirstName.Contains(pagination.Search!)) ||
-                      (u.LastName != null && u.LastName.Contains(pagination.Search!)) ||
-                      (u.Email != null && u.Email.Contains(pagination.Search!))),
+                     (string.IsNullOrEmpty(request.Keyword) ||
+                      u.FirstName.Contains(request.Keyword!) ||
+                      u.LastName.Contains(request.Keyword!) ||
+                      u.Email!.Contains(request.Keyword!)),
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserResponse>>(customers);
@@ -65,14 +64,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Items = result,
                 TotalCount = totalCount,
-                Page = pagination.Page,
-                PageSize = pagination.PageSize
+                PageNumber = request.PaginationParams.PageNumber,
+                PageSize = request.PaginationParams.PageSize
             };
         }
 
-        public async Task<LockResponse> LockCustomerAccount(LockRequest dto)
+        public async Task<LockResponse> LockCustomerAccount(Guid userId, LockRequest dto)
         {
-            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -90,9 +89,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<UnlockResponse> UnLockCustomerAccount(UnlockRequest dto)
+        public async Task<UnlockResponse> UnLockCustomerAccount(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -112,15 +111,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<PagedResult<UserResponse>> GetModeratorList(PaginationParams pagination)
+        public async Task<PagedResult<UserResponse>> GetModeratorList(UserFilterRequest request)
         {
             var (modetators, totalCount) = await _userRepository.GetPagedAsync(
-                pagination.Page, pagination.PageSize,
+                request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
                 u => u.Role.Name == RoleValue.Moderator.Name &&
-                     (string.IsNullOrEmpty(pagination.Search) ||
-                      (u.FirstName != null && u.FirstName.Contains(pagination.Search!)) ||
-                      (u.LastName != null && u.LastName.Contains(pagination.Search!)) ||
-                      (u.Email != null && u.Email.Contains(pagination.Search!))),
+                     (string.IsNullOrEmpty(request.Keyword) ||
+                     u.FirstName.Contains(request.Keyword!) ||
+                     u.LastName.Contains(request.Keyword!) ||
+                     u.Email!.Contains(request.Keyword!)),
                 q => q.OrderBy(u => u.CreatedAtUtc));
 
             var result = _mapper.Map<List<UserResponse>>(modetators);
@@ -129,13 +128,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Items = result,
                 TotalCount = totalCount,
-                Page = pagination.Page,
-                PageSize = pagination.PageSize
+                PageNumber = request.PaginationParams.PageNumber,
+                PageSize = request.PaginationParams.PageSize
             };
         }
-        public async Task<LockResponse> LockModeratorAccount(LockRequest dto)
+        public async Task<LockResponse> LockModeratorAccount(Guid userId, LockRequest dto)
         {
-            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -152,9 +151,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 LockoutEnd = user.LockoutEnd
             };
         }
-        public async Task<UnlockResponse> UnLockModeratorAccount(UnlockRequest dto)
+        public async Task<UnlockResponse> UnLockModeratorAccount(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(dto.UserId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -240,17 +239,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var profile = _mapper.Map<ProfileResponse>(user);
-            profile.Avatar = _s3ImageService.GeneratePreSignedUrl(user.Avatar?.Key ?? null);
 
-            // Get followers count
             var followersCount = await _userFollowRepository.CountAsync(f => f.FolloweeId == userId);
             profile.FollowersCount = followersCount;
 
-            // Get following count
             var followingCount = await _userFollowRepository.CountAsync(f => f.FollowerId == userId);
             profile.FollowingCount = followingCount;
 
-            // Check if current user is following this profile
             if (currentUserId.HasValue && currentUserId.Value != userId)
             {
                 var isFollowing = await _userFollowRepository.ExistsAsync(

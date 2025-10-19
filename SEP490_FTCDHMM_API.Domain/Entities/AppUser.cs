@@ -18,6 +18,10 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public AppRole Role { get; set; } = null!;
         public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
         public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
+        public ICollection<UserRecipeView> ViewedRecipes { get; set; } = new List<UserRecipeView>();
+        public ICollection<UserFavoriteRecipe> FavoriteRecipes { get; set; } = new List<UserFavoriteRecipe>();
+        public ICollection<UserSaveRecipe> SaveRecipes { get; set; } = new List<UserSaveRecipe>();
+
 
     }
 }

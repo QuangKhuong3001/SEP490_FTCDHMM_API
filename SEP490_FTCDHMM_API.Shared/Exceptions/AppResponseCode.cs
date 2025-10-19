@@ -21,6 +21,7 @@
         public static readonly AppResponseCode NAME_ALREADY_EXISTS = new(417, "NAME_ALREADY_EXISTS");
         public static readonly AppResponseCode ROLE_ALREADY_EXISTS = new(418, "ROLE_ALREADY_EXISTS");
         public static readonly AppResponseCode MISSING_REQUIRED_NUTRIENTS = new(419, "MISSING_REQUIRED_NUTRIENTS");
+        public static readonly AppResponseCode INVALID_INPUT = new(420, "INVALID_INPUT");
         public static readonly AppResponseCode UNKNOWN_ERROR = new(500, "UNKNOWN_ERROR");
 
 
