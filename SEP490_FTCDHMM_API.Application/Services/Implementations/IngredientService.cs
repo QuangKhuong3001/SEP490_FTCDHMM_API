@@ -51,9 +51,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         private async Task HasNutrientsRequied(List<Guid> nutrientIds)
         {
-            var requiredNames = new[] { "Calories", "Protein", "Fat", "Carbohydrate" };
-
-            var requiredNutrients = await _nutrientRepository.GetAllAsync(n => requiredNames.Contains(n.Name));
+            var requiredNutrients = await _nutrientRepository.GetAllAsync(n => n.IsRequired);
             var requiredNutrientIds = requiredNutrients.Select(r => r.Id);
 
             var missingRequired = requiredNutrientIds.Except(nutrientIds).ToList();

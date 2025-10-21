@@ -42,11 +42,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 await _ingredientCategoryRepository.DeleteAsync(category);
             }
         }
+
         public async Task<PagedResult<IngredientCategoryResponse>> GetAllCategories(IngredientCategoryFilterRequest request)
         {
             var (categories, totalCount) = await _ingredientCategoryRepository.GetPagedAsync(
                             request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                            l => l.isDeleted == false,
+                            l => l.isDeleted == false &&
+                                (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)),
                             q => q.OrderBy(u => u.Name));
 
             var result = _mapper.Map<List<IngredientCategoryResponse>>(categories);
@@ -63,7 +65,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var ingredients = await _ingredientCategoryRepository.GetAllAsync(
                             l => !l.isDeleted &&
-                                 (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
+                                (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
             ingredients = ingredients.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<List<IngredientCategoryResponse>>(ingredients);

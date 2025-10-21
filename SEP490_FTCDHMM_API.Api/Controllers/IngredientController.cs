@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SEP490_FTCDHMM_API.Api.Dtos.IngredientDetectionDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -15,12 +16,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     public class IngredientController : ControllerBase
     {
         private readonly IIngredientService _ingredientService;
+        private readonly IIngredientDetectionService _ingredientDetectionService;
         private readonly IMapper _mapper;
 
-        public IngredientController(IIngredientService ingredientService, IMapper mapper)
+        public IngredientController(IIngredientService ingredientService, IMapper mapper, IIngredientDetectionService ingredientDetectionService)
         {
             _ingredientService = ingredientService;
             _mapper = mapper;
+            _ingredientDetectionService = ingredientDetectionService;
         }
 
         [Authorize]
@@ -70,6 +73,16 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             await _ingredientService.DeleteIngredient(id);
             return Ok(new { message = "Ingredient deleted successfully." });
+        }
+
+        [HttpPost("detect-gemini")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> DetectByGemini([FromForm] IngredientDetectionUploadRequest request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest>(request);
+
+            var result = await _ingredientDetectionService.DetectIngredientsAsync(appRequest);
+            return Ok(result);
         }
     }
 }

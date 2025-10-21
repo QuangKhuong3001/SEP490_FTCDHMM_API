@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Api.Dtos.GoogleAuthDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
@@ -18,13 +17,11 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
-        private readonly IGoogleAuthService _googleAuthService;
 
-        public AuthController(IAuthService authService, IMapper mapper, IGoogleAuthService googleAuthService)
+        public AuthController(IAuthService authService, IMapper mapper)
         {
             _authService = authService;
             _mapper = mapper;
-            _googleAuthService = googleAuthService;
         }
 
         [DisallowAuthenticated]

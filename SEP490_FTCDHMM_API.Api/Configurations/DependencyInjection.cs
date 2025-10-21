@@ -168,6 +168,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddHttpClient<IGoogleAuthService, GoogleAuthService>();
             services.AddScoped<IGoogleProvisioningService, GoogleProvisioningService>();
 
+            //gemini
+            services.AddScoped<IGeminiIngredientDetectionService, GeminiIngredientDetectionService>();
+
             // DI Internal Service
             // Auth
             services.AddScoped<IAuthService, AuthService>();
@@ -203,6 +206,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //nutrient
             services.AddScoped<INutrientRepository, NutrientRepository>();
+            services.AddScoped<INutrientService, NutrientService>();
 
             //label
             services.AddScoped<ILabelRepository, LabelRepository>();
@@ -223,6 +227,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //cookingstep
             services.AddScoped<ICookingStepRepository, CookingStepRepository>();
+
+            //ingredientDetection
+            services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
+
 
         }
     }

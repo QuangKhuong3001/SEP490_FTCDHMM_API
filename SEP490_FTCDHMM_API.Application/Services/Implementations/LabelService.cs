@@ -34,7 +34,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (labels, totalCount) = await _labelRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                l => l.isDeleted == false,
+                l => l.isDeleted == false &&
+                    (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)),
                 q => q.OrderBy(u => u.Name));
 
             var result = _mapper.Map<List<LabelResponse>>(labels);
@@ -51,7 +52,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var labels = await _labelRepository.GetAllAsync(
                 l => !l.isDeleted &&
-                     (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
+                    (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
             labels = labels.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<List<LabelResponse>>(labels);

@@ -27,7 +27,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateRecipe(CreateRecipeRequest request)
+        public async Task<IActionResult> CreateRecipe([FromForm] CreateRecipeRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 

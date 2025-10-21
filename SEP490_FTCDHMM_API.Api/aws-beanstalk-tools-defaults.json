@@ -1,14 +1,13 @@
-
 {
-    "region" : "ap-southeast-1",
-    "configuration" : "Debug",
-    "framework"     : "net8.0",
-    "self-contained" : false,
-    "application"    : "FitFoodAPI",
-    "environment"    : "FitFoodAPI-env",
-    "app-path"       : "/",
-    "iis-website"    : "Default Web Site",
-    "enable-xray"    : false,
-    "enhanced-health-type" : "enhanced",
-    "additional-options"   : ""
+  "region": "ap-southeast-1",
+  "configuration": "Debug",
+  "framework": "net8.0",
+  "self-contained": false,
+  "application": "FitFoodAPI",
+  "environment": "FitFoodAPI-env",
+  "app-path": "/",
+  "iis-website": "Default Web Site",
+  "enable-xray": false,
+  "enhanced-health-type": "enhanced",
+  "additional-options": ""
 }

@@ -13,6 +13,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.HasKey(u => u.Id);
 
+            builder.Ignore(u => u.PhoneNumberConfirmed);
+
             builder.Property(u => u.Email)
                .IsRequired()
                .HasMaxLength(256);

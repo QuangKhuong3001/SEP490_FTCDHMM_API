@@ -111,9 +111,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     Recipe = recipe
                 });
 
-                await _cookingStepRepository.AddRangeAsync(steps);
             }
-
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);
@@ -192,7 +190,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     Recipe = recipe
                 });
 
-                await _cookingStepRepository.AddRangeAsync(newSteps);
             }
 
             recipe.CookingSteps = newSteps;

@@ -12,6 +12,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.HasKey(n => n.Id);
 
+            builder.Property(e => e.IsRequired)
+                .HasDefaultValue(false);
+
             builder.Property(n => n.Name)
                    .HasMaxLength(200)
                    .IsRequired();
