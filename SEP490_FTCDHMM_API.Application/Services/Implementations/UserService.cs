@@ -98,7 +98,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user.Role.Name != RoleValue.Customer.Name)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
-            if (user.LockoutEnd > DateTime.UtcNow)
+            if (user.LockoutEnd <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
@@ -161,7 +161,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user.Role.Name != RoleValue.Moderator.Name)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
-            if (user.LockoutEnd > DateTime.UtcNow)
+            if (user.LockoutEnd <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
