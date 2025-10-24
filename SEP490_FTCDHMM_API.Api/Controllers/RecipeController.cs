@@ -140,7 +140,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpGet("myRecipe")]
-        public async Task<IActionResult> GetMyRecipeList([FromForm] PaginationParams request)
+        public async Task<IActionResult> GetMyRecipeList([FromQuery] PaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
