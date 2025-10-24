@@ -432,7 +432,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                  q.Include(r => r.Image)
-                 .Include(r => r.Labels);
+                 .Include(r => r.Labels)
+                 .Include(r => r.Ingredients);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
