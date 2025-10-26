@@ -18,6 +18,8 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public DateTime UpdatedAtUtc { get; set; }
         public required int Ration { get; set; }
         public string? ImageUrl { get; set; }
+        public bool IsFavorited { get; set; }
+        public bool IsSaved { get; set; }
 
         public required List<CookingStepResponse> CookingSteps { get; set; }
         public required List<LabelResponse> Labels { get; set; }

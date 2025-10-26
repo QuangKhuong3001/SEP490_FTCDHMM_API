@@ -291,7 +291,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 });
             }
 
+            // Check if recipe is favorited and saved by current user
+            var isFavorited = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
+            var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
+
             var result = _mapper.Map<RecipeDetailsResponse>(recipe);
+            result.IsFavorited = isFavorited;
+            result.IsSaved = isSaved;
+
             return result;
         }
         public async Task AddToFavorite(Guid userId, Guid recipeId)
