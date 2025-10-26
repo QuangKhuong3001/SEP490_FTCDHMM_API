@@ -235,7 +235,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
                  .Include(r => r.Ingredients)
-                 .Include(r => r.Labels);
+                 .Include(r => r.Labels)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
@@ -260,11 +262,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
-                r => r.Image!,
-                r => r.Labels,
-                r => r.CookingSteps,
-                r => r.Ingredients);
+      IQueryable<Recipe> include(IQueryable<Recipe> q) =>
+          q.Include(r => r.Author)
+           .Include(r => r.Author!.Avatar)
+           .Include(r => r.Image)
+           .Include(r => r.Labels)
+           .Include(r => r.CookingSteps)
+           .ThenInclude(cs => cs.Image)
+           .Include(r => r.Ingredients);
+
+      var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);
