@@ -145,9 +145,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 {
                     IngredientId = ingredient.Id,
                     NutrientId = n.NutrientId,
-                    Min = n.Min,
-                    Max = n.Max,
-                    Median = n.Median
+                    MinPer100 = n.Min,
+                    MaxPer100 = n.Max,
+                    MedianPer100g = n.Median
                 })
                 .ToList();
 
@@ -228,9 +228,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     var existingEntity = existing.FirstOrDefault(x => x.NutrientId == nutrientDto.NutrientId);
                     if (existingEntity != null)
                     {
-                        existingEntity.Min = nutrientDto.Min;
-                        existingEntity.Max = nutrientDto.Max;
-                        existingEntity.Median = nutrientDto.Median;
+                        existingEntity.MinPer100 = nutrientDto.Min;
+                        existingEntity.MaxPer100 = nutrientDto.Max;
+                        existingEntity.MedianPer100g = nutrientDto.Median;
                     }
                     else
                     {
@@ -238,9 +238,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         {
                             IngredientId = ingredient.Id,
                             NutrientId = nutrientDto.NutrientId,
-                            Min = nutrientDto.Min,
-                            Max = nutrientDto.Max,
-                            Median = nutrientDto.Median
+                            MinPer100 = nutrientDto.Min,
+                            MaxPer100 = nutrientDto.Max,
+                            MedianPer100g = nutrientDto.Median
                         });
                     }
                 }

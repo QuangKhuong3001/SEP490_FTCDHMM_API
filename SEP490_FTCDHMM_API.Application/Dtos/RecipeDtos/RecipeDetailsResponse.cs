@@ -14,7 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public required AuthorResponse Author { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public required DifficultyValue Difficulty { get; set; }
-        public double CookTime { get; set; }
+        public decimal CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public required int Ration { get; set; }
         public string? ImageUrl { get; set; }

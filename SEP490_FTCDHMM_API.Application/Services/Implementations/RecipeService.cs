@@ -122,7 +122,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId, include: i => i.Include(r => r.Labels).Include(r => r.Ingredients));
             if ((recipe == null) || (recipe.isDeleted == true))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
@@ -140,6 +140,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!(labelExists && ingredientExists))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
+            recipe.Labels.Clear();
+            recipe.Ingredients.Clear();
 
             recipe.Name = request.Name;
             recipe.Description = request.Description;

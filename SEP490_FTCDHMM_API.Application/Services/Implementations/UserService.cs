@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
@@ -327,8 +328,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
-                u => u.Follower
-            );
+                include: i => i.Include(u => u.Follower));
+
 
 
             var followerUsers = followers.Select(f => f.Follower).ToList();
@@ -340,8 +341,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
-                u => u.Followee
-            );
+                include: i => i.Include(u => u.Followee));
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 

@@ -26,8 +26,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.isDeleted)
                 .HasDefaultValue(false);
 
-            builder.Property(r => r.CookTime)
-                .HasPrecision(10, 2);
+            builder.Property(x => x.CookTime)
+                .IsRequired();
 
             builder.Property(r => r.Ration)
                 .IsRequired();
