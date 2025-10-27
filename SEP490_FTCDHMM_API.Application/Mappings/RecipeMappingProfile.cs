@@ -16,12 +16,18 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.Author,
                     opt => opt.MapFrom(r => r.Author)
+                ).ForMember(
+                    dest => dest.Ingredients,
+                    opt => opt.MapFrom(r => r.RecipeIngredients)
                 );
 
             CreateMap<Recipe, MyRecipeResponse>()
                 .ForMember(
                     dest => dest.ImageUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<Recipe, MyRecipeResponse>>()
+                ).ForMember(
+                    dest => dest.Ingredients,
+                    opt => opt.MapFrom(r => r.RecipeIngredients)
                 );
 
             CreateMap<Recipe, RecipeDetailsResponse>()
@@ -32,6 +38,15 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.Author,
                     opt => opt.MapFrom(r => r.Author)
+                ).ForMember(
+                    dest => dest.Ingredients,
+                    opt => opt.MapFrom(r => r.RecipeIngredients)
+                );
+
+            CreateMap<RecipeIngredient, RecipeIngredientResponse>()
+                .ForMember(
+                    dest => dest.Name,
+                    opt => opt.MapFrom(r => r.Ingredient.Name)
                 );
         }
     }

@@ -6,13 +6,15 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
     {
         Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes);
         Task<T?> GetByIdAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null);
-        Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
-        Task<IReadOnlyList<T>> GetAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
+        Task<IList<T>> GetAllAsync(
+            Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IQueryable<T>>? include = null);
 
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
+        Task DeleteRangeAsync(IEnumerable<T> entities);
 
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);

@@ -11,7 +11,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public AppUser Author { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public required DifficultyValue Difficulty { get; set; }
-        public double CookTime { get; set; }
+        public int CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public required int Ration { get; set; }
         public Guid? ImageId { get; set; }
@@ -21,7 +21,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
 
         public ICollection<CookingStep> CookingSteps { get; set; } = new List<CookingStep>();
         public ICollection<Label> Labels { get; set; } = new List<Label>();
-        public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+        public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+        public ICollection<RecipeNutritionAggregate> NutritionAggregates { get; set; } = new List<RecipeNutritionAggregate>();
         public ICollection<UserRecipeView> Views { get; set; } = new List<UserRecipeView>();
         public ICollection<UserFavoriteRecipe> FavoritedBy { get; set; } = new List<UserFavoriteRecipe>();
         public ICollection<UserSaveRecipe> SavedBy { get; set; } = new List<UserSaveRecipe>();

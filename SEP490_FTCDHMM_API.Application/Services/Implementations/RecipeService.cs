@@ -11,6 +11,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
@@ -30,6 +31,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserFavoriteRecipeRepository _userFavoriteRecipeRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
         private readonly ICookingStepRepository _cookingStepRepository;
+        private readonly IRecipeNutritionAggregator _recipeNutritionAggregator;
 
         public RecipeService(IRecipeRepository recipeRepository,
             IMapper mapper,
@@ -42,7 +44,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IUserRecipeViewRepository userRecipeViewRepository,
             IUserFavoriteRecipeRepository userFavoriteRecipeRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
-            ICookingStepRepository cookingStepRepository)
+            ICookingStepRepository cookingStepRepository,
+            IRecipeNutritionAggregator recipeNutritionAggregator)
         {
             _recipeRepository = recipeRepository;
             _mapper = mapper;
@@ -56,6 +59,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userFavoriteRecipeRepository = userFavoriteRecipeRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _cookingStepRepository = cookingStepRepository;
+            _recipeNutritionAggregator = recipeNutritionAggregator;
         }
 
         public async Task CreatRecipe(Guid userId, CreateRecipeRequest request)
@@ -65,13 +69,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var labelExists = await _labelRepository.IdsExistAsync(request.LabelIds);
-            var ingredientExists = await _ingredientRepository.IdsExistAsync(request.IngredientIds);
 
-            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
-            var ingredients = await _ingredientRepository.GetAllAsync(i => request.IngredientIds.Contains(i.Id));
+            var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
+            var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
             if (!(labelExists && ingredientExists))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
             var recipe = new Recipe
             {
@@ -81,9 +86,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Difficulty = DifficultyValue.From(request.Difficulty),
                 CookTime = request.CookTime,
                 Labels = labels.ToList(),
-                Ingredients = ingredients.ToList(),
                 Ration = request.Ration,
+                RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
+                {
+                    IngredientId = i.IngredientId,
+                    QuantityGram = i.QuantityGram
+                }).ToList()
             };
+
 
             if (request.Image != null && request.Image.Length > 0)
             {
@@ -115,6 +125,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);
+
+            var fullRecipe = await _recipeRepository.GetByIdAsync(recipe.Id,
+            include: q => q
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                        .ThenInclude(i => i.IngredientNutrients)
+                        .ThenInclude(n => n.Nutrient)
+);
+            await _recipeNutritionAggregator.AggregateAndSaveAsync(fullRecipe!);
         }
         public async Task UpdateRecipe(Guid userId, Guid recipeId, UpdateRecipeRequest request)
         {
@@ -122,7 +141,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId, include: i => i.Include(r => r.Labels).Include(r => r.RecipeIngredients));
             if ((recipe == null) || (recipe.isDeleted == true))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
@@ -132,21 +151,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             var labelExists = await _labelRepository.IdsExistAsync(request.LabelIds);
-            var ingredientExists = await _ingredientRepository.IdsExistAsync(request.IngredientIds);
 
-            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
-            var ingredients = await _ingredientRepository.GetAllAsync(i => request.IngredientIds.Contains(i.Id));
+            var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
+            var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
             if (!(labelExists && ingredientExists))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
+            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
+
+            recipe.Labels.Clear();
+            recipe.RecipeIngredients.Clear();
 
             recipe.Name = request.Name;
             recipe.Description = request.Description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
             recipe.CookTime = request.CookTime;
             recipe.Labels = labels.ToList();
-            recipe.Ingredients = ingredients.ToList();
+            recipe.RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
+            {
+                RecipeId = recipeId,
+                IngredientId = i.IngredientId,
+                QuantityGram = i.QuantityGram
+            }).ToList();
             recipe.UpdatedAtUtc = DateTime.UtcNow;
             recipe.Ration = request.Ration;
 
@@ -195,6 +222,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             recipe.CookingSteps = newSteps;
 
             await _recipeRepository.UpdateAsync(recipe);
+
+            await _recipeNutritionAggregator.AggregateAndSaveAsync(recipe);
+
         }
         public async Task DeleteRecipe(Guid userId, Guid recipeId)
         {
@@ -234,7 +264,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
-                 .Include(r => r.Ingredients)
+                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.Labels);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
@@ -261,10 +291,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId,
-                r => r.Image!,
-                r => r.Labels,
-                r => r.CookingSteps,
-                r => r.Ingredients);
+                include: i => i.Include(r => r.Image!)
+                .Include(r => r.Labels)
+                .Include(r => r.CookingSteps)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient));
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);

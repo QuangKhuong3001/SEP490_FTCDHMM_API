@@ -26,8 +26,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.isDeleted)
                 .HasDefaultValue(false);
 
-            builder.Property(r => r.CookTime)
-                .HasPrecision(10, 2);
+            builder.Property(x => x.CookTime)
+                .IsRequired();
 
             builder.Property(r => r.Ration)
                 .IsRequired();
@@ -48,9 +48,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .WithMany(l => l.Recipes)
                 .UsingEntity(j => j.ToTable("RecipeLabels"));
 
-            builder.HasMany(r => r.Ingredients)
-                .WithMany(i => i.Recipes)
-                .UsingEntity(j => j.ToTable("RecipeIngredients"));
+            builder.HasMany(r => r.RecipeIngredients)
+                   .WithOne(ri => ri.Recipe)
+                   .HasForeignKey(ri => ri.RecipeId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(r => r.CookingSteps)
                 .WithOne(cs => cs.Recipe)

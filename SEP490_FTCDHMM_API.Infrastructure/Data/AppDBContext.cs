@@ -12,22 +12,30 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
             : base(options) { }
 
         public DbSet<AppRolePermission> AppRolePermissions { get; set; }
+        public DbSet<CookingStep> CookingSteps { get; set; } = null!;
+        public DbSet<CustomHealthGoal> CustomHealthGoals { get; set; } = null!;
+        public DbSet<CustomHealthGoalTarget> CustomHealthGoalTargets { get; set; } = null!;
         public DbSet<EmailOtp> EmailOtps { get; set; }
+        public DbSet<HealthGoal> HealthGoals { get; set; } = null!;
+        public DbSet<HealthGoalTarget> HealthGoalTargets { get; set; } = null!;
         public DbSet<Image> Images { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<IngredientCategory> IngredientCategories { get; set; }
         public DbSet<IngredientNutrient> IngredientNutrients { get; set; }
-        public DbSet<CookingStep> CookingSteps { get; set; } = null!;
         public DbSet<Label> Labels { get; set; }
         public DbSet<Nutrient> Nutrients { get; set; }
         public DbSet<NutrientUnit> NutrientUnits { get; set; }
         public DbSet<PermissionAction> PermissionActions { get; set; }
         public DbSet<PermissionDomain> PermissionDomains { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+        public DbSet<RecipeNutritionAggregate> RecipeNutritionAggregates { get; set; }
         public DbSet<UserFavoriteRecipe> UserFavoriteRecipes { get; set; }
-        public DbSet<UserSaveRecipe> UserSaveRecipes { get; set; }
         public DbSet<UserFollow> UserFollows { get; set; }
+        public DbSet<UserHealthGoal> UserHealthGoals { get; set; }
         public DbSet<UserRecipeView> UserRecipeViews { get; set; }
+        public DbSet<UserSaveRecipe> UserSaveRecipes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

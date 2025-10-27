@@ -22,13 +22,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .HasForeignKey(x => x.NutrientId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(x => x.Min)
+            builder.Property(x => x.MinValue)
                    .HasPrecision(10, 3);
 
-            builder.Property(x => x.Max)
+            builder.Property(x => x.MaxValue)
                    .HasPrecision(10, 3);
 
-            builder.Property(x => x.Median)
+            builder.Property(x => x.MedianValue)
                    .HasPrecision(10, 3)
                    .IsRequired();
 

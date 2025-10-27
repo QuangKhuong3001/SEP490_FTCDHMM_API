@@ -22,8 +22,12 @@
         public static readonly PermissionValue Label_Update = new("Label", "Update");
         public static readonly PermissionValue Label_Delete = new("Label", "Delete");
 
-        public static readonly PermissionValue IngredientCategory_Crete = new("IngredientCategory", "Create");
+        public static readonly PermissionValue IngredientCategory_Create = new("IngredientCategory", "Create");
         public static readonly PermissionValue IngredientCategory_Delete = new("IngredientCategory", "Delete");
+
+        public static readonly PermissionValue HealthGoal_Create = new("HealthGoal", "Create");
+        public static readonly PermissionValue HealthGoal_Update = new("HealthGoal", "Update");
+        public static readonly PermissionValue HealthGoal_Delete = new("HealthGoal", "Delete");
 
         public static IEnumerable<PermissionValue> All => new[]
         {
@@ -39,8 +43,11 @@
             Label_Create,
             Label_Delete,
             Label_Update,
-            IngredientCategory_Crete,
-            IngredientCategory_Crete
+            IngredientCategory_Create,
+            IngredientCategory_Delete,
+            HealthGoal_Create,
+            HealthGoal_Delete,
+            HealthGoal_Update,
         };
     }
 }

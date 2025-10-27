@@ -14,4 +14,8 @@
 		<ProjectReference Include="..\SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Enums\" />
+	</ItemGroup>
+
 </Project>

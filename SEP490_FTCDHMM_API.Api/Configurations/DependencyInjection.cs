@@ -15,6 +15,7 @@ using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence;
@@ -231,6 +232,24 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //ingredientDetection
             services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
 
+            //healthgoal
+            services.AddScoped<IHealthGoalRepository, HealthGoalRepository>();
+            services.AddScoped<IHealthGoalService, HealthGoalService>();
+
+
+            //userhealthgoal
+            services.AddScoped<IUserHealthGoalRepository, UserHealthGoalRepository>();
+            services.AddScoped<IUserHealthGoalService, UserHealthGoalService>();
+
+            //customhealthgoal
+            services.AddScoped<ICustomHealthGoalRepository, CustomHealthGoalRepository>();
+            services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
+
+            //RecipeScore
+            services.AddScoped<INutritionAnalyzer, NutritionAnalyzer>();
+            services.AddScoped<IHealthGoalEvaluator, HealthGoalEvaluator>();
+            services.AddScoped<IRecipeGoalAnalysisService, RecipeGoalAnalysisService>();
+            services.AddScoped<IRecipeNutritionAggregator, RecipeNutritionAggregator>();
 
         }
     }

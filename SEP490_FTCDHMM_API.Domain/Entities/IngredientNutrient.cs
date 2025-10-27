@@ -7,8 +7,8 @@
         public Guid NutrientId { get; set; }
         public Nutrient Nutrient { get; set; } = null!;
 
-        public decimal? Min { get; set; }
-        public decimal? Max { get; set; }
-        public decimal Median { get; set; }
+        public decimal? MinValue { get; set; }
+        public decimal? MaxValue { get; set; }
+        public decimal MedianValue { get; set; }
     }
 }

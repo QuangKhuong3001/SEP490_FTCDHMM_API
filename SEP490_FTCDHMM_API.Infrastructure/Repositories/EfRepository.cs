@@ -35,35 +35,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
         }
 
-        public async Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+        public async Task<IList<T>> GetAllAsync(
+            Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             IQueryable<T> query = _dbContext.Set<T>();
 
-            if (includes != null)
-            {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
-            }
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            if (include != null)
+                query = include(query);
 
             return await query.ToListAsync();
-        }
-
-
-        public async Task<IReadOnlyList<T>> GetAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
-        {
-            IQueryable<T> query = _dbContext.Set<T>();
-
-            if (includes != null && includes.Length > 0)
-            {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
-            }
-
-            return await query.Where(predicate).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -87,6 +71,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         public async Task DeleteAsync(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteRangeAsync(IEnumerable<T> entities)
+        {
+            _dbContext.Set<T>().RemoveRange(entities);
             await _dbContext.SaveChangesAsync();
         }
 
