@@ -231,7 +231,18 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //ingredientDetection
             services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
 
+            //healthgoal
+            services.AddScoped<IHealthGoalRepository, HealthGoalRepository>();
+            services.AddScoped<IHealthGoalService, HealthGoalService>();
 
+
+            //userhealthgoal
+            services.AddScoped<IUserHealthGoalRepository, UserHealthGoalRepository>();
+            services.AddScoped<IUserHealthGoalService, UserHealthGoalService>();
+
+            //customhealthgoal
+            services.AddScoped<ICustomHealthGoalRepository, CustomHealthGoalRepository>();
+            services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RoleDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -150,7 +151,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<List<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
         {
-            var domains = await _permissionDomainRepository.GetAllAsync(d => d.Actions);
+            var domains = await _permissionDomainRepository.GetAllAsync(include: d => d.Include(r => r.Actions));
 
             var rolePermissions = await _rolePermissionRepository.GetAllAsync(rp => rp.RoleId == roleId);
 

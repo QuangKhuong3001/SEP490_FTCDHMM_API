@@ -12,8 +12,8 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         [Required(ErrorMessage = "Missing Difficulty")]
         public required string Difficulty { get; set; }
 
-        [Range(0.01, double.MaxValue, ErrorMessage = "Cook time must be greater than 0.")]
-        public double CookTime { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Cook time must be greater than 0.")]
+        public required int CookTime { get; set; }
 
         public IFormFile? Image { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Ration must be greater than 0")]

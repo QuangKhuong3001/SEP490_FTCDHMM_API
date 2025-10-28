@@ -11,7 +11,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public AppUser Author { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public required DifficultyValue Difficulty { get; set; }
-        public double CookTime { get; set; }
+        public int CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public required int Ration { get; set; }
         public Guid? ImageId { get; set; }

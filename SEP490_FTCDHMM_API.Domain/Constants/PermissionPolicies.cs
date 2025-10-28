@@ -20,8 +20,12 @@
         public const string Label_Create = "Label:Create";
         public const string Label_Update = "Label:Update";
 
-        public const string IngredientCategory_Create = "Label:Create";
-        public const string IngredientCategory_Delete = "Label:Delete";
+        public const string IngredientCategory_Create = "IngredientCategory:Create";
+        public const string IngredientCategory_Delete = "IngredientCategory:Delete";
+
+        public const string HealthGoal_Create = "HealthGoal:Create";
+        public const string HealthGoal_Update = "HealthGoal:Update";
+        public const string HealthGoal_Delete = "HealthGoal:Delete";
 
     }
 

@@ -20,6 +20,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasColumnType("datetime2")
                 .IsRequired();
 
+            builder.Property(x => x.Calories)
+                .HasColumnType("decimal(10,3)")
+                .IsRequired();
+
             builder.Property(i => i.Description)
                 .HasMaxLength(1000)
                 .IsUnicode(true)
