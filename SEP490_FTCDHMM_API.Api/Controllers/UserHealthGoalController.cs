@@ -1,10 +1,12 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserHealthGoalController : ControllerBase

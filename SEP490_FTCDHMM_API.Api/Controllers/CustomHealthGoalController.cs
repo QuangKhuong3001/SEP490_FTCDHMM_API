@@ -77,7 +77,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize(Policy = PermissionPolicies.HealthGoal_Delete)]
+        [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -91,4 +91,3 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
     }
 }
-
