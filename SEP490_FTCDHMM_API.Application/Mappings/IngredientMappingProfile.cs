@@ -15,6 +15,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     opt => opt.MapFrom(src => src.Categories));
 
             CreateMap<Ingredient, IngredientDetailsResponse>()
+                .ForMember(dest => dest.ImageUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<Ingredient, IngredientDetailsResponse>>())
                 .ForMember(dest => dest.Nutrients,
                     opt => opt.MapFrom(src => src.IngredientNutrients));
         }
