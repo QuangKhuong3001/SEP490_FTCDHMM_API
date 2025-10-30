@@ -259,6 +259,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //customhealthgoal
             services.AddScoped<ICustomHealthGoalRepository, CustomHealthGoalRepository>();
             services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
+
+            //healthgoalconflict
+            services.AddScoped<IHealthGoalConflictRepository, HealthGoalConflictRepository>();
+
         }
     }
 }

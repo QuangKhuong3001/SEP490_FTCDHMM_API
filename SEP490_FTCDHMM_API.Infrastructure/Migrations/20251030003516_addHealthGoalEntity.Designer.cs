@@ -12,8 +12,8 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251029232113_v23")]
-    partial class v23
+    [Migration("20251030003516_addHealthGoalEntity")]
+    partial class addHealthGoalEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -708,6 +708,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -732,14 +737,41 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("MaxValue")
-                        .HasColumnType("decimal(10,2)");
+                    b.Property<decimal?>("MaxEnergyPct")
+                        .HasPrecision(6, 4)
+                        .HasColumnType("decimal(6,4)");
 
-                    b.Property<decimal>("MinValue")
-                        .HasColumnType("decimal(10,2)");
+                    b.Property<decimal?>("MaxValue")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("MedianEnergyPct")
+                        .HasPrecision(6, 4)
+                        .HasColumnType("decimal(6,4)");
+
+                    b.Property<decimal?>("MedianValue")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("MinEnergyPct")
+                        .HasPrecision(6, 4)
+                        .HasColumnType("decimal(6,4)");
+
+                    b.Property<decimal?>("MinValue")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<Guid>("NutrientId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Weight")
+                        .HasPrecision(9, 3)
+                        .HasColumnType("decimal(9,3)");
 
                     b.HasKey("Id");
 
@@ -812,6 +844,28 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HealthGoals", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalConflict", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("HealthGoalAId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("HealthGoalBId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HealthGoalBId");
+
+                    b.HasIndex("HealthGoalAId", "HealthGoalBId")
+                        .IsUnique();
+
+                    b.ToTable("HealthGoalConflicts", (string)null);
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalTarget", b =>
@@ -1959,7 +2013,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", "Nutrient")
                         .WithMany()
                         .HasForeignKey("NutrientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CustomHealthGoal");
@@ -1976,6 +2030,25 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("SentTo");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalConflict", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", "HealthGoalA")
+                        .WithMany()
+                        .HasForeignKey("HealthGoalAId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", "HealthGoalB")
+                        .WithMany()
+                        .HasForeignKey("HealthGoalBId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("HealthGoalA");
+
+                    b.Navigation("HealthGoalB");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalTarget", b =>
