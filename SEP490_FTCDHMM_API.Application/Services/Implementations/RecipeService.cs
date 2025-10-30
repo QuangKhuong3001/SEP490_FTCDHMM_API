@@ -299,7 +299,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
            .Include(r => r.Labels)
            .Include(r => r.CookingSteps)
            .ThenInclude(cs => cs.Image)
-           .Include(r => r.RecipeIngredients);
+           .Include(r => r.RecipeIngredients)
+           .ThenInclude(ri => ri.Ingredient);
 
       var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
@@ -478,6 +479,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  q.Include(r => r.Image)
                  .Include(r => r.Labels)
                  .Include(r => r.RecipeIngredients)
+                 .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.CookingSteps)
                  .ThenInclude(cs => cs.Image);
 
