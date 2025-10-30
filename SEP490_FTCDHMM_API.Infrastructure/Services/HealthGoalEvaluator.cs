@@ -20,13 +20,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                 if (t.TargetType == NutrientTargetType.Absolute)
                 {
-                    sub = ScoreInRange(actual, t.MinValue, t.MedianValue, t.MaxValue);
+                    sub = ScoreInRange(actual, t.MinValue, t.MaxValue);
                 }
                 else
                 {
                     var kcal = NutrientEnergyFactor.KcalPerGram(t.Nutrient.Name) * actual;
                     var pct = totalKcal == 0 ? 0 : kcal / totalKcal;
-                    sub = ScoreInRange(pct, t.MinEnergyPct, t.MedianEnergyPct, t.MaxEnergyPct);
+                    sub = ScoreInRange(pct, t.MinEnergyPct, t.MaxEnergyPct);
                 }
 
                 var w = (double)(t.Weight <= 0 ? 1 : t.Weight);
@@ -38,25 +38,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return Math.Clamp(normalized, 0, 100);
         }
 
-        private static double ScoreInRange(decimal actual, decimal? min, decimal? median, decimal? max)
+        private static double ScoreInRange(decimal actual, decimal? min, decimal? max)
         {
-            if (median.HasValue && actual == median.Value) return 1.0;
-
             if (min.HasValue && max.HasValue && min.Value < max.Value)
             {
                 if (actual < min.Value || actual > max.Value) return 0.3;
 
-                if (median.HasValue)
-                {
-                    var half = (max.Value - min.Value) / 2m;
-                    var dev = Math.Abs(actual - median.Value);
-                    return 0.7 + 0.3 * (double)Math.Max(0, 1 - dev / (half == 0 ? 1 : half));
-                }
-                return 0.8;
+                return 1;
             }
-
-            if (median.HasValue)
-                return 1.0 - (double)Math.Min(1m, Math.Abs(actual - median.Value) / (median.Value == 0 ? 1 : median.Value));
 
             return 0.5;
         }

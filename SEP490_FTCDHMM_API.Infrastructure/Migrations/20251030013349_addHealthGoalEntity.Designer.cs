@@ -12,7 +12,7 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251030003516_addHealthGoalEntity")]
+    [Migration("20251030013349_addHealthGoalEntity")]
     partial class addHealthGoalEntity
     {
         /// <inheritdoc />
@@ -745,14 +745,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal?>("MedianEnergyPct")
-                        .HasPrecision(6, 4)
-                        .HasColumnType("decimal(6,4)");
-
-                    b.Property<decimal?>("MedianValue")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<decimal?>("MinEnergyPct")
                         .HasPrecision(6, 4)
                         .HasColumnType("decimal(6,4)");
@@ -882,14 +874,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("decimal(6,4)");
 
                     b.Property<decimal?>("MaxValue")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal?>("MedianEnergyPct")
-                        .HasPrecision(6, 4)
-                        .HasColumnType("decimal(6,4)");
-
-                    b.Property<decimal?>("MedianValue")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 

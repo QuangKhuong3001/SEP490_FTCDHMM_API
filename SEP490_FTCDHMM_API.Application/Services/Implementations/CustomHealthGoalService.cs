@@ -59,10 +59,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     NutrientId = t.NutrientId,
                     TargetType = NutrientTargetType.From(t.TargetType),
                     MinValue = t.MinValue,
-                    MedianValue = t.MedianValue,
                     MaxValue = t.MaxValue,
                     MinEnergyPct = t.MinEnergyPct,
-                    MedianEnergyPct = t.MedianEnergyPct,
                     MaxEnergyPct = t.MaxEnergyPct,
                     Weight = t.Weight
                 }).ToList()
@@ -120,10 +118,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 NutrientId = t.NutrientId,
                 TargetType = NutrientTargetType.From(t.TargetType),
                 MinValue = t.MinValue,
-                MedianValue = t.MedianValue,
                 MaxValue = t.MaxValue,
                 MinEnergyPct = t.MinEnergyPct,
-                MedianEnergyPct = t.MedianEnergyPct,
                 MaxEnergyPct = t.MaxEnergyPct,
                 Weight = t.Weight
             }).ToList();

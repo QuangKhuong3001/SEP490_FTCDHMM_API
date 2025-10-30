@@ -21,11 +21,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             .HasMaxLength(50);
 
             builder.Property(x => x.MinValue).HasPrecision(18, 4);
-            builder.Property(x => x.MedianValue).HasPrecision(18, 4);
             builder.Property(x => x.MaxValue).HasPrecision(18, 4);
 
             builder.Property(x => x.MinEnergyPct).HasPrecision(6, 4);
-            builder.Property(x => x.MedianEnergyPct).HasPrecision(6, 4);
             builder.Property(x => x.MaxEnergyPct).HasPrecision(6, 4);
 
             builder.Property(x => x.Weight).HasPrecision(9, 3);

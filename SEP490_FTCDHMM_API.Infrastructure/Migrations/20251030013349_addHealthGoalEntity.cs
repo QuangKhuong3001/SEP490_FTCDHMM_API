@@ -153,10 +153,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     NutrientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TargetType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MinValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MedianValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     MaxValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     MinEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    MedianEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
                     MaxEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
                     Weight = table.Column<decimal>(type: "decimal(9,3)", precision: 9, scale: 3, nullable: false)
                 },
@@ -209,10 +207,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     NutrientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TargetType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MinValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MedianValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     MaxValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
                     MinEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    MedianEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
                     MaxEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
                     Weight = table.Column<decimal>(type: "decimal(9,3)", precision: 9, scale: 3, nullable: false)
                 },
