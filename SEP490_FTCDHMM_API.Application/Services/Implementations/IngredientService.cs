@@ -176,7 +176,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
             {
                 var ingredient = await _ingredientRepository.GetByIdAsync(
-                ingredientId, i => i.IngredientNutrients);
+                ingredientId, i => i.IngredientNutrients, i => i.Categories);
 
                 if (ingredient == null)
                     throw new AppException(AppResponseCode.NOT_FOUND);
@@ -200,7 +200,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (categories.Any(c => c.isDeleted))
                     throw new AppException(AppResponseCode.INVALID_ACTION);
 
-                ingredient.Categories = categories.ToList();
+                ingredient.Categories.Clear();
+                foreach (var category in categories)
+                {
+                    ingredient.Categories.Add(category);
+                }
 
                 if (!string.IsNullOrEmpty(dto.Description))
                     ingredient.Description = dto.Description.Trim();
@@ -271,6 +275,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var result = _mapper.Map<IngredientDetailsResponse>(ingredient);
 
+            // Tạo Signed URL cho hình ảnh S3 thay vì dùng URL trực tiếp
+            // Vì Bucket S3 được cấu hình ở chế độ Private (không public), nên URL trực tiếp sẽ trả về 403 Forbidden
+            // Signed URL cho phép truy cập tạm thời (có thời hạn) vào object private trên S3 mà không cần public bucket
+            // Frontend nhận URL đã register và có thể hiển thị hình ảnh trong khoảng thời gian giới hạn (mặc định 7 ngày)
+            if (ingredient.Image?.Key != null)
+            {
+                result.ImageUrl = _s3ImageService.GeneratePreSignedUrl(ingredient.Image.Key) ?? string.Empty;
+            }
+
             return result;
         }
 
@@ -299,4 +312,3 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
     }
 }
-

@@ -264,8 +264,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
-                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
-                 .Include(r => r.Labels);
+                 .Include(r => r.RecipeIngredients)
+                 .Include(r => r.Labels)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
@@ -290,12 +292,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
-                include: i => i.Include(r => r.Image!)
-                .Include(r => r.Labels)
-                .Include(r => r.CookingSteps)
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient));
+      IQueryable<Recipe> include(IQueryable<Recipe> q) =>
+          q.Include(r => r.Author)
+           .Include(r => r.Author!.Avatar)
+           .Include(r => r.Image)
+           .Include(r => r.Labels)
+           .Include(r => r.CookingSteps)
+           .ThenInclude(cs => cs.Image)
+           .Include(r => r.RecipeIngredients);
+
+      var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -315,7 +321,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 });
             }
 
+            // Check if recipe is favorited and saved by current user
+            var isFavorited = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
+            var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
+
             var result = _mapper.Map<RecipeDetailsResponse>(recipe);
+            result.IsFavorited = isFavorited;
+            result.IsSaved = isSaved;
+
             return result;
         }
         public async Task AddToFavorite(Guid userId, Guid recipeId)
@@ -463,12 +476,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                  q.Include(r => r.Image)
-                 .Include(r => r.Labels);
+                 .Include(r => r.Labels)
+                 .Include(r => r.RecipeIngredients)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
                 pageSize: paginationParams.PageSize,
-                filter: f => !f.isDeleted,
+                filter: f => !f.isDeleted && f.AuthorId == userId,
                 orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
                 include: include
             );
