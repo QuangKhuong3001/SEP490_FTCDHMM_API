@@ -820,6 +820,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("HealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
+<<<<<<< HEAD
                     b.Property<decimal?>("MaxEnergyPct")
                         .HasPrecision(6, 4)
                         .HasColumnType("decimal(6,4)");
@@ -843,10 +844,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<decimal?>("MinValue")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+=======
+                    b.Property<decimal>("MaxValue")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("MinValue")
+                        .HasColumnType("decimal(10,2)");
+>>>>>>> b7b5684473aeacae1ef1d843dbbdc9490cc73d8d
 
                     b.Property<Guid>("NutrientId")
                         .HasColumnType("uniqueidentifier");
 
+<<<<<<< HEAD
                     b.Property<string>("TargetType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -856,6 +865,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasPrecision(9, 3)
                         .HasColumnType("decimal(9,3)");
 
+=======
+>>>>>>> b7b5684473aeacae1ef1d843dbbdc9490cc73d8d
                     b.HasKey("Id");
 
                     b.HasIndex("HealthGoalId");
@@ -907,7 +918,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+<<<<<<< HEAD
                     b.Property<decimal>("Calories")
+=======
+                    b.Property<decimal?>("Calories")
+                        .IsRequired()
+>>>>>>> b7b5684473aeacae1ef1d843dbbdc9490cc73d8d
                         .HasColumnType("decimal(10,3)");
 
                     b.Property<string>("Description")
@@ -1047,6 +1063,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("NutrientId")
                         .HasColumnType("uniqueidentifier");
 
+<<<<<<< HEAD
                     b.Property<decimal?>("MaxValue")
                         .HasPrecision(10, 3)
                         .HasColumnType("decimal(10,3)");
@@ -1056,6 +1073,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("decimal(10,3)");
 
                     b.Property<decimal?>("MinValue")
+=======
+                    b.Property<decimal?>("MaxPer100")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("decimal(10,3)");
+
+                    b.Property<decimal>("MedianPer100g")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("decimal(10,3)");
+
+                    b.Property<decimal?>("MinPer100")
+>>>>>>> b7b5684473aeacae1ef1d843dbbdc9490cc73d8d
                         .HasPrecision(10, 3)
                         .HasColumnType("decimal(10,3)");
 
@@ -1986,7 +2014,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", "Nutrient")
                         .WithMany()
                         .HasForeignKey("NutrientId")
+<<<<<<< HEAD
                         .OnDelete(DeleteBehavior.Cascade)
+=======
+                        .OnDelete(DeleteBehavior.Restrict)
+>>>>>>> b7b5684473aeacae1ef1d843dbbdc9490cc73d8d
                         .IsRequired();
 
                     b.Navigation("HealthGoal");
