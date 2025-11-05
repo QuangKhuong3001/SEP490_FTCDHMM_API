@@ -27,7 +27,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<List<NutrientNameResponse>> GetRequiredNutrientList()
         {
-            var requireds = await _nutrientRepository.GetAllAsync(r => r.IsRequired, include: i => i.Include(r => r.Unit));
+            var requireds = await _nutrientRepository.GetAllAsync(r => r.IsMacroNutrient, include: i => i.Include(r => r.Unit));
             var result = _mapper.Map<List<NutrientNameResponse>>(requireds);
 
             return result;

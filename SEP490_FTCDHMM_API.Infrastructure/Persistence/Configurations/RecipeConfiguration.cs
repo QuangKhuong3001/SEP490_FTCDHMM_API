@@ -39,6 +39,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.Property(x => x.Calories)
+                .HasColumnType("decimal(10,3)");
+
             builder.HasOne(r => r.Author)
                 .WithMany()
                 .HasForeignKey(r => r.AuthorId)

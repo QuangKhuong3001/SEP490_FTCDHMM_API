@@ -12,7 +12,6 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Services;
@@ -22,7 +21,6 @@ using SEP490_FTCDHMM_API.Infrastructure.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
-using StackExchange.Redis;
 using ApiMapping = SEP490_FTCDHMM_API.Api.Mappings;
 using ApplicationMapping = SEP490_FTCDHMM_API.Application.Mappings;
 
@@ -41,11 +39,11 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
 
             //cache
-            services.AddSingleton<IConnectionMultiplexer>(sp =>
-            {
-                var redisConnection = configuration.GetConnectionString("Redis");
-                return ConnectionMultiplexer.Connect(redisConnection!);
-            });
+            //services.AddSingleton<IConnectionMultiplexer>(sp =>
+            //{
+            //    var redisConnection = configuration.GetConnectionString("Redis");
+            //    return ConnectionMultiplexer.Connect(redisConnection!);
+            //});
 
             // Config Identity
             services.AddIdentity<AppUser, AppRole>(options =>
@@ -145,7 +143,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             // DI External Service
 
             //redis
-            services.AddScoped<ICacheService, RedisCacheService>();
+            //services.AddScoped<ICacheService, RedisCacheService>();
 
             //usda
             //services.AddScoped<IUsdaApiService, UsdaApiService>();

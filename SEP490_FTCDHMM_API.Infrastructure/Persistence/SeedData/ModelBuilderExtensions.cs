@@ -160,9 +160,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
             var IU = DeterministicGuid("Unit:InternationalUnit");
 
             builder.Entity<Nutrient>().HasData(
-                new Nutrient { Id = DeterministicGuid("Protein"), Name = "Protein", VietnameseName = "Chất đạm", Description = "Giúp xây dựng cơ bắp và tế bào.", UnitId = g, IsRequired = true },
-                new Nutrient { Id = DeterministicGuid("Fat"), Name = "Fat", VietnameseName = "Tổng chất béo", Description = "Tổng lượng chất béo trong thực phẩm.", UnitId = g, IsRequired = true },
-                new Nutrient { Id = DeterministicGuid("Carbohydrate"), Name = "Carbohydrate", VietnameseName = "Tinh bột", Description = "Nguồn năng lượng chính của cơ thể.", UnitId = g, IsRequired = true },
+                new Nutrient { Id = DeterministicGuid("Protein"), Name = "Protein", VietnameseName = "Chất đạm", Description = "Giúp xây dựng cơ bắp và tế bào.", UnitId = g, IsMacroNutrient = true },
+                new Nutrient { Id = DeterministicGuid("Fat"), Name = "Fat", VietnameseName = "Tổng chất béo", Description = "Tổng lượng chất béo trong thực phẩm.", UnitId = g, IsMacroNutrient = true },
+                new Nutrient { Id = DeterministicGuid("Carbohydrate"), Name = "Carbohydrate", VietnameseName = "Tinh bột", Description = "Nguồn năng lượng chính của cơ thể.", UnitId = g, IsMacroNutrient = true },
                 new Nutrient { Id = DeterministicGuid("Fiber"), Name = "Dietary Fiber", VietnameseName = "Chất xơ", Description = "Hỗ trợ tiêu hóa và giảm cholesterol.", UnitId = g },
                 new Nutrient { Id = DeterministicGuid("Sugars"), Name = "Sugars", VietnameseName = "Đường", Description = "Tổng lượng đường tự nhiên và thêm vào.", UnitId = g },
                 new Nutrient { Id = DeterministicGuid("Cholesterol"), Name = "Cholesterol", VietnameseName = "Cholesterol", Description = "Cholesterol trong thực phẩm.", UnitId = mg },
