@@ -21,7 +21,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             _ingredientRepo = ingredientRepo;
             _apiKey = config["Gemini:ApiKey"] ?? throw new Exception("Missing Gemini API key.");
             _timeoutSeconds = int.TryParse(config["Gemini:TimeoutSeconds"], out var timeout) ? timeout : 60;
-            // Set timeout for HTTP client
             _client.Timeout = TimeSpan.FromSeconds(_timeoutSeconds);
         }
 
