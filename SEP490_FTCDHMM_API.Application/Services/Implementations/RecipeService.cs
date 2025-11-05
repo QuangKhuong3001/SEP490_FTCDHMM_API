@@ -23,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IMapper _mapper;
         private readonly IS3ImageService _imageService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICacheService _cache;
+        //private readonly ICacheService _cache;
         private readonly ILabelRepository _labelRepository;
         private readonly IUserRepository _userRepository;
         private readonly IIngredientRepository _ingredientRepository;
@@ -37,7 +37,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IMapper mapper,
             IS3ImageService imageService,
             IUnitOfWork unitOfWork,
-            ICacheService cache,
+            //ICacheService cache,
             ILabelRepository labelRepository,
             IUserRepository userRepository,
             IIngredientRepository ingredientRepository,
@@ -51,7 +51,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
             _imageService = imageService;
             _unitOfWork = unitOfWork;
-            _cache = cache;
+            //_cache = cache;
             _labelRepository = labelRepository;
             _userRepository = userRepository;
             _ingredientRepository = ingredientRepository;
