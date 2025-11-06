@@ -23,6 +23,17 @@
         public const string IngredientCategory_Create = "Label:Create";
         public const string IngredientCategory_Delete = "Label:Delete";
 
+
+        public const string Comment_Create = "Comment:Create";
+        public const string Comment_Delete = "Comment:Delete";
+        public const string Comment_Update = "Comment:Update";
+
+        public const string Rating_Create = "Rating:Create";
+        public const string Rating_Delete = "Rating:Delete";
+        public const string Rating_Update = "Rating:Update";
+
+
+
     }
 
 }

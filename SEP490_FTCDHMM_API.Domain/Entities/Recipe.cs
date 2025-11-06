@@ -25,6 +25,9 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<UserRecipeView> Views { get; set; } = new List<UserRecipeView>();
         public ICollection<UserFavoriteRecipe> FavoritedBy { get; set; } = new List<UserFavoriteRecipe>();
         public ICollection<UserSaveRecipe> SavedBy { get; set; } = new List<UserSaveRecipe>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+
 
     }
 }

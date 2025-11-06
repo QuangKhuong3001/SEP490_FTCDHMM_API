@@ -8,7 +8,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.UserSaveRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -22,7 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IMapper _mapper;
         private readonly IS3ImageService _imageService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICacheService _cache;
+        //private readonly ICacheService _cache;
         private readonly ILabelRepository _labelRepository;
         private readonly IUserRepository _userRepository;
         private readonly IIngredientRepository _ingredientRepository;
@@ -35,7 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IMapper mapper,
             IS3ImageService imageService,
             IUnitOfWork unitOfWork,
-            ICacheService cache,
+            //ICacheService cache,
             ILabelRepository labelRepository,
             IUserRepository userRepository,
             IIngredientRepository ingredientRepository,
@@ -48,7 +47,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
             _imageService = imageService;
             _unitOfWork = unitOfWork;
-            _cache = cache;
+            //_cache = cache;
             _labelRepository = labelRepository;
             _userRepository = userRepository;
             _ingredientRepository = ingredientRepository;
@@ -262,16 +261,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
-      IQueryable<Recipe> include(IQueryable<Recipe> q) =>
-          q.Include(r => r.Author)
-           .Include(r => r.Author!.Avatar)
-           .Include(r => r.Image)
-           .Include(r => r.Labels)
-           .Include(r => r.CookingSteps)
-           .ThenInclude(cs => cs.Image)
-           .Include(r => r.Ingredients);
+            IQueryable<Recipe> include(IQueryable<Recipe> q) =>
+                q.Include(r => r.Author)
+                 .Include(r => r.Author!.Avatar)
+                 .Include(r => r.Image)
+                 .Include(r => r.Labels)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image)
+                 .Include(r => r.Ingredients);
 
-      var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);

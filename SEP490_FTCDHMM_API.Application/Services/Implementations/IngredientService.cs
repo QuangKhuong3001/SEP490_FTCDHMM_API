@@ -7,7 +7,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -26,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly INutrientRepository _nutrientRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ICacheService _cache;
+        //private readonly ICacheService _cache;
 
         private readonly TimeSpan _ttl = TimeSpan.FromMinutes(10);
         private const int MinLenth = 2;
@@ -36,8 +35,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IRecipeRepository recipeRepository,
             IS3ImageService s3ImageService,
             INutrientRepository nutrientRepository,
-            IMapper mapper, IUnitOfWork unitOfWork,
-            ICacheService cache)
+            IMapper mapper, IUnitOfWork unitOfWork)
+        //ICacheService cache)
         {
             _ingredientRepository = ingredientRepository;
             _ingredientCategoryRepository = ingredientCategoryRepository;
@@ -46,7 +45,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _nutrientRepository = nutrientRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _cache = cache;
+            //_cache = cache;
         }
 
         private async Task HasNutrientsRequied(List<Guid> nutrientIds)
@@ -289,8 +288,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             keyword = keyword.Trim();
             var key = $"ingredient:search:{keyword.ToLowerInvariant()}";
 
-            var cached = await _cache.GetAsync<List<IngredientNameResponse>>(key, ct);
-            if (cached is { Count: > 0 }) return cached;
+            //var cached = await _cache.GetAsync<List<IngredientNameResponse>>(key, ct);
+            //if (cached is { Count: > 0 }) return cached;
 
             var dbItems = await _ingredientRepository.GetTop5Async(keyword, ct);
 
@@ -298,7 +297,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (mapped.Count > 0)
             {
-                await _cache.SetAsync(key, mapped, _ttl, ct);
+                //await _cache.SetAsync(key, mapped, _ttl, ct);
                 return mapped;
             }
 

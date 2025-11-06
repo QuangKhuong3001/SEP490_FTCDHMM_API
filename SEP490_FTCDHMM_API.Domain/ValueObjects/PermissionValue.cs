@@ -25,6 +25,14 @@
         public static readonly PermissionValue IngredientCategory_Crete = new("IngredientCategory", "Create");
         public static readonly PermissionValue IngredientCategory_Delete = new("IngredientCategory", "Delete");
 
+
+        public static readonly PermissionValue Comment_Create = new("Comment", "Create");
+        public static readonly PermissionValue Comment_Delete = new("Comment", "Delete");
+        public static readonly PermissionValue Comment_Update = new("Comment", "Update");
+
+        public static readonly PermissionValue Rating_Create = new("Rating", "Create");
+        public static readonly PermissionValue Rating_Delete = new("Rating", "Delete");
+        public static readonly PermissionValue Rating_Update = new("Rating", "Update");
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -40,7 +48,15 @@
             Label_Delete,
             Label_Update,
             IngredientCategory_Crete,
-            IngredientCategory_Crete
+            IngredientCategory_Crete,
+            Comment_Create,
+            Comment_Delete,
+            Comment_Update,
+
+
+            Rating_Create,
+            Rating_Delete,
+            Rating_Update
         };
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029200736_Comment_Rating")]
+    partial class Comment_Rating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,42 +333,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
-                            IsActive = true
-                        },
-                        new
-                        {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -462,42 +429,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
-                            IsActive = false
-                        },
-                        new
-                        {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -590,42 +521,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
                             IsActive = false
                         });
                 });
@@ -1526,42 +1421,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                             Id = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
                             Name = "Delete",
                             PermissionDomainId = new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f")
-                        },
-                        new
-                        {
-                            Id = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
-                        },
-                        new
-                        {
-                            Id = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
-                        },
-                        new
-                        {
-                            Id = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
-                        },
-                        new
-                        {
-                            Id = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
-                        },
-                        new
-                        {
-                            Id = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
-                        },
-                        new
-                        {
-                            Id = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
                         });
                 });
 
@@ -1604,16 +1463,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f"),
                             Name = "IngredientCategory"
-                        },
-                        new
-                        {
-                            Id = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc"),
-                            Name = "Comment"
-                        },
-                        new
-                        {
-                            Id = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8"),
-                            Name = "Rating"
                         });
                 });
 
@@ -1910,7 +1759,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ParentComment");
