@@ -301,7 +301,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
            .Include(r => r.RecipeIngredients)
            .ThenInclude(ri => ri.Ingredient);
 
-      var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);

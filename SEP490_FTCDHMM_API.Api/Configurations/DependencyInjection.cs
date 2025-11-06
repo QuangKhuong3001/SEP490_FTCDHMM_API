@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -148,7 +149,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //usda
             //services.AddScoped<IUsdaApiService, UsdaApiService>();
 
-            //rollback 
+            //rollback
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             //Mail
@@ -229,6 +230,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //ingredientDetection
             services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
+            //comment rating
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IRatingService, RatingService>();
 
             //healthgoal
             services.AddScoped<IHealthGoalRepository, HealthGoalRepository>();
@@ -260,6 +264,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //healthgoalconflict
             services.AddScoped<IHealthGoalConflictRepository, HealthGoalConflictRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<IRatingRepository, RatingRepository>();
+            services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();
 
         }
     }

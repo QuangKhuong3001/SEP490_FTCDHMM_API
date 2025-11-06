@@ -2,9 +2,9 @@
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Infrastructure.Hubs;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
-
 var builder = WebApplication.CreateBuilder(args);
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -27,7 +27,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
     });
-
+builder.Services.AddSignalR();
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -96,7 +96,7 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapHub<RecipeHub>("/hubs/recipe");
 app.MapControllers();
 
 app.Run();
