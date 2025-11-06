@@ -15,11 +15,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     opt => opt.MapFrom(src => src.Categories));
 
             CreateMap<Ingredient, IngredientDetailsResponse>()
-                // ImageUrl sẽ được gán ở đây nhưng sau đó sẽ bị override ở IngredientService.GetDetails()
-                // để tạo Signed URL thay vì dùng URL trực tiếp, bucket S3 được thiết lập Private,
-                // nên URL trực tiếp sẽ trả về 403 Forbidden. Service layer sẽ xử lý việc ký URL để đảm bảo kiểm soát truy cập đúng cách
                 .ForMember(dest => dest.ImageUrl,
-                    opt => opt.MapFrom(src => src.Image != null ? $"https://sep490-images.s3.amazonaws.com/{src.Image.Key}" : string.Empty))
+                    opt => opt.MapFrom<UniversalImageUrlResolver<Ingredient, IngredientDetailsResponse>>())
                 .ForMember(dest => dest.Nutrients,
                     opt => opt.MapFrom(src => src.IngredientNutrients));
         }
