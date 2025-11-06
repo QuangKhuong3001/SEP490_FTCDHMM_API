@@ -1139,7 +1139,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsRequired")
+                    b.Property<bool>("IsMacroNutrient")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -1167,7 +1167,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("4e7a667e-4012-d80e-9276-1cd44d4e7fbd"),
                             Description = "Giúp xây dựng cơ bắp và tế bào.",
-                            IsRequired = true,
+                            IsMacroNutrient = true,
                             Name = "Protein",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Chất đạm"
@@ -1176,7 +1176,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("73cd094d-61aa-61ce-d021-9ffa9b9ebbad"),
                             Description = "Tổng lượng chất béo trong thực phẩm.",
-                            IsRequired = true,
+                            IsMacroNutrient = true,
                             Name = "Fat",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Tổng chất béo"
@@ -1185,7 +1185,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("feca7dbc-1254-74f3-c7e0-ff7b786515d0"),
                             Description = "Nguồn năng lượng chính của cơ thể.",
-                            IsRequired = true,
+                            IsMacroNutrient = true,
                             Name = "Carbohydrate",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Tinh bột"
@@ -1194,7 +1194,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("e19cd21d-2c38-e38f-7c55-f643fd65daf9"),
                             Description = "Hỗ trợ tiêu hóa và giảm cholesterol.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Dietary Fiber",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Chất xơ"
@@ -1203,7 +1203,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("dbe42ec4-51b1-f98d-66fe-6fed6bdcad0a"),
                             Description = "Tổng lượng đường tự nhiên và thêm vào.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Sugars",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Đường"
@@ -1212,7 +1212,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("f2e0b30a-40ad-f850-5251-36fd00dc462e"),
                             Description = "Cholesterol trong thực phẩm.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Cholesterol",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Cholesterol"
@@ -1221,7 +1221,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("ba6906e3-9e16-e3df-06c5-f3b628919649"),
                             Description = "Giúp điều hòa nước và áp suất máu.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Sodium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Natri"
@@ -1230,7 +1230,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("ed0c64a9-afc7-216a-a83e-8aebc743e462"),
                             Description = "Cần thiết cho xương và răng chắc khỏe.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Calcium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Canxi"
@@ -1239,7 +1239,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("968aface-8106-d49e-09dc-761ca6080887"),
                             Description = "Thành phần của huyết sắc tố (hemoglobin).",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Iron",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Sắt"
@@ -1248,7 +1248,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("f3c5dea5-8442-1e88-a8bb-d71679c86ede"),
                             Description = "Quan trọng cho cơ và thần kinh.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Magnesium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Magie"
@@ -1257,7 +1257,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("88264feb-65c1-6808-c47c-44e3ebe1f725"),
                             Description = "Giúp hình thành xương và răng.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Phosphorus",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Phốt pho"
@@ -1266,7 +1266,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("67dc4e3a-958b-9f2b-ba70-d7e6690b8f2d"),
                             Description = "Duy trì cân bằng nước và nhịp tim.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Potassium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Kali"
@@ -1275,7 +1275,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("5e08cf55-2b60-6f26-ef65-305553ffb09b"),
                             Description = "Giúp sáng mắt và tăng sức đề kháng.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin A",
                             UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
                             VietnameseName = "Vitamin A"
@@ -1284,7 +1284,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("4345a4c7-9cd2-6519-5892-9dcc40bb9ecc"),
                             Description = "Tăng cường miễn dịch, chống oxy hóa.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin C",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin C"
@@ -1293,7 +1293,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("c8cd2a0b-6458-d98b-0ebf-0243cf575556"),
                             Description = "Giúp hấp thu canxi, tốt cho xương.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin D",
                             UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
                             VietnameseName = "Vitamin D"
@@ -1302,7 +1302,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("40d7e2f9-a5da-064c-fe4d-28febe860039"),
                             Description = "Chống oxy hóa, bảo vệ tế bào.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin E",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin E"
@@ -1311,7 +1311,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("7df9ddde-bcce-958a-2a38-85778c6cfb7b"),
                             Description = "Giúp đông máu và duy trì xương khỏe mạnh.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin K",
                             UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
                             VietnameseName = "Vitamin K"
@@ -1320,7 +1320,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("422833be-5c43-e625-7a6a-6a74c32794a6"),
                             Description = "Chuyển hóa năng lượng, hỗ trợ thần kinh.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin B1 (Thiamin)",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin B1"
@@ -1329,7 +1329,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("ac960903-ad9f-dfae-e0b3-35628565a3cb"),
                             Description = "Tốt cho da, mắt và hệ thần kinh.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin B2 (Riboflavin)",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin B2"
@@ -1338,7 +1338,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("bc5e858f-8aaa-e3f1-c7ae-bf691e5fa88e"),
                             Description = "Giúp chuyển hóa năng lượng, bảo vệ tim mạch.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin B3 (Niacin)",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin B3"
@@ -1347,7 +1347,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("4e465394-2d14-2a0a-7a00-5db0bc9e4597"),
                             Description = "Giúp tổng hợp hồng cầu, duy trì trao đổi chất.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin B6",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Vitamin B6"
@@ -1356,7 +1356,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("ff39565c-1b2f-7db1-4f47-7b9ca86221f6"),
                             Description = "Quan trọng cho phụ nữ mang thai và tế bào mới.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Folate (Folic Acid)",
                             UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
                             VietnameseName = "Axit folic"
@@ -1365,7 +1365,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("3a9a556f-7285-4572-28aa-67447560ece8"),
                             Description = "Giúp tạo máu và duy trì hệ thần kinh.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Vitamin B12",
                             UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
                             VietnameseName = "Vitamin B12"
@@ -1374,7 +1374,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("7dd02ec7-0bde-e9d2-4f7b-99e3184f139e"),
                             Description = "Hỗ trợ miễn dịch, da, tóc và móng.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Zinc",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Kẽm"
@@ -1383,7 +1383,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("fa0f09a4-fbbd-3da5-76b0-748a0d87ce21"),
                             Description = "Tham gia hình thành tế bào máu và enzyme.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Copper",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Đồng"
@@ -1392,7 +1392,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("c52f37b6-b8ba-c587-72d7-d3f5dc8044d6"),
                             Description = "Cần cho xương và não.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Manganese",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
                             VietnameseName = "Mangan"
@@ -1401,7 +1401,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("55fb9dc4-6bf0-06b4-e2c5-ca786f557d38"),
                             Description = "Chống oxy hóa, tăng cường miễn dịch.",
-                            IsRequired = false,
+                            IsMacroNutrient = false,
                             Name = "Selenium",
                             UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
                             VietnameseName = "Selen"
@@ -1662,6 +1662,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Calories")
+                        .HasColumnType("decimal(10,3)");
 
                     b.Property<int>("CookTime")
                         .HasColumnType("int");

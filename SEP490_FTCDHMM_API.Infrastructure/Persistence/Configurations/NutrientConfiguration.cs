@@ -12,7 +12,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.HasKey(n => n.Id);
 
-            builder.Property(e => e.IsRequired)
+            builder.Property(e => e.IsMacroNutrient)
                 .HasDefaultValue(false);
 
             builder.Property(n => n.Name)

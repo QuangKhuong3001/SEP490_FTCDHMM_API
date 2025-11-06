@@ -44,6 +44,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     ComputedAtUtc = DateTime.UtcNow
                 });
             }
+            recipe.Calories = profile.TotalCalories;
 
             await _appDbContext.RecipeNutritionAggregates.AddRangeAsync(aggregates);
             await _appDbContext.SaveChangesAsync();
