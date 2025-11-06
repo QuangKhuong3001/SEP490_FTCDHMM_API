@@ -25,5 +25,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             await _hubContext.Clients.Group(recipeId.ToString())
                 .SendAsync(HubEvent.ReceiveRatingUpdate.Value, average);
         }
+
+        public async Task SendCommentDeletedAsync(Guid recipeId, Guid commentId, DateTime deletedAt)
+        {
+            var deleteData = new
+            {
+                commentId,
+                recipeId,
+                deletedAt
+            };
+
+            await _hubContext.Clients.Group(recipeId.ToString())
+                .SendAsync(HubEvent.CommentDeleted.Value, deleteData);
+        }
     }
 }

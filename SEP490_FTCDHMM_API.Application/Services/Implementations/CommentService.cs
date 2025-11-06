@@ -69,9 +69,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (mode == DeleteMode.RecipeAuthor && comment.Recipe.AuthorId != userId)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
+            var recipeId = comment.RecipeId;
+
             await DeleteRepliesRecursive(comment);
 
             await _commentRepository.DeleteAsync(comment);
+
+            // Send real-time deletion notification
+            await _notifier.SendCommentDeletedAsync(recipeId, commentId, DateTime.UtcNow);
         }
 
         private async Task DeleteRepliesRecursive(Comment parent)

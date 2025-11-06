@@ -5,6 +5,7 @@
         public static readonly HubEvent ReceiveComment = new("ReceiveComment");
         public static readonly HubEvent ReceiveRatingUpdate = new("ReceiveRatingUpdate");
         public static readonly HubEvent ReceiveNotification = new("ReceiveNotification");
+        public static readonly HubEvent CommentDeleted = new("CommentDeleted");
 
         public override string ToString() => Value;
 
@@ -15,6 +16,7 @@
                 "ReceiveComment" => ReceiveComment,
                 "ReceiveRatingUpdate" => ReceiveRatingUpdate,
                 "ReceiveNotification" => ReceiveNotification,
+                "CommentDeleted" => CommentDeleted,
                 _ => new HubEvent(value)
             };
         }
