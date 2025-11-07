@@ -149,5 +149,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetRecipesByUserId(Guid userId, [FromQuery] PaginationParams request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
+            return Ok(result);
+        }
+
     }
 }
