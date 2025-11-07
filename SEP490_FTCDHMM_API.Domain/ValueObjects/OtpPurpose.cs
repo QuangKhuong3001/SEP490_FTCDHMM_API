@@ -9,12 +9,15 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 
         public override string ToString() => Value;
 
-        public static OtpPurpose From(string value) =>
-            value switch
+        public static OtpPurpose From(string value)
+        {
+            return value.Trim().ToUpperInvariant() switch
             {
                 "VERIFYACCOUNTEMAIL" => VerifyAccountEmail,
                 "FORGOTPASSWORD" => ForgotPassword,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
+        }
+
     }
 }

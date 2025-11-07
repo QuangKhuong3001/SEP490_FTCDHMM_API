@@ -273,6 +273,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
             user.UpdatedAtUtc = DateTime.UtcNow;
+            user.DateOfBirth = dto.DateOfBirth;
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
@@ -324,20 +325,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<List<UserResponse>> GetFollowersAsync(Guid userId)
+        public async Task<IEnumerable<UserResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
                 include: i => i.Include(u => u.Follower));
 
-
-
             var followerUsers = followers.Select(f => f.Follower).ToList();
 
-            return _mapper.Map<List<UserResponse>>(followerUsers);
+            return _mapper.Map<IEnumerable<UserResponse>>(followerUsers);
         }
 
-        public async Task<List<UserResponse>> GetFollowingAsync(Guid userId)
+        public async Task<IEnumerable<UserResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
@@ -345,8 +344,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 
-            return _mapper.Map<List<UserResponse>>(followingUsers);
+            return _mapper.Map<IEnumerable<UserResponse>>(followingUsers);
         }
 
+        public async Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND);
+            }
+
+            user.ActivityLevel = ActivityLevel.From(request.ActivityLevel);
+            await _userRepository.UpdateAsync(user);
+        }
     }
 }

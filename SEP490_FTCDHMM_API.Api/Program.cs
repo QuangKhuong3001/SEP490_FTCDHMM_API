@@ -23,11 +23,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
-    });
 builder.Services.AddSignalR(options =>
 {
     // Configure keepalive to prevent timeout
@@ -35,6 +30,8 @@ builder.Services.AddSignalR(options =>
     options.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15s - gửi keepalive ping
     options.HandshakeTimeout = TimeSpan.FromSeconds(10); // 10s - handshake timeout
 });
+builder.Services.AddControllers();
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();

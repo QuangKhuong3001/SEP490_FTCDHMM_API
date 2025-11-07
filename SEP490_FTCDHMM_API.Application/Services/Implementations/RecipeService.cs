@@ -10,7 +10,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Services;
+using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
@@ -291,15 +291,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
-      IQueryable<Recipe> include(IQueryable<Recipe> q) =>
-          q.Include(r => r.Author)
-           .Include(r => r.Author!.Avatar)
-           .Include(r => r.Image)
-           .Include(r => r.Labels)
-           .Include(r => r.CookingSteps)
-           .ThenInclude(cs => cs.Image)
-           .Include(r => r.RecipeIngredients)
-           .ThenInclude(ri => ri.Ingredient);
+            IQueryable<Recipe> include(IQueryable<Recipe> q) =>
+                q.Include(r => r.Author)
+                 .Include(r => r.Author!.Avatar)
+                 .Include(r => r.Image)
+                 .Include(r => r.Labels)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image)
+                 .Include(r => r.RecipeIngredients)
+                 .ThenInclude(ri => ri.Ingredient);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
@@ -474,6 +474,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, PaginationParams paginationParams)
         {
+            var user = _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                  q.Include(r => r.Image)
                  .Include(r => r.Labels)

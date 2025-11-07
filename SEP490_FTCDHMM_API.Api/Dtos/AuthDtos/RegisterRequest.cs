@@ -20,6 +20,12 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 100 characters")]
         public string Password { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Date of birth is required")]
+        public DateTime DateOfBirth { get; set; }
+
+        [Required(ErrorMessage = "Gender is required")]
+        public required string Gender { get; set; }
+
         [Required(ErrorMessage = "Confirm password is required")]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string RePassword { get; set; } = string.Empty;

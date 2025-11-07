@@ -8,6 +8,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task CreateCategory(CreateIngredientCategoryRequest request);
         Task DeleteCategory(Guid id);
         Task<PagedResult<IngredientCategoryResponse>> GetAllCategories(IngredientCategoryFilterRequest request);
-        Task<List<IngredientCategoryResponse>> GetAllCategories(IngredientCategorySearchDropboxRequest request);
+        Task<IEnumerable<IngredientCategoryResponse>> GetAllCategories(IngredientCategorySearchDropboxRequest request);
     }
 }

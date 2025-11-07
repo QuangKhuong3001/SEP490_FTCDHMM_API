@@ -15,9 +15,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<ProfileResponse> GetProfileAsync(Guid userId, Guid? currentUserId = null);
         Task FollowUserAsync(Guid followerId, Guid followeeId);
         Task UnfollowUserAsync(Guid followerId, Guid followeeId);
-        Task<List<UserResponse>> GetFollowersAsync(Guid userId);
-        Task<List<UserResponse>> GetFollowingAsync(Guid userId);
+        Task<IEnumerable<UserResponse>> GetFollowersAsync(Guid userId);
+        Task<IEnumerable<UserResponse>> GetFollowingAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto);
+        Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request);
 
     }
 }

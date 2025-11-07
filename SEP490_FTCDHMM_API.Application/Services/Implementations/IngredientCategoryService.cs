@@ -61,14 +61,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
-        public async Task<List<IngredientCategoryResponse>> GetAllCategories(IngredientCategorySearchDropboxRequest request)
+        public async Task<IEnumerable<IngredientCategoryResponse>> GetAllCategories(IngredientCategorySearchDropboxRequest request)
         {
             var ingredients = await _ingredientCategoryRepository.GetAllAsync(
                             l => !l.isDeleted &&
                                 (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
             ingredients = ingredients.OrderBy(l => l.Name).ToList();
 
-            var result = _mapper.Map<List<IngredientCategoryResponse>>(ingredients);
+            var result = _mapper.Map<IEnumerable<IngredientCategoryResponse>>(ingredients);
             return result;
         }
     }

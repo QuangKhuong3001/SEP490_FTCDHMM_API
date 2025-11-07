@@ -10,13 +10,11 @@ public class RecipeGoalAnalysisService : IRecipeGoalAnalysisService
 {
     private readonly IRecipeRepository _recipeRepository;
     private readonly IHealthGoalRepository _healthGoalRepository;
-    private readonly IHealthGoalEvaluator _evaluator;
 
-    public RecipeGoalAnalysisService(IRecipeRepository recipeRepository, IHealthGoalRepository healthGoalRepository, IHealthGoalEvaluator evaluator)
+    public RecipeGoalAnalysisService(IRecipeRepository recipeRepository, IHealthGoalRepository healthGoalRepository)
     {
         _recipeRepository = recipeRepository;
         _healthGoalRepository = healthGoalRepository;
-        _evaluator = evaluator;
     }
 
     public async Task<HealthGoalAnalysisResponse> AnalyzeAsync(Guid recipeId, Guid goalId)
@@ -37,7 +35,7 @@ public class RecipeGoalAnalysisService : IRecipeGoalAnalysisService
                 .ToDictionary(x => x.Nutrient.Name, x => x.Amount)
         };
 
-        var score = _evaluator.Evaluate(profile, goal);
+        var score = HealthGoalEvaluator.Evaluate(profile, goal);
 
         return new HealthGoalAnalysisResponse
         {

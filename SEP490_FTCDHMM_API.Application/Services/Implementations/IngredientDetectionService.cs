@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _ingredientRepo = ingredientRepo;
         }
 
-        public async Task<List<IngredientDetectionResult>> DetectIngredientsAsync(IngredientDetectionUploadRequest request)
+        public async Task<IEnumerable<IngredientDetectionResult>> DetectIngredientsAsync(IngredientDetectionUploadRequest request)
         {
             var result = await _geminiDetectionService.DetectIngredientsAsync(request.Image);
 

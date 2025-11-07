@@ -12,7 +12,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task ActiveRole(Guid roleId);
         Task DeactiveRole(Guid roleId);
         Task UpdateRolePermissions(Guid roleId, RolePermissionSettingRequest dto);
-        Task<List<PermissionDomainRequest>> GetRolePermissions(Guid roleId);
+        Task<IEnumerable<PermissionDomainRequest>> GetRolePermissions(Guid roleId);
 
     }
 }

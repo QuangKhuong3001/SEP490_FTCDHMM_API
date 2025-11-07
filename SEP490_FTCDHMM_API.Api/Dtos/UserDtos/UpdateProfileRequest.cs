@@ -18,5 +18,9 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
         [Required(ErrorMessage = "Gender is required")]
         public string Gender { get; set; } = string.Empty;
         public IFormFile? Avatar { get; set; }
+
+        [Required(ErrorMessage = "Date of birth is required")]
+        public DateTime DateOfBirth { get; set; }
+
     }
 }

@@ -3,12 +3,11 @@
     public static class NutrientEnergyFactor
     {
         public static decimal KcalPerGram(string nutrientName)
-            => nutrientName.ToLower() switch
+            => nutrientName.Trim().ToUpperInvariant() switch
             {
-                "protein" => 4m,
-                "fat" => 9m,
-                "carbohydrate" => 4m,
-                "alcohol" => 7m,
+                "PROTEIN" => 4m,
+                "FAT" => 9m,
+                "CARBONHYDRATE" => 4m,
                 _ => 0m
             };
     }
