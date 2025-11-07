@@ -4,8 +4,8 @@
     {
         public string Name { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
-        public decimal? Min { get; set; }
-        public decimal? Max { get; set; }
-        public decimal Median { get; set; }
+        public decimal? MinValue { get; set; }
+        public decimal? MaxValue { get; set; }
+        public decimal MedianValue { get; set; }
     }
 }
