@@ -16,7 +16,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:3000", "https://sep-490-ftcdhmm-ui.vercel.app")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
 
@@ -27,7 +28,13 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
     });
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    // Configure keepalive to prevent timeout
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 60s - timeout nếu client không respond
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15s - gửi keepalive ping
+    options.HandshakeTimeout = TimeSpan.FromSeconds(10); // 10s - handshake timeout
+});
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -97,6 +104,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<RecipeHub>("/hubs/recipe");
+app.MapHub<CommentHub>("/hubs/comments");
 app.MapControllers();
 
 app.Run();

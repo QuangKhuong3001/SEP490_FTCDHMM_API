@@ -7,22 +7,22 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
     public class SignalRNotifierService : IRealtimeNotifier
     {
-        private readonly IHubContext<RecipeHub> _hubContext;
+        private readonly IHubContext<CommentHub> _hubContext;
 
-        public SignalRNotifierService(IHubContext<RecipeHub> hubContext)
+        public SignalRNotifierService(IHubContext<CommentHub> hubContext)
         {
             _hubContext = hubContext;
         }
 
         public async Task SendCommentAsync(Guid recipeId, object comment)
         {
-            await _hubContext.Clients.Group(recipeId.ToString())
+            await _hubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.ReceiveComment.Value, comment);
         }
 
         public async Task SendRatingUpdateAsync(Guid recipeId, double average)
         {
-            await _hubContext.Clients.Group(recipeId.ToString())
+            await _hubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.ReceiveRatingUpdate.Value, average);
         }
 
@@ -35,7 +35,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 deletedAt
             };
 
-            await _hubContext.Clients.Group(recipeId.ToString())
+            await _hubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentDeleted.Value, deleteData);
         }
     }
