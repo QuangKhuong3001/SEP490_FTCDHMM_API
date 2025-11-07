@@ -6,6 +6,7 @@
         public string Content { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public Guid? ParentCommentId { get; set; }
         public Guid UserId { get; set; }

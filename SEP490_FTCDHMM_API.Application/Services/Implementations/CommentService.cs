@@ -34,7 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             comment.CreatedAtUtc = DateTime.UtcNow;
 
             await _commentRepository.AddAsync(comment);
-            var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User));
+            var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
 
             var response = _mapper.Map<CommentResponse>(saved);
 
@@ -49,7 +49,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var comments = await _commentRepository.GetAllAsync(
                 c => c.RecipeId == recipeId && c.ParentCommentId == null,
-                c => c.Include(x => x.User).Include(x => x.Replies)
+                c => c.Include(x => x.User).ThenInclude(x => x.Avatar)
+                      .Include(x => x.Replies).ThenInclude(x => x.User).ThenInclude(x => x.Avatar)
             );
 
             return _mapper.Map<List<CommentResponse>>(comments);
