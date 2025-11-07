@@ -33,11 +33,25 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             comment.RecipeId = recipeId;
             comment.CreatedAtUtc = DateTime.UtcNow;
 
+            // If replying to a level 2+ comment, reply to its parent instead (limit to max 2 levels)
+            if (comment.ParentCommentId.HasValue)
+            {
+                var parentComment = await _commentRepository.GetByIdAsync(
+                    comment.ParentCommentId.Value,
+                    c => c.Include(x => x.ParentComment)
+                );
+
+                if (parentComment != null && parentComment.ParentCommentId.HasValue)
+                {
+                    // This is a level 2 comment, so set parent to its parent (level 1)
+                    comment.ParentCommentId = parentComment.ParentCommentId;
+                }
+            }
+
             await _commentRepository.AddAsync(comment);
             var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
 
             var response = _mapper.Map<CommentResponse>(saved);
-
 
             // gửi realtime tới group của recipe
             await _notifier.SendCommentAsync(recipeId, response);
@@ -51,6 +65,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 c => c.RecipeId == recipeId && c.ParentCommentId == null,
                 c => c.Include(x => x.User).ThenInclude(x => x.Avatar)
                       .Include(x => x.Replies).ThenInclude(x => x.User).ThenInclude(x => x.Avatar)
+                      .Include(x => x.Replies).ThenInclude(x => x.Replies).ThenInclude(x => x.User).ThenInclude(x => x.Avatar)
             );
 
             return _mapper.Map<List<CommentResponse>>(comments);
