@@ -58,8 +58,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize(Policy = PermissionPolicies.Label_Update)]
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, CreateLabelRequest request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.CreateLabelRequest>(request);
+
+            await _labelService.UpdateLabel(id, appRequest);
+            return Ok();
+        }
+
+        [Authorize(Policy = PermissionPolicies.Label_Update)]
         [HttpPut("{id:guid}/colorCode")]
-        public async Task<IActionResult> UpdaetColor(Guid id, UpdateColorCodeRequest request)
+        public async Task<IActionResult> UpdateColor(Guid id, UpdateColorCodeRequest request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.UpdateColorCodeRequest>(request);
 

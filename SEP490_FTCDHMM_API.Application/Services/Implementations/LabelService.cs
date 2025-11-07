@@ -86,5 +86,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             label.ColorCode = request.ColorCode;
             await _labelRepository.UpdateAsync(label);
         }
+
+        public async Task UpdateLabel(Guid labelId, CreateLabelRequest request)
+        {
+            var label = await _labelRepository.GetByIdAsync(labelId);
+
+            if (label == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            // Check if new name already exists (and is different from current name)
+            if (label.Name != request.Name && await _labelRepository.ExistsAsync(l => l.Name == request.Name && l.Id != labelId))
+                throw new AppException(AppResponseCode.NAME_ALREADY_EXISTS);
+
+            label.Name = request.Name;
+            label.ColorCode = request.ColorCode;
+            await _labelRepository.UpdateAsync(label);
+        }
     }
 }

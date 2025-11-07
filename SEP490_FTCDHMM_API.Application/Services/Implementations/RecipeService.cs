@@ -263,8 +263,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
-                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
-                 .Include(r => r.Labels);
+                 .Include(r => r.RecipeIngredients)
+                 .Include(r => r.Labels)
+                 .Include(r => r.CookingSteps)
+                 .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
@@ -289,15 +291,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
-                include: i => i.Include(r => r.Image!)
-                .Include(r => r.Labels)
-                .Include(r => r.CookingSteps)
-                    .ThenInclude(cs => cs.Image)
-                .Include(r => r.Author)
-                    .ThenInclude(a => a.Avatar)
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient));
+      IQueryable<Recipe> include(IQueryable<Recipe> q) =>
+          q.Include(r => r.Author)
+           .Include(r => r.Author!.Avatar)
+           .Include(r => r.Image)
+           .Include(r => r.Labels)
+           .Include(r => r.CookingSteps)
+           .ThenInclude(cs => cs.Image)
+           .Include(r => r.RecipeIngredients)
+           .ThenInclude(ri => ri.Ingredient);
+
+      var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
             if ((recipe == null) || (recipe.isDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -474,7 +478,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  q.Include(r => r.Image)
                  .Include(r => r.Labels)
                  .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient)
+                 .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.CookingSteps)
                     .ThenInclude(cs => cs.Image);
 
