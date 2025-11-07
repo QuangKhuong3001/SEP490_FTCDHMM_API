@@ -34,7 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (labels, totalCount) = await _labelRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                l => l.isDeleted == false &&
+                l => l.IsDeleted == false &&
                     (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)),
                 q => q.OrderBy(u => u.Name));
 
@@ -51,7 +51,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<IEnumerable<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request)
         {
             var labels = await _labelRepository.GetAllAsync(
-                l => !l.isDeleted &&
+                l => !l.IsDeleted &&
                     (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
             labels = labels.OrderBy(l => l.Name).ToList();
 
@@ -67,7 +67,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (label.Recipes.Any())
             {
-                label.isDeleted = true;
+                label.IsDeleted = true;
                 await _labelRepository.UpdateAsync(label);
             }
             else
@@ -83,22 +83,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (label == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            label.ColorCode = request.ColorCode;
-            await _labelRepository.UpdateAsync(label);
-        }
-
-        public async Task UpdateLabel(Guid labelId, CreateLabelRequest request)
-        {
-            var label = await _labelRepository.GetByIdAsync(labelId);
-
-            if (label == null)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
-            // Check if new name already exists (and is different from current name)
-            if (label.Name != request.Name && await _labelRepository.ExistsAsync(l => l.Name == request.Name && l.Id != labelId))
-                throw new AppException(AppResponseCode.NAME_ALREADY_EXISTS);
-
-            label.Name = request.Name;
             label.ColorCode = request.ColorCode;
             await _labelRepository.UpdateAsync(label);
         }
