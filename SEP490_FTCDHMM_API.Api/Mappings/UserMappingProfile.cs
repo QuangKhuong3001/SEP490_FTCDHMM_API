@@ -16,6 +16,8 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<APIDtos.UserDtos.UpdateProfileRequest, ApplicationDtos.UserDtos.UpdateProfileRequest>();
 
             CreateMap<APIDtos.UserDtos.UserFilterRequest, ApplicationDtos.UserDtos.UserFilterRequest>();
+
+            CreateMap<APIDtos.UserDtos.ChangeActivityLevelRequest, ApplicationDtos.UserDtos.ChangeActivityLevelRequest>();
         }
     }
 }

@@ -48,14 +48,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
-        public async Task<List<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request)
+        public async Task<IEnumerable<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request)
         {
             var labels = await _labelRepository.GetAllAsync(
                 l => !l.isDeleted &&
                     (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
             labels = labels.OrderBy(l => l.Name).ToList();
 
-            var result = _mapper.Map<List<LabelResponse>>(labels);
+            var result = _mapper.Map<IEnumerable<LabelResponse>>(labels);
             return result;
         }
 

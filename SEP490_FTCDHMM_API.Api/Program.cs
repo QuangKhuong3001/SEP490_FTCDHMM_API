@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
-using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
 
@@ -22,11 +21,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new GenderJsonConverter());
-    });
+builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
 

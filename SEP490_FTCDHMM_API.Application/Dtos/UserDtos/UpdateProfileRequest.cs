@@ -9,6 +9,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.UserDtos
         public string PhoneNumber { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public IFormFile? Avatar { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
     }
 }

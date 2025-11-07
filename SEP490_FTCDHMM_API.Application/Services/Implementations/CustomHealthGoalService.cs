@@ -69,10 +69,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _customHealthGoalRepository.AddAsync(goal);
         }
 
-        public async Task<IReadOnlyList<HealthGoalResponse>> GetMyGoalsAsync(Guid userId)
+        public async Task<IEnumerable<HealthGoalResponse>> GetMyGoalsAsync(Guid userId)
         {
             var goals = await _customHealthGoalRepository.GetAllAsync(g => g.UserId == userId, include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient));
-            return _mapper.Map<List<HealthGoalResponse>>(goals);
+            return _mapper.Map<IEnumerable<HealthGoalResponse>>(goals);
         }
 
         public async Task UpdateAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request)

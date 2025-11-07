@@ -1,4 +1,5 @@
 ﻿using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -6,18 +7,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
     public class RecipeNutritionAggregator : IRecipeNutritionAggregator
     {
-        private readonly INutritionAnalyzer _analyzer;
         private readonly AppDbContext _appDbContext;
 
-        public RecipeNutritionAggregator(INutritionAnalyzer analyzer, AppDbContext appDbContext)
+        public RecipeNutritionAggregator(AppDbContext appDbContext)
         {
-            _analyzer = analyzer;
             _appDbContext = appDbContext;
         }
 
         public async Task AggregateAndSaveAsync(Recipe recipe)
         {
-            var profile = _analyzer.AnalyzeRecipe(recipe);
+            var profile = NutritionAnalyzer.AnalyzeRecipe(recipe);
 
             var oldRecords = _appDbContext.RecipeNutritionAggregates.Where(x => x.RecipeId == recipe.Id);
 

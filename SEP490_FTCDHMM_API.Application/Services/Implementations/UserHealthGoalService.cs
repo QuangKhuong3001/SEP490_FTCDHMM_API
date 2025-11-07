@@ -54,7 +54,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userHealthGoalRepository.AddAsync(userGoal);
         }
 
-        public async Task<List<HealthGoalResponse>> GetCurrentGoalAsync(Guid userId)
+        public async Task<IEnumerable<HealthGoalResponse>> GetCurrentGoalAsync(Guid userId)
         {
             var userGoals = await _userHealthGoalRepository.GetAllAsync(u => u.UserId == userId, include: q => q.Include(u => u.HealthGoal).ThenInclude(g => g.Targets));
 
@@ -63,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 h => currentHealthGoalIds.Contains(h.Id),
                 include: q => q.Include(h => h.Targets).ThenInclude(t => t.Nutrient));
 
-            var result = _mapper.Map<List<HealthGoalResponse>>(currentHealthGoal);
+            var result = _mapper.Map<IEnumerable<HealthGoalResponse>>(currentHealthGoal);
             return result;
         }
 

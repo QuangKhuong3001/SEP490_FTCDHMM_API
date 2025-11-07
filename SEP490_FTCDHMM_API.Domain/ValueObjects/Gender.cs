@@ -2,18 +2,18 @@
 {
     public record Gender(string Value)
     {
-        public static readonly Gender Male = new("Male");
-        public static readonly Gender Female = new("Female");
-        public static readonly Gender Other = new("Other");
+        public static readonly Gender Male = new("MALE");
+        public static readonly Gender Female = new("FEMALE");
+        public static readonly Gender Other = new("OTHER");
 
         public override string ToString() => Value;
 
         public static Gender From(string value)
         {
-            return value switch
+            return value.Trim().ToUpperInvariant() switch
             {
-                "Male" => Male,
-                "Female" => Female,
+                "MALE" => Male,
+                "FEMALE" => Female,
                 _ => Other
             };
         }

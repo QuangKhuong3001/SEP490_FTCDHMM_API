@@ -15,6 +15,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Ignore(u => u.PhoneNumberConfirmed);
 
+            builder.Property(u => u.DateOfBirth)
+               .IsRequired();
+
             builder.Property(u => u.Email)
                .IsRequired()
                .HasMaxLength(256);
@@ -32,10 +35,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                     g => g.Value,
                     v => Gender.From(v)
                 )
-                .HasDefaultValueSql("'Other'");
+                .HasDefaultValueSql("'OTHER'");
+
+            builder.Property(u => u.ActivityLevel)
+                .HasConversion(
+                    g => g.Value,
+                    v => ActivityLevel.From(v)
+                )
+                .HasDefaultValueSql("'MODERATE'");
 
             builder.Property(u => u.CreatedAtUtc)
-               .HasDefaultValueSql("GETDATE()");
+               .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(u => u.UpdatedAtUtc)
                 .IsRequired(false);

@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
     {
         Task CreatLabel(CreateLabelRequest dto);
         Task<PagedResult<LabelResponse>> GetAllLabels(LabelFilterRequest request);
-        Task<List<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request);
+        Task<IEnumerable<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request);
         Task DeleteLabel(Guid labelId);
         Task UpdateColorCode(Guid labelId, UpdateColorCodeRequest request);
     }

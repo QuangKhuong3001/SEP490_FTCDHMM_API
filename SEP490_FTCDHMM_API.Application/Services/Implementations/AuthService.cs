@@ -63,6 +63,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 LastName = dto.LastName,
                 PhoneNumber = dto.PhoneNumber,
                 RoleId = customerRole!.Id,
+                Gender = Gender.From(dto.Gender),
+                DateOfBirth = dto.DateOfBirth
             };
             var createResult = await _userManager.CreateAsync(user, dto.Password);
             if (!createResult.Succeeded)

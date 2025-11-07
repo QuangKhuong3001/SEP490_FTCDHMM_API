@@ -1,12 +1,11 @@
 ﻿using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Infrastructure.Services
+namespace SEP490_FTCDHMM_API.Domain.Services
 {
-    public class HealthGoalEvaluator : IHealthGoalEvaluator
+    public static class HealthGoalEvaluator
     {
-        public double Evaluate(NutritionProfile profile, HealthGoal goal)
+        public static double Evaluate(NutritionProfile profile, HealthGoal goal)
         {
             if (goal.Targets.Count == 0) return 0;
 

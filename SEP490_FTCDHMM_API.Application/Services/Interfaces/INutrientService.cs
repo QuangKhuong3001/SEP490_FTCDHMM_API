@@ -4,7 +4,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface INutrientService
     {
-        Task<List<NutrientNameResponse>> GetRequiredNutrientList();
-        Task<List<NutrientNameResponse>> GetAllNutrient();
+        Task<IEnumerable<NutrientNameResponse>> GetRequiredNutrientList();
+        Task<IEnumerable<NutrientNameResponse>> GetAllNutrient();
     }
 }

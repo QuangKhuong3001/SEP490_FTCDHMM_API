@@ -7,9 +7,11 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public Gender Gender { get; set; } = Gender.Other;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAtUtc { get; set; }
+        public ActivityLevel ActivityLevel { get; set; } = ActivityLevel.Moderate;
 
         public Guid? AvatarId { get; set; }
         public Image? Avatar { get; set; } = null!;

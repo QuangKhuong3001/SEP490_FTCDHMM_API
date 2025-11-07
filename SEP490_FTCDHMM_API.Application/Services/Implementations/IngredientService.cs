@@ -274,10 +274,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<List<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default)
+        public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLenth)
-                return new();
+                return Enumerable.Empty<IngredientNameResponse>();
 
             keyword = keyword.Trim();
             var key = $"ingredient:search:{keyword.ToLowerInvariant()}";
@@ -295,7 +295,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 return mapped;
             }
 
-            return new();
+            return Enumerable.Empty<IngredientNameResponse>();
         }
     }
 }

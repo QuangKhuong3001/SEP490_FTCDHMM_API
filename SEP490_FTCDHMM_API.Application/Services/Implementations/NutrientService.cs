@@ -17,18 +17,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _nutrientRepository = nutrientRepository;
         }
 
-        public async Task<List<NutrientNameResponse>> GetAllNutrient()
+        public async Task<IEnumerable<NutrientNameResponse>> GetAllNutrient()
         {
             var nutrients = await _nutrientRepository.GetAllAsync(include: i => i.Include(n => n.Unit));
-            var result = _mapper.Map<List<NutrientNameResponse>>(nutrients);
+            var result = _mapper.Map<IEnumerable<NutrientNameResponse>>(nutrients);
 
             return result;
         }
 
-        public async Task<List<NutrientNameResponse>> GetRequiredNutrientList()
+        public async Task<IEnumerable<NutrientNameResponse>> GetRequiredNutrientList()
         {
             var requireds = await _nutrientRepository.GetAllAsync(r => r.IsMacroNutrient, include: i => i.Include(r => r.Unit));
-            var result = _mapper.Map<List<NutrientNameResponse>>(requireds);
+            var result = _mapper.Map<IEnumerable<NutrientNameResponse>>(requireds);
 
             return result;
         }

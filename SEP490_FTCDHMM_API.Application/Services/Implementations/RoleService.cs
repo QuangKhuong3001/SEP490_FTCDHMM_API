@@ -149,7 +149,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task<List<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
+        public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
         {
             var domains = await _permissionDomainRepository.GetAllAsync(include: d => d.Include(r => r.Actions));
 

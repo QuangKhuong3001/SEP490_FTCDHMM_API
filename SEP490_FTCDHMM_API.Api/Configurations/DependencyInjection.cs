@@ -14,7 +14,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Services;
+using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence;
@@ -244,8 +244,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
 
             //RecipeScore
-            services.AddScoped<INutritionAnalyzer, NutritionAnalyzer>();
-            services.AddScoped<IHealthGoalEvaluator, HealthGoalEvaluator>();
             services.AddScoped<IRecipeGoalAnalysisService, RecipeGoalAnalysisService>();
             services.AddScoped<IRecipeNutritionAggregator, RecipeNutritionAggregator>();
 

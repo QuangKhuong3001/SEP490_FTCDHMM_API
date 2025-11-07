@@ -1,12 +1,11 @@
 ﻿using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Infrastructure.Services
+namespace SEP490_FTCDHMM_API.Domain.Services
 {
-    public class NutritionAnalyzer : INutritionAnalyzer
+    public static class NutritionAnalyzer
     {
-        public NutritionProfile AnalyzeRecipe(Recipe recipe)
+        public static NutritionProfile AnalyzeRecipe(Recipe recipe)
         {
             var totals = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
             decimal totalCalories = 0;
