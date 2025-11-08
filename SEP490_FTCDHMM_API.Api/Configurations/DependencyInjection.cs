@@ -70,7 +70,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 typeof(ApiMapping.UserMappingProfile).Assembly,
                 typeof(ApiMapping.RoleMappingProfile).Assembly,
                 typeof(ApplicationMapping.UserMappingProfile).Assembly,
-                typeof(ApplicationMapping.RoleMappingProfile).Assembly);
+                typeof(ApplicationMapping.RoleMappingProfile).Assembly,
+                typeof(ApplicationMapping.UserHealthMetricMappingProfile).Assembly);
 
             // Config JWT
             services.AddAuthentication(options =>
@@ -259,6 +260,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //customhealthgoal
             services.AddScoped<ICustomHealthGoalRepository, CustomHealthGoalRepository>();
             services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
+
+            //userhealthmetric
+            services.AddScoped<IUserHealthMetricRepository, UserHealthMetricRepository>();
+            services.AddScoped<IUserHealthMetricService, UserHealthMetricService>();
 
             //healthgoalconflict
             services.AddScoped<IHealthGoalConflictRepository, HealthGoalConflictRepository>();

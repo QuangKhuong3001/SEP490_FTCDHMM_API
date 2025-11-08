@@ -73,8 +73,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthMetricService.GetHistoryByUserIdAsync(userId);
-            return Ok();
+            var result = await _userHealthMetricService.GetHistoryByUserIdAsync(userId);
+            var mappedResult = _mapper.Map<IEnumerable<UserHealthMetricResponse>>(result);
+            return Ok(mappedResult);
         }
 
     }
