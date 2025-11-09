@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] Dtos.UserDietRestriction.UserDietRestrictionFilterRequest dto)
+        public async Task<IActionResult> GetList([FromQuery] Dtos.IngredientDtos.IngredientFilterRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientFilterRequest>(dto);
 
