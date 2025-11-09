@@ -17,6 +17,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
             CreateMap<AppUser, ProfileResponse>()
                 .ForMember(dest => dest.Gender,
                     opt => opt.MapFrom(src => src.Gender.Value))
+                .ForMember(dest => dest.ActivityLevel,
+                    opt => opt.MapFrom(src => src.ActivityLevel.Value))
                 .ForMember(
                     dest => dest.AvatarUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<AppUser, ProfileResponse>>()
