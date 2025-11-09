@@ -41,12 +41,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 u.UserId == userId);
 
             if (duplicates)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.DUPLICATE);
 
             var type = RestrictionType.From(request.Type);
 
             if (type == RestrictionType.TemporaryAvoid && !request.ExpiredAtUtc.HasValue)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            if (type != RestrictionType.TemporaryAvoid)
+            {
+                request.ExpiredAtUtc = null;
+            }
 
             await _userDietRestrictionRepository.AddAsync(new UserDietRestriction
             {
@@ -72,12 +77,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 u.UserId == userId);
 
             if (duplicates)
-                throw new AppException(AppResponseCode.EXISTS);
+                throw new AppException(AppResponseCode.DUPLICATE);
 
             var type = RestrictionType.From(request.Type);
 
             if (type == RestrictionType.TemporaryAvoid && !request.ExpiredAtUtc.HasValue)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            if (type != RestrictionType.TemporaryAvoid)
+            {
+                request.ExpiredAtUtc = null;
+            }
 
             await _userDietRestrictionRepository.AddAsync(new UserDietRestriction
             {
@@ -105,7 +115,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var restrictions = await _userDietRestrictionRepository.GetAllAsync(
                     predicate: d => d.UserId == userId &&
-                                    d.ExpiredAtUtc < DateTime.UtcNow,
+                                    (d.ExpiredAtUtc == null || d.ExpiredAtUtc < DateTime.UtcNow),
                     include: q => q.Include(d => d.Ingredient)
                                    .Include(d => d.IngredientCategory)
                 );
