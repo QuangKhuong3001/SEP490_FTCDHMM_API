@@ -27,6 +27,17 @@
         public const string HealthGoal_Update = "HealthGoal:Update";
         public const string HealthGoal_Delete = "HealthGoal:Delete";
 
+
+        public const string Comment_Create = "Comment:Create";
+        public const string Comment_Delete = "Comment:Delete";
+        public const string Comment_Update = "Comment:Update";
+
+        public const string Rating_Create = "Rating:Create";
+        public const string Rating_Delete = "Rating:Delete";
+        public const string Rating_Update = "Rating:Update";
+
+
+
     }
 
 }

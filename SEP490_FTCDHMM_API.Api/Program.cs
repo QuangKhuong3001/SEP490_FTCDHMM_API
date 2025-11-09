@@ -1,10 +1,11 @@
 ﻿using Hangfire;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Infrastructure.Hubs;
 using SEP490_FTCDHMM_API.Infrastructure.Hangfire;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
-
 var builder = WebApplication.CreateBuilder(args);
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -16,12 +17,20 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:3000", "https://sep-490-ftcdhmm-ui.vercel.app")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
 
 builder.Services.AddServices(builder.Configuration);
 
+builder.Services.AddSignalR(options =>
+{
+    // Configure keepalive to prevent timeout
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 60s - timeout nếu client không respond
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15s - gửi keepalive ping
+    options.HandshakeTimeout = TimeSpan.FromSeconds(10); // 10s - handshake timeout
+});
 builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
@@ -97,7 +106,8 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapHub<RecipeHub>("/hubs/recipe");
+app.MapHub<CommentHub>("/hubs/comments");
 app.MapControllers();
 
 app.Run();

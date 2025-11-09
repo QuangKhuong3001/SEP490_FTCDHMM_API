@@ -29,6 +29,14 @@
         public static readonly PermissionValue HealthGoal_Update = new("HealthGoal", "Update");
         public static readonly PermissionValue HealthGoal_Delete = new("HealthGoal", "Delete");
 
+
+        public static readonly PermissionValue Comment_Create = new("Comment", "Create");
+        public static readonly PermissionValue Comment_Delete = new("Comment", "Delete");
+        public static readonly PermissionValue Comment_Update = new("Comment", "Update");
+
+        public static readonly PermissionValue Rating_Create = new("Rating", "Create");
+        public static readonly PermissionValue Rating_Delete = new("Rating", "Delete");
+        public static readonly PermissionValue Rating_Update = new("Rating", "Update");
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -48,6 +56,12 @@
             HealthGoal_Create,
             HealthGoal_Delete,
             HealthGoal_Update,
+            Comment_Create,
+            Comment_Delete,
+            Comment_Update,
+            Rating_Create,
+            Rating_Delete,
+            Rating_Update
         };
     }
 }

@@ -38,6 +38,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<UserHealthMetric> UserHealthMetrics { get; set; }
         public DbSet<UserRecipeView> UserRecipeViews { get; set; }
         public DbSet<UserSaveRecipe> UserSaveRecipes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
