@@ -115,7 +115,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var restrictions = await _userDietRestrictionRepository.GetAllAsync(
                     predicate: d => d.UserId == userId &&
-                                    (d.ExpiredAtUtc == null || d.ExpiredAtUtc < DateTime.UtcNow),
+                                    (d.ExpiredAtUtc == null || d.ExpiredAtUtc > DateTime.UtcNow),
                     include: q => q.Include(d => d.Ingredient)
                                    .Include(d => d.IngredientCategory)
                 );

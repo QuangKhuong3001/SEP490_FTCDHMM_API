@@ -19,7 +19,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public string? ImageUrl { get; set; }
         public bool IsFavorited { get; set; }
         public bool IsSaved { get; set; }
-
         public required List<CookingStepResponse> CookingSteps { get; set; }
         public required List<LabelResponse> Labels { get; set; }
         public required List<RecipeIngredientResponse> Ingredients { get; set; }
