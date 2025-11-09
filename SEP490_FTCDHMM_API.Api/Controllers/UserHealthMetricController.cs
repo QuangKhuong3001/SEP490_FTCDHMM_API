@@ -38,7 +38,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid metricId, UpdateUserHealthMetricRequest request)
+        public async Task<IActionResult> Update([FromRoute] Guid id, UpdateUserHealthMetricRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -47,20 +47,20 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserHealthMetricDtos.UpdateUserHealthMetricRequest>(request);
 
-            await _userHealthMetricService.UpdateAsync(userId, metricId, appRequest);
+            await _userHealthMetricService.UpdateAsync(userId, id, appRequest);
             return Ok();
         }
 
         [Authorize]
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid metricId)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthMetricService.DeleteAsync(userId, metricId);
+            await _userHealthMetricService.DeleteAsync(userId, id);
             return Ok();
         }
 
