@@ -13,11 +13,13 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IUserHealthMetricService _userHealthMetricService;
         private readonly IMapper _mapper;
 
-        public UserController(IUserService userService, IMapper mapper)
+        public UserController(IUserService userService, IUserHealthMetricService userHealthMetricService, IMapper mapper)
         {
             _userService = userService;
+            _userHealthMetricService = userHealthMetricService;
             _mapper = mapper;
         }
 
@@ -191,6 +193,10 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.UserDtos.ChangeActivityLevelRequest>(request);
 
             await _userService.ChangeActivityLevel(userId, appRequest);
+
+            // Recalculate all existing metrics with the new activity level
+            await _userHealthMetricService.RecalculateUserMetricsAsync(userId);
+
             return Ok();
         }
     }

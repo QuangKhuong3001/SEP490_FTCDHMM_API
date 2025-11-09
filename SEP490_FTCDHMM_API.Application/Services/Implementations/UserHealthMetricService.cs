@@ -122,5 +122,34 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return _mapper.Map<IEnumerable<UserHealthMetricResponse>>(metrics);
         }
 
+        public async Task RecalculateUserMetricsAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var metrics = await _userHealthMetricRepository.GetAllAsync(h => h.UserId == userId);
+            var activityFactor = user.ActivityLevel.Factor;
+
+            foreach (var metric in metrics)
+            {
+                // Recalculate BMR using the same formula as when creating the metric
+                var age = AgeCalculator.Calculate(user.DateOfBirth);
+                var bmr = BmrCalculator.Calculate(
+                    weightKg: metric.WeightKg,
+                    heightCm: metric.HeightCm,
+                    age: age,
+                    gender: user.Gender.Value,
+                    muscleMassKg: metric.MuscleMassKg,
+                    bodyFatPercent: metric.BodyFatPercent);
+
+                // Recalculate TDEE with the new activity level
+                var tdee = bmr * activityFactor;
+                metric.TDEE = Math.Round(tdee, 2);
+
+                await _userHealthMetricRepository.UpdateAsync(metric);
+            }
+        }
+
     }
 }
