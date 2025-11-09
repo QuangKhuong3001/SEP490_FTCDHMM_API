@@ -17,6 +17,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<CustomHealthGoalTarget> CustomHealthGoalTargets { get; set; } = null!;
         public DbSet<EmailOtp> EmailOtps { get; set; }
         public DbSet<HealthGoal> HealthGoals { get; set; } = null!;
+        public DbSet<HealthGoalConflict> HealthGoalConflicts { get; set; } = null!;
         public DbSet<HealthGoalTarget> HealthGoalTargets { get; set; } = null!;
         public DbSet<Image> Images { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
@@ -30,9 +31,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
         public DbSet<RecipeNutritionAggregate> RecipeNutritionAggregates { get; set; }
+        public DbSet<UserDietRestriction> UserDietRestrictions { get; set; }
         public DbSet<UserFavoriteRecipe> UserFavoriteRecipes { get; set; }
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<UserHealthGoal> UserHealthGoals { get; set; }
+        public DbSet<UserHealthMetric> UserHealthMetrics { get; set; }
         public DbSet<UserRecipeView> UserRecipeViews { get; set; }
         public DbSet<UserSaveRecipe> UserSaveRecipes { get; set; }
         public DbSet<Comment> Comments { get; set; }

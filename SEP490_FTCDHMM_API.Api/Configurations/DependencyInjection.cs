@@ -12,6 +12,8 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
+using SEP490_FTCDHMM_API.Application.Jobs.Implementations;
+using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -45,6 +47,24 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //    var redisConnection = configuration.GetConnectionString("Redis");
             //    return ConnectionMultiplexer.Connect(redisConnection!);
             //});
+
+
+            //hangfire
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseRecommendedSerializerSettings()
+                      .UseSqlServerStorage(configuration.GetConnectionString("MyCnn"), new SqlServerStorageOptions
+                      {
+                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                          QueuePollInterval = TimeSpan.Zero,
+                          UseRecommendedIsolationLevel = true,
+                          DisableGlobalLocks = true
+                      });
+            });
+            services.AddHangfireServer();
 
             // Config Identity
             services.AddIdentity<AppUser, AppRole>(options =>
@@ -141,6 +161,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<AppSettings>(configuration.GetSection("Application"));
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
+
+            //job
+            services.AddScoped<IExpireUserDietRestrictionsJob, ExpireUserDietRestrictionsJob>();
 
             // DI External Service
 
@@ -271,6 +294,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();
 
+            //dietRestriction
+            services.AddScoped<IUserDietRestrictionRepository, UserDietRestrictionRepository>();
+            services.AddScoped<IUserDietRestrictionService, UserDietRestrictionService>();
         }
     }
 }

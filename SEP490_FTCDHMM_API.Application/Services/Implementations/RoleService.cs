@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var existing = await _roleRepository.ExistsAsync(r => r.Name == dto.Name);
 
             if (existing)
-                throw new AppException(AppResponseCode.ROLE_ALREADY_EXISTS);
+                throw new AppException(AppResponseCode.EXISTS);
 
             var role = new AppRole
             {
@@ -140,7 +140,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             foreach (var permission in dto.Permissions)
             {
-                var rp = rolePermissions.FirstOrDefault(x => x.PermissionActionId == permission.PermissionActionId);
+                var rp = rolePermissions.FirstOrDefault(
+                    x => x.PermissionActionId == permission.PermissionActionId);
                 if (rp != null)
                 {
                     rp.IsActive = permission.IsActive;
@@ -151,7 +152,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
         {
-            var domains = await _permissionDomainRepository.GetAllAsync(include: d => d.Include(r => r.Actions));
+            var domains = await _permissionDomainRepository.GetAllAsync(
+                include: d => d.Include(r => r.Actions));
 
             var rolePermissions = await _rolePermissionRepository.GetAllAsync(rp => rp.RoleId == roleId);
 

@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserHealthMetricController : ControllerBase
     {
         private readonly IUserHealthMetricService _userHealthMetricService;
@@ -21,7 +22,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserHealthMetricRequest request)
         {
@@ -36,7 +36,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateUserHealthMetricRequest request)
         {
@@ -51,7 +50,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
@@ -64,7 +62,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetHistory()
         {

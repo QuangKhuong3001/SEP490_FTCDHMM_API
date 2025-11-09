@@ -71,13 +71,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<HealthGoalResponse>> GetMyGoalsAsync(Guid userId)
         {
-            var goals = await _customHealthGoalRepository.GetAllAsync(g => g.UserId == userId, include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient));
+            var goals = await _customHealthGoalRepository.GetAllAsync(
+                predicate: g => g.UserId == userId,
+                include: q => q.Include(g => g.Targets)
+                                    .ThenInclude(t => t.Nutrient));
             return _mapper.Map<IEnumerable<HealthGoalResponse>>(goals);
         }
 
         public async Task UpdateAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request)
         {
-            var healthGoal = await _customHealthGoalRepository.GetByIdAsync(id, include: i => i.Include(h => h.Targets));
+            var healthGoal = await _customHealthGoalRepository.GetByIdAsync(id,
+                include: i => i.Include(h => h.Targets));
 
             if (healthGoal == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);

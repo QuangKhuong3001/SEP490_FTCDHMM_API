@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SEP490_FTCDHMM_API.Api.Dtos.UserDietRestriction;
 using APIDtos = SEP490_FTCDHMM_API.Api.Dtos;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 namespace SEP490_FTCDHMM_API.Api.Mappings
@@ -14,7 +15,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<APIDtos.IngredientDtos.UpdateIngredientRequest, ApplicationDtos.IngredientDtos.UpdateIngredientRequest>();
 
             //filter
-            CreateMap<APIDtos.IngredientDtos.IngredientFilterRequest, ApplicationDtos.IngredientDtos.IngredientFilterRequest>();
+            CreateMap<UserDietRestrictionFilterRequest, ApplicationDtos.IngredientDtos.IngredientFilterRequest>();
 
             //detection
             CreateMap<APIDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest, ApplicationDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest>();
