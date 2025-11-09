@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "MODERATE" => Moderate,
                 "ACTIVE" => Active,
                 "VERYACTIVE" => VeryActive,
-                _ => throw new AppException(AppResponseCode.INVALID_INPUT)
+                _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }
     }

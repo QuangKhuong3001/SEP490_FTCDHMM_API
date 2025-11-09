@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task CreatLabel(CreateLabelRequest dto)
         {
             if (await _labelRepository.ExistsAsync(l => l.Name == dto.Name))
-                throw new AppException(AppResponseCode.NAME_ALREADY_EXISTS);
+                throw new AppException(AppResponseCode.EXISTS);
 
             await _labelRepository.AddAsync(new Label
             {

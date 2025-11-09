@@ -23,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var exits = await _ingredientCategoryRepository.ExistsAsync(c => c.Name == request.Name);
             if (exits)
-                throw new AppException(AppResponseCode.NAME_ALREADY_EXISTS);
+                throw new AppException(AppResponseCode.EXISTS);
 
             await _ingredientCategoryRepository.AddAsync(new IngredientCategory { Name = request.Name });
         }

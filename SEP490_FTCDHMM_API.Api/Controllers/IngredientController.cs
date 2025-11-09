@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.IngredientDetectionDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos;
+using SEP490_FTCDHMM_API.Api.Dtos.UserDietRestriction;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDietRestriction;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
@@ -28,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] IngredientFilterRequest dto)
+        public async Task<IActionResult> GetList([FromQuery] Dtos.UserDietRestriction.UserDietRestrictionFilterRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientFilterRequest>(dto);
 

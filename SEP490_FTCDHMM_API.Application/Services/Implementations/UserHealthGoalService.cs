@@ -56,7 +56,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<HealthGoalResponse>> GetCurrentGoalAsync(Guid userId)
         {
-            var userGoals = await _userHealthGoalRepository.GetAllAsync(u => u.UserId == userId, include: q => q.Include(u => u.HealthGoal).ThenInclude(g => g.Targets));
+            var userGoals = await _userHealthGoalRepository.GetAllAsync(
+                predicate: u => u.UserId == userId,
+                include: q => q.Include(u => u.HealthGoal)
+                                    .ThenInclude(g => g.Targets));
 
             var currentHealthGoalIds = userGoals.ToList().Select(c => c.HealthGoalId).ToList();
             var currentHealthGoal = await _healthGoalRepopository.GetAllAsync(

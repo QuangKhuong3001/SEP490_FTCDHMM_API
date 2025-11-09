@@ -103,7 +103,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task CreateIngredient(CreateIngredientRequest dto)
         {
             if (await _ingredientRepository.ExistsAsync(i => i.Name == dto.Name))
-                throw new AppException(AppResponseCode.NAME_ALREADY_EXISTS);
+                throw new AppException(AppResponseCode.EXISTS);
 
             if (!await _ingredientCategoryRepository.IdsExistAsync(dto.IngredientCategoryIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);

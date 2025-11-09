@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
+using SEP490_FTCDHMM_API.Infrastructure.Hangfire;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
 
@@ -80,6 +81,11 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = new[] { new HangfireAuthFilter() }
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    HangfireJobRegistrar.Register(scope.ServiceProvider);
+}
 
 app.UseHttpsRedirection();
 

@@ -15,7 +15,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "EASY" => Easy,
                 "MEDIUM" => Medium,
                 "HARD" => Hard,
-                _ => throw new AppException(AppResponseCode.INVALID_INPUT)
+                _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }
         public override string ToString() => Value;
