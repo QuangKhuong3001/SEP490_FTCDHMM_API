@@ -347,6 +347,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return _mapper.Map<IEnumerable<UserResponse>>(followingUsers);
         }
 
+        public async Task<ActivityLevel> GetActivityLevel(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND);
+            }
+
+            return user.ActivityLevel;
+        }
+
         public async Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request)
         {
             var user = await _userRepository.GetByIdAsync(userId);

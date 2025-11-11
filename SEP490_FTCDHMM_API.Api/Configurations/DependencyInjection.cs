@@ -24,8 +24,6 @@ using SEP490_FTCDHMM_API.Infrastructure.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
-using ApiMapping = SEP490_FTCDHMM_API.Api.Mappings;
-using ApplicationMapping = SEP490_FTCDHMM_API.Application.Mappings;
 
 namespace SEP490_FTCDHMM_API.Api.Configurations
 {
@@ -85,12 +83,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             });
 
             // Auto Mapping
-            services.AddAutoMapper(typeof(ApiMapping.AuthMappingProfile).Assembly,
-                typeof(ApiMapping.CommonMappingProfile).Assembly,
-                typeof(ApiMapping.UserMappingProfile).Assembly,
-                typeof(ApiMapping.RoleMappingProfile).Assembly,
-                typeof(ApplicationMapping.UserMappingProfile).Assembly,
-                typeof(ApplicationMapping.RoleMappingProfile).Assembly);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Config JWT
             services.AddAuthentication(options =>
@@ -151,8 +144,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //    job => job.ExecuteAsync(),
             //    Cron.Daily(2, 0)
             //);
-
-            services.AddHangfireServer();
 
             //bind settings value
             services.Configure<AwsS3Settings>(configuration.GetSection("AWS"));
@@ -288,6 +279,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();
+
+            //userhealthmetric
+            services.AddScoped<IUserHealthMetricRepository, UserHealthMetricRepository>();
+            services.AddScoped<IUserHealthMetricService, UserHealthMetricService>();
 
             //dietRestriction
             services.AddScoped<IUserDietRestrictionRepository, UserDietRestrictionRepository>();

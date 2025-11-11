@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Dtos.UserHealthMetricDtos
+﻿using SEP490_FTCDHMM_API.Domain.ValueObjects;
+
+namespace SEP490_FTCDHMM_API.Application.Dtos.UserHealthMetricDtos
 {
     public class UserHealthMetricResponse
     {
@@ -12,5 +14,6 @@
         public decimal TDEE { get; set; }
         public DateTime RecordedAt { get; set; }
         public string? Notes { get; set; }
+        public ActivityLevel ActivityLevel { get; set; } = ActivityLevel.Moderate;
     }
 }

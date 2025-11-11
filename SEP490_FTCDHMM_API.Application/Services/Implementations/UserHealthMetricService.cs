@@ -56,7 +56,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 BMR = Math.Round(bmr, 2),
                 TDEE = Math.Round(tdee, 2),
                 Notes = request.Notes,
-                RecordedAt = DateTime.UtcNow
+                RecordedAt = DateTime.UtcNow,
+                ActivityLevel = user.ActivityLevel
             };
 
             await _userHealthMetricRepository.AddAsync(metric);
@@ -99,6 +100,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             metric.TDEE = Math.Round(tdee, 2);
             metric.Notes = request.Notes;
             metric.RecordedAt = DateTime.UtcNow;
+            metric.ActivityLevel = user.ActivityLevel;
+
 
             await _userHealthMetricRepository.UpdateAsync(metric);
         }

@@ -36,7 +36,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("{metricId:guid}")]
         public async Task<IActionResult> Update(Guid metricId, UpdateUserHealthMetricRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -50,7 +50,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("{metricId:guid}")]
         public async Task<IActionResult> Delete(Guid metricId)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -70,8 +70,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthMetricService.GetHistoryByUserIdAsync(userId);
-            return Ok();
+            var result = await _userHealthMetricService.GetHistoryByUserIdAsync(userId);
+            return Ok(result);
         }
 
     }

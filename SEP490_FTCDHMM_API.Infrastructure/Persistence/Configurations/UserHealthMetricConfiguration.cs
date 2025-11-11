@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
@@ -17,6 +18,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(x => x.TDEE).HasPrecision(6, 2);
             builder.Property(x => x.BodyFatPercent).HasPrecision(5, 2);
             builder.Property(x => x.MuscleMassKg).HasPrecision(5, 2);
+
+            builder.Property(u => u.ActivityLevel)
+            .HasConversion(
+                g => g.Value,
+                v => ActivityLevel.From(v)
+            )
+            .HasDefaultValueSql("'MODERATE'");
 
             builder.Property(u => u.RecordedAt)
                 .HasDefaultValueSql("GETUTCDATE()");

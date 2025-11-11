@@ -1,5 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
@@ -19,6 +20,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<IEnumerable<UserResponse>> GetFollowingAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto);
         Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request);
+        Task<ActivityLevel> GetActivityLevel(Guid userId);
 
     }
 }

@@ -474,7 +474,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, PaginationParams paginationParams)
         {
-            var user = _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 

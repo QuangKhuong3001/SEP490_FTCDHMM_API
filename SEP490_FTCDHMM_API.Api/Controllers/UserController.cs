@@ -170,6 +170,17 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize]
+        [HttpGet("activity-level")]
+        public async Task<IActionResult> GetActivityLevel()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var result = await _userService.GetActivityLevel(userId);
+
+            return Ok(result);
+        }
+
+        [Authorize]
         [HttpPut("activity-level")]
         public async Task<IActionResult> ChangeActivityLevel(ChangeActivityLevelRequest request)
         {
