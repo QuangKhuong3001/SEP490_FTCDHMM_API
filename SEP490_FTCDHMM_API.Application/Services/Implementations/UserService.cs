@@ -272,7 +272,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             user.LastName = dto.LastName;
             user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
-            user.UpdatedAtUtc = DateTime.UtcNow;
             user.DateOfBirth = dto.DateOfBirth;
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)

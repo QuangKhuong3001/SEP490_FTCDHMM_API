@@ -25,24 +25,3 @@ public class UniversalImageUrlResolver<TSource, TDestination>
         return _s3.GeneratePreSignedUrl(key);
     }
 }
-
-public class CommentAvatarUrlResolver : IValueResolver<Comment, object, string?>
-{
-    private readonly IS3ImageService _s3;
-
-    public CommentAvatarUrlResolver(IS3ImageService s3)
-    {
-        _s3 = s3;
-    }
-
-    public string? Resolve(Comment src, object dest, string? destMember, ResolutionContext context)
-    {
-        var userAvatar = src?.User?.Avatar;
-
-        if (userAvatar == null)
-            return null;
-
-        var key = userAvatar.Key;
-        return _s3.GeneratePreSignedUrl(key);
-    }
-}

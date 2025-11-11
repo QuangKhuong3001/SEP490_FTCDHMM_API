@@ -23,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
 
                     .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                     .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-                    .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom<CommentAvatarUrlResolver>())
+                    .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom<UniversalImageUrlResolver<Comment, CommentResponse>>())
                     .ForMember(dest => dest.Replies, opt => opt.MapFrom(src => src.Replies));
 
         }

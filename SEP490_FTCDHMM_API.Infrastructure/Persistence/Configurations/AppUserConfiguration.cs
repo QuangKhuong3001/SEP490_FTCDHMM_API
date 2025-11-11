@@ -61,9 +61,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .HasForeignKey(u => u.RoleId)
                    .IsRequired();
 
-            builder.HasOne(u => u.Image)
+            builder.HasOne(u => u.Avatar)
                     .WithOne()
-                    .HasForeignKey<AppUser>(u => u.ImageId)
+                    .HasForeignKey<AppUser>(u => u.AvatarId)
                     .OnDelete(DeleteBehavior.Restrict);
 
             builder.Ignore(u => u.PhoneNumberConfirmed);

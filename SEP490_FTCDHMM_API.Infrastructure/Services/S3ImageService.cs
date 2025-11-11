@@ -46,7 +46,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             {
                 Id = id,
                 Key = key,
-                FileName = file.FileName,
                 ContentType = file.ContentType,
                 UploadedBy = uploadedBy,
                 CreatedAt = DateTime.UtcNow
@@ -79,7 +78,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 {
                     Id = id,
                     Key = key,
-                    FileName = file.FileName,
                     ContentType = file.ContentType,
                     UploadedBy = uploadedBy,
                     CreatedAt = DateTime.UtcNow
