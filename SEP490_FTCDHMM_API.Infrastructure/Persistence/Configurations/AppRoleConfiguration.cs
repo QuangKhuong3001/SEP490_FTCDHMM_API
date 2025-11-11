@@ -21,11 +21,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(r => r.Name)
                    .IsRequired()
-                   .HasMaxLength(100);
-
-            builder.Property(r => r.NormalizedName)
-                   .IsRequired()
-                   .HasMaxLength(100);
+                   .HasMaxLength(50);
         }
     }
 }

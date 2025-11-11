@@ -14,10 +14,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(c => c.Content)
                    .IsRequired()
-                   .HasMaxLength(1000);
+                   .HasMaxLength(1024);
 
-            builder.Property(c => c.CreatedAtUtc)
-                   .IsRequired();
+            builder.Property(u => u.CreatedAtUtc)
+               .HasDefaultValueSql("GETUTCDATE()");
 
             builder.HasOne(c => c.Recipe)
                    .WithMany(r => r.Comments)

@@ -2,7 +2,7 @@
 {
     public class AppRolePermission
     {
-        public Guid RoleId { get; set; } = Guid.NewGuid();
+        public Guid RoleId { get; set; }
         public AppRole Role { get; set; } = null!;
 
         public Guid PermissionActionId { get; set; }

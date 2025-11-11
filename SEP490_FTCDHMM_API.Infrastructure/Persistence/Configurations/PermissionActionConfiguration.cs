@@ -4,11 +4,11 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
-    internal class PermissionConfiguration : IEntityTypeConfiguration<PermissionAction>
+    internal class PermissionDomainConfiguration : IEntityTypeConfiguration<PermissionDomain>
     {
-        public void Configure(EntityTypeBuilder<PermissionAction> builder)
+        public void Configure(EntityTypeBuilder<PermissionDomain> builder)
         {
-            builder.ToTable("PermissionActions");
+            builder.ToTable("PermissionDomains");
 
             builder.HasKey(p => p.Id);
 
@@ -16,8 +16,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .ValueGeneratedOnAdd();
 
             builder.Property(p => p.Name)
-                   .IsRequired()
-                   .HasMaxLength(100);
+                   .IsRequired();
+
         }
     }
 }

@@ -4,9 +4,15 @@
     {
         public AppResponseCode ResponseCode { get; }
 
-        public AppException(AppResponseCode code)
+        public AppException(AppResponseCode responseCode)
         {
-            ResponseCode = new AppResponseCode(code.StatusCode, code.Code);
+            ResponseCode = responseCode;
+        }
+
+        public AppException(AppResponseCode responseCode, string message)
+        : base(message)
+        {
+            ResponseCode = responseCode;
         }
     }
 }

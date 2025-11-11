@@ -30,6 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
                 {
                     code = ex.ResponseCode.Code,
                     statusCode = ex.ResponseCode.StatusCode,
+                    message = ex.Message
                 };
 
                 await context.Response.WriteAsJsonAsync(response);
@@ -45,6 +46,7 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
                 {
                     code = AppResponseCode.UNKNOWN_ERROR.Code,
                     statusCode = AppResponseCode.UNKNOWN_ERROR.StatusCode,
+                    message = ex.Message
                 };
 
                 await context.Response.WriteAsJsonAsync(response);

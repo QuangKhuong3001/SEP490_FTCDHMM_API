@@ -13,14 +13,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.HasKey(u => u.Id);
 
-            builder.Ignore(u => u.PhoneNumberConfirmed);
-
-            builder.Property(u => u.DateOfBirth)
-               .IsRequired();
-
-            builder.Property(u => u.Email)
-               .IsRequired()
-               .HasMaxLength(256);
+            builder.Property(r => r.Id)
+               .ValueGeneratedOnAdd();
 
             builder.Property(u => u.FirstName)
                 .IsRequired()
@@ -30,12 +24,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.Property(u => u.DateOfBirth)
+               .IsRequired();
+
             builder.Property(u => u.Gender)
                 .HasConversion(
                     g => g.Value,
                     v => Gender.From(v)
                 )
                 .HasDefaultValueSql("'OTHER'");
+
+            builder.Property(u => u.CreatedAtUtc)
+               .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(u => u.ActivityLevel)
                 .HasConversion(
@@ -44,21 +44,32 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 )
                 .HasDefaultValueSql("'MODERATE'");
 
-            builder.Property(u => u.CreatedAtUtc)
-               .HasDefaultValueSql("GETUTCDATE()");
+            builder.Property(u => u.UserName)
+               .IsRequired()
+               .HasMaxLength(256);
 
-            builder.Property(u => u.UpdatedAtUtc)
-                .IsRequired(false);
+            builder.Property(u => u.Email)
+               .IsRequired()
+               .HasMaxLength(256);
+
+            builder.Property(u => u.EmailConfirmed)
+               .IsRequired()
+               .HasDefaultValue(false);
 
             builder.HasOne(u => u.Role)
                    .WithMany()
                    .HasForeignKey(u => u.RoleId)
                    .IsRequired();
 
-            builder.HasOne(u => u.Avatar)
+            builder.HasOne(u => u.Image)
                     .WithOne()
-                    .HasForeignKey<AppUser>(u => u.AvatarId)
+                    .HasForeignKey<AppUser>(u => u.ImageId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Ignore(u => u.PhoneNumberConfirmed);
+            builder.Ignore(u => u.PhoneNumber);
+            builder.Ignore(u => u.TwoFactorEnabled);
+
         }
     }
 }

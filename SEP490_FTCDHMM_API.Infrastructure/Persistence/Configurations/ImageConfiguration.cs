@@ -13,12 +13,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.HasKey(i => i.Id);
 
             builder.Property(i => i.Key)
-                   .IsRequired()
-                   .HasMaxLength(255);
-
-            builder.Property(i => i.FileName)
-                   .IsRequired()
-                   .HasMaxLength(255);
+                   .IsRequired();
 
             builder.Property(i => i.ContentType)
                    .IsRequired()

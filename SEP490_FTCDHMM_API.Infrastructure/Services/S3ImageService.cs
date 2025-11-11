@@ -143,7 +143,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             {
                 Id = id,
                 Key = key,
-                FileName = fileName,
                 ContentType = contentType,
                 CreatedAt = DateTime.UtcNow,
                 UploadedById = uploadedById

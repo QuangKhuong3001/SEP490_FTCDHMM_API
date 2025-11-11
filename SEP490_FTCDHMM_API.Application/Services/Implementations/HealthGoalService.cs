@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var exist = await _nutrientRepository.IdsExistAsync(nutrientIds);
 
             if (!exist)
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.NOT_FOUND, "Dinh dưỡng không tồn tại trong hệ thống");
 
             var duplicateIds = request.Targets
                 .GroupBy(t => t.NutrientId)

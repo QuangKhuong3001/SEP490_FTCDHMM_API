@@ -12,6 +12,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
 
         [Range(1, 5, ErrorMessage = "Score must be between 1 and 5.")]
         public int Score { get; set; }
+        public string? Feedback { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }
 
