@@ -191,5 +191,16 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             await _userService.ChangeActivityLevel(userId, appRequest);
             return Ok();
         }
+
+        [Authorize(Roles = RoleConstants.Admin)]
+        [HttpPost("{userId:guid}/roles")]
+        public async Task<IActionResult> AssignRole(Guid userId, ChangeRoleRequest request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.UserDtos.ChangeRoleRequest>(request);
+
+            await _userService.ChangeRole(userId, appRequest);
+
+            return Ok(new { Message = "Người dùng đã được gán vai trò thành công." });
+        }
     }
 }

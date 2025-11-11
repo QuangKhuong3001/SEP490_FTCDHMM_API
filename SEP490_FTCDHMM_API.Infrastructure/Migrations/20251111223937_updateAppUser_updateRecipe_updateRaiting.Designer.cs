@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251111223937_updateAppUser_updateRecipe_updateRaiting")]
+    partial class updateAppUser_updateRecipe_updateRaiting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1961,7 +1964,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasIndex("IngredientId");
 
-                    b.ToTable("RecipeIngredients", (string)null);
+                    b.ToTable("RecipeIngredients");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeNutritionAggregate", b =>
@@ -1989,7 +1992,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasIndex("NutrientId");
 
-                    b.ToTable("RecipeNutritionAggregates", (string)null);
+                    b.ToTable("RecipeNutritionAggregates");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserDietRestriction", b =>
@@ -2142,7 +2145,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserHealthMetrics", (string)null);
+                    b.ToTable("UserHealthMetrics");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserRecipeView", b =>

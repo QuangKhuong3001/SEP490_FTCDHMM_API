@@ -11,6 +11,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public Gender Gender { get; set; } = Gender.Other;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public ActivityLevel ActivityLevel { get; set; } = ActivityLevel.Moderate;
+        public string? Address { get; set; }
+        public string? Bio { get; set; }
 
         public Guid? AvatarId { get; set; }
         public Image? Avatar { get; set; } = null!;
@@ -23,7 +25,6 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<UserFavoriteRecipe> FavoriteRecipes { get; set; } = new List<UserFavoriteRecipe>();
         public ICollection<UserSaveRecipe> SaveRecipes { get; set; } = new List<UserSaveRecipe>();
         public ICollection<UserDietRestriction> DietRestrictions { get; set; } = new List<UserDietRestriction>();
-
 
     }
 }

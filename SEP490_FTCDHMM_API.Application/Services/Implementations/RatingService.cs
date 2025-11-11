@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -12,24 +13,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IRatingRepository _ratingRepository;
         private readonly IMapper _mapper;
         private readonly IRealtimeNotifier _notifier;
+        private readonly IRecipeRepository _recipeRepository;
 
-        public RatingService(IRatingRepository ratingRepository, IMapper mapper, IRealtimeNotifier notifier)
+        public RatingService(IRatingRepository ratingRepository, IMapper mapper, IRealtimeNotifier notifier, IRecipeRepository recipeRepository)
         {
             _ratingRepository = ratingRepository;
             _mapper = mapper;
             _notifier = notifier;
+            _recipeRepository = recipeRepository;
         }
 
-        public async Task<RatingResponse> AddOrUpdateAsync(Guid userId, Guid recipeId, CreateRatingRequest request)
+        public async Task AddOrUpdate(Guid userId, Guid recipeId, RatingRequest request)
         {
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
 
-            var existingRatings = await _ratingRepository.GetAllAsync(r => r.UserId == userId && r.RecipeId == recipeId);
-            var existing = existingRatings.FirstOrDefault();
+            if (recipe == null || recipe.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
-            if (existing != null)
+            var existingRating = await _ratingRepository.GetLatestAsync(r => r.UserId == userId && r.RecipeId == recipeId);
+
+            if (existingRating != null)
             {
-                existing.Score = request.Score;
-                await _ratingRepository.UpdateAsync(existing);
+                existingRating.Score = request.Score;
+                await _ratingRepository.UpdateAsync(existingRating);
             }
             else
             {
@@ -37,30 +43,36 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 {
                     UserId = userId,
                     RecipeId = recipeId,
+                    Feedback = request.Feedback,
                     Score = request.Score,
                     CreatedAtUtc = DateTime.UtcNow
                 };
                 await _ratingRepository.AddAsync(rating);
-                existing = rating;
+                existingRating = rating;
             }
 
-
             var allRatings = await _ratingRepository.GetAllAsync(r => r.RecipeId == recipeId);
-            var avg = allRatings.Any() ? allRatings.Average(r => r.Score) : 0;
 
+            var avg = allRatings.Average(r => r.Score);
+            recipe.Rating = avg;
 
-            var saved = await _ratingRepository.GetByIdAsync(existing.Id, r => r.User);
+            await _recipeRepository.UpdateAsync(recipe);
 
-
-            await _notifier.SendRatingUpdateAsync(recipeId, avg);
-
-            return _mapper.Map<RatingResponse>(saved);
+            await _notifier.SendRatingUpdateAsync(recipeId, existingRating);
         }
 
-        public async Task<double> GetAverageRatingAsync(Guid recipeId)
+        public async Task Delete(Guid userId, Guid ratingId)
         {
-            var ratings = await _ratingRepository.GetAllAsync(r => r.RecipeId == recipeId);
-            return ratings.Any() ? ratings.Average(r => r.Score) : 0;
+            var rating = await _ratingRepository.GetByIdAsync(ratingId);
+            if (rating == null)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Đánh giá không tồn tại");
+
+            if (rating.UserId != userId)
+                throw new AppException(AppResponseCode.FORBIDDEN, "Không có quyền xóa đánh giá này");
+
+            await _ratingRepository.DeleteAsync(rating);
+
+            await _notifier.SendRatingDeletedAsync(rating.RecipeId, ratingId);
         }
     }
 }

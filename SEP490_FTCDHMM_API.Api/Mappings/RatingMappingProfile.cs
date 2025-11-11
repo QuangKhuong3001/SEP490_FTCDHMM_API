@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
     {
         public RatingMappingProfile()
         {
-            CreateMap<APIDtos.RatingDtos.CreateRatingRequest, ApplicationDtos.RatingDtos.CreateRatingRequest>();
+            CreateMap<APIDtos.RatingDtos.RatingRequest, ApplicationDtos.RatingDtos.RatingRequest>();
 
         }
     }

@@ -4,23 +4,30 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
 {
     public class UpdateProfileRequest
     {
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập họ.")]
+        [StringLength(50, ErrorMessage = "Họ không được vượt quá 50 ký tự.")]
         public string FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập tên.")]
+        [StringLength(50, ErrorMessage = "Tên không được vượt quá 50 ký tự.")]
         public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Phone number is required")]
-        [RegularExpression(@"^0\d{8,9}$", ErrorMessage = "Phone number must start with 0 and contain 9–10 digits")]
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
+        [RegularExpression(@"^0\d{8,9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng 0 và có từ 9 đến 10 chữ số.")]
         public string PhoneNumber { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Gender is required")]
+
+        [Required(ErrorMessage = "Vui lòng chọn giới tính.")]
         public string Gender { get; set; } = string.Empty;
+
         public IFormFile? Avatar { get; set; }
 
-        [Required(ErrorMessage = "Date of birth is required")]
+        [Required(ErrorMessage = "Vui lòng chọn ngày sinh.")]
         public DateTime DateOfBirth { get; set; }
 
+        [StringLength(256, ErrorMessage = "Địa chỉ không được vượt quá 256 ký tự.")]
+        public string? Address { get; set; }
+
+        [StringLength(256, ErrorMessage = "Giới thiệu bản thân không được vượt quá 256 ký tự.")]
+        public string? Bio { get; set; }
     }
 }

@@ -18,6 +18,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.CreatedAtUtc)
                    .IsRequired();
 
+            builder.Property(r => r.Feedback)
+                   .HasMaxLength(256)
+                   .IsRequired();
+
             builder.HasIndex(r => new { r.UserId, r.RecipeId }).IsUnique();
 
             builder.HasOne(r => r.User)

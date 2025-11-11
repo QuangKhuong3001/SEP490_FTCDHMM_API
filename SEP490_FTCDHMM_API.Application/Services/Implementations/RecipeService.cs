@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
+using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserFavoriteRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserSaveRecipeDtos;
@@ -141,7 +142,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include: i => i.Include(r => r.Labels).Include(r => r.RecipeIngredients));
-            if ((recipe == null) || (recipe.isDeleted == true))
+            if ((recipe == null) || (recipe.IsDeleted == true))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (recipe.AuthorId != userId)
@@ -228,7 +229,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task DeleteRecipe(Guid userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if ((recipe == null) || (recipe.isDeleted == true))
+            if ((recipe == null) || (recipe.IsDeleted == true))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -238,35 +239,46 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (recipe.AuthorId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
-            recipe.isDeleted = true;
+            recipe.IsDeleted = true;
             await _recipeRepository.UpdateAsync(recipe);
         }
         public async Task<PagedResult<RecipeResponse>> GetAllRecipes(RecipeFilterRequest request)
         {
             Expression<Func<Recipe, bool>> filter = f =>
-                !f.isDeleted
-                && (request.LabelId == null || f.Labels.Any(l => l.Id == request.LabelId))
-                && (string.IsNullOrEmpty(request.Keyword) || f.Name.Contains(request.Keyword));
+                !f.IsDeleted
+                && (request.Difficulty == null ||
+                    f.Difficulty == DifficultyValue.From(request.Difficulty))
+                && (request.Ration == null ||
+                    f.Ration == request.Ration)
+                && (request.MaxCookTime == null ||
+                    f.CookTime < request.MaxCookTime)
+                && ((!request.LabelIds.Any()) ||
+                    f.Labels.Any(l => request.LabelIds.Contains(l.Id)))
+                && ((!request.IngredientIds.Any()) ||
+                    f.RecipeIngredients.Any(ri => request.IngredientIds.Contains(ri.IngredientId)))
+                && (string.IsNullOrEmpty(request.Keyword) ||
+                    f.Name.Contains(request.Keyword));
 
-            Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>>? orderBy = request.SortBy?.ToLower() switch
+            Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> orderBy = request.SortBy?.ToLower() switch
             {
                 "name_asc" => q => q.OrderBy(r => r.Name),
                 "name_desc" => q => q.OrderByDescending(r => r.Name),
                 "time_asc" => q => q.OrderBy(r => r.CookTime),
                 "time_desc" => q => q.OrderByDescending(r => r.CookTime),
                 "latest" => q => q.OrderByDescending(r => r.UpdatedAtUtc),
+                "rate_asc" => q => q.OrderBy(r => r.Rating),
+                "rate_desc" => q => q.OrderByDescending(r => r.Rating),
                 _ => q => q.OrderByDescending(r => r.UpdatedAtUtc)
             };
 
-            string[]? searchProps = new[] { "Name", "Description" };
-
-            Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
+            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
                  .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.Labels)
                  .Include(r => r.CookingSteps)
-                 .ThenInclude(cs => cs.Image);
+                    .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
@@ -274,7 +286,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 filter: filter,
                 orderBy: orderBy,
                 keyword: request.Keyword,
-                searchProperties: searchProps,
+                searchProperties: new[] { "Name", "Description" },
                 include: include
             );
 
@@ -288,6 +300,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
+
 
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
@@ -303,7 +316,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
-            if ((recipe == null) || (recipe.isDeleted))
+            if ((recipe == null) || (recipe.IsDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -339,7 +352,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -361,7 +374,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -380,7 +393,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (items, totalCount) = await _userFavoriteRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.isDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe)
@@ -411,7 +424,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (items, totalCount) = await _userSaveRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.isDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe)
@@ -440,7 +453,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -462,7 +475,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -489,7 +502,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
                 pageSize: paginationParams.PageSize,
-                filter: f => !f.isDeleted && f.AuthorId == userId,
+                filter: f => !f.IsDeleted && f.AuthorId == userId,
                 orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
                 include: include
             );
@@ -504,5 +517,82 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
+
+        public async Task<double> GetAverageScore(Guid recipeId)
+        {
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            if (recipe == null || recipe.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            return recipe.Rating;
+        }
+
+        public async Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request)
+        {
+            var recipe = await _recipeRepository.GetByIdAsync(
+                id: recipeId,
+                include: i => i.Include(r => r.Ratings));
+
+            if (recipe == null || recipe.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            var query = recipe.Ratings
+                .Where(v => !v.Recipe.IsDeleted)
+                .OrderByDescending(v => v.CreatedAtUtc)
+                .AsQueryable();
+
+            var totalCount = query.Count();
+
+            var pagedRatings = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+
+            var result = _mapper.Map<IEnumerable<RatingResponse>>(pagedRatings);
+            return new PagedResult<RatingResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, PaginationParams request)
+        {
+            var user = await _userRepository.GetByIdAsync(
+                id: userId,
+                include: i => i.Include(u => u.ViewedRecipes)
+                               .ThenInclude(v => v.Recipe)
+                                   .ThenInclude(r => r.Image));
+
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Tài khoản không hợp lệ hoặc không tồn tại trong hệ thống.");
+
+            var query = user.ViewedRecipes
+                .Where(v => !v.Recipe.IsDeleted)
+                .OrderByDescending(v => v.ViewedAtUtc)
+                .Select(v => v.Recipe)
+                .AsQueryable();
+
+            var totalCount = query.Count();
+
+            var pagedRecipes = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var result = _mapper.Map<IEnumerable<RecipeResponse>>(pagedRecipes);
+
+            return new PagedResult<RecipeResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
     }
 }

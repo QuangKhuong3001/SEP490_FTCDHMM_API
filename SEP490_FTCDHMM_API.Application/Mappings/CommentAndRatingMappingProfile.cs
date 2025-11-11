@@ -10,12 +10,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
         public CommentAndRatingMappingProfile()
         {
 
-            CreateMap<CreateRatingRequest, Rating>();
+            CreateMap<RatingRequest, Rating>();
 
             CreateMap<Rating, RatingResponse>()
-                    .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-                    .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
-
+                .ForMember(dest => dest.UserInteractionResponse,
+                    opt => opt.MapFrom(src => src.User));
 
             CreateMap<CreateCommentRequest, Comment>();
 

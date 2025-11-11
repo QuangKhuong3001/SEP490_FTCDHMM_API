@@ -10,7 +10,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public Guid Id { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;
-        public required AuthorResponse Author { get; set; }
+        public required UserInteractionResponse Author { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public required DifficultyValue Difficulty { get; set; }
         public decimal CookTime { get; set; }

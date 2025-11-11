@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Implementations;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;

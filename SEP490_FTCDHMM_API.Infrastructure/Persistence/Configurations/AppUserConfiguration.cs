@@ -52,6 +52,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                .IsRequired()
                .HasMaxLength(256);
 
+            builder.Property(u => u.Address)
+               .HasMaxLength(256);
+
+            builder.Property(u => u.Bio)
+               .HasMaxLength(256);
+
             builder.Property(u => u.EmailConfirmed)
                .IsRequired()
                .HasDefaultValue(false);

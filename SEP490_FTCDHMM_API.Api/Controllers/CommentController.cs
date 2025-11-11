@@ -10,7 +10,7 @@ using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
-    [Route("api/recipes/{recipeId:guid}/comments")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
     {
@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("{recipeId:guid}")]
         public async Task<IActionResult> GetAll(Guid recipeId)
         {
             var result = await _commentService.GetAllByRecipeAsync(recipeId);
@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("{recipeId:guid}")]
         public async Task<IActionResult> Create(Guid recipeId, [FromBody] CreateCommentRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpDelete("{commentId:guid}")]
-        public async Task<IActionResult> DeleteOwn(Guid recipeId, Guid commentId)
+        public async Task<IActionResult> DeleteOwn(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Self);
@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize]
         [HttpDelete("{commentId:guid}/by-author")]
-        public async Task<IActionResult> DeleteByRecipeAuthor(Guid recipeId, Guid commentId)
+        public async Task<IActionResult> DeleteByRecipeAuthor(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.RecipeAuthor);
@@ -62,7 +62,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.Comment_Delete)]
         [HttpDelete("{commentId:guid}/manage")]
-        public async Task<IActionResult> DeleteWithPermission(Guid recipeId, Guid commentId)
+        public async Task<IActionResult> DeleteWithPermission(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Permission);

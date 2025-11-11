@@ -10,6 +10,8 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.UserDtos
         public string Gender { get; set; } = string.Empty;
         public IFormFile? Avatar { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public string? Bio { get; set; }
 
     }
 }

@@ -14,6 +14,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RecipeController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -25,7 +26,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _recipeService = recipeService;
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRecipe([FromForm] CreateRecipeRequest request)
         {
@@ -36,6 +36,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllRecipes([FromQuery] RecipeFilterRequest filter)
         {
@@ -45,7 +46,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPut("{recipeId:guid}")]
         public async Task<IActionResult> UpdateRecipe(Guid recipeId, UpdateRecipeRequest request)
         {
@@ -56,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{recipeId:guid}")]
         public async Task<IActionResult> GetRecipeDetail(Guid recipeId)
         {
@@ -66,7 +66,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpDelete("{recipeId:guid}")]
         public async Task<IActionResult> DeleteRecipe(Guid recipeId)
         {
@@ -76,7 +75,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("favoriteList")]
         public async Task<IActionResult> GetFavoriteList([FromQuery] FavoriteRecipeFilterRequest filter)
         {
@@ -87,7 +85,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost("{recipeId:guid}/favorite")]
         public async Task<IActionResult> AddToFavoriteList(Guid recipeId)
         {
@@ -97,7 +94,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpDelete("{recipeId:guid}/favorite")]
         public async Task<IActionResult> RemoveFromFavoriteList(Guid recipeId)
         {
@@ -107,7 +103,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("saveList")]
         public async Task<IActionResult> GetSaveList([FromQuery] SaveRecipeFilterRequest filter)
         {
@@ -118,7 +113,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost("{recipeId:guid}/save")]
         public async Task<IActionResult> AddToSaveList(Guid recipeId)
         {
@@ -128,7 +122,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpDelete("{recipeId:guid}/save")]
         public async Task<IActionResult> RemoveFromSaveList(Guid recipeId)
         {
@@ -138,7 +131,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("myRecipe")]
         public async Task<IActionResult> GetMyRecipeList([FromQuery] PaginationParams request)
         {
@@ -149,13 +141,43 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("user/{userId:guid}")]
         public async Task<IActionResult> GetRecipesByUserId(Guid userId, [FromQuery] PaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
             var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
             return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{recipeId:guid}/score")]
+        public async Task<IActionResult> GetAverageScore(Guid recipeId)
+        {
+            var avg = await _recipeService.GetAverageScore(recipeId);
+            return Ok(new { averageRating = avg });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{recipeId:guid}/raiting")]
+        public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] PaginationParams request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+
+            var result = await _recipeService.GetRaiting(recipeId, appRequest);
+            return Ok(result);
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetUserHistory([FromQuery] PaginationParams request)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+
+            var history = await _recipeService.GetHistory(userId, appRequest);
+            return Ok(history);
         }
 
     }

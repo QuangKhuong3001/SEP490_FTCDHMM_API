@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -54,7 +54,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             // gửi realtime tới group của recipe
-            await _notifier.SendCommentAsync(recipeId, response);
+            await _notifier.SendCommentAddedAsync(recipeId, response);
 
             return response;
         }
@@ -91,8 +91,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _commentRepository.DeleteAsync(comment);
 
-            // Send real-time deletion notification
-            await _notifier.SendCommentDeletedAsync(recipeId, commentId, DateTime.UtcNow);
+            await _notifier.SendCommentDeletedAsync(recipeId, commentId);
         }
 
         private async Task DeleteRepliesRecursive(Comment parent)
