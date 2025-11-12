@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 

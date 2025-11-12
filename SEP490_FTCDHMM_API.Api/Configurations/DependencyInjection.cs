@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -265,6 +264,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();
+            //Notification
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
 
         }
     }

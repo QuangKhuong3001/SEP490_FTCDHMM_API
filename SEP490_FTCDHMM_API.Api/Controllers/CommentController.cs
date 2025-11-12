@@ -38,8 +38,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
-            var result = await _commentService.CreateAsync(userId, recipeId, appRequest);
-            return Ok(result);
+            await _commentService.CreateAsync(userId, recipeId, appRequest);
+            return Ok();
         }
 
         [Authorize]

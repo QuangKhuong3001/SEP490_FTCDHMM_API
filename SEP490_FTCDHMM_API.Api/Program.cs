@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
-using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Hubs;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
@@ -102,6 +101,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<RecipeHub>("/hubs/recipe");
 app.MapHub<CommentHub>("/hubs/comments");
+app.MapHub<NotificationHub>("/hubs/notification");
+
 app.MapControllers();
 
 app.Run();

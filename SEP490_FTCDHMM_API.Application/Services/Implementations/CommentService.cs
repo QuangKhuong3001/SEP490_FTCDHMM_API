@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Interfaces.Realtime;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -15,25 +15,36 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly ICommentRepository _commentRepository;
         private readonly IMapper _mapper;
         private readonly IRealtimeNotifier _notifier;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IRecipeRepository _recipeRepository;
+
 
         public CommentService(
             ICommentRepository commentRepository,
             IMapper mapper,
+            IRecipeRepository recipeRepository,
+            INotificationRepository notificationRepository,
             IRealtimeNotifier notifier)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
+            _recipeRepository = recipeRepository;
+            _notificationRepository = notificationRepository;
             _notifier = notifier;
         }
 
-        public async Task<CommentResponse> CreateAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
+        public async Task CreateAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
         {
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            if (recipe == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
             var comment = _mapper.Map<Comment>(request);
+
             comment.UserId = userId;
             comment.RecipeId = recipeId;
             comment.CreatedAtUtc = DateTime.UtcNow;
 
-            // If replying to a level 2+ comment, reply to its parent instead (limit to max 2 levels)
             if (comment.ParentCommentId.HasValue)
             {
                 var parentComment = await _commentRepository.GetByIdAsync(
@@ -43,20 +54,42 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 if (parentComment != null && parentComment.ParentCommentId.HasValue)
                 {
-                    // This is a level 2 comment, so set parent to its parent (level 1)
                     comment.ParentCommentId = parentComment.ParentCommentId;
                 }
+
             }
 
             await _commentRepository.AddAsync(comment);
+
             var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
 
             var response = _mapper.Map<CommentResponse>(saved);
 
-            // gửi realtime tới group của recipe
             await _notifier.SendCommentAsync(recipeId, response);
 
-            return response;
+            if (comment.ParentCommentId.HasValue)
+            {
+                var parentComment = await _commentRepository.GetByIdAsync(
+                    comment.ParentCommentId.Value,
+                    c => c.Include(x => x.ParentComment)
+                );
+
+                if (parentComment != null)
+                {
+                    await _notificationRepository.AddNotification(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                }
+                else
+                {
+                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                }
+
+            }
+            else
+            {
+                await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+            }
+
         }
 
         public async Task<List<CommentResponse>> GetAllByRecipeAsync(Guid recipeId)

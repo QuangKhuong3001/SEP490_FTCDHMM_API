@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Domain.ValueObjects
+﻿using SEP490_FTCDHMM_API.Shared.Exceptions;
+
+namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 {
     public record HubEvent(string Value)
     {
@@ -17,7 +19,7 @@
                 "ReceiveRatingUpdate" => ReceiveRatingUpdate,
                 "ReceiveNotification" => ReceiveNotification,
                 "CommentDeleted" => CommentDeleted,
-                _ => new HubEvent(value)
+                _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }
     }
