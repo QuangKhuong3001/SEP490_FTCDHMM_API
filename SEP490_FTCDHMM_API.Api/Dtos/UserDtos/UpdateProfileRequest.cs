@@ -4,23 +4,19 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
 {
     public class UpdateProfileRequest
     {
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập tên")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Tên phải từ 1-50 ký tự")]
         public string FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập họ")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Họ phải từ 1-50 ký tự")]
         public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Phone number is required")]
-        [RegularExpression(@"^0\d{8,9}$", ErrorMessage = "Phone number must start with 0 and contain 9–10 digits")]
-        public string PhoneNumber { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Gender is required")]
+        [Required(ErrorMessage = "Vui lòng chọn giới tính")]
         public string Gender { get; set; } = string.Empty;
         public IFormFile? Avatar { get; set; }
 
-        [Required(ErrorMessage = "Date of birth is required")]
+        [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
         public DateTime DateOfBirth { get; set; }
-
     }
 }

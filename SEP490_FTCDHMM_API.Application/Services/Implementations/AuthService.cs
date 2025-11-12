@@ -61,7 +61,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                PhoneNumber = dto.PhoneNumber,
                 RoleId = customerRole!.Id,
                 Gender = Gender.From(dto.Gender),
                 DateOfBirth = dto.DateOfBirth

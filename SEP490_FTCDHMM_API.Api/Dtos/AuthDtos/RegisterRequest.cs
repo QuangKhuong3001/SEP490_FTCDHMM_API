@@ -4,35 +4,30 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
 {
     public class RegisterRequest
     {
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập tên")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Tên phải từ 1-50 ký tự")]
         public string FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập họ")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Họ phải từ 1-50 ký tự")]
         public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 100 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Mật khẩu phải từ 8-100 ký tự")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Date of birth is required")]
+        [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
         public DateTime DateOfBirth { get; set; }
 
-        [Required(ErrorMessage = "Gender is required")]
+        [Required(ErrorMessage = "Vui lòng chọn giới tính")]
         public required string Gender { get; set; }
 
-        [Required(ErrorMessage = "Confirm password is required")]
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Xác nhận mật khẩu không khớp")]
         public string RePassword { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Phone number is required")]
-        [Phone(ErrorMessage = "Invalid phone number format")]
-        [RegularExpression(@"^0\d{8,9}$", ErrorMessage = "Phone number must start with 0 and contain 9–10 digits")]
-        public string PhoneNumber { get; set; } = string.Empty;
     }
 }
