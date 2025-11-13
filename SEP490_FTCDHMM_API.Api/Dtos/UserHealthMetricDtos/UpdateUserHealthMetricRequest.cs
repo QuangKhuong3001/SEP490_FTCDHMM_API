@@ -4,21 +4,21 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserHealthMetricDtos
 {
     public class UpdateUserHealthMetricRequest
     {
-        [Required(ErrorMessage = "Weight (kg) is required.")]
-        [Range(0, 300, ErrorMessage = "Weight must be between 30kg and 300kg.")]
+        [Required(ErrorMessage = "Cân nặng không được để trống")]
+        [Range(0.1, 300, ErrorMessage = "Cân nặng phải nằm trong khoảng từ 0.1 đến 300 kg")]
         public decimal WeightKg { get; set; }
 
-        [Required(ErrorMessage = "Height (cm) is required.")]
-        [Range(30, 250, ErrorMessage = "Height must be between 100cm and 250cm.")]
+        [Required(ErrorMessage = "Chiều cao không được để trống")]
+        [Range(30, 250, ErrorMessage = "Chiều cao phải nằm trong khoảng từ 30 đến 250 cm")]
         public decimal HeightCm { get; set; }
 
-        [Range(2, 70, ErrorMessage = "Body fat percentage must be between 2% and 70%.")]
+        [Range(2, 70, ErrorMessage = "Tỷ lệ mỡ cơ thể phải nằm trong khoảng từ 2% đến 70%")]
         public decimal? BodyFatPercent { get; set; }
 
-        [Range(10, 150, ErrorMessage = "Muscle mass must be between 10kg and 150kg.")]
+        [Range(10, 150, ErrorMessage = "Khối lượng cơ phải nằm trong khoảng từ 10 đến 150 kg")]
         public decimal? MuscleMassKg { get; set; }
 
-        [StringLength(300, ErrorMessage = "Notes cannot exceed 300 characters.")]
+        [StringLength(300, ErrorMessage = "Ghi chú không được vượt quá 300 ký tự")]
         public string? Notes { get; set; }
     }
 }
