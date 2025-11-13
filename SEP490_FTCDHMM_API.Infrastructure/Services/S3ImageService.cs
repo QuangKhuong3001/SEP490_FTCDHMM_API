@@ -4,6 +4,7 @@ using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -48,7 +49,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 Key = key,
                 ContentType = file.ContentType,
                 UploadedBy = uploadedBy,
-                CreatedAt = DateTime.UtcNow
+                CreatedAtUTC = DateTime.UtcNow
             };
 
             _dbContext.Images.Add(image);
@@ -56,6 +57,34 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             return image;
         }
+
+        public async Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder, Guid? userId)
+        {
+            if (!IsImage(file))
+                throw new AppException(AppResponseCode.INVALID_FILE);
+
+            var id = Guid.NewGuid();
+            var extension = Path.GetExtension(file.FileName);
+            var key = $"{folder}/{id}{extension}";
+
+            var transfer = new TransferUtility(_s3Client);
+            await transfer.UploadAsync(file.Content, _settings.BucketName, key);
+
+            var image = new Image
+            {
+                Id = id,
+                Key = key,
+                ContentType = file.ContentType,
+                UploadedById = userId,
+                CreatedAtUTC = DateTime.UtcNow
+            };
+
+            _dbContext.Images.Add(image);
+            await _dbContext.SaveChangesAsync();
+
+            return image;
+        }
+
 
         public async Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder, AppUser uploadedBy)
         {
@@ -80,7 +109,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     Key = key,
                     ContentType = file.ContentType,
                     UploadedBy = uploadedBy,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAtUTC = DateTime.UtcNow
                 };
 
                 images.Add(image);
@@ -91,6 +120,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             return images;
         }
+
+        public async Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder, Guid? userId)
+        {
+            var result = new List<Image>();
+
+            foreach (var f in files)
+            {
+                var img = await UploadImageAsync(f, folder, userId);
+                result.Add(img);
+            }
+
+            return result;
+        }
+
 
         public string? GeneratePreSignedUrl(string? key)
         {
@@ -142,7 +185,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 Id = id,
                 Key = key,
                 ContentType = contentType,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAtUTC = DateTime.UtcNow,
                 UploadedById = uploadedById
             };
 
@@ -189,5 +232,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return false;
         }
 
+        private bool IsImage(FileUploadModel file)
+        {
+            if (string.IsNullOrWhiteSpace(file.ContentType))
+                return false;
+
+            return file.ContentType.StartsWith("image/");
+        }
     }
 }

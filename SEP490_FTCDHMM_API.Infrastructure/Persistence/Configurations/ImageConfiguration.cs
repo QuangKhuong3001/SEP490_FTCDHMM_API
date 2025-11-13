@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.Property(i => i.CreatedAt)
+            builder.Property(i => i.CreatedAtUTC)
                    .HasDefaultValueSql("GETDATE()");
 
             builder.HasOne(i => i.UploadedBy)

@@ -49,12 +49,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
+            modelBuilder.SeedDefaultImage();
             modelBuilder.SeedRoles();
             modelBuilder.SeedPermissions();
             modelBuilder.SeedRolePermissions();
             modelBuilder.SeedNutrientUnits();
             modelBuilder.SeedNutrients();
             modelBuilder.SeedIngredientCategories();
+            modelBuilder.SeedLabels();
         }
     }
 }

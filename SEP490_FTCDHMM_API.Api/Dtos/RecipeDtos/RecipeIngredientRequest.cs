@@ -6,6 +6,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
     {
         [Required(ErrorMessage = "Missing Ingredient")]
         public Guid IngredientId { get; set; }
+
         [Required(ErrorMessage = "Missing Quantity")]
         public decimal QuantityGram { get; set; }
     }
