@@ -28,5 +28,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 
         [Required(ErrorMessage = "Missing LabelIds")]
         public required List<CookingStepRequest> CookingSteps { get; set; }
+        public List<Guid> TaggedUserIds { get; set; } = new();
+
     }
 }

@@ -15,7 +15,7 @@
         public static readonly AppResponseCode UNAUTHORIZED = new(409, "Chưa được xác thực");
         public static readonly AppResponseCode SECURITY_TOKEN_EXCEPTION = new(410, "Lỗi xác thực token bảo mật");
         public static readonly AppResponseCode ACCESS_DENIED = new(411, "Không có quyền truy cập");
-        public static readonly AppResponseCode FORBIDDEN = new(412, "Truy cập bị từ chối");
+        public static readonly AppResponseCode FORBIDDEN = new(412, "Bạn không có quyền thực hiện yều cầu này");
         public static readonly AppResponseCode NOT_FOUND = new(413, "Không tìm thấy dữ liệu yêu cầu");
         public static readonly AppResponseCode EXISTS = new(415, "Dữ liệu đã tồn tại trong hệ thống");
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(416, "Dịch vụ tạm thời không khả dụng");

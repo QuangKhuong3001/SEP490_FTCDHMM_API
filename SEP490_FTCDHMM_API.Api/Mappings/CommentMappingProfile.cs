@@ -9,6 +9,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public CommentMappingProfile()
         {
             CreateMap<APIDtos.CommentDtos.CreateCommentRequest, ApplicationDtos.CommentDtos.CreateCommentRequest>();
+            CreateMap<APIDtos.CommentDtos.UpdateCommentRequest, ApplicationDtos.CommentDtos.UpdateCommentRequest>();
         }
     }
 }

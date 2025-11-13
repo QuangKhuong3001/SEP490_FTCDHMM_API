@@ -26,5 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 
         [Required(ErrorMessage = "Missing CookingSteps")]
         public required List<CookingStepRequest> CookingSteps { get; set; }
+        public List<Guid> TaggedUserIds { get; set; } = new();
+
     }
 }

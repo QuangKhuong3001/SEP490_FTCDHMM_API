@@ -286,6 +286,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //dietRestriction
             services.AddScoped<IUserDietRestrictionRepository, UserDietRestrictionRepository>();
             services.AddScoped<IUserDietRestrictionService, UserDietRestrictionService>();
+
+            //recipeUserTag
+            services.AddScoped<IRecipeUserTagRepository, RecipeUserTagRepository>();
+
         }
     }
 }

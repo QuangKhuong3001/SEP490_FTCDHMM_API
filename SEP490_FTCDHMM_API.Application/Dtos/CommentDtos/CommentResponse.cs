@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Dtos.CommentDtos
+﻿using SEP490_FTCDHMM_API.Application.Dtos.CommentMentionDtos;
+
+namespace SEP490_FTCDHMM_API.Application.Dtos.CommentDtos
 {
     public class CommentResponse
     {
@@ -12,5 +14,6 @@
         public Guid UserId { get; set; }
 
         public List<CommentResponse> Replies { get; set; } = new();
+        public List<MentionedUserResponse> Mentions { get; set; } = new();
     }
 }

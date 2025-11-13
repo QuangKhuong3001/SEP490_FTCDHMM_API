@@ -33,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
         private readonly ICookingStepRepository _cookingStepRepository;
         private readonly IRecipeNutritionAggregator _recipeNutritionAggregator;
+        private readonly IRecipeUserTagRepository _recipeUserTagRepository;
 
         public RecipeService(IRecipeRepository recipeRepository,
             IMapper mapper,
@@ -40,6 +41,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IUnitOfWork unitOfWork,
             //ICacheService cache,
             ILabelRepository labelRepository,
+            IRecipeUserTagRepository recipeUserTagRepository,
             IUserRepository userRepository,
             IIngredientRepository ingredientRepository,
             IUserRecipeViewRepository userRecipeViewRepository,
@@ -54,6 +56,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _unitOfWork = unitOfWork;
             //_cache = cache;
             _labelRepository = labelRepository;
+            _recipeUserTagRepository = recipeUserTagRepository;
             _userRepository = userRepository;
             _ingredientRepository = ingredientRepository;
             _userRecipeViewRepository = userRecipeViewRepository;
@@ -130,6 +133,27 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     userId
                 );
                 recipe.Image = uploaded;
+            }
+
+            if (request.TaggedUserIds.Any())
+            {
+                var distinctIds = request.TaggedUserIds.Distinct().ToList();
+
+                foreach (var userIdToTag in distinctIds)
+                {
+                    if (userIdToTag == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn không thể gắn thẻ chính mình.");
+
+                    var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
+                    if (!exists)
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng được gắn thẻ không hợp lệ.");
+
+                    recipe.RecipeUserTags.Add(new RecipeUserTag
+                    {
+                        RecipeId = recipe.Id,
+                        TaggedUserId = userIdToTag,
+                    });
+                }
             }
 
             var steps = new List<CookingStep>();
@@ -261,6 +285,35 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 );
 
                 recipe.Image = newImage;
+            }
+
+            var existingTags = await _recipeUserTagRepository.GetAllAsync(t => t.RecipeId == recipe.Id);
+
+            if (existingTags.Any())
+            {
+                await _recipeUserTagRepository.DeleteRangeAsync(existingTags);
+            }
+
+            if (request.TaggedUserIds.Any())
+            {
+                var distinctIds = request.TaggedUserIds.Distinct().ToList();
+
+                foreach (var userIdToTag in distinctIds)
+                {
+                    if (userIdToTag == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn không thể tag chính mình.");
+
+                    var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
+                    if (!exists)
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION,
+                            $"Người dùng {userIdToTag} không tồn tại.");
+
+                    recipe.RecipeUserTags.Add(new RecipeUserTag
+                    {
+                        RecipeId = recipe.Id,
+                        TaggedUserId = userIdToTag,
+                    });
+                }
             }
 
             foreach (var oldStep in recipe.CookingSteps)

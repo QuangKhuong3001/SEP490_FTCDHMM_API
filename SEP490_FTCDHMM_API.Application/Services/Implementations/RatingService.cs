@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
+﻿using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -11,14 +10,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class RatingService : IRatingService
     {
         private readonly IRatingRepository _ratingRepository;
-        private readonly IMapper _mapper;
         private readonly IRealtimeNotifier _notifier;
         private readonly IRecipeRepository _recipeRepository;
 
-        public RatingService(IRatingRepository ratingRepository, IMapper mapper, IRealtimeNotifier notifier, IRecipeRepository recipeRepository)
+        public RatingService(IRatingRepository ratingRepository, IRealtimeNotifier notifier, IRecipeRepository recipeRepository)
         {
             _ratingRepository = ratingRepository;
-            _mapper = mapper;
             _notifier = notifier;
             _recipeRepository = recipeRepository;
         }

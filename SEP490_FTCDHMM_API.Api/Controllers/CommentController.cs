@@ -12,6 +12,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
@@ -31,18 +32,27 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost("{recipeId:guid}")]
         public async Task<IActionResult> Create(Guid recipeId, [FromBody] CreateCommentRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
-            var result = await _commentService.CreateAsync(userId, recipeId, appRequest);
-            return Ok(result);
+            await _commentService.CreateAsync(userId, recipeId, appRequest);
+            return Ok();
         }
 
-        [Authorize]
+        [HttpPut("{recipeId:guid}")]
+        public async Task<IActionResult> Update(Guid recipeId, [FromBody] UpdateCommentRequest request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.UpdateCommentRequest>(request);
+
+            await _commentService.UpdateAsync(userId, recipeId, appRequest);
+            return Ok("Bình luận chỉnh sửa thành công");
+        }
+
+
         [HttpDelete("{commentId:guid}")]
         public async Task<IActionResult> DeleteOwn(Guid commentId)
         {
@@ -51,7 +61,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(new { message = "Your comment has been deleted." });
         }
 
-        [Authorize]
         [HttpDelete("{commentId:guid}/by-author")]
         public async Task<IActionResult> DeleteByRecipeAuthor(Guid commentId)
         {

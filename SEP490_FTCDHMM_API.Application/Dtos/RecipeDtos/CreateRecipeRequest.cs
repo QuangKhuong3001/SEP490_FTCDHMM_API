@@ -14,5 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public required List<Guid> LabelIds { get; set; }
         public List<RecipeIngredientRequest> Ingredients { get; set; } = new();
         public required List<CookingStepRequest> CookingSteps { get; set; }
+        public List<Guid> TaggedUserIds { get; set; } = new();
+
     }
 }
