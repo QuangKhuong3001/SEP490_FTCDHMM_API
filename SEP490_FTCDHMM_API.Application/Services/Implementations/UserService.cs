@@ -80,6 +80,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+            user.LockReason = dto.Reason;
+
+            var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
+            var placeholders = new Dictionary<string, string>
+                    {
+                        { "LockoutEnd", localLockoutEnd.ToString() },
+                        { "LockReason", dto.Reason },
+                    };
+
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
+
+            await _mailService.SendEmailAsync(user.Email!, htmlBody);
 
             await _userRepository.UpdateAsync(user);
 
@@ -143,6 +155,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+            user.LockReason = dto.Reason;
+
+            var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
+            var placeholders = new Dictionary<string, string>
+                    {
+                        { "LockoutEnd", localLockoutEnd.ToString() },
+                        { "LockReason", dto.Reason },
+                    };
+
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
+
+            await _mailService.SendEmailAsync(user.Email!, htmlBody);
 
             await _userRepository.UpdateAsync(user);
 

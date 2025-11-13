@@ -13,7 +13,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ActivityLevel ActivityLevel { get; set; } = ActivityLevel.Moderate;
         public string? Address { get; set; }
         public string? Bio { get; set; }
-
+        public string? LockReason { get; set; }
         public Guid? AvatarId { get; set; }
         public Image? Avatar { get; set; } = null!;
 
