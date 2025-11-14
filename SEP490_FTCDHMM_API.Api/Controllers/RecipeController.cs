@@ -33,7 +33,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.CreateRecipeRequest>(request);
             await _recipeService.CreatRecipe(userId, appRequest);
-            return Ok(new { message = "Tạo công thức thành công" });
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -43,7 +43,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appFilter = _mapper.Map<ApplicationDtos.RecipeDtos.RecipeFilterRequest>(filter);
 
             var result = await _recipeService.GetAllRecipes(appFilter);
-            return Ok(new { message = "Lấy danh sách công thức thành công", data = result });
+            return Ok(result);
         }
 
         [HttpPut("{recipeId:guid}")]
@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UpdateRecipeRequest>(request);
             await _recipeService.UpdateRecipe(userId, recipeId, appRequest);
-            return Ok(new { message = "Cập nhật công thức thành công" });
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -63,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var result = await _recipeService.GetRecipeDetails(userId, recipeId);
-            return Ok(new { message = "Lấy chi tiết công thức thành công", data = result });
+            return Ok(result);
         }
 
         [HttpDelete("{recipeId:guid}")]
@@ -72,7 +72,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeService.DeleteRecipe(userId, recipeId);
-            return Ok(new { message = "Xóa công thức thành công" });
+            return Ok();
         }
 
         [HttpGet("favoriteList")]
@@ -82,7 +82,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appFilter = _mapper.Map<ApplicationDtos.UserFavoriteRecipeDtos.FavoriteRecipeFilterRequest>(filter);
             var result = await _recipeService.GetFavoriteList(userId, appFilter);
-            return Ok(new { message = "Lấy danh sách yêu thích thành công", data = result });
+            return Ok(result);
         }
 
         [HttpPost("{recipeId:guid}/favorite")]
@@ -91,7 +91,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeService.AddToFavorite(userId, recipeId);
-            return Ok(new { message = "Thêm vào danh sách yêu thích thành công" });
+            return Ok();
         }
 
         [HttpDelete("{recipeId:guid}/favorite")]
@@ -100,7 +100,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeService.RemoveFromFavorite(userId, recipeId);
-            return Ok(new { message = "Xóa khỏi danh sách yêu thích thành công" });
+            return Ok();
         }
 
         [HttpGet("saveList")]
@@ -110,7 +110,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appFilter = _mapper.Map<ApplicationDtos.UserSaveRecipeDtos.SaveRecipeFilterRequest>(filter);
             var result = await _recipeService.GetSavedList(userId, appFilter);
-            return Ok(new { message = "Lấy danh sách lưu thành công", data = result });
+            return Ok(result);
         }
 
         [HttpPost("{recipeId:guid}/save")]
@@ -119,7 +119,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeService.SaveRecipe(userId, recipeId);
-            return Ok(new { message = "Lưu công thức thành công" });
+            return Ok();
         }
 
         [HttpDelete("{recipeId:guid}/save")]
@@ -128,7 +128,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeService.UnsaveRecipe(userId, recipeId);
-            return Ok(new { message = "Bỏ lưu công thức thành công" });
+            return Ok();
         }
 
         [HttpGet("myRecipe")]
@@ -138,7 +138,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
             var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
-            return Ok(new { message = "Lấy danh sách công thức của bạn thành công", data = result });
+            return Ok(result);
         }
 
         [AllowAnonymous]
@@ -147,7 +147,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
             var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
-            return Ok(new { message = "Lấy danh sách công thức của người dùng thành công", data = result });
+            return Ok(result);
         }
 
         [AllowAnonymous]
@@ -165,7 +165,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
 
             var result = await _recipeService.GetRating(recipeId, appRequest);
-            return Ok(new { message = "Lấy danh sách đánh giá thành công", data = result });
+            return Ok(result);
         }
 
         [HttpGet("history")]
@@ -177,7 +177,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
 
             var history = await _recipeService.GetHistory(userId, appRequest);
-            return Ok(new { message = "Lấy lịch sử xem thành công", data = history });
+            return Ok(history);
         }
 
     }

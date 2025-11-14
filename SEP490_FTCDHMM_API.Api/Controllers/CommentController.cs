@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> GetAll(Guid recipeId)
         {
             var result = await _commentService.GetAllByRecipeAsync(recipeId);
-            return Ok(new { message = "Lấy danh sách bình luận thành công", data = result });
+            return Ok(result);
         }
 
         [HttpPost("{recipeId:guid}")]
@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
             var response = await _commentService.CreateAsync(userId, recipeId, appRequest);
-            return Ok(new { message = "Tạo bình luận thành công", data = response });
+            return Ok(response);
         }
 
         [HttpPut("{recipeId:guid}/{commentId:guid}")]
@@ -49,7 +49,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.UpdateCommentRequest>(request);
 
             var response = await _commentService.UpdateAsync(userId, recipeId, commentId, appRequest);
-            return Ok(new { message = "Cập nhật bình luận thành công", data = response });
+            return Ok(response);
         }
 
 
@@ -58,7 +58,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Self);
-            return Ok(new { message = "Bình luận đã được xóa thành công" });
+            return Ok(new { message = "Your comment has been deleted." });
         }
 
         [HttpDelete("{commentId:guid}/by-author")]
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.RecipeAuthor);
-            return Ok(new { message = "Bình luận đã được xóa bởi tác giả công thức" });
+            return Ok(new { message = "Comment deleted by recipe author." });
         }
 
         [Authorize(Policy = PermissionPolicies.Comment_Delete)]
@@ -75,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Permission);
-            return Ok(new { message = "Bình luận đã được xóa với quyền quản lý" });
+            return Ok(new { message = "Comment deleted with elevated permission." });
         }
 
     }
