@@ -678,11 +678,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return recipe.Rating;
         }
 
-        public async Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request)
+        public async Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, PaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
-                include: i => i.Include(r => r.Ratings));
+                include: i => i.Include(r => r.Ratings)
+                               .ThenInclude(rt => rt.User)
+                               .ThenInclude(u => u.Avatar));
 
             if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");

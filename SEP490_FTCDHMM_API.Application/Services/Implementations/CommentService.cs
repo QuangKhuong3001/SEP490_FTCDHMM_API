@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _notifier = notifier;
         }
 
-        public async Task CreateAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
+        public async Task<CommentResponse> CreateAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
         {
             var userExist = await _userRepository.ExistsAsync(u => u.Id == userId);
             if (!userExist)
@@ -86,6 +86,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
+
+            return response;
         }
 
         public async Task<List<CommentResponse>> GetAllByRecipeAsync(Guid recipeId)
@@ -151,7 +153,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task UpdateAsync(Guid userId, Guid commentId, UpdateCommentRequest request)
+        public async Task<CommentResponse> UpdateAsync(Guid userId, Guid recipeId, Guid commentId, UpdateCommentRequest request)
         {
             var comment = await _commentRepository.GetByIdAsync(commentId);
             if (comment == null)
@@ -178,7 +180,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _commentRepository.UpdateAsync(comment);
+            var updated = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
 
+            var response = _mapper.Map<CommentResponse>(updated);
+            await _notifier.SendCommentUpdatedAsync(recipeId, response);
+
+            return response;
         }
     }
 }

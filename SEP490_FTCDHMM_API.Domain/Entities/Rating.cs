@@ -8,7 +8,7 @@
         public Guid RecipeId { get; set; }
         public Recipe Recipe { get; set; } = null!;
         public int Score { get; set; }
-        public required string Feedback { get; set; }
+        public string? Feedback { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }
 
