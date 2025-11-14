@@ -80,6 +80,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+            user.LockReason = dto.Reason;
+
+            var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
+            var placeholders = new Dictionary<string, string>
+                    {
+                        { "LockoutEnd", localLockoutEnd.ToString() },
+                        { "LockReason", dto.Reason },
+                    };
+
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
+
+            await _mailService.SendEmailAsync(user.Email!, htmlBody);
 
             await _userRepository.UpdateAsync(user);
 
@@ -143,6 +155,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
+            user.LockReason = dto.Reason;
+
+            var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
+            var placeholders = new Dictionary<string, string>
+                    {
+                        { "LockoutEnd", localLockoutEnd.ToString() },
+                        { "LockReason", dto.Reason },
+                    };
+
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
+
+            await _mailService.SendEmailAsync(user.Email!, htmlBody);
 
             await _userRepository.UpdateAsync(user);
 
@@ -273,6 +297,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
             user.DateOfBirth = dto.DateOfBirth;
+            user.Bio = dto.Bio;
+            user.Address = dto.Address;
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
@@ -324,7 +350,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<IEnumerable<UserResponse>> GetFollowersAsync(Guid userId)
+        public async Task<IEnumerable<UserInteractionResponse>> GetFollowersAsync(Guid userId)
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
@@ -332,10 +358,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var followerUsers = followers.Select(f => f.Follower).ToList();
 
-            return _mapper.Map<IEnumerable<UserResponse>>(followerUsers);
+            return _mapper.Map<IEnumerable<UserInteractionResponse>>(followerUsers);
         }
 
-        public async Task<IEnumerable<UserResponse>> GetFollowingAsync(Guid userId)
+        public async Task<IEnumerable<UserInteractionResponse>> GetFollowingAsync(Guid userId)
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
@@ -343,7 +369,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 
-            return _mapper.Map<IEnumerable<UserResponse>>(followingUsers);
+            return _mapper.Map<IEnumerable<UserInteractionResponse>>(followingUsers);
         }
 
         public async Task<ActivityLevel> GetActivityLevel(Guid userId)
@@ -366,6 +392,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             user.ActivityLevel = ActivityLevel.From(request.ActivityLevel);
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task ChangeRole(Guid userId, ChangeRoleRequest request)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND, "Người dùng không tồn tại");
+            }
+            var role = await _roleRepository.GetByIdAsync(request.RoleId);
+            if (role == null || !role.IsActive)
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND, "Vai trò không tồn tại");
+            }
+            user.RoleId = request.RoleId;
             await _userRepository.UpdateAsync(user);
         }
     }

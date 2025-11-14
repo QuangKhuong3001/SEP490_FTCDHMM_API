@@ -14,5 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public string? ImageUrl { get; set; }
         public required List<LabelResponse> Labels { get; set; }
         public required List<RecipeIngredientResponse> Ingredients { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime UpdatedAtUtc { get; set; }
     }
 }

@@ -14,21 +14,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(cs => cs.Instruction)
                    .IsRequired()
-                   .HasMaxLength(1000);
+                   .HasMaxLength(2000);
 
             builder.Property(cs => cs.StepOrder)
                    .IsRequired();
 
-            builder.HasOne(cs => cs.Image)
-                   .WithMany()
-                   .HasForeignKey(cs => cs.ImageId)
-                   .OnDelete(DeleteBehavior.SetNull);
-
             builder.HasOne(cs => cs.Recipe)
-                .WithMany(r => r.CookingSteps)
-                .HasForeignKey(cs => cs.RecipeId)
-                .OnDelete(DeleteBehavior.Cascade);
+                   .WithMany(r => r.CookingSteps)
+                   .HasForeignKey(cs => cs.RecipeId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasMany(cs => cs.CookingStepImages)
+                   .WithOne(si => si.CookingStep)
+                   .HasForeignKey(si => si.CookingStepId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

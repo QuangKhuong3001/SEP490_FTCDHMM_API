@@ -684,8 +684,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValueSql("'MODERATE'");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<Guid?>("AvatarId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -724,6 +732,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LockReason")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -808,19 +819,31 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CommentMention", b =>
+                {
+                    b.Property<Guid>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MentionedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CommentId", "MentionedUserId");
+
+                    b.HasIndex("MentionedUserId");
+
+                    b.ToTable("CommentMentions", (string)null);
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CookingStep", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ImageId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Instruction")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
@@ -830,11 +853,33 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ImageId");
-
                     b.HasIndex("RecipeId");
 
                     b.ToTable("CookingSteps", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CookingStepImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CookingStepId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ImageOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CookingStepId");
+
+                    b.HasIndex("ImageId");
+
+                    b.ToTable("CookingStepImages", (string)null);
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", b =>
@@ -1061,7 +1106,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedAtUTC")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
@@ -1078,6 +1123,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("UploadedById");
 
                     b.ToTable("Images", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
+                            ContentType = "image/png",
+                            CreatedAtUTC = new DateTime(2025, 11, 13, 21, 27, 38, 68, DateTimeKind.Utc).AddTicks(9824),
+                            Key = "images/default/no-image.png"
+                        });
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>
@@ -1269,6 +1323,78 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Labels", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("edae6e4e-e3a4-ccd4-a2d4-81edf652d3f4"),
+                            ColorCode = "#4CAF50",
+                            IsDeleted = false,
+                            Name = "Lành mạnh"
+                        },
+                        new
+                        {
+                            Id = new Guid("133554ee-b8bf-0518-a055-4097baea7b64"),
+                            ColorCode = "#2196F3",
+                            IsDeleted = false,
+                            Name = "Giàu đạm"
+                        },
+                        new
+                        {
+                            Id = new Guid("d5caeabc-0ca2-b778-f234-d5c084dd23cb"),
+                            ColorCode = "#9C27B0",
+                            IsDeleted = false,
+                            Name = "Ít tinh bột"
+                        },
+                        new
+                        {
+                            Id = new Guid("16a7239f-04ef-4ae8-3c3d-f7c91f625ade"),
+                            ColorCode = "#8BC34A",
+                            IsDeleted = false,
+                            Name = "Thuần chay"
+                        },
+                        new
+                        {
+                            Id = new Guid("8443f632-4d26-96c3-6c99-cdb180c761f3"),
+                            ColorCode = "#CDDC39",
+                            IsDeleted = false,
+                            Name = "Chay"
+                        },
+                        new
+                        {
+                            Id = new Guid("19f3c506-46ad-f9be-3a10-63dc2ed6a57e"),
+                            ColorCode = "#FF9800",
+                            IsDeleted = false,
+                            Name = "Không gluten"
+                        },
+                        new
+                        {
+                            Id = new Guid("b6cb3448-5f59-44b8-e69e-5a2e408ccd97"),
+                            ColorCode = "#FFC107",
+                            IsDeleted = false,
+                            Name = "Món nhanh"
+                        },
+                        new
+                        {
+                            Id = new Guid("c8f90ed8-cc93-7d51-8477-534ff99d0fd0"),
+                            ColorCode = "#00BCD4",
+                            IsDeleted = false,
+                            Name = "Ít béo"
+                        },
+                        new
+                        {
+                            Id = new Guid("d238ef58-09be-5176-f430-16cdbfc0032a"),
+                            ColorCode = "#795548",
+                            IsDeleted = false,
+                            Name = "Keto"
+                        },
+                        new
+                        {
+                            Id = new Guid("f4a0ea3a-98b1-3443-4739-f63803a841c8"),
+                            ColorCode = "#FF5722",
+                            IsDeleted = false,
+                            Name = "Phù hợp cho người tiểu đường"
+                        });
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", b =>
@@ -1850,7 +1976,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Feedback")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
@@ -1903,21 +2031,26 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid?>("ImageId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<double>("Rating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
+                        .HasDefaultValue(0.0);
 
                     b.Property<int>("Ration")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("isDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
@@ -1975,6 +2108,26 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("NutrientId");
 
                     b.ToTable("RecipeNutritionAggregates");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeUserTag", b =>
+                {
+                    b.Property<Guid>("RecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TaggedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RecipeId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RecipeId", "TaggedUserId");
+
+                    b.HasIndex("RecipeId1");
+
+                    b.HasIndex("TaggedUserId");
+
+                    b.ToTable("RecipeUserTags", (string)null);
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserDietRestriction", b =>
@@ -2297,22 +2450,53 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CommentMention", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Comment", "Comment")
+                        .WithMany("Mentions")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "MentionedUser")
+                        .WithMany()
+                        .HasForeignKey("MentionedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("MentionedUser");
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CookingStep", b =>
                 {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Recipe")
                         .WithMany("CookingSteps")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Image");
-
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CookingStepImage", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.CookingStep", "CookingStep")
+                        .WithMany("CookingStepImages")
+                        .HasForeignKey("CookingStepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CookingStep");
+
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", b =>
@@ -2531,6 +2715,29 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeUserTag", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", null)
+                        .WithMany("RecipeUserTags")
+                        .HasForeignKey("RecipeId1");
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "TaggedUser")
+                        .WithMany()
+                        .HasForeignKey("TaggedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+
+                    b.Navigation("TaggedUser");
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserDietRestriction", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategory", "IngredientCategory")
@@ -2684,7 +2891,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Comment", b =>
                 {
+                    b.Navigation("Mentions");
+
                     b.Navigation("Replies");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CookingStep", b =>
+                {
+                    b.Navigation("CookingStepImages");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", b =>
@@ -2737,6 +2951,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Ratings");
 
                     b.Navigation("RecipeIngredients");
+
+                    b.Navigation("RecipeUserTags");
 
                     b.Navigation("SavedBy");
 

@@ -8,8 +8,9 @@ using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
-    [Route("api/recipes/{recipeId:guid}/ratings")]
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RatingController : ControllerBase
     {
         private readonly IRatingService _ratingService;
@@ -21,23 +22,28 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
-        [HttpGet("average")]
-        public async Task<IActionResult> GetAverage(Guid recipeId)
-        {
-            var avg = await _ratingService.GetAverageRatingAsync(recipeId);
-            return Ok(new { averageRating = avg });
-        }
-
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> Rate(Guid recipeId, [FromBody] CreateRatingRequest request)
+        [HttpPost("{recipeId:guid}")]
+        public async Task<IActionResult> Rate(Guid recipeId, [FromBody] RatingRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var appRequest = _mapper.Map<ApplicationDtos.RatingDtos.CreateRatingRequest>(request);
+            var appRequest = _mapper.Map<ApplicationDtos.RatingDtos.RatingRequest>(request);
 
-            var result = await _ratingService.AddOrUpdateAsync(userId, recipeId, appRequest);
-            return Ok(result);
+            await _ratingService.AddOrUpdate(userId, recipeId, appRequest);
+            return Ok(new
+            {
+                Message = "Đánh giá thành công"
+            });
+        }
+
+        [HttpDelete("{recipeId:guid}")]
+        public async Task<IActionResult> Delete(Guid recipeId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _ratingService.Delete(userId, recipeId);
+            return Ok(new
+            {
+                Message = "Xoá đánh giá thành công"
+            });
         }
     }
 }

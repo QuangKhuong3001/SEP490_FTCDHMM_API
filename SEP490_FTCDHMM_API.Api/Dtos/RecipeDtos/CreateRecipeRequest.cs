@@ -30,5 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 
         [Required(ErrorMessage = "Công thức phải có ít nhất một bước")]
         public required List<CookingStepRequest> CookingSteps { get; set; }
+        public List<Guid> TaggedUserIds { get; set; } = new();
+
     }
 }

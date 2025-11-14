@@ -9,9 +9,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
     {
         public CookingStepMappingProfile()
         {
-
             CreateMap<APIDtos.CookingStepDtos.CookingStepRequest, ApplicationDtos.CookingStepDtos.CookingStepRequest>();
-
         }
     }
 }

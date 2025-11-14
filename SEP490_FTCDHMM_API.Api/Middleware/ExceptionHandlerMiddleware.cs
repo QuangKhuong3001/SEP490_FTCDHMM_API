@@ -28,7 +28,6 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
 
                 var response = new
                 {
-                    code = ex.ResponseCode.Code,
                     statusCode = ex.ResponseCode.StatusCode,
                     message = ex.Message
                 };
@@ -44,7 +43,6 @@ namespace SEP490_FTCDHMM_API.Api.Middleware
 
                 var response = new
                 {
-                    code = AppResponseCode.UNKNOWN_ERROR.Code,
                     statusCode = AppResponseCode.UNKNOWN_ERROR.StatusCode,
                     message = ex.Message
                 };

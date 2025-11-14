@@ -17,7 +17,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public Guid? ImageId { get; set; }
         public Image? Image { get; set; }
         public decimal? Calories { get; set; }
-        public bool isDeleted = false;
+        public bool IsDeleted { get; set; } = false;
+        public double Rating { get; set; } = 0;
 
         public ICollection<CookingStep> CookingSteps { get; set; } = new List<CookingStep>();
         public ICollection<Label> Labels { get; set; } = new List<Label>();
@@ -28,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<UserSaveRecipe> SavedBy { get; set; } = new List<UserSaveRecipe>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-
+        public ICollection<RecipeUserTag> RecipeUserTags { get; set; } = new List<RecipeUserTag>();
 
     }
 }

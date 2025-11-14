@@ -16,6 +16,21 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
             return new Guid(hash);
         }
 
+        public static void SeedDefaultImage(this ModelBuilder builder)
+        {
+            var defaultImageId = DeterministicGuid("Image:Default");
+
+            builder.Entity<Image>().HasData(
+                new Image
+                {
+                    Id = defaultImageId,
+                    Key = "images/default/no-image.png",
+                    ContentType = "image/png",
+                    CreatedAtUTC = DateTime.UtcNow
+                }
+            );
+        }
+
         public static void SeedRoles(this ModelBuilder builder)
         {
             var roleType = typeof(RoleValue);
@@ -209,6 +224,25 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
             };
 
             builder.Entity<IngredientCategory>().HasData(categories);
+        }
+
+        public static void SeedLabels(this ModelBuilder builder)
+        {
+            var labels = new List<Label>
+            {
+                new() { Id = DeterministicGuid("Label:Healthy"), Name = "Lành mạnh", ColorCode = "#4CAF50" },
+                new() { Id = DeterministicGuid("Label:HighProtein"), Name = "Giàu đạm", ColorCode = "#2196F3" },
+                new() { Id = DeterministicGuid("Label:LowCarb"), Name = "Ít tinh bột", ColorCode = "#9C27B0" },
+                new() { Id = DeterministicGuid("Label:Vegan"), Name = "Thuần chay", ColorCode = "#8BC34A" },
+                new() { Id = DeterministicGuid("Label:Vegetarian"), Name = "Chay", ColorCode = "#CDDC39" },
+                new() { Id = DeterministicGuid("Label:GlutenFree"), Name = "Không gluten", ColorCode = "#FF9800" },
+                new() { Id = DeterministicGuid("Label:QuickMeal"), Name = "Món nhanh", ColorCode = "#FFC107" },
+                new() { Id = DeterministicGuid("Label:LowFat"), Name = "Ít béo", ColorCode = "#00BCD4" },
+                new() { Id = DeterministicGuid("Label:Keto"), Name = "Keto", ColorCode = "#795548" },
+                new() { Id = DeterministicGuid("Label:DiabeticFriendly"), Name = "Phù hợp cho người tiểu đường", ColorCode = "#FF5722" }
+            };
+
+            builder.Entity<Label>().HasData(labels);
         }
     }
 }

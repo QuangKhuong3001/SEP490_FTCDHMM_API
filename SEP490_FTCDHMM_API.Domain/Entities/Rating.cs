@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SEP490_FTCDHMM_API.Domain.Entities
+﻿namespace SEP490_FTCDHMM_API.Domain.Entities
 {
     public class Rating
     {
@@ -9,10 +7,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public AppUser User { get; set; } = null!;
         public Guid RecipeId { get; set; }
         public Recipe Recipe { get; set; } = null!;
-
-        [Range(1, 5, ErrorMessage = "Score must be between 1 and 5.")]
         public int Score { get; set; }
-        public string? Feedback { get; set; }
+        public required string Feedback { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }
 

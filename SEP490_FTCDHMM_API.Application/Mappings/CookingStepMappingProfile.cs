@@ -8,12 +8,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
     {
         public CookingStepMappingProfile()
         {
-            CreateMap<CookingStep, CookingStepResponse>()
-                .ForMember(
-                    dest => dest.ImageUrl,
-                    opt => opt.MapFrom<UniversalImageUrlResolver<CookingStep, CookingStepResponse>>()
-                );
-
+            CreateMap<CookingStep, CookingStepResponse>();
         }
     }
 }

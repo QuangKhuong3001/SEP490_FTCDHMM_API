@@ -1,4 +1,5 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
+using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserFavoriteRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserSaveRecipeDtos;
@@ -19,8 +20,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task SaveRecipe(Guid userId, Guid recipeId);
         Task UnsaveRecipe(Guid userId, Guid recipeId);
         Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, PaginationParams paginationParams);
-        //Task RatingRecipe(Guid userId, Guid recipeId, RatingRecipeRequest request);
-        //Task<List<RecommendRecipeResponse>> RecommendRecipeList();
-        //Task ReportRecipe(Guid userId, Guid recipeId, ReportRecipeRequest request);
+        Task<double> GetAverageScore(Guid recipeId);
+        Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request);
+        Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, PaginationParams request);
     }
 }

@@ -23,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.CreatedAtUtc)
                 .HasDefaultValueSql("GETUTCDATE()");
 
-            builder.Property(r => r.isDeleted)
+            builder.Property(r => r.IsDeleted)
                 .HasDefaultValue(false);
 
             builder.Property(x => x.CookTime)
@@ -31,6 +31,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(r => r.Ration)
                 .IsRequired();
+
+            builder.Property(r => r.Rating)
+               .IsRequired()
+               .HasDefaultValue(0);
 
             builder.Property(r => r.Difficulty)
                 .HasConversion(

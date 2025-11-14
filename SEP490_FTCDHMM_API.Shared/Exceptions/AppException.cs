@@ -5,6 +5,7 @@
         public AppResponseCode ResponseCode { get; }
 
         public AppException(AppResponseCode responseCode)
+            : base(responseCode.Message)
         {
             ResponseCode = responseCode;
         }

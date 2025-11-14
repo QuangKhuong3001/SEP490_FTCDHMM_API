@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
+using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserFavoriteRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserSaveRecipeDtos;
@@ -13,6 +14,7 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -31,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
         private readonly ICookingStepRepository _cookingStepRepository;
         private readonly IRecipeNutritionAggregator _recipeNutritionAggregator;
+        private readonly IRecipeUserTagRepository _recipeUserTagRepository;
 
         public RecipeService(IRecipeRepository recipeRepository,
             IMapper mapper,
@@ -38,6 +41,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IUnitOfWork unitOfWork,
             //ICacheService cache,
             ILabelRepository labelRepository,
+            IRecipeUserTagRepository recipeUserTagRepository,
             IUserRepository userRepository,
             IIngredientRepository ingredientRepository,
             IUserRecipeViewRepository userRecipeViewRepository,
@@ -52,6 +56,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _unitOfWork = unitOfWork;
             //_cache = cache;
             _labelRepository = labelRepository;
+            _recipeUserTagRepository = recipeUserTagRepository;
             _userRepository = userRepository;
             _ingredientRepository = ingredientRepository;
             _userRecipeViewRepository = userRecipeViewRepository;
@@ -63,6 +68,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreatRecipe(Guid userId, CreateRecipeRequest request)
         {
+            var stepOrders = request.CookingSteps.Select(x => x.StepOrder).ToList();
+
+            if (stepOrders.Count != stepOrders.Distinct().Count())
+            {
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Thứ tự của các bước nấu ăn không được trùng nhau.");
+            }
+
+            foreach (var step in request.CookingSteps)
+            {
+                var imageOrders = step.Images.Select(i => i.ImageOrder).ToList();
+
+                if (imageOrders.Count != imageOrders.Distinct().Count())
+                {
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Thứ tự ảnh trong cùng một bước không được trùng nhau.");
+                }
+            }
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
@@ -72,8 +94,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
             var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
-            if (!(labelExists && ingredientExists))
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+            if (!(ingredientExists))
+                throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
+
+            if (!(labelExists))
+                throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
+
+            if (ingredientIds.HasDuplicate())
+                throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nguyên liệu bị trùng lặp");
+
+            if (request.LabelIds.HasDuplicate())
+                throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nhãn dán bị trùng lặp");
+
 
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
@@ -93,11 +125,35 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 }).ToList()
             };
 
-
-            if (request.Image != null && request.Image.Length > 0)
+            if (request.Image != null)
             {
-                var image = await _imageService.UploadImageAsync(request.Image, StorageFolder.RECIPES, user);
-                recipe.Image = image;
+                var uploaded = await _imageService.UploadImageAsync(
+                    request.Image,
+                    StorageFolder.RECIPES,
+                    userId
+                );
+                recipe.Image = uploaded;
+            }
+
+            if (request.TaggedUserIds.Any())
+            {
+                var distinctIds = request.TaggedUserIds.Distinct().ToList();
+
+                foreach (var userIdToTag in distinctIds)
+                {
+                    if (userIdToTag == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn không thể gắn thẻ chính mình.");
+
+                    var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
+                    if (!exists)
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng được gắn thẻ không hợp lệ.");
+
+                    recipe.RecipeUserTags.Add(new RecipeUserTag
+                    {
+                        RecipeId = recipe.Id,
+                        TaggedUserId = userIdToTag,
+                    });
+                }
             }
 
             var steps = new List<CookingStep>();
@@ -107,115 +163,209 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (string.IsNullOrWhiteSpace(step.Instruction))
                     throw new AppException(AppResponseCode.INVALID_ACTION);
 
-                Image? stepImage = null;
-                if (step.Image != null)
-                    stepImage = await _imageService.UploadImageAsync(step.Image, StorageFolder.COOKING_STEPS, user);
-
-                steps.Add(new CookingStep
+                var cookingStep = new CookingStep
                 {
                     Id = Guid.NewGuid(),
                     Instruction = step.Instruction.Trim(),
                     StepOrder = step.StepOrder,
-                    Image = stepImage,
                     Recipe = recipe
-                });
+                };
 
+                if (step.Images != null && step.Images.Any())
+                {
+                    cookingStep.CookingStepImages = new List<CookingStepImage>();
+
+                    foreach (var file in step.Images)
+                    {
+                        var uploaded = await _imageService.UploadImageAsync(
+                            file.Image,
+                            StorageFolder.COOKING_STEPS,
+                            userId
+                        );
+
+                        cookingStep.CookingStepImages.Add(new CookingStepImage
+                        {
+                            Id = Guid.NewGuid(),
+                            CookingStepId = cookingStep.Id,
+                            ImageOrder = file.ImageOrder,
+                            Image = uploaded,
+                        });
+                    }
+                }
+
+                steps.Add(cookingStep);
             }
+
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);
 
             var fullRecipe = await _recipeRepository.GetByIdAsync(recipe.Id,
-            include: q => q
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient)
+                include: q => q
+                    .Include(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
                         .ThenInclude(i => i.IngredientNutrients)
                         .ThenInclude(n => n.Nutrient)
-);
+            );
+
             await _recipeNutritionAggregator.AggregateAndSaveAsync(fullRecipe!);
         }
+
+
         public async Task UpdateRecipe(Guid userId, Guid recipeId, UpdateRecipeRequest request)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId, include: i => i.Include(r => r.Labels).Include(r => r.RecipeIngredients));
-            if ((recipe == null) || (recipe.isDeleted == true))
+            var recipe = await _recipeRepository.GetByIdAsync(
+                id: recipeId,
+                include: q => q
+                    .Include(r => r.Labels)
+                    .Include(r => r.RecipeIngredients)
+                    .Include(r => r.CookingSteps)
+                        .ThenInclude(cs => cs.CookingStepImages)
+                            .ThenInclude(si => si.Image)
+            );
+
+            if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (recipe.AuthorId != userId)
-            {
                 throw new AppException(AppResponseCode.FORBIDDEN);
-            }
 
             var labelExists = await _labelRepository.IdsExistAsync(request.LabelIds);
 
             var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
             var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
-            if (!(labelExists && ingredientExists))
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+            if (!(ingredientExists))
+                throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
+
+            if (!(labelExists))
+                throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
+
+            if (ingredientIds.HasDuplicate())
+                throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nguyên liệu bị trùng lặp");
+
+            if (request.LabelIds.HasDuplicate())
+                throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nhãn dán bị trùng lặp");
 
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
-
-            recipe.Labels.Clear();
-            recipe.RecipeIngredients.Clear();
 
             recipe.Name = request.Name;
             recipe.Description = request.Description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
             recipe.CookTime = request.CookTime;
+            recipe.Ration = request.Ration;
+            recipe.UpdatedAtUtc = DateTime.UtcNow;
+
+            recipe.Labels.Clear();
             recipe.Labels = labels.ToList();
+
+            recipe.RecipeIngredients.Clear();
             recipe.RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
             {
                 RecipeId = recipeId,
                 IngredientId = i.IngredientId,
                 QuantityGram = i.QuantityGram
             }).ToList();
-            recipe.UpdatedAtUtc = DateTime.UtcNow;
-            recipe.Ration = request.Ration;
 
-            if (request.Image != null && request.Image.Length > 0)
+            if (request.Image != null)
             {
                 if (recipe.ImageId.HasValue)
                 {
                     await _imageService.DeleteImageAsync(recipe.ImageId.Value);
                 }
 
-                var image = await _imageService.UploadImageAsync(request.Image, StorageFolder.RECIPES, user);
-                recipe.Image = image;
+                var newImage = await _imageService.UploadImageAsync(
+                    request.Image,
+                    StorageFolder.RECIPES,
+                    userId
+                );
+
+                recipe.Image = newImage;
+            }
+
+            var existingTags = await _recipeUserTagRepository.GetAllAsync(t => t.RecipeId == recipe.Id);
+
+            if (existingTags.Any())
+            {
+                await _recipeUserTagRepository.DeleteRangeAsync(existingTags);
+            }
+
+            if (request.TaggedUserIds.Any())
+            {
+                var distinctIds = request.TaggedUserIds.Distinct().ToList();
+
+                foreach (var userIdToTag in distinctIds)
+                {
+                    if (userIdToTag == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn không thể tag chính mình.");
+
+                    var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
+                    if (!exists)
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION,
+                            $"Người dùng {userIdToTag} không tồn tại.");
+
+                    recipe.RecipeUserTags.Add(new RecipeUserTag
+                    {
+                        RecipeId = recipe.Id,
+                        TaggedUserId = userIdToTag,
+                    });
+                }
             }
 
             foreach (var oldStep in recipe.CookingSteps)
             {
-                if (oldStep.ImageId.HasValue)
-                    await _imageService.DeleteImageAsync(oldStep.ImageId.Value);
-                await _cookingStepRepository.DeleteAsync(oldStep);
+                foreach (var si in oldStep.CookingStepImages)
+                {
+                    await _imageService.DeleteImageAsync(si.ImageId);
+                }
             }
 
+            recipe.CookingSteps.Clear();
+            await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipeId);
+
+
             var newSteps = new List<CookingStep>();
+
             foreach (var step in request.CookingSteps.OrderBy(s => s.StepOrder))
             {
                 if (string.IsNullOrWhiteSpace(step.Instruction))
                     throw new AppException(AppResponseCode.INVALID_ACTION);
 
-                Image? stepImage = null;
-
-                if (step.Image != null && step.Image.Length > 0)
-                {
-                    stepImage = await _imageService.UploadImageAsync(step.Image, StorageFolder.COOKING_STEPS, user);
-                }
-
-                newSteps.Add(new CookingStep
+                var newStep = new CookingStep
                 {
                     Id = Guid.NewGuid(),
                     Instruction = step.Instruction.Trim(),
                     StepOrder = step.StepOrder,
-                    Image = stepImage,
                     Recipe = recipe
-                });
+                };
 
+                if (step.Images != null && step.Images.Any())
+                {
+                    newStep.CookingStepImages = new List<CookingStepImage>();
+
+                    foreach (var file in step.Images)
+                    {
+                        var uploaded = await _imageService.UploadImageAsync(
+                            file.Image,
+                            StorageFolder.COOKING_STEPS,
+                            userId
+                        );
+
+                        newStep.CookingStepImages.Add(new CookingStepImage
+                        {
+                            Id = Guid.NewGuid(),
+                            CookingStepId = newStep.Id,
+                            ImageOrder = file.ImageOrder,
+                            ImageId = uploaded.Id,
+                        });
+                    }
+                }
+
+                newSteps.Add(newStep);
             }
 
             recipe.CookingSteps = newSteps;
@@ -223,12 +373,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _recipeRepository.UpdateAsync(recipe);
 
             await _recipeNutritionAggregator.AggregateAndSaveAsync(recipe);
-
         }
+
         public async Task DeleteRecipe(Guid userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if ((recipe == null) || (recipe.isDeleted == true))
+            if ((recipe == null) || (recipe.IsDeleted == true))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -238,35 +388,47 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (recipe.AuthorId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
-            recipe.isDeleted = true;
+            recipe.IsDeleted = true;
             await _recipeRepository.UpdateAsync(recipe);
         }
         public async Task<PagedResult<RecipeResponse>> GetAllRecipes(RecipeFilterRequest request)
         {
             Expression<Func<Recipe, bool>> filter = f =>
-                !f.isDeleted
-                && (request.LabelId == null || f.Labels.Any(l => l.Id == request.LabelId))
-                && (string.IsNullOrEmpty(request.Keyword) || f.Name.Contains(request.Keyword));
+                !f.IsDeleted
+                && (request.Difficulty == null ||
+                    f.Difficulty == DifficultyValue.From(request.Difficulty))
+                && (request.Ration == null ||
+                    f.Ration == request.Ration)
+                && (request.MaxCookTime == null ||
+                    f.CookTime < request.MaxCookTime)
+                && ((!request.LabelIds.Any()) ||
+                    f.Labels.Any(l => request.LabelIds.Contains(l.Id)))
+                && ((!request.IngredientIds.Any()) ||
+                    f.RecipeIngredients.Any(ri => request.IngredientIds.Contains(ri.IngredientId)))
+                && (string.IsNullOrEmpty(request.Keyword) ||
+                    f.Name.Contains(request.Keyword));
 
-            Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>>? orderBy = request.SortBy?.ToLower() switch
+            Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> orderBy = request.SortBy?.ToLower() switch
             {
                 "name_asc" => q => q.OrderBy(r => r.Name),
                 "name_desc" => q => q.OrderByDescending(r => r.Name),
                 "time_asc" => q => q.OrderBy(r => r.CookTime),
                 "time_desc" => q => q.OrderByDescending(r => r.CookTime),
                 "latest" => q => q.OrderByDescending(r => r.UpdatedAtUtc),
+                "rate_asc" => q => q.OrderBy(r => r.Rating),
+                "rate_desc" => q => q.OrderByDescending(r => r.Rating),
                 _ => q => q.OrderByDescending(r => r.UpdatedAtUtc)
             };
 
-            string[]? searchProps = new[] { "Name", "Description" };
-
-            Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
+            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author)
                  .Include(r => r.Image)
                  .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.Labels)
                  .Include(r => r.CookingSteps)
-                 .ThenInclude(cs => cs.Image);
+                    .ThenInclude(cs => cs.CookingStepImages)
+                        .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
@@ -274,7 +436,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 filter: filter,
                 orderBy: orderBy,
                 keyword: request.Keyword,
-                searchProperties: searchProps,
+                searchProperties: new[] { "Name", "Description" },
                 include: include
             );
 
@@ -289,6 +451,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
+
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
             IQueryable<Recipe> include(IQueryable<Recipe> q) =>
@@ -297,13 +460,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  .Include(r => r.Image)
                  .Include(r => r.Labels)
                  .Include(r => r.CookingSteps)
-                 .ThenInclude(cs => cs.Image)
+                    .ThenInclude(cs => cs.CookingStepImages)
+                        .ThenInclude(cs => cs.Image)
                  .Include(r => r.RecipeIngredients)
-                 .ThenInclude(ri => ri.Ingredient);
+                    .ThenInclude(ri => ri.Ingredient);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
-            if ((recipe == null) || (recipe.isDeleted))
+            if ((recipe == null) || (recipe.IsDeleted))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -321,7 +485,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 });
             }
 
-            // Check if recipe is favorited and saved by current user
             var isFavorited = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
             var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
 
@@ -339,7 +502,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -361,7 +524,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -380,7 +543,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (items, totalCount) = await _userFavoriteRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.isDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe)
@@ -411,7 +574,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (items, totalCount) = await _userSaveRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.isDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe)
@@ -440,7 +603,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -462,7 +625,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (recipe == null || recipe.isDeleted == true)
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -480,16 +643,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
                  q.Include(r => r.Image)
-                 .Include(r => r.Labels)
-                 .Include(r => r.RecipeIngredients)
-                 .ThenInclude(ri => ri.Ingredient)
-                 .Include(r => r.CookingSteps)
-                    .ThenInclude(cs => cs.Image);
+                .Include(r => r.Labels)
+                .Include(r => r.RecipeIngredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.CookingSteps)
+                    .ThenInclude(cs => cs.CookingStepImages)
+                        .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
                 pageSize: paginationParams.PageSize,
-                filter: f => !f.isDeleted && f.AuthorId == userId,
+                filter: f => !f.IsDeleted && f.AuthorId == userId,
                 orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
                 include: include
             );
@@ -504,5 +668,82 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
+
+        public async Task<double> GetAverageScore(Guid recipeId)
+        {
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            if (recipe == null || recipe.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            return recipe.Rating;
+        }
+
+        public async Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request)
+        {
+            var recipe = await _recipeRepository.GetByIdAsync(
+                id: recipeId,
+                include: i => i.Include(r => r.Ratings));
+
+            if (recipe == null || recipe.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            var query = recipe.Ratings
+                .Where(v => !v.Recipe.IsDeleted)
+                .OrderByDescending(v => v.CreatedAtUtc)
+                .AsQueryable();
+
+            var totalCount = query.Count();
+
+            var pagedRatings = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+
+            var result = _mapper.Map<IEnumerable<RatingResponse>>(pagedRatings);
+            return new PagedResult<RatingResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, PaginationParams request)
+        {
+            var user = await _userRepository.GetByIdAsync(
+                id: userId,
+                include: i => i.Include(u => u.ViewedRecipes)
+                               .ThenInclude(v => v.Recipe)
+                                   .ThenInclude(r => r.Image));
+
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            var query = user.ViewedRecipes
+                .Where(v => !v.Recipe.IsDeleted)
+                .OrderByDescending(v => v.ViewedAtUtc)
+                .Select(v => v.Recipe)
+                .AsQueryable();
+
+            var totalCount = query.Count();
+
+            var pagedRecipes = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var result = _mapper.Map<IEnumerable<RecipeResponse>>(pagedRecipes);
+
+            return new PagedResult<RecipeResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
     }
 }

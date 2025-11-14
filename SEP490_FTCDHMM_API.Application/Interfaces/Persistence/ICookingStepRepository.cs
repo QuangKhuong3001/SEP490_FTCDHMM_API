@@ -4,5 +4,6 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
 {
     public interface ICookingStepRepository : IRepository<CookingStep>
     {
+        Task DeleteStepsByRecipeIdAsync(Guid recipeId);
     }
 }
