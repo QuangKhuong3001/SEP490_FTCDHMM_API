@@ -10,5 +10,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.UserDtos
         public string Email { get; set; } = string.Empty;
         public DateTime CreatedAtUTC { get; set; }
         public string Status { get; set; } = UserStatus.Unverified;
+        public string? LockReason { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
     }
 }

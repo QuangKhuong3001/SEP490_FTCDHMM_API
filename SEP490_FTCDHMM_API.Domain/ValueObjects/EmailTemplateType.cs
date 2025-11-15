@@ -8,6 +8,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
         public static readonly EmailTemplateType ForgotPassword = new("FORGOTPASSWORD");
         public static readonly EmailTemplateType ModeratorCreated = new("MODERATORCREATED");
         public static readonly EmailTemplateType LockAccount = new("LOCKACCOUNT");
+        public static readonly EmailTemplateType UnlockAccount = new("UNLOCKACCOUNT");
 
         public override string ToString() => Value;
 
@@ -19,6 +20,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "FORGOTPASSWORD" => ForgotPassword,
                 "MODERATORCREATED" => ModeratorCreated,
                 "LOCKACCOUNT" => LockAccount,
+                "UNLOCKACCOUNT" => UnlockAccount,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }
