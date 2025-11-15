@@ -81,7 +81,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _commentRepository.AddAsync(comment);
-            var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
+            var saved = await _commentRepository.GetByIdAsync(
+                comment.Id,
+                c => c
+                    .Include(x => x.User).ThenInclude(x => x.Avatar)
+                    .Include(x => x.Mentions).ThenInclude(x => x.MentionedUser)
+            );
 
             var response = _mapper.Map<CommentResponse>(saved);
 
