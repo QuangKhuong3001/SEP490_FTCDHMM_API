@@ -304,7 +304,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
-            user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
             user.DateOfBirth = dto.DateOfBirth;
             user.Bio = dto.Bio;
@@ -364,7 +363,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
-                include: i => i.Include(u => u.Follower));
+                include: i => i.Include(u => u.Follower).ThenInclude(u => u.Avatar));
 
             var followerUsers = followers.Select(f => f.Follower).ToList();
 
@@ -375,7 +374,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
-                include: i => i.Include(u => u.Followee));
+                include: i => i.Include(u => u.Followee).ThenInclude(u => u.Avatar));
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 
