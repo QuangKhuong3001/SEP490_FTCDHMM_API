@@ -111,6 +111,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                             .ThenInclude(x => x.Avatar)
                     .Include(x => x.Mentions)
                         .ThenInclude(x => x.MentionedUser)
+                            .ThenInclude(x => x.Avatar)
             );
 
             return _mapper.Map<List<CommentResponse>>(comments);

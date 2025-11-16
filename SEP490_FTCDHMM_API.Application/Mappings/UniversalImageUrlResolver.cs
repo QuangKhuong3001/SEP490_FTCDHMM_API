@@ -14,13 +14,16 @@ public class UniversalImageUrlResolver<TSource, TDestination>
 
     public string? Resolve(TSource src, TDestination dest, string? destMember, ResolutionContext context)
     {
-        var imageProp = src?.GetType().GetProperty("Image")
-                      ?? src?.GetType().GetProperty("Avatar");
+        if (src == null)
+            return null;
+
+        var imageProp = src.GetType().GetProperty("Image")
+                      ?? src.GetType().GetProperty("Avatar");
 
         if (imageProp == null)
         {
             // Try to get Avatar through User property (for Comment entity)
-            var userProp = src?.GetType().GetProperty("User");
+            var userProp = src.GetType().GetProperty("User");
             if (userProp != null)
             {
                 var userObj = userProp.GetValue(src);
@@ -30,7 +33,9 @@ public class UniversalImageUrlResolver<TSource, TDestination>
                     if (imageProp != null)
                     {
                         var imageObj = imageProp.GetValue(userObj) as Image;
-                        var key = imageObj?.Key;
+                        if (imageObj == null)
+                            return null;
+                        var key = imageObj.Key;
                         return _s3.GeneratePreSignedUrl(key);
                     }
                 }
@@ -39,7 +44,9 @@ public class UniversalImageUrlResolver<TSource, TDestination>
         }
 
         var image = imageProp.GetValue(src) as Image;
-        var imageKey = image?.Key;
+        if (image == null)
+            return null;
+        var imageKey = image.Key;
         return _s3.GeneratePreSignedUrl(imageKey);
     }
 }

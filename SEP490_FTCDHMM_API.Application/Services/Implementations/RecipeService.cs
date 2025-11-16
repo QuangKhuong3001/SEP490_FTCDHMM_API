@@ -422,6 +422,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author)
+                    .ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.RecipeIngredients)
                     .ThenInclude(ri => ri.Ingredient)
@@ -456,7 +457,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             IQueryable<Recipe> include(IQueryable<Recipe> q) =>
                 q.Include(r => r.Author)
-                 .Include(r => r.Author!.Avatar)
+                    .ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.Labels)
                  .Include(r => r.CookingSteps)
@@ -548,6 +549,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(f => f.Recipe)
                         .ThenInclude(r => r.Author)
+                            .ThenInclude(u => u.Avatar)
                     .Include(f => f.Recipe.Image)
                     .Include(f => f.Recipe.FavoritedBy)
             );
@@ -579,6 +581,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(f => f.Recipe)
                         .ThenInclude(r => r.Author)
+                            .ThenInclude(u => u.Avatar)
                     .Include(f => f.Recipe.Image)
                     .Include(f => f.Recipe.FavoritedBy)
             );
@@ -718,7 +721,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 id: userId,
                 include: i => i.Include(u => u.ViewedRecipes)
                                .ThenInclude(v => v.Recipe)
-                                   .ThenInclude(r => r.Image));
+                                   .ThenInclude(r => r.Image)
+                               .Include(u => u.ViewedRecipes)
+                                   .ThenInclude(v => v.Recipe)
+                                       .ThenInclude(r => r.Author)
+                                           .ThenInclude(a => a.Avatar));
 
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
