@@ -476,7 +476,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var viewed = await _userRecipeViewRepository.GetAllAsync(v => v.UserId == userId && v.RecipeId == recipeId);
 
-            if (viewed == null)
+            if (!viewed.Any())
             {
                 await _userRecipeViewRepository.AddAsync(new UserRecipeView
                 {
