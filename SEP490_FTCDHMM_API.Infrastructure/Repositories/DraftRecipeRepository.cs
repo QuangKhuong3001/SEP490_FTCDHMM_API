@@ -17,6 +17,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         public async Task<DraftRecipe?> GetDraftByAuthorIdAsync(Guid authorId)
         {
             return await _dbContext.DraftRecipes.Where(d => d.AuthorId == authorId)
+                    .Include(r => r.Image)
                     .Include(r => r.DraftCookingSteps)
                         .ThenInclude(cs => cs.DraftCookingStepImages)
                             .ThenInclude(si => si.Image)
