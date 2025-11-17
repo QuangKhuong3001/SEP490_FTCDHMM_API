@@ -1,5 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
-using SEP490_FTCDHMM_API.Application.Dtos.CookingStepDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SEP490_FTCDHMM_API.Api.Dtos.IngredientDetectionDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos;
+using SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos.IngredientDetection;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
@@ -79,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> DetectByGemini([FromForm] IngredientDetectionUploadRequest request)
         {
-            var appRequest = _mapper.Map<ApplicationDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest>(request);
+            var appRequest = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientDetection.IngredientDetectionUploadRequest>(request);
 
             var result = await _ingredientDetectionService.DetectIngredientsAsync(appRequest);
             return Ok(result);

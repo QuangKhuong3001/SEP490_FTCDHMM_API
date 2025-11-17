@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SEP490_FTCDHMM_API.Api.Dtos.NutrientTargetDtos;
+using SEP490_FTCDHMM_API.Api.Dtos.NutrientDtos.NutrientTarget;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.CustomHealthGoalDtos
 {

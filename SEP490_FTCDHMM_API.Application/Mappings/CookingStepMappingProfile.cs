@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.CookingStepDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings

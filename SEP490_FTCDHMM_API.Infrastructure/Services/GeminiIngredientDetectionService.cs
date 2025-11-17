@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using SEP490_FTCDHMM_API.Application.Dtos.IngredientDetectionDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.IngredientDetection;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 

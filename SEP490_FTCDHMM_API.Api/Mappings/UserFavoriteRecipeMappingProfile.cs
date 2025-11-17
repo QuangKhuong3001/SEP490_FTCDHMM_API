@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
     {
         public UserFavoriteRecipeMappingProfile()
         {
-            CreateMap<APIDtos.UserFavoriteRecipeDtos.FavoriteRecipeFilterRequest, ApplicationDtos.UserFavoriteRecipeDtos.FavoriteRecipeFilterRequest>();
+            CreateMap<APIDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest, ApplicationDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest>();
         }
     }
 }
