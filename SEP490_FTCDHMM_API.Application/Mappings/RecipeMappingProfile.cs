@@ -24,9 +24,6 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 ).ForMember(
                     dest => dest.Labels,
                     opt => opt.MapFrom(r => r.Labels)
-                ).ForMember(
-                    dest => dest.RecipeTaggeds,
-                    opt => opt.MapFrom(r => r.RecipeUserTags)
                 );
 
             CreateMap<RecipeUserTag, DraftRecipeUserTaggedResponse>()
@@ -57,6 +54,9 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 ).ForMember(
                     dest => dest.Ingredients,
                     opt => opt.MapFrom(r => r.RecipeIngredients)
+                ).ForMember(
+                    dest => dest.RecipeTaggeds,
+                    opt => opt.MapFrom(r => r.RecipeUserTags)
                 );
 
             CreateMap<RecipeIngredient, RecipeIngredientResponse>()

@@ -34,6 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly ICookingStepRepository _cookingStepRepository;
         private readonly IRecipeNutritionAggregator _recipeNutritionAggregator;
         private readonly IRecipeUserTagRepository _recipeUserTagRepository;
+        private readonly IDraftRecipeRepository _draftRecipeRepository;
 
         public RecipeService(IRecipeRepository recipeRepository,
             IMapper mapper,
@@ -41,6 +42,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IUnitOfWork unitOfWork,
             //ICacheService cache,
             ILabelRepository labelRepository,
+            IDraftRecipeRepository draftRecipeRepository,
             IRecipeUserTagRepository recipeUserTagRepository,
             IUserRepository userRepository,
             IIngredientRepository ingredientRepository,
@@ -56,6 +58,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _unitOfWork = unitOfWork;
             //_cache = cache;
             _labelRepository = labelRepository;
+            _draftRecipeRepository = draftRecipeRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _userRepository = userRepository;
             _ingredientRepository = ingredientRepository;
@@ -68,6 +71,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreatRecipe(Guid userId, CreateRecipeRequest request)
         {
+            var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
+            if (draftExist != null)
+            {
+                await _draftRecipeRepository.DeleteAsync(draftExist);
+            }
+
             var stepOrders = request.CookingSteps.Select(x => x.StepOrder).ToList();
 
             if (stepOrders.Count != stepOrders.Distinct().Count())
@@ -111,6 +120,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var recipe = new Recipe
             {
+                Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
                 AuthorId = userId,
@@ -142,11 +152,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 foreach (var userIdToTag in distinctIds)
                 {
                     if (userIdToTag == userId)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn không thể gắn thẻ chính mình.");
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể tự tag chính mình.");
 
                     var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
                     if (!exists)
-                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng được gắn thẻ không hợp lệ.");
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
                     recipe.RecipeUserTags.Add(new RecipeUserTag
                     {
@@ -210,7 +220,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _recipeNutritionAggregator.AggregateAndSaveAsync(fullRecipe!);
         }
-
 
         public async Task UpdateRecipe(Guid userId, Guid recipeId, UpdateRecipeRequest request)
         {
@@ -310,7 +319,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     recipe.RecipeUserTags.Add(new RecipeUserTag
                     {
-                        RecipeId = recipe.Id,
                         TaggedUserId = userIdToTag,
                     });
                 }
@@ -391,6 +399,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             recipe.IsDeleted = true;
             await _recipeRepository.UpdateAsync(recipe);
         }
+
         public async Task<PagedResult<RecipeResponse>> GetAllRecipes(RecipeFilterRequest request)
         {
             Expression<Func<Recipe, bool>> filter = f =>
@@ -426,6 +435,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  .Include(r => r.RecipeIngredients)
                     .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.Labels)
+                 .Include(r => r.RecipeUserTags)
+                    .ThenInclude(cs => cs.TaggedUser)
                  .Include(r => r.CookingSteps)
                     .ThenInclude(cs => cs.CookingStepImages)
                         .ThenInclude(cs => cs.Image);
@@ -451,7 +462,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-
         public async Task<RecipeDetailsResponse> GetRecipeDetails(Guid userId, Guid recipeId)
         {
             IQueryable<Recipe> include(IQueryable<Recipe> q) =>
@@ -459,6 +469,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  .Include(r => r.Author!.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.Labels)
+                 .Include(r => r.RecipeUserTags)
+                    .ThenInclude(cs => cs.TaggedUser)
                  .Include(r => r.CookingSteps)
                     .ThenInclude(cs => cs.CookingStepImages)
                         .ThenInclude(cs => cs.Image)
@@ -494,6 +506,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             return result;
         }
+
         public async Task AddToFavorite(Guid userId, Guid recipeId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -516,6 +529,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     UserId = userId
                 });
         }
+
         public async Task RemoveFromFavorite(Guid userId, Guid recipeId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -595,6 +609,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
+
         public async Task SaveRecipe(Guid userId, Guid recipeId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -617,6 +632,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     UserId = userId
                 });
         }
+
         public async Task UnsaveRecipe(Guid userId, Guid recipeId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -645,7 +661,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                  q.Include(r => r.Image)
                 .Include(r => r.Labels)
                 .Include(r => r.RecipeIngredients)
-                .ThenInclude(ri => ri.Ingredient)
+                    .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.RecipeUserTags)
+                    .ThenInclude(cs => cs.TaggedUser)
                 .Include(r => r.CookingSteps)
                     .ThenInclude(cs => cs.CookingStepImages)
                         .ThenInclude(cs => cs.Image);
