@@ -31,8 +31,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             var existingRating = await _ratingRepository.GetLatestAsync(
-                r => r.CreatedAtUtc,
-                r => r.UserId == userId && r.RecipeId == recipeId);
+                orderByDescendingKeySelector: r => r.CreatedAtUtc,
+                predicate: r => r.UserId == userId
+                                && r.RecipeId == recipeId);
 
             if (existingRating != null)
             {
@@ -56,7 +57,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var allRatings = await _ratingRepository.GetAllAsync(r => r.RecipeId == recipeId);
 
-            var avg = allRatings.Any() ? allRatings.Average(r => r.Score) : 0;
+            var avg = allRatings.Average(r => r.Score);
+
             recipe.Rating = avg;
 
             await _recipeRepository.UpdateAsync(recipe);
@@ -74,10 +76,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (rating.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN, "Không có quyền xóa đánh giá này");
 
-            var recipeId = rating.RecipeId;
             await _ratingRepository.DeleteAsync(rating);
-
-            await _notifier.SendRatingDeletedAsync(recipeId, ratingId);
         }
     }
 }

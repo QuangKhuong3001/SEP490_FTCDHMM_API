@@ -78,10 +78,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
             var draft = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
-            var existingImageId = draft?.ImageId;
 
             if (draft != null)
             {
+                await _imageRepository.MarkDeletedAsync(draft.ImageId);
                 await _imageRepository.MarkDeletedStepsImageFromDraftAsync(draft);
                 await _draftRecipeRepository.DeleteAsync(draft);
             }
@@ -99,23 +99,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (request.Image != null)
             {
-                // Delete old image only if a new one is being uploaded
-                if (existingImageId.HasValue)
-                {
-                    await _imageRepository.MarkDeletedAsync(existingImageId.Value);
-                }
                 var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS, userId);
                 draft.Image = uploaded;
             }
-            else if (existingImageId.HasValue)
-            {
-                // Preserve existing image if no new image is provided
-                var existingImage = await _imageRepository.GetByIdAsync(existingImageId.Value);
-                if (existingImage != null)
-                {
-                    draft.Image = existingImage;
-                }
-            }
+
 
             draft.DraftRecipeIngredients = request.Ingredients.Select(i => new DraftRecipeIngredient
             {
