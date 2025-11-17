@@ -431,6 +431,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author)
+                    .ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.RecipeIngredients)
                     .ThenInclude(ri => ri.Ingredient)
@@ -466,7 +467,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             IQueryable<Recipe> include(IQueryable<Recipe> q) =>
                 q.Include(r => r.Author)
-                 .Include(r => r.Author!.Avatar)
+                    .ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.Labels)
                  .Include(r => r.RecipeUserTags)
@@ -488,7 +489,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var viewed = await _userRecipeViewRepository.GetAllAsync(v => v.UserId == userId && v.RecipeId == recipeId);
 
-            if (viewed == null)
+            if (!viewed.Any())
             {
                 await _userRecipeViewRepository.AddAsync(new UserRecipeView
                 {
@@ -562,6 +563,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(f => f.Recipe)
                         .ThenInclude(r => r.Author)
+                            .ThenInclude(u => u.Avatar)
                     .Include(f => f.Recipe.Image)
                     .Include(f => f.Recipe.FavoritedBy)
             );
@@ -593,6 +595,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(f => f.Recipe)
                         .ThenInclude(r => r.Author)
+                            .ThenInclude(u => u.Avatar)
                     .Include(f => f.Recipe.Image)
                     .Include(f => f.Recipe.FavoritedBy)
             );
@@ -696,11 +699,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return recipe.Rating;
         }
 
-        public async Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request)
+        public async Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, PaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
-                include: i => i.Include(r => r.Ratings));
+                include: i => i.Include(r => r.Ratings)
+                               .ThenInclude(rt => rt.User)
+                               .ThenInclude(u => u.Avatar));
 
             if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
@@ -734,7 +739,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 id: userId,
                 include: i => i.Include(u => u.ViewedRecipes)
                                .ThenInclude(v => v.Recipe)
-                                   .ThenInclude(r => r.Image));
+                                   .ThenInclude(r => r.Image)
+                               .Include(u => u.ViewedRecipes)
+                                   .ThenInclude(v => v.Recipe)
+                                       .ThenInclude(r => r.Author)
+                                           .ThenInclude(a => a.Avatar));
 
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);

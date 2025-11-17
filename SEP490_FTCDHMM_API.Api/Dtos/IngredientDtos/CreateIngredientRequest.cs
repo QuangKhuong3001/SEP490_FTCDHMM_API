@@ -5,22 +5,20 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
 {
     public class CreateIngredientRequest
     {
-        [Required(ErrorMessage = "Missing Name")]
-        [StringLength(100, ErrorMessage = "Name must be less than 100 characters")]
+        [Required(ErrorMessage = "Tên nguyên liệu không được để trống")]
+        [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên nguyên liệu phải từ 1 đến 255 ký tự")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(200, ErrorMessage = "Name must be less than 200 characters")]
+        [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "Missing Ingredient Category")]
+        [Required(ErrorMessage = "Vui lòng chọn phân loại nguyên liệu")]
         public required List<Guid> IngredientCategoryIds { get; set; }
 
-        [Required(ErrorMessage = "Missing Image")]
+        [Required(ErrorMessage = "Vui lòng tải lên hình ảnh")]
         public required IFormFile Image { get; set; }
 
-        [Required(ErrorMessage = "Missing Nutrients")]
+        [Required(ErrorMessage = "Vui lòng thêm thành phần dinh dưỡng")]
         public required List<NutrientRequest> Nutrients { get; set; }
-
-
     }
 }

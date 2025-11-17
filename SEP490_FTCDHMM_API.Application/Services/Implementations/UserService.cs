@@ -91,7 +91,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
 
-            await _mailService.SendEmailAsync(user.Email!, htmlBody);
+            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo khóa tài khoản");
 
             await _userRepository.UpdateAsync(user);
 
@@ -115,6 +115,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
+            user.LockReason = null;
+
+            var placeholders = new Dictionary<string, string> { };
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.UnlockAccount, placeholders);
+            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo mở khóa tài khoản");
 
             await _userRepository.UpdateAsync(user);
 
@@ -166,7 +171,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
 
-            await _mailService.SendEmailAsync(user.Email!, htmlBody);
+            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo khóa tài khoản");
 
             await _userRepository.UpdateAsync(user);
 
@@ -190,6 +195,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = null;
+            user.LockReason = null;
+
+            var placeholders = new Dictionary<string, string> { };
+            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.UnlockAccount, placeholders);
+            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo mở khóa tài khoản");
 
             await _userRepository.UpdateAsync(user);
 
@@ -250,7 +260,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ModeratorCreated, placeholders);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Tài khoản quản lý viên FitFood Tracker đã được tạo");
 
             return new CreateModeratorAccountResponse
             {
@@ -294,7 +304,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
-            user.PhoneNumber = dto.PhoneNumber;
             user.Gender = Gender.From(dto.Gender);
             user.DateOfBirth = dto.DateOfBirth;
             user.Bio = dto.Bio;
@@ -354,7 +363,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followers = await _userFollowRepository.GetAllAsync(
                 u => u.FolloweeId == userId,
-                include: i => i.Include(u => u.Follower));
+                include: i => i.Include(u => u.Follower).ThenInclude(u => u.Avatar));
 
             var followerUsers = followers.Select(f => f.Follower).ToList();
 
@@ -365,7 +374,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var followings = await _userFollowRepository.GetAllAsync(
                 u => u.FollowerId == userId,
-                include: i => i.Include(u => u.Followee));
+                include: i => i.Include(u => u.Followee).ThenInclude(u => u.Avatar));
 
             var followingUsers = followings.Select(f => f.Followee).ToList();
 

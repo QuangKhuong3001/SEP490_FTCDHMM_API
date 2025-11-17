@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thông báo khóa tài khoản</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #d32f2f;
+        color: white;
+        padding: 20px;
+        border-radius: 5px 5px 0 0;
+        text-align: center;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 20px;
+        background-color: white;
+      }
+      .content p {
+        margin: 10px 0;
+      }
+      .alert-box {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .alert-box strong {
+        color: #856404;
+      }
+      .lockout-info {
+        background-color: #f8d7da;
+        border-left: 4px solid #d32f2f;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .lockout-info p {
+        margin: 5px 0;
+        color: #721c24;
+      }
+      .reason-box {
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .reason-box strong {
+        color: #0c5aa0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-top: 1px solid #ddd;
+        font-size: 12px;
+        color: #666;
+      }
+      .action-info {
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .action-info p {
+        margin: 5px 0;
+        color: #155724;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Tài Khoản Của Bạn Đã Bị Khóa</h2>
+      </div>
+
+      <div class="content">
+        <p>Xin chào,</p>
+
+        <p>
+          Chúng tôi thông báo rằng tài khoản của bạn đã bị khóa do các lý do
+          sau:
+        </p>
+
+        <div class="reason-box">
+          <strong>Lý do khóa tài khoản:</strong>
+          <p>{{LockReason}}</p>
+        </div>
+
+        <div class="lockout-info">
+          <p><strong>Thời gian khóa:</strong></p>
+          <p>
+            Tài khoản của bạn sẽ được mở khóa vào:
+            <strong>{{LockoutEnd}}</strong>
+          </p>
+        </div>
+
+        <p>Trong thời gian này, bạn sẽ không thể:</p>
+        <ul>
+          <li>Đăng nhập vào tài khoản</li>
+          <li>Tạo bình luận hoặc đánh giá</li>
+          <li>Tương tác với các công thức nấu ăn</li>
+          <li>Truy cập các tính năng khác của nền tảng</li>
+        </ul>
+
+        <div class="action-info">
+          <p><strong>Bạn có thắc mắc?</strong></p>
+          <p>
+            Nếu bạn cho rằng đây là một lỗi hoặc muốn giải thích thêm, vui lòng
+            liên hệ với đội hỗ trợ của chúng tôi.
+          </p>
+        </div>
+
+        <p>
+          Chúng tôi hy vọng bạn sẽ tuân thủ các điều khoản sử dụng và hướng dẫn
+          cộng đồng của chúng tôi.
+        </p>
+
+        <p>Trân trọng,<br />Đội hỗ trợ FitFood</p>
+      </div>
+
+      <div class="footer">
+        <p>© 2025 FitFood. Tất cả quyền được bảo lưu.</p>
+        <p>Đây là email tự động, vui lòng không trả lời email này.</p>
+      </div>
+    </div>
+  </body>
+</html>

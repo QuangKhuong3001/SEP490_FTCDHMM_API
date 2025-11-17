@@ -25,14 +25,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             _appSettings = appOptions.Value;
         }
 
-        public async Task SendEmailAsync(string email, string htmlMessage)
+        public async Task SendEmailAsync(string email, string htmlMessage, string? subject = null)
         {
             try
             {
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail));
                 message.To.Add(MailboxAddress.Parse(email));
-                message.Subject = _appSettings.AppName;
+                message.Subject = subject ?? _appSettings.AppName;
 
                 var bodyBuilder = new BodyBuilder { HtmlBody = htmlMessage };
                 message.Body = bodyBuilder.ToMessageBody();

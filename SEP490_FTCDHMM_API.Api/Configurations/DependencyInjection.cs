@@ -76,9 +76,17 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             services.Configure<IdentityOptions>(options =>
             {
+                // Lockout configuration
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(365);
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
+
+                // Password policy configuration
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = true;  // Special characters: @#$%^&*-_
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
             });
 
             // Auto Mapping

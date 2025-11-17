@@ -1,19 +1,188 @@
 <!DOCTYPE html>
-<html>
-<body>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tài khoản quản lý viên đã được tạo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #9c27b0;
+        color: white;
+        padding: 20px;
+        border-radius: 5px 5px 0 0;
+        text-align: center;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 20px;
+        background-color: white;
+      }
+      .content p {
+        margin: 10px 0;
+      }
+      .credentials-box {
+        background-color: #f3e5f5;
+        border-left: 4px solid #9c27b0;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .credential-item {
+        background-color: white;
+        border: 1px solid #e1bee7;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 3px;
+      }
+      .credential-label {
+        color: #6a1b9a;
+        font-weight: bold;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .credential-value {
+        color: #333;
+        font-size: 16px;
+        font-family: "Courier New", monospace;
+        margin-top: 5px;
+        padding: 8px;
+        background-color: #f5f5f5;
+        border-radius: 3px;
+      }
+      .otp-box {
+        background-color: #f3e5f5;
+        border-left: 4px solid #9c27b0;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 3px;
+        text-align: center;
+      }
+      .otp-code {
+        background-color: #7b1fa2;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 4px;
+        padding: 15px;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+      }
+      .otp-label {
+        color: #6a1b9a;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .info-box {
+        background-color: #e0f2f1;
+        border-left: 4px solid #009688;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .info-box p {
+        margin: 5px 0;
+        color: #00695c;
+      }
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .warning-box p {
+        margin: 5px 0;
+        color: #e65100;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-top: 1px solid #ddd;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <h2>Confirm Your Account</h2>
-        <p>Hello <strong>{{UserName}}</strong>,</p>
-        <p>Password: <strong>{{Password}}</strong>,</p>
-        <p>Thank you for registering. Please use the OTP code below to confirm your account:</p>
+      <div class="header">
+        <h2>Tài Khoản Quản Lý Viên Đã Được Tạo</h2>
+      </div>
 
-        <div class="otp">{{OtpCode}}</div>
-        <p>This code will expire at <strong>{{ExpireTime}}</strong>.</p>
-        <p>If you did not request this, please ignore this email.</p>
+      <div class="content">
+        <p>Xin chào <strong>{{UserName}}</strong>,</p>
 
-        <div class="footer">
-            <p>Best regards,<br />The Support Team</p>
+        <p>
+          Chúc mừng! Tài khoản quản lý viên của bạn đã được tạo thành công trên
+          nền tảng FitFood. Dưới đây là thông tin đăng nhập của bạn:
+        </p>
+
+        <div class="credentials-box">
+          <div class="credential-item">
+            <div class="credential-label">Email:</div>
+            <div class="credential-value">{{UserName}}</div>
+          </div>
+          <div class="credential-item">
+            <div class="credential-label">Mật khẩu tạm thời:</div>
+            <div class="credential-value">{{Password}}</div>
+          </div>
         </div>
+
+        <div class="warning-box">
+          <p><strong>Lưu ý bảo mật:</strong></p>
+          <p>
+            Vui lòng đổi mật khẩu này ngay sau lần đăng nhập đầu tiên của bạn để
+            bảo vệ tài khoản của bạn.
+          </p>
+        </div>
+
+        <p>
+          Để hoàn tất việc thiết lập tài khoản, vui lòng sử dụng mã OTP dưới
+          đây:
+        </p>
+
+        <div class="otp-box">
+          <div class="otp-label">Mã xác nhận của bạn:</div>
+          <div class="otp-code">{{OtpCode}}</div>
+        </div>
+
+        <div class="info-box">
+          <p><strong>Thông tin quan trọng:</strong></p>
+          <p>Mã này sẽ hết hạn vào <strong>{{ExpireTime}}</strong></p>
+          <p>Vui lòng nhập mã này để kích hoạt tài khoản của bạn.</p>
+        </div>
+
+        <p>
+          Nếu bạn có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với
+          đội hỗ trợ của chúng tôi.
+        </p>
+
+        <p>Trân trọng,<br />Đội hỗ trợ FitFood</p>
+      </div>
+
+      <div class="footer">
+        <p>© 2025 FitFood. Tất cả quyền được bảo lưu.</p>
+        <p>Đây là email tự động, vui lòng không trả lời email này.</p>
+      </div>
     </div>
-</body>
+  </body>
 </html>

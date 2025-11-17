@@ -38,18 +38,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
-            await _commentService.CreateAsync(userId, recipeId, appRequest);
-            return Ok();
+            var response = await _commentService.CreateAsync(userId, recipeId, appRequest);
+            return Ok(response);
         }
 
-        [HttpPut("{recipeId:guid}")]
-        public async Task<IActionResult> Update(Guid recipeId, [FromBody] UpdateCommentRequest request)
+        [HttpPut("{recipeId:guid}/{commentId:guid}")]
+        public async Task<IActionResult> Update(Guid recipeId, Guid commentId, [FromBody] UpdateCommentRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.UpdateCommentRequest>(request);
 
-            await _commentService.UpdateAsync(userId, recipeId, appRequest);
-            return Ok("Bình luận chỉnh sửa thành công");
+            var response = await _commentService.UpdateAsync(userId, recipeId, commentId, appRequest);
+            return Ok(response);
         }
 
 

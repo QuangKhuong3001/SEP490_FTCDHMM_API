@@ -19,21 +19,28 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             await _hubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentAdded.Value, comment);
         }
+
+        public async Task SendCommentUpdatedAsync(Guid recipeId, object comment)
+        {
+            await _hubContext.Clients.Group($"recipe-{recipeId}")
+                .SendAsync(HubEvent.CommentUpdated.Value, comment);
+        }
+
         public async Task SendCommentDeletedAsync(Guid recipeId, Guid commentId)
         {
             await _hubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentDeleted.Value, commentId);
         }
-        public async Task SendRatingUpdateAsync(Guid recipeId, object raiting)
+        public async Task SendRatingUpdateAsync(Guid recipeId, object rating)
         {
             await _hubContext.Clients.Group($"recipe-{recipeId}")
-                .SendAsync(HubEvent.RatingUpdated.Value, raiting);
+                .SendAsync(HubEvent.RatingUpdated.Value, rating);
         }
 
-        public async Task SendRatingDeletedAsync(Guid recipeId, Guid raitingId)
+        public async Task SendRatingDeletedAsync(Guid recipeId, Guid ratingId)
         {
             await _hubContext.Clients.Group($"recipe-{recipeId}")
-                .SendAsync(HubEvent.RatingDeleted.Value, raitingId);
+                .SendAsync(HubEvent.RatingDeleted.Value, ratingId);
         }
 
         public async Task SendNotificationAsync(Guid userId, object notification)

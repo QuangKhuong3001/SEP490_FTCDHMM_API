@@ -35,11 +35,11 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             });
         }
 
-        [HttpDelete("{recipeId:guid}")]
-        public async Task<IActionResult> Delete(Guid recipeId)
+        [HttpDelete("{ratingId:guid}")]
+        public async Task<IActionResult> Delete(Guid ratingId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _ratingService.Delete(userId, recipeId);
+            await _ratingService.Delete(userId, ratingId);
             return Ok(new
             {
                 Message = "Xoá đánh giá thành công"

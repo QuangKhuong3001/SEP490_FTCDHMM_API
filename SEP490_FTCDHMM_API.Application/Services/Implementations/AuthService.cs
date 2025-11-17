@@ -61,7 +61,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                PhoneNumber = dto.PhoneNumber,
                 RoleId = customerRole!.Id,
                 Gender = Gender.From(dto.Gender),
                 DateOfBirth = dto.DateOfBirth
@@ -93,7 +92,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Xác Thực tài khoản FitFood Tracker");
 
             return (true, Array.Empty<string>());
         }
@@ -209,14 +208,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 var emailTemplateType = EmailTemplateType.VerifyAccountEmail;
                 var htmlBody = await _emailTemplateService.RenderTemplateAsync(emailTemplateType, placeholders);
-                await _mailService.SendEmailAsync(dto.Email, htmlBody);
+                await _mailService.SendEmailAsync(dto.Email, htmlBody, "Xác thực tài khoản FitFood Tracker");
 
             }
             else if (purpose == OtpPurpose.ForgotPassword)
             {
                 var emailTemplateType = EmailTemplateType.ForgotPassword;
                 var htmlBody = await _emailTemplateService.RenderTemplateAsync(emailTemplateType, placeholders);
-                await _mailService.SendEmailAsync(dto.Email, htmlBody);
+                await _mailService.SendEmailAsync(dto.Email, htmlBody, "Đặt lại mật khẩu tài khoản FitFood Tracker");
 
             }
 
@@ -254,7 +253,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ForgotPassword, placeholders);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Đặt lại mật khẩu tài khoản FitFood Tracker");
         }
 
         public async Task<string> VerifyOtpForPasswordReset(VerifyOtpForPasswordResetRequest dto)

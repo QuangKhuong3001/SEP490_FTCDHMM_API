@@ -21,7 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task UnsaveRecipe(Guid userId, Guid recipeId);
         Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, PaginationParams paginationParams);
         Task<double> GetAverageScore(Guid recipeId);
-        Task<PagedResult<RatingResponse>> GetRaiting(Guid recipeId, PaginationParams request);
+        Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, PaginationParams request);
         Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, PaginationParams request);
     }
 }

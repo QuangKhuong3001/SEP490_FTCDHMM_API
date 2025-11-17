@@ -159,12 +159,12 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{recipeId:guid}/raiting")]
+        [HttpGet("{recipeId:guid}/rating")]
         public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] PaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
 
-            var result = await _recipeService.GetRaiting(recipeId, appRequest);
+            var result = await _recipeService.GetRating(recipeId, appRequest);
             return Ok(result);
         }
 

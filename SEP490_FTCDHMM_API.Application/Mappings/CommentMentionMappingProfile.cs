@@ -9,8 +9,10 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
         public CommentMentionMappingProfile()
         {
             CreateMap<CommentMention, MentionedUserResponse>()
-                    .ForMember(dest => dest.UserName,
-                        opt => opt.MapFrom(src => src.MentionedUser.UserName));
+                    .ForMember(dest => dest.FirstName,
+                        opt => opt.MapFrom(src => src.MentionedUser.FirstName))
+                    .ForMember(dest => dest.LastName,
+                        opt => opt.MapFrom(src => src.MentionedUser.LastName));
         }
     }
 }
