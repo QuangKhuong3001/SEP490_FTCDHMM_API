@@ -9,7 +9,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public NutrientTargetMappingProfile()
         {
             //nutrient
-            CreateMap<APIDtos.NutrientTargetDtos.NutrientTargetRequest, ApplicationDtos.NutrientTargetDtos.NutrientTargetRequest>();
+            CreateMap<APIDtos.NutrientDtos.NutrientTarget.NutrientTargetRequest, ApplicationDtos.NutrientDtos.NutrientTarget.NutrientTargetRequest>();
         }
     }
 }

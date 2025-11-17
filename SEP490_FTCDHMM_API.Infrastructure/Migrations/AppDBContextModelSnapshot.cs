@@ -960,6 +960,132 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.ToTable("CustomHealthGoalTargets", (string)null);
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DraftRecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Instruction")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("StepOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DraftRecipeId");
+
+                    b.ToTable("DraftCookingSteps", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStepImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DraftCookingStepId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ImageOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DraftCookingStepId");
+
+                    b.HasIndex("ImageId");
+
+                    b.ToTable("DraftCookingStepImages", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CookTime")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Difficulty")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid?>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Ration")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId")
+                        .IsUnique();
+
+                    b.HasIndex("ImageId");
+
+                    b.ToTable("DraftRecipes", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipeIngredient", b =>
+                {
+                    b.Property<Guid>("DraftRecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("QuantityGram")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.HasKey("DraftRecipeId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("DraftRecipeIngredients", (string)null);
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipeUserTag", b =>
+                {
+                    b.Property<Guid>("DraftRecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TaggedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("DraftRecipeId", "TaggedUserId");
+
+                    b.HasIndex("TaggedUserId");
+
+                    b.ToTable("DraftRecipeUserTags", (string)null);
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.EmailOtp", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1108,6 +1234,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1126,7 +1255,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 13, 21, 2, 30, 888, DateTimeKind.Utc).AddTicks(8569),
+                            CreatedAtUTC = new DateTime(2025, 11, 17, 4, 56, 39, 331, DateTimeKind.Utc).AddTicks(246),
+                            IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
                 });
@@ -1309,6 +1439,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid?>("DraftRecipeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1318,6 +1451,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DraftRecipeId");
 
                     b.ToTable("Labels", (string)null);
 
@@ -2526,6 +2661,92 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Nutrient");
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStep", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "DraftRecipe")
+                        .WithMany("DraftCookingSteps")
+                        .HasForeignKey("DraftRecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DraftRecipe");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStepImage", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStep", "DraftCookingStep")
+                        .WithMany("DraftCookingStepImages")
+                        .HasForeignKey("DraftCookingStepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DraftCookingStep");
+
+                    b.Navigation("Image");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "Author")
+                        .WithOne()
+                        .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Image");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipeIngredient", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "DraftRecipe")
+                        .WithMany("DraftRecipeIngredients")
+                        .HasForeignKey("DraftRecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DraftRecipe");
+
+                    b.Navigation("Ingredient");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipeUserTag", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "DraftRecipe")
+                        .WithMany("DraftRecipeUserTags")
+                        .HasForeignKey("DraftRecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "TaggedUser")
+                        .WithMany()
+                        .HasForeignKey("TaggedUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("DraftRecipe");
+
+                    b.Navigation("TaggedUser");
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.EmailOtp", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "SentTo")
@@ -2613,6 +2834,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Nutrient");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Label", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", null)
+                        .WithMany("Labels")
+                        .HasForeignKey("DraftRecipeId");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Nutrient", b =>
@@ -2901,6 +3129,22 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", b =>
                 {
                     b.Navigation("Targets");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftCookingStep", b =>
+                {
+                    b.Navigation("DraftCookingStepImages");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", b =>
+                {
+                    b.Navigation("DraftCookingSteps");
+
+                    b.Navigation("DraftRecipeIngredients");
+
+                    b.Navigation("DraftRecipeUserTags");
+
+                    b.Navigation("Labels");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", b =>
