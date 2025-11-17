@@ -1,4 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.IngredientDetectionDtos;
+﻿using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.IngredientDetection;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;

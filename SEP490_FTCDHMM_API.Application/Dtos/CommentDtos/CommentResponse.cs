@@ -1,4 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.CommentMentionDtos;
+﻿using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos.CommentMention;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.CommentDtos
 {

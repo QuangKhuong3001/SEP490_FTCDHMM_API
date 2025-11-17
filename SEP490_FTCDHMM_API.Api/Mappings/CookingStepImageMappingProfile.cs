@@ -9,7 +9,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
     {
         public CookingStepImageMappingProfile()
         {
-            CreateMap<APIDtos.CookingStepImageDtos.CookingStepImageRequest, ApplicationDtos.CookingStepImageDtos.CookingStepImageRequest>()
+            CreateMap<APIDtos.RecipeDtos.CookingStep.CookingStepImage.CookingStepImageRequest, ApplicationDtos.RecipeDtos.CookingStep.CookingStepImage.CookingStepImageRequest>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src =>
                     new FileUploadModel
                     {

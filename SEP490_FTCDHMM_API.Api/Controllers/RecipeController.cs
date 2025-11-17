@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.Common;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
-using SEP490_FTCDHMM_API.Api.Dtos.UserFavoriteRecipeDtos;
-using SEP490_FTCDHMM_API.Api.Dtos.UserSaveRecipeDtos;
+using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
+using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
@@ -80,7 +80,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var appFilter = _mapper.Map<ApplicationDtos.UserFavoriteRecipeDtos.FavoriteRecipeFilterRequest>(filter);
+            var appFilter = _mapper.Map<ApplicationDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest>(filter);
             var result = await _recipeService.GetFavoriteList(userId, appFilter);
             return Ok(result);
         }
@@ -108,7 +108,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var appFilter = _mapper.Map<ApplicationDtos.UserSaveRecipeDtos.SaveRecipeFilterRequest>(filter);
+            var appFilter = _mapper.Map<ApplicationDtos.RecipeDtos.UserSaveRecipe.SaveRecipeFilterRequest>(filter);
             var result = await _recipeService.GetSavedList(userId, appFilter);
             return Ok(result);
         }

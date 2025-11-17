@@ -17,7 +17,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<APIDtos.IngredientDtos.IngredientFilterRequest, ApplicationDtos.IngredientDtos.IngredientFilterRequest>();
 
             //detection
-            CreateMap<APIDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest, ApplicationDtos.IngredientDetectionDtos.IngredientDetectionUploadRequest>();
+            CreateMap<APIDtos.IngredientDtos.IngredientDetection.IngredientDetectionUploadRequest, ApplicationDtos.IngredientDtos.IngredientDetection.IngredientDetectionUploadRequest>();
         }
     }
 }

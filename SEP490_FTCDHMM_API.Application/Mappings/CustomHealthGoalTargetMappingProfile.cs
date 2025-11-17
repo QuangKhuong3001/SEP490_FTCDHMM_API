@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.NutrientTargetDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings

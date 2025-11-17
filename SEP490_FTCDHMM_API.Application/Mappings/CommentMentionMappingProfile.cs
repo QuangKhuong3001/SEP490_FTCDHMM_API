@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.CommentMentionDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos.CommentMention;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings

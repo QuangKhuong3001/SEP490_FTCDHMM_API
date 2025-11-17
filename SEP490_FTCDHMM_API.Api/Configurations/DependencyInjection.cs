@@ -249,6 +249,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //cookingstep
             services.AddScoped<ICookingStepRepository, CookingStepRepository>();
 
+            //image
+            services.AddScoped<IImageRepository, ImageRepository>();
+
             //ingredientDetection
             services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
             //comment rating
@@ -297,6 +300,15 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //recipeUserTag
             services.AddScoped<IRecipeUserTagRepository, RecipeUserTagRepository>();
+
+            //draftRecipe
+            services.AddScoped<IDraftRecipeUserTagRepository, DraftRecipeUserTagRepository>();
+            services.AddScoped<IDraftRecipeIngredientRepository, DraftRecipeIngredientRepository>();
+            services.AddScoped<IDraftCookingStepRepository, DraftCookingStepRepository>();
+            services.AddScoped<IDraftCookingStepImageRepository, DraftCookingStepImageRepository>();
+            services.AddScoped<IDraftRecipeRepository, DraftRecipeRepository>();
+
+            services.AddScoped<IDraftRecipeService, DraftRecipeService>();
 
         }
     }

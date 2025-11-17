@@ -1,8 +1,8 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
-using SEP490_FTCDHMM_API.Application.Dtos.UserFavoriteRecipeDtos;
-using SEP490_FTCDHMM_API.Application.Dtos.UserSaveRecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserFavoriteRecipe;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {

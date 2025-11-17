@@ -79,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 CreatedAtUTC = DateTime.UtcNow
             };
 
-            _dbContext.Images.Add(image);
+            await _dbContext.Images.AddAsync(image);
             await _dbContext.SaveChangesAsync();
 
             return image;
