@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Identity;
+using SEP490_FTCDHMM_API.Application.Common.Helpers;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
@@ -55,9 +56,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);
 
+            var username = UsernameHelper.ExtractUserName(dto.Email);
+
             var user = new AppUser
             {
-                UserName = dto.Email,
+                UserName = username,
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
