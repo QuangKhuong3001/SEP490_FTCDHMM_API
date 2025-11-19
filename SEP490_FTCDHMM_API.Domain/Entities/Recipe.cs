@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
-        public string? Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public required Guid AuthorId { get; set; }
         public AppUser Author { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

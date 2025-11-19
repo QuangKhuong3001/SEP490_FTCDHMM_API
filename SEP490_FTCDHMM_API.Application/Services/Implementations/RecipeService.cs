@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using SEP490_FTCDHMM_API.Application.Common.Constants;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
@@ -71,6 +73,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreatRecipe(Guid userId, CreateRecipeRequest request)
         {
+            var description = request.Description;
+            if (description.IsNullOrEmpty())
+            {
+                description = DefaultValues.DEFAULT_RECIPE_DESCRIPTION;
+            }
+
             var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
             if (draftExist != null)
             {
@@ -122,7 +130,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
-                Description = request.Description,
+                Description = description!,
                 AuthorId = userId,
                 Difficulty = DifficultyValue.From(request.Difficulty),
                 CookTime = request.CookTime,
@@ -223,6 +231,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateRecipe(Guid userId, Guid recipeId, UpdateRecipeRequest request)
         {
+            var description = request.Description;
+            if (description.IsNullOrEmpty())
+            {
+                description = DefaultValues.DEFAULT_RECIPE_DESCRIPTION;
+            }
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);

@@ -18,7 +18,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasMaxLength(200);
 
             builder.Property(r => r.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(2000)
+                .IsRequired();
 
             builder.Property(r => r.CreatedAtUtc)
                 .HasDefaultValueSql("GETUTCDATE()");
