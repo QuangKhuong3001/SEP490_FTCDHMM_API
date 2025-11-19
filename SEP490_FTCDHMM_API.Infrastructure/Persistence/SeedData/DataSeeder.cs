@@ -45,7 +45,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
                     Email = adminConfig.Email,
                     FirstName = adminConfig.FirstName,
                     LastName = adminConfig.LastName,
-                    Gender = Gender.Other,
+                    Gender = Gender.Male,
                     EmailConfirmed = true,
                     RoleId = adminRole.Id
                 };

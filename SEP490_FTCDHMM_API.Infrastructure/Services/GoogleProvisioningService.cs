@@ -35,14 +35,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             var lastName = req.UserInfo?.FamilyName ?? p.FamilyName ?? p.Name?.Split(' ').LastOrDefault() ?? "";
             var picture = req.UserInfo?.PictureUrl ?? p.PictureUrl;
 
-            Gender gender = Gender.Other;
+            Gender gender = Gender.Male;
             if (!string.IsNullOrWhiteSpace(req.UserInfo?.Gender))
             {
                 gender = req.UserInfo.Gender.ToLower() switch
                 {
                     "male" => Gender.Male,
                     "female" => Gender.Female,
-                    _ => Gender.Other
+                    _ => Gender.Male
                 };
             }
 

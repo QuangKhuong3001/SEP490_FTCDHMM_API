@@ -38,8 +38,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
-            var response = await _commentService.CreateAsync(userId, recipeId, appRequest);
-            return Ok(response);
+            await _commentService.CreateAsync(userId, recipeId, appRequest);
+            return Ok();
         }
 
         [HttpPut("{recipeId:guid}/{commentId:guid}")]
@@ -48,8 +48,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.UpdateCommentRequest>(request);
 
-            var response = await _commentService.UpdateAsync(userId, recipeId, commentId, appRequest);
-            return Ok(response);
+            await _commentService.UpdateAsync(userId, recipeId, commentId, appRequest);
+            return Ok();
         }
 
 

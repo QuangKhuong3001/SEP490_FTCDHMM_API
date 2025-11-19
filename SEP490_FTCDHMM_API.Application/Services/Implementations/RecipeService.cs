@@ -654,7 +654,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userSaveRecipeRepository.DeleteAsync(exist.First());
         }
 
-        public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, PaginationParams paginationParams)
+        public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, RecipePaginationParams paginationParams)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
@@ -690,6 +690,42 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
+        public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserName(string userName, RecipePaginationParams paginationParams)
+        {
+            var user = await _userRepository.GetLatestAsync(u => u.UserName == userName);
+            if (user == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            Func<IQueryable<Recipe>, IQueryable<Recipe>>? include = q =>
+                 q.Include(r => r.Image)
+                .Include(r => r.Labels)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.RecipeUserTags)
+                    .ThenInclude(cs => cs.TaggedUser)
+                .Include(r => r.CookingSteps)
+                    .ThenInclude(cs => cs.CookingStepImages)
+                        .ThenInclude(cs => cs.Image);
+
+            var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                pageNumber: paginationParams.PageNumber,
+                pageSize: paginationParams.PageSize,
+                filter: f => !f.IsDeleted && f.AuthorId == user.Id,
+                orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
+                include: include
+            );
+
+            var result = _mapper.Map<IReadOnlyList<MyRecipeResponse>>(items);
+
+            return new PagedResult<MyRecipeResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = paginationParams.PageNumber,
+                PageSize = paginationParams.PageSize
+            };
+        }
+
         public async Task<double> GetAverageScore(Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
@@ -699,7 +735,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return recipe.Rating;
         }
 
-        public async Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, PaginationParams request)
+        public async Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
@@ -733,7 +769,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, PaginationParams request)
+        public async Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, RecipePaginationParams request)
         {
             var user = await _userRepository.GetByIdAsync(
                 id: userId,

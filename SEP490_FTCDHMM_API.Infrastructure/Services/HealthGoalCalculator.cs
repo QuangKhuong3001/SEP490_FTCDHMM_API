@@ -1,7 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
@@ -11,9 +10,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
         {
             double bmr;
             Gender gender = Gender.From(request.Gender);
-
-            if (gender == Gender.Other)
-                throw new AppException(AppResponseCode.MISSING_GENDER);
 
             if (gender.Equals(Gender.Male))
             {

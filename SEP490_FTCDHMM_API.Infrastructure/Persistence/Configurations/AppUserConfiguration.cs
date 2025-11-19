@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                     g => g.Value,
                     v => Gender.From(v)
                 )
-                .HasDefaultValueSql("'OTHER'");
+                .HasDefaultValueSql("'MALE'");
 
             builder.Property(u => u.CreatedAtUtc)
                .HasDefaultValueSql("GETUTCDATE()");

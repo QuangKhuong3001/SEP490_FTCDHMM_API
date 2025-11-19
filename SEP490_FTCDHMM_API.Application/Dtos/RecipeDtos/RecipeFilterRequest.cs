@@ -1,6 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
-
-namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
+﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {
     public class RecipeFilterRequest
     {
@@ -11,6 +9,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public decimal? MaxCookTime { get; set; }
         public List<Guid> LabelIds { get; set; } = new List<Guid>();
         public List<Guid> IngredientIds { get; set; } = new List<Guid>();
-        public required PaginationParams PaginationParams { get; set; }
+        public required RecipePaginationParams PaginationParams { get; set; }
     }
 }

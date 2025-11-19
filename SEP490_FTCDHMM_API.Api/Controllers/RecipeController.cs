@@ -2,7 +2,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SEP490_FTCDHMM_API.Api.Dtos.Common;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
@@ -132,21 +131,21 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpGet("myRecipe")]
-        public async Task<IActionResult> GetMyRecipeList([FromQuery] PaginationParams request)
+        public async Task<IActionResult> GetMyRecipeList([FromQuery] RecipePaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
             var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
             return Ok(result);
         }
 
         [AllowAnonymous]
-        [HttpGet("user/{userId:guid}")]
-        public async Task<IActionResult> GetRecipesByUserId(Guid userId, [FromQuery] PaginationParams request)
+        [HttpGet("user/{userName}")]
+        public async Task<IActionResult> GetRecipesByUserId(string userName, [FromQuery] RecipePaginationParams request)
         {
-            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
-            var result = await _recipeService.GetRecipeByUserId(userId, appRequest);
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
+            var result = await _recipeService.GetRecipeByUserName(userName, appRequest);
             return Ok(result);
         }
 
@@ -160,21 +159,21 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet("{recipeId:guid}/rating")]
-        public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] PaginationParams request)
+        public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] RecipePaginationParams request)
         {
-            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
             var result = await _recipeService.GetRating(recipeId, appRequest);
             return Ok(result);
         }
 
         [HttpGet("history")]
-        public async Task<IActionResult> GetUserHistory([FromQuery] PaginationParams request)
+        public async Task<IActionResult> GetUserHistory([FromQuery] RecipePaginationParams request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
-            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
             var history = await _recipeService.GetHistory(userId, appRequest);
             return Ok(history);
