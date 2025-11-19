@@ -3,6 +3,6 @@
     public class RatingRequest
     {
         public int Score { get; set; }
-        public string Feedback { get; set; } = string.Empty;
+        public string? Feedback { get; set; } = string.Empty;
     }
 }

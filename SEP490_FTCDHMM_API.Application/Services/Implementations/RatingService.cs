@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -25,6 +26,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task AddOrUpdate(Guid userId, Guid recipeId, RatingRequest request)
         {
+            if (request.Score < 4 && request.Feedback.IsNullOrEmpty())
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Nhận xét là bắt buộc khi đánh giá từ 3 sao đổ xuống");
+
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
 
             if (recipe == null || recipe.IsDeleted)

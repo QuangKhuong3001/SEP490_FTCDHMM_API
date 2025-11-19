@@ -726,7 +726,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
-        qua
         public async Task<double> GetAverageScore(Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);

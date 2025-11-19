@@ -8,6 +8,6 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RatingDtos
         public int Score { get; set; }
 
         [StringLength(256, ErrorMessage = "Đánh giá không được vượt quá 256 ký tự.")]
-        public string Feedback { get; set; } = string.Empty;
+        public string? Feedback { get; set; }
     }
 }
