@@ -11,7 +11,7 @@
             decimal? bodyFatPercent = null)
         {
             //Cunningham
-            if (muscleMassKg.HasValue && bodyFatPercent.HasValue)
+            if (muscleMassKg.HasValue || bodyFatPercent.HasValue)
             {
                 decimal lbm;
                 if (muscleMassKg.HasValue)

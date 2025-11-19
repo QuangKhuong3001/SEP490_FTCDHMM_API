@@ -28,7 +28,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            var bmi = request.WeightKg / (decimal)Math.Pow((double)(request.HeightCm / 100), 2);
+            var bmi = request.WeightKg / (request.HeightCm / 100m * request.HeightCm / 100m);
 
             var age = AgeCalculator.Calculate(user.DateOfBirth);
 

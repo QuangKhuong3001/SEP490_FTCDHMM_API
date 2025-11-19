@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Common.Constants
+﻿namespace SEP490_FTCDHMM_API.Domain.Constants
 {
     public static class DefaultValues
     {

@@ -2,7 +2,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SEP490_FTCDHMM_API.Application.Common.Constants;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
@@ -12,6 +11,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -277,7 +277,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
             recipe.Name = request.Name;
-            recipe.Description = request.Description;
+            recipe.Description = description!;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
             recipe.CookTime = request.CookTime;
             recipe.Ration = request.Ration;

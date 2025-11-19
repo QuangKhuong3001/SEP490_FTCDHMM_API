@@ -9,6 +9,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 using SEP490_FTCDHMM_API.Shared.Utils;
@@ -50,6 +51,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<(bool Success, IEnumerable<string> Errors)> Register(RegisterDto dto)
         {
+            var age = AgeCalculator.Calculate(dto.DateOfBirth);
+            if (age < AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
+                throw new AppException(AppResponseCode.INVALID_ACTION, $"Tuổi phải nằm trong khoảng {AuthConstants.MIN_REGISTER_AGE} đến {AuthConstants.MAX_REGISTER_AGE} tuổi");
+
             var existing = await _userManager.FindByEmailAsync(dto.Email);
             if (existing != null)
                 throw new AppException(AppResponseCode.EXISTS);

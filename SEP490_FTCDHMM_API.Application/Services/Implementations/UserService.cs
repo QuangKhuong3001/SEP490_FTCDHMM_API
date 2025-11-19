@@ -9,6 +9,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 using SEP490_FTCDHMM_API.Shared.Utils;
@@ -298,6 +299,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto)
         {
+            var age = AgeCalculator.Calculate(dto.DateOfBirth);
+            if (age < AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
+                throw new AppException(AppResponseCode.INVALID_ACTION, $"Tuổi phải nằm trong khoảng {AuthConstants.MIN_REGISTER_AGE} đến {AuthConstants.MAX_REGISTER_AGE} tuổi");
+
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
