@@ -19,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<APIDtos.RecipeDtos.RecipeFilterRequest, ApplicationDtos.RecipeDtos.RecipeFilterRequest>();
             CreateMap<APIDtos.RecipeDtos.UpdateRecipeRequest, ApplicationDtos.RecipeDtos.UpdateRecipeRequest>();
             CreateMap<APIDtos.RecipeDtos.RecipeIngredientRequest, RecipeIngredientRequest>();
+            CreateMap<APIDtos.RecipeDtos.RecipePaginationParams, ApplicationDtos.RecipeDtos.RecipePaginationParams>();
         }
     }
 }
