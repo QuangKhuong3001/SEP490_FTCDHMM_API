@@ -20,17 +20,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IRoleRepository _roleRepository;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
         private readonly IJwtAuthService _jwtService;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IGoogleProvisioningService _googleProvisioningService;
+        private readonly IUserRepository _userRepository;
 
         public AuthService(UserManager<AppUser> userManager,
             IRoleRepository roleRepository,
-            SignInManager<AppUser> signInManager,
+            IUserRepository userRepository,
             IOtpRepository otpRepo,
             IMailService mailService,
             IJwtAuthService jwtService,
@@ -40,7 +40,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             _userManager = userManager;
             _roleRepository = roleRepository;
-            _signInManager = signInManager;
+            _userRepository = userRepository;
             _otpRepo = otpRepo;
             _mailService = mailService;
             _jwtService = jwtService;
@@ -61,11 +61,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);
 
-            var username = UsernameHelper.ExtractUserName(dto.Email);
+            var userName = UsernameHelper.ExtractUserName(dto.Email);
+
+            while (await _userRepository.ExistsAsync(u => u.UserName == userName))
+            {
+                userName = UsernameHelper.IncrementUserName(userName);
+            }
 
             var user = new AppUser
             {
-                UserName = username,
+                UserName = userName,
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,

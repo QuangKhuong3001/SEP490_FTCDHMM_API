@@ -13,5 +13,6 @@
         public bool IsFollowing { get; set; }
         public string? Address { get; set; }
         public string? Bio { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }
