@@ -740,16 +740,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
-        public async Task<double> GetAverageScore(Guid recipeId)
+        public async Task<RecipeRatingResponse> GetAverageScore(Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
-            return recipe.Rating;
+            var result = _mapper.Map<RecipeRatingResponse>(recipe);
+
+            return result;
         }
 
-        public async Task<PagedResult<RatingResponse>> GetRating(Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRating(Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
@@ -773,8 +775,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .ToList();
 
 
-            var result = _mapper.Map<IEnumerable<RatingResponse>>(pagedRatings);
-            return new PagedResult<RatingResponse>
+            var result = _mapper.Map<IEnumerable<RatingDetailsResponse>>(pagedRatings);
+            return new PagedResult<RatingDetailsResponse>
             {
                 Items = result,
                 TotalCount = totalCount,

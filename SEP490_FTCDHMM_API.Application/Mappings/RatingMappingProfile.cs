@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
     {
         public RatingMappingProfile()
         {
-            CreateMap<Rating, RatingResponse>()
+            CreateMap<Rating, RatingDetailsResponse>()
                 .ForMember(dest => dest.UserInteractionResponse,
                     opt => opt.MapFrom(src => src.User));
         }

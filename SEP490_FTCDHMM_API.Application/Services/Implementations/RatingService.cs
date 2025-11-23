@@ -64,10 +64,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var avg = allRatings.Average(r => r.Score);
 
             recipe.Rating = avg;
+            recipe.NumberOfRatings = allRatings.Count;
 
             await _recipeRepository.UpdateAsync(recipe);
 
-            var ratingResponse = _mapper.Map<RatingResponse>(existingRating);
+            var ratingResponse = _mapper.Map<RatingDetailsResponse>(existingRating);
             await _notifier.SendRatingUpdateAsync(recipeId, ratingResponse);
         }
 

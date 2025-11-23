@@ -18,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public Image? Image { get; set; }
         public decimal? Calories { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public int NumberOfRatings { get; set; } = 0;
         public double Rating { get; set; } = 0;
 
         public ICollection<CookingStep> CookingSteps { get; set; } = new List<CookingStep>();
