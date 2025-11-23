@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Thời gian mục tiêu không hợp lệ");
 
             var goalExist = await _healthGoalRepopository.ExistsAsync(u => u.Id == targetId);
-            var customExist = await _healthGoalRepopository.ExistsAsync(u => u.Id == targetId);
+            var customExist = await _customHealthGoalRepository.ExistsAsync(u => u.Id == targetId);
             if (!goalExist && !customExist)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
