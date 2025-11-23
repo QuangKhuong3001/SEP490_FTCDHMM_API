@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.CustomHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
-using SEP490_FTCDHMM_API.Domain.Constants;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
@@ -35,18 +34,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             await _customHealthGoalService.CreateAsync(userId, appRequest);
             return Ok();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetMyGoals()
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-                return BadRequest();
-
-            var result = await _customHealthGoalService.GetMyGoalsAsync(userId);
-            return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
@@ -86,31 +73,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
                 return BadRequest();
 
             await _customHealthGoalService.DeleteAsync(userId, id);
-            return Ok();
-        }
-
-        [HttpPut("{id:guid}/active")]
-        public async Task<IActionResult> Active(Guid id)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-                return BadRequest();
-
-            await _customHealthGoalService.ActiveAsync(userId, id);
-            return Ok();
-        }
-
-        [Authorize(Policy = PermissionPolicies.HealthGoal_Delete)]
-        [HttpPut("{id:guid}/de-active")]
-        public async Task<IActionResult> DeActive(Guid id)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-                return BadRequest();
-
-            await _customHealthGoalService.DeActiveAsync(userId, id);
             return Ok();
         }
     }

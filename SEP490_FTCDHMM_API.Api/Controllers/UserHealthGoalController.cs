@@ -2,7 +2,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SEP490_FTCDHMM_API.Api.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
@@ -21,14 +23,16 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost("{goalId:guid}")]
-        public async Task<IActionResult> SetGoal(Guid goalId)
+        public async Task<IActionResult> SetGoal(Guid goalId, UserHealthGoalRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthGoalService.SetGoalAsync(userId, goalId);
+            var appRequest = _mapper.Map<ApplicationDtos.UserHealthGoalDtos.UserHealthGoalRequest>(request);
+
+            await _userHealthGoalService.SetGoalAsync(userId, goalId, appRequest);
             return Ok();
         }
 
@@ -43,6 +47,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var result = await _userHealthGoalService.GetCurrentGoalAsync(userId);
             return Ok(result);
         }
+
+
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> RemoveFromCurrent(Guid id)

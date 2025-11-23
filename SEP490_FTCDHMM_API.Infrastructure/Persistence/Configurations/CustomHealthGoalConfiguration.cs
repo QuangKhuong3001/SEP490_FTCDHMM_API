@@ -19,22 +19,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(x => x.Description)
                 .HasMaxLength(500);
 
-            builder.Property(x => x.CreatedAtUtc)
-                .HasColumnType("datetime2")
-                .HasDefaultValueSql("GETUTCDATE()");
-
             builder.HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(x => x.Targets)
                 .WithOne(x => x.CustomHealthGoal)
                 .HasForeignKey(x => x.CustomHealthGoalId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Property(e => e.IsActive)
-                   .HasDefaultValue(true);
         }
     }
 }

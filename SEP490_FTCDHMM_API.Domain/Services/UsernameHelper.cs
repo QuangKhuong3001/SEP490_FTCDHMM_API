@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Common.Helpers
+﻿namespace SEP490_FTCDHMM_API.Domain.Services
 {
     public static class UsernameHelper
     {

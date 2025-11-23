@@ -285,7 +285,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
 
             //healthgoalconflict
-            services.AddScoped<IHealthGoalConflictRepository, HealthGoalConflictRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();

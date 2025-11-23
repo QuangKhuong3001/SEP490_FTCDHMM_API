@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -37,20 +36,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IngredientCategories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Labels",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ColorCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Labels", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,29 +77,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HealthGoalConflicts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HealthGoalAId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HealthGoalBId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HealthGoalConflicts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HealthGoalConflicts_HealthGoals_HealthGoalAId",
-                        column: x => x.HealthGoalAId,
-                        principalTable: "HealthGoals",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_HealthGoalConflicts_HealthGoals_HealthGoalBId",
-                        column: x => x.HealthGoalBId,
-                        principalTable: "HealthGoals",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -279,6 +241,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CommentMentions",
+                columns: table => new
+                {
+                    CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MentionedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommentMentions", x => new { x.CommentId, x.MentionedUserId });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -300,12 +274,25 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CookingStepImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CookingStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CookingStepImages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CookingSteps",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Instruction = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Instruction = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     StepOrder = table.Column<int>(type: "int", nullable: false),
                     RecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -321,9 +308,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -362,6 +347,104 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DraftCookingStepImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DraftCookingStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftCookingStepImages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DraftCookingSteps",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Instruction = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    StepOrder = table.Column<int>(type: "int", nullable: false),
+                    DraftRecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftCookingSteps", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DraftRecipeIngredients",
+                columns: table => new
+                {
+                    DraftRecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IngredientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuantityGram = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftRecipeIngredients", x => new { x.DraftRecipeId, x.IngredientId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DraftRecipes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    Difficulty = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CookTime = table.Column<int>(type: "int", nullable: false),
+                    Ration = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftRecipes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Labels",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ColorCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DraftRecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Labels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Labels_DraftRecipes_DraftRecipeId",
+                        column: x => x.DraftRecipeId,
+                        principalTable: "DraftRecipes",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DraftRecipeUserTags",
+                columns: table => new
+                {
+                    DraftRecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TaggedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftRecipeUserTags", x => new { x.DraftRecipeId, x.TaggedUserId });
+                    table.ForeignKey(
+                        name: "FK_DraftRecipeUserTags_DraftRecipes_DraftRecipeId",
+                        column: x => x.DraftRecipeId,
+                        principalTable: "DraftRecipes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmailOtps",
                 columns: table => new
                 {
@@ -386,7 +469,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Key = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAtUTC = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UploadedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -427,9 +511,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'OTHER'"),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'MALE'"),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     ActivityLevel = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'MODERATE'"),
+                    Address = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Bio = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    LockReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AvatarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -518,7 +605,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     Difficulty = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -527,7 +614,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Ration = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Calories = table.Column<decimal>(type: "decimal(10,3)", nullable: true),
-                    isDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Rating = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0)
                 },
                 constraints: table =>
                 {
@@ -574,24 +662,30 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CustomHealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ExpiredAtUtc = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserHealthGoals", x => new { x.UserId, x.HealthGoalId });
+                    table.PrimaryKey("PK_UserHealthGoals", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserHealthGoals_CustomHealthGoals_CustomHealthGoalId",
+                        column: x => x.CustomHealthGoalId,
+                        principalTable: "CustomHealthGoals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserHealthGoals_HealthGoals_HealthGoalId",
                         column: x => x.HealthGoalId,
                         principalTable: "HealthGoals",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserHealthGoals_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -665,7 +759,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Score = table.Column<int>(type: "int", nullable: false),
-                    Feedback = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Feedback = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -762,6 +856,36 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RecipeUserTags",
+                columns: table => new
+                {
+                    RecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TaggedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RecipeId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipeUserTags", x => new { x.RecipeId, x.TaggedUserId });
+                    table.ForeignKey(
+                        name: "FK_RecipeUserTags_Recipes_RecipeId",
+                        column: x => x.RecipeId,
+                        principalTable: "Recipes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RecipeUserTags_Recipes_RecipeId1",
+                        column: x => x.RecipeId1,
+                        principalTable: "Recipes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RecipeUserTags_Users_TaggedUserId",
+                        column: x => x.TaggedUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserFavoriteRecipes",
                 columns: table => new
                 {
@@ -837,6 +961,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Images",
+                columns: new[] { "Id", "ContentType", "CreatedAtUTC", "IsDeleted", "Key", "UploadedById" },
+                values: new object[] { new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"), "image/png", new DateTime(2025, 11, 23, 7, 45, 11, 793, DateTimeKind.Utc).AddTicks(1674), false, "images/default/no-image.png", null });
+
+            migrationBuilder.InsertData(
                 table: "IngredientCategories",
                 columns: new[] { "Id", "Name", "isDeleted" },
                 values: new object[,]
@@ -852,6 +981,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("bcfbe809-1ee1-771d-e271-0f959bfd67f6"), "Đồ ngọt", false },
                     { new Guid("db5072d7-9bc0-6d4a-8d33-3b18239c40f6"), "Dầu mỡ", false },
                     { new Guid("e7f53468-c971-6d4d-7e56-1e50702495fd"), "Thịt", false }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Labels",
+                columns: new[] { "Id", "ColorCode", "DraftRecipeId", "IsDeleted", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("133554ee-b8bf-0518-a055-4097baea7b64"), "#2196F3", null, false, "Giàu đạm" },
+                    { new Guid("16a7239f-04ef-4ae8-3c3d-f7c91f625ade"), "#8BC34A", null, false, "Thuần chay" },
+                    { new Guid("19f3c506-46ad-f9be-3a10-63dc2ed6a57e"), "#FF9800", null, false, "Không gluten" },
+                    { new Guid("8443f632-4d26-96c3-6c99-cdb180c761f3"), "#CDDC39", null, false, "Chay" },
+                    { new Guid("b6cb3448-5f59-44b8-e69e-5a2e408ccd97"), "#FFC107", null, false, "Món nhanh" },
+                    { new Guid("c8f90ed8-cc93-7d51-8477-534ff99d0fd0"), "#00BCD4", null, false, "Ít béo" },
+                    { new Guid("d238ef58-09be-5176-f430-16cdbfc0032a"), "#795548", null, false, "Keto" },
+                    { new Guid("d5caeabc-0ca2-b778-f234-d5c084dd23cb"), "#9C27B0", null, false, "Ít tinh bột" },
+                    { new Guid("edae6e4e-e3a4-ccd4-a2d4-81edf652d3f4"), "#4CAF50", null, false, "Lành mạnh" },
+                    { new Guid("f4a0ea3a-98b1-3443-4739-f63803a841c8"), "#FF5722", null, false, "Phù hợp cho người tiểu đường" }
                 });
 
             migrationBuilder.InsertData(
@@ -1092,6 +1238,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CommentMentions_MentionedUserId",
+                table: "CommentMentions",
+                column: "MentionedUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ParentCommentId",
                 table: "Comments",
                 column: "ParentCommentId");
@@ -1107,8 +1258,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CookingSteps_ImageId",
-                table: "CookingSteps",
+                name: "IX_CookingStepImages_CookingStepId",
+                table: "CookingStepImages",
+                column: "CookingStepId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CookingStepImages_ImageId",
+                table: "CookingStepImages",
                 column: "ImageId");
 
             migrationBuilder.CreateIndex(
@@ -1132,20 +1288,45 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "NutrientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmailOtps_SentToId",
-                table: "EmailOtps",
-                column: "SentToId");
+                name: "IX_DraftCookingStepImages_DraftCookingStepId",
+                table: "DraftCookingStepImages",
+                column: "DraftCookingStepId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HealthGoalConflicts_HealthGoalAId_HealthGoalBId",
-                table: "HealthGoalConflicts",
-                columns: new[] { "HealthGoalAId", "HealthGoalBId" },
+                name: "IX_DraftCookingStepImages_ImageId",
+                table: "DraftCookingStepImages",
+                column: "ImageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DraftCookingSteps_DraftRecipeId",
+                table: "DraftCookingSteps",
+                column: "DraftRecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DraftRecipeIngredients_IngredientId",
+                table: "DraftRecipeIngredients",
+                column: "IngredientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DraftRecipes_AuthorId",
+                table: "DraftRecipes",
+                column: "AuthorId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_HealthGoalConflicts_HealthGoalBId",
-                table: "HealthGoalConflicts",
-                column: "HealthGoalBId");
+                name: "IX_DraftRecipes_ImageId",
+                table: "DraftRecipes",
+                column: "ImageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DraftRecipeUserTags_TaggedUserId",
+                table: "DraftRecipeUserTags",
+                column: "TaggedUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailOtps_SentToId",
+                table: "EmailOtps",
+                column: "SentToId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HealthGoalTargets_HealthGoalId",
@@ -1193,6 +1374,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 table: "Ingredients",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Labels_DraftRecipeId",
+                table: "Labels",
+                column: "DraftRecipeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Nutrients_UnitId",
@@ -1243,6 +1429,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 filter: "[ImageId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RecipeUserTags_RecipeId1",
+                table: "RecipeUserTags",
+                column: "RecipeId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecipeUserTags_TaggedUserId",
+                table: "RecipeUserTags",
+                column: "TaggedUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionActionId",
                 table: "RolePermissions",
                 column: "PermissionActionId");
@@ -1265,9 +1461,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "FolloweeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserHealthGoals_CustomHealthGoalId",
+                table: "UserHealthGoals",
+                column: "CustomHealthGoalId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserHealthGoals_HealthGoalId",
                 table: "UserHealthGoals",
                 column: "HealthGoalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserHealthGoals_UserId",
+                table: "UserHealthGoals",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserHealthMetrics_UserId",
@@ -1348,6 +1555,22 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_CommentMentions_Comments_CommentId",
+                table: "CommentMentions",
+                column: "CommentId",
+                principalTable: "Comments",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CommentMentions_Users_MentionedUserId",
+                table: "CommentMentions",
+                column: "MentionedUserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_Comments_Recipes_RecipeId",
                 table: "Comments",
                 column: "RecipeId",
@@ -1363,12 +1586,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_CookingSteps_Images_ImageId",
-                table: "CookingSteps",
+                name: "FK_CookingStepImages_CookingSteps_CookingStepId",
+                table: "CookingStepImages",
+                column: "CookingStepId",
+                principalTable: "CookingSteps",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CookingStepImages_Images_ImageId",
+                table: "CookingStepImages",
                 column: "ImageId",
                 principalTable: "Images",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CookingSteps_Recipes_RecipeId",
@@ -1383,8 +1614,70 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 table: "CustomHealthGoals",
                 column: "UserId",
                 principalTable: "Users",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftCookingStepImages_DraftCookingSteps_DraftCookingStepId",
+                table: "DraftCookingStepImages",
+                column: "DraftCookingStepId",
+                principalTable: "DraftCookingSteps",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftCookingStepImages_Images_ImageId",
+                table: "DraftCookingStepImages",
+                column: "ImageId",
+                principalTable: "Images",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftCookingSteps_DraftRecipes_DraftRecipeId",
+                table: "DraftCookingSteps",
+                column: "DraftRecipeId",
+                principalTable: "DraftRecipes",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftRecipeIngredients_DraftRecipes_DraftRecipeId",
+                table: "DraftRecipeIngredients",
+                column: "DraftRecipeId",
+                principalTable: "DraftRecipes",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftRecipeIngredients_Ingredients_IngredientId",
+                table: "DraftRecipeIngredients",
+                column: "IngredientId",
+                principalTable: "Ingredients",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftRecipes_Images_ImageId",
+                table: "DraftRecipes",
+                column: "ImageId",
+                principalTable: "Images",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftRecipes_Users_AuthorId",
+                table: "DraftRecipes",
+                column: "AuthorId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DraftRecipeUserTags_Users_TaggedUserId",
+                table: "DraftRecipeUserTags",
+                column: "TaggedUserId",
+                principalTable: "Users",
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_EmailOtps_Users_SentToId",
@@ -1427,19 +1720,25 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Comments");
+                name: "CommentMentions");
 
             migrationBuilder.DropTable(
-                name: "CookingSteps");
+                name: "CookingStepImages");
 
             migrationBuilder.DropTable(
                 name: "CustomHealthGoalTargets");
 
             migrationBuilder.DropTable(
-                name: "EmailOtps");
+                name: "DraftCookingStepImages");
 
             migrationBuilder.DropTable(
-                name: "HealthGoalConflicts");
+                name: "DraftRecipeIngredients");
+
+            migrationBuilder.DropTable(
+                name: "DraftRecipeUserTags");
+
+            migrationBuilder.DropTable(
+                name: "EmailOtps");
 
             migrationBuilder.DropTable(
                 name: "HealthGoalTargets");
@@ -1461,6 +1760,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "RecipeNutritionAggregates");
+
+            migrationBuilder.DropTable(
+                name: "RecipeUserTags");
 
             migrationBuilder.DropTable(
                 name: "RolePermissions");
@@ -1487,7 +1789,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "UserSaveRecipes");
 
             migrationBuilder.DropTable(
-                name: "CustomHealthGoals");
+                name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "CookingSteps");
+
+            migrationBuilder.DropTable(
+                name: "DraftCookingSteps");
 
             migrationBuilder.DropTable(
                 name: "Labels");
@@ -1497,6 +1805,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PermissionActions");
+
+            migrationBuilder.DropTable(
+                name: "CustomHealthGoals");
 
             migrationBuilder.DropTable(
                 name: "HealthGoals");
@@ -1509,6 +1820,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Recipes");
+
+            migrationBuilder.DropTable(
+                name: "DraftRecipes");
 
             migrationBuilder.DropTable(
                 name: "NutrientUnits");

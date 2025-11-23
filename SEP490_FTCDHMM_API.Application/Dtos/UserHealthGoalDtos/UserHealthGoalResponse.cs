@@ -2,9 +2,10 @@
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos
 {
-    public class HealthGoalResponse
+    public class UserHealthGoalResponse
     {
-        public Guid Id { get; set; }
+        public Guid? HealthGoalId { get; set; }
+        public Guid? CustomHealthGoalId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public List<NutrientTargetResponse> Targets { get; set; } = new();

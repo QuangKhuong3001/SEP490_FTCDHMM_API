@@ -9,5 +9,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<IEnumerable<HealthGoalResponse>> GetAllAsync();
         Task<HealthGoalResponse> GetByIdAsync(Guid id);
         Task DeleteAsync(Guid id);
+        Task<IEnumerable<UserHealthGoalResponse>> GetListGoalAsync(Guid userId);
+
     }
 }

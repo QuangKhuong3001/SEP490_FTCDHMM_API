@@ -81,7 +81,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
                 {
                     actionEntities.Add(new PermissionAction
                     {
-                        Id = DeterministicGuid($"{perm.Domain}:{perm.Action}"), // ✅ duy nhất
+                        Id = DeterministicGuid($"{perm.Domain}:{perm.Action}"),
                         Name = perm.Action,
                         PermissionDomainId = domainId
                     });
@@ -171,7 +171,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
             var g = DeterministicGuid("Unit:Gram");
             var mg = DeterministicGuid("Unit:Milligram");
             var µg = DeterministicGuid("Unit:Microgram");
-            var kcal = DeterministicGuid("Unit:Kilocalorie");
             var IU = DeterministicGuid("Unit:InternationalUnit");
 
             builder.Entity<Nutrient>().HasData(

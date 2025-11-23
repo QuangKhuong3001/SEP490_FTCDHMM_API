@@ -18,7 +18,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<DraftRecipe> DraftRecipes { get; set; } = null!;
         public DbSet<EmailOtp> EmailOtps { get; set; }
         public DbSet<HealthGoal> HealthGoals { get; set; } = null!;
-        public DbSet<HealthGoalConflict> HealthGoalConflicts { get; set; } = null!;
         public DbSet<HealthGoalTarget> HealthGoalTargets { get; set; } = null!;
         public DbSet<Image> Images { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }

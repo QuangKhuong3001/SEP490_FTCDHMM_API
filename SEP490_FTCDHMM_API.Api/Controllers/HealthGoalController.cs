@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.HealthGoalDtos;
@@ -64,6 +65,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             await _healthGoalService.DeleteAsync(id);
             return Ok();
+        }
+
+        [HttpGet("listGoal")]
+        public async Task<IActionResult> GetListGoal()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+
+            var result = await _healthGoalService.GetListGoalAsync(userId);
+            return Ok(result);
         }
     }
 }

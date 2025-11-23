@@ -12,8 +12,8 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251117045639_addIsDeletedToImage")]
-    partial class addIsDeletedToImage
+    [Migration("20251123074512_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -729,12 +729,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(max)")
-                        .HasDefaultValueSql("'OTHER'");
+                        .HasDefaultValueSql("'MALE'");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LockReason")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -888,19 +891,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1153,28 +1146,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.ToTable("HealthGoals", (string)null);
                 });
 
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalConflict", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HealthGoalAId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("HealthGoalBId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HealthGoalBId");
-
-                    b.HasIndex("HealthGoalAId", "HealthGoalBId")
-                        .IsUnique();
-
-                    b.ToTable("HealthGoalConflicts", (string)null);
-                });
-
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalTarget", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1258,7 +1229,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 17, 4, 56, 39, 331, DateTimeKind.Utc).AddTicks(246),
+                            CreatedAtUTC = new DateTime(2025, 11, 23, 7, 45, 11, 793, DateTimeKind.Utc).AddTicks(1674),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2111,7 +2082,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Feedback")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -2155,6 +2125,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
@@ -2345,17 +2316,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("HealthGoalId")
+                    b.Property<Guid?>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                    b.Property<DateTime?>("ExpiredAtUtc")
+                        .HasColumnType("date");
 
-                    b.HasKey("UserId", "HealthGoalId");
+                    b.Property<Guid?>("HealthGoalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("CustomHealthGoalId");
 
                     b.HasIndex("HealthGoalId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserHealthGoals", (string)null);
                 });
@@ -2639,7 +2616,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -2759,25 +2736,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("SentTo");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalConflict", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", "HealthGoalA")
-                        .WithMany()
-                        .HasForeignKey("HealthGoalAId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", "HealthGoalB")
-                        .WithMany()
-                        .HasForeignKey("HealthGoalBId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("HealthGoalA");
-
-                    b.Navigation("HealthGoalB");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoalTarget", b =>
@@ -3031,17 +2989,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", b =>
                 {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", "CustomHealthGoal")
+                        .WithMany()
+                        .HasForeignKey("CustomHealthGoalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", "HealthGoal")
                         .WithMany()
                         .HasForeignKey("HealthGoalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne()
+                        .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("CustomHealthGoal");
 
                     b.Navigation("HealthGoal");
 
