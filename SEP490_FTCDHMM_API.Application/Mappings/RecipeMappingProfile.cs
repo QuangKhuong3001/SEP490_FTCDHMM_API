@@ -65,7 +65,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     opt => opt.MapFrom(r => r.Ingredient.Name)
                 );
 
-            CreateMap<Recipe, RecipeRatingResponse>();
+            CreateMap<Recipe, RecipeRatingResponse>()
+                .ForMember(
+                    dest => dest.AverageRating,
+                    opt => opt.MapFrom(src => src.Rating)
+                );
         }
     }
 }

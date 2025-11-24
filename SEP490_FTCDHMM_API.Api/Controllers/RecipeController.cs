@@ -154,7 +154,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
             var avg = await _recipeService.GetAverageScore(recipeId);
-            return Ok(new { averageRating = avg });
+            return Ok(avg);
         }
 
         [AllowAnonymous]
