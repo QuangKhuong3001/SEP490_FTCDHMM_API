@@ -17,6 +17,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
 
             CreateMap<APIDtos.RecipeDtos.RecipeFilterRequest, ApplicationDtos.RecipeDtos.RecipeFilterRequest>();
+            CreateMap<APIDtos.RecipeDtos.RecipePaginationParams, ApplicationDtos.RecipeDtos.RecipePaginationParams>();
             CreateMap<APIDtos.RecipeDtos.UpdateRecipeRequest, ApplicationDtos.RecipeDtos.UpdateRecipeRequest>();
             CreateMap<APIDtos.RecipeDtos.RecipeIngredientRequest, RecipeIngredientRequest>();
         }
