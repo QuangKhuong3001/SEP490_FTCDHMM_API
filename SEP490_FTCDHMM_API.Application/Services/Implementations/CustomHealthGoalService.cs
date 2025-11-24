@@ -15,12 +15,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly ICustomHealthGoalRepository _customHealthGoalRepository;
         private readonly IMapper _mapper;
         private readonly INutrientRepository _nutrientRepository;
+        private readonly IUserHealthGoalRepository _userHealthGoalRepository;
 
-        public CustomHealthGoalService(ICustomHealthGoalRepository customHealthGoalRepository, IMapper mapper, INutrientRepository nutrientRepository)
+        public CustomHealthGoalService(ICustomHealthGoalRepository customHealthGoalRepository, IMapper mapper, INutrientRepository nutrientRepository, IUserHealthGoalRepository userHealthGoalRepository)
         {
             _customHealthGoalRepository = customHealthGoalRepository;
             _mapper = mapper;
             _nutrientRepository = nutrientRepository;
+            _userHealthGoalRepository = userHealthGoalRepository;
         }
 
         public async Task CreateAsync(Guid userId, CreateCustomHealthGoalRequest request)
@@ -92,6 +94,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
 
             await _customHealthGoalRepository.AddAsync(goal);
+
+            // Automatically set the newly created custom health goal as the user's current goal
+            var existingUserGoal = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
+            if (existingUserGoal != null)
+            {
+                await _userHealthGoalRepository.DeleteAsync(existingUserGoal);
+            }
+
+            var userHealthGoal = new UserHealthGoal
+            {
+                UserId = userId,
+                CustomHealthGoalId = goal.Id
+            };
+            await _userHealthGoalRepository.AddAsync(userHealthGoal);
         }
 
         public async Task UpdateAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request)
