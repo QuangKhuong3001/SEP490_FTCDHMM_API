@@ -17,6 +17,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         public async Task<UserHealthGoal?> GetActiveGoalByUserIdAsync(Guid userId)
         {
             return await _dbContext.UserHealthGoals
+                .Include(u => u.HealthGoal)
+                    .ThenInclude(hg => hg!.Targets)
+                        .ThenInclude(t => t.Nutrient)
+                .Include(u => u.CustomHealthGoal)
+                    .ThenInclude(chg => chg!.Targets)
+                        .ThenInclude(t => t.Nutrient)
                 .Where(u => u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow)
                 .FirstOrDefaultAsync(uhg => uhg.UserId == userId);
         }
