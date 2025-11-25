@@ -153,7 +153,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("{recipeId:guid}/score")]
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
-            var avg = await _recipeService.GetAverageScore(recipeId);
+            var avg = await _recipeService.GetRecipeRating(recipeId);
             return Ok(new { averageRating = avg });
         }
 
@@ -163,7 +163,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
-            var result = await _recipeService.GetRating(recipeId, appRequest);
+            var result = await _recipeService.GetRatingDetails(recipeId, appRequest);
             return Ok(result);
         }
 

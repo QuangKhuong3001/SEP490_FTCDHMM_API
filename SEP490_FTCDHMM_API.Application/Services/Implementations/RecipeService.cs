@@ -740,7 +740,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
-        public async Task<RecipeRatingResponse> GetAverageScore(Guid recipeId)
+        public async Task<RecipeRatingResponse> GetRecipeRating(Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.IsDeleted)
@@ -751,7 +751,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<PagedResult<RatingDetailsResponse>> GetRating(Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetails(Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
