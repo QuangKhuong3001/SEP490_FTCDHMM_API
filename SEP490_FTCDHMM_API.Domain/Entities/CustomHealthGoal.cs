@@ -7,7 +7,7 @@
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public ICollection<CustomHealthGoalTarget> Targets { get; set; } = new List<CustomHealthGoalTarget>();
+        public ICollection<HealthGoalTarget> Targets { get; set; } = null!;
         public AppUser User { get; set; } = null!;
     }
 }

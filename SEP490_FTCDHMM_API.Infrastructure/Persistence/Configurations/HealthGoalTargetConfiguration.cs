@@ -12,24 +12,44 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.ToTable("HealthGoalTargets");
 
             builder.HasKey(x => x.Id);
-            builder.Property(e => e.TargetType)
-            .HasConversion(
-                p => p.Value,
-                v => NutrientTargetType.From(v)
-            )
-            .IsRequired()
-            .HasMaxLength(50);
 
-            builder.Property(x => x.MinValue).HasPrecision(18, 4);
-            builder.Property(x => x.MaxValue).HasPrecision(18, 4);
+            builder.HasOne(x => x.HealthGoal)
+                .WithMany(g => g.Targets)
+                .HasForeignKey(x => x.HealthGoalId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            builder.Property(x => x.MinEnergyPct).HasPrecision(6, 4);
-            builder.Property(x => x.MaxEnergyPct).HasPrecision(6, 4);
+            builder.HasOne(x => x.CustomHealthGoal)
+                .WithMany(g => g.Targets)
+                .HasForeignKey(x => x.CustomHealthGoalId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            builder.Property(x => x.Weight).HasPrecision(9, 3);
+            builder.HasOne(x => x.Nutrient)
+                .WithMany()
+                .HasForeignKey(x => x.NutrientId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(x => x.HealthGoal).WithMany(g => g.Targets).HasForeignKey(x => x.HealthGoalId);
-            builder.HasOne(x => x.Nutrient).WithMany().HasForeignKey(x => x.NutrientId);
+            builder.Property(u => u.TargetType)
+               .HasConversion(
+                   g => g.Value,
+                   v => NutrientTargetType.From(v)
+               )
+               .HasDefaultValueSql("'ABSOLUTE'");
+
+            builder.Property(x => x.MinValue)
+                .HasPrecision(10, 2);
+
+            builder.Property(x => x.MaxValue)
+                .HasPrecision(10, 2);
+
+            builder.Property(x => x.MinEnergyPct)
+                .HasPrecision(5, 2);
+
+            builder.Property(x => x.MaxEnergyPct)
+                .HasPrecision(5, 2);
+
+            builder.Property(x => x.Weight)
+                .HasPrecision(6, 2)
+                .IsRequired();
         }
     }
 }

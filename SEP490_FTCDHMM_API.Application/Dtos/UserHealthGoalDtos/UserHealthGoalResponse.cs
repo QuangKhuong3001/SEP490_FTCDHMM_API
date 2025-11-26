@@ -1,6 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 
-namespace SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos
+namespace SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos
 {
     public class UserHealthGoalResponse
     {

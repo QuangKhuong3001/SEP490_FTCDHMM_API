@@ -1,10 +1,10 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
-using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
+namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
 {
     public interface IRecipeService
     {

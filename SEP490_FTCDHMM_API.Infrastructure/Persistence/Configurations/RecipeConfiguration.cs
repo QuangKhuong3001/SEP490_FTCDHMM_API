@@ -33,19 +33,28 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.Ration)
                 .IsRequired();
 
-            builder.Property(r => r.Rating)
+            builder.Property(r => r.AvgRating)
                .IsRequired()
                .HasDefaultValue(0);
 
-            builder.Property(r => r.Difficulty)
+            builder.Property(r => r.ViewCount)
+               .IsRequired()
+               .HasDefaultValue(0);
+
+            builder.Property(r => r.RatingCount)
+               .IsRequired()
+               .HasDefaultValue(0);
+
+            builder.Property(u => u.Difficulty)
                 .HasConversion(
-                    v => v.Value,
-                    v => new DifficultyValue(v))
-                .IsRequired()
-                .HasMaxLength(50);
+                    g => g.Value,
+                    v => DifficultyValue.From(v)
+                )
+                .HasDefaultValueSql("'MEDIUM'");
 
             builder.Property(x => x.Calories)
-                .HasColumnType("decimal(10,3)");
+                .HasColumnType("decimal(10,3)")
+                .IsRequired();
 
             builder.HasOne(r => r.Author)
                 .WithMany()

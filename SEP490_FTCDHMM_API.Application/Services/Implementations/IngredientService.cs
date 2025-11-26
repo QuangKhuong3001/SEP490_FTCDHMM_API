@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.Nutrient;
 using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -24,6 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly INutrientRepository _nutrientRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IIngredientNutritionCalculator _ingredientNutritionCalculator;
         //private readonly ICacheService _cache;
 
         private readonly TimeSpan _ttl = TimeSpan.FromMinutes(10);
@@ -32,6 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public IngredientService(IIngredientRepository ingredientRepository,
             IIngredientCategoryRepository ingredientCategoryRepository,
             IS3ImageService s3ImageService,
+            IIngredientNutritionCalculator ingredientNutritionCalculator,
             INutrientRepository nutrientRepository,
             IMapper mapper, IUnitOfWork unitOfWork)
         //ICacheService cache)
@@ -40,6 +43,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _ingredientCategoryRepository = ingredientCategoryRepository;
             _s3ImageService = s3ImageService;
             _nutrientRepository = nutrientRepository;
+            _ingredientNutritionCalculator = ingredientNutritionCalculator;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             //_cache = cache;
@@ -147,8 +151,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 })
                 .ToList();
 
+            ingredient.Calories = _ingredientNutritionCalculator.CalculateCalories(
+                dto.Nutrients.Select(n => new NutrientValueInput
+                {
+                    NutrientId = n.NutrientId,
+                    Median = n.Median
+                })
+            );
+
             await _ingredientRepository.AddAsync(ingredient);
         }
+
         public async Task DeleteIngredient(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
@@ -251,6 +264,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     }
                 }
 
+                ingredient.Calories = _ingredientNutritionCalculator.CalculateCalories(
+                    dto.Nutrients.Select(n => new NutrientValueInput
+                    {
+                        NutrientId = n.NutrientId,
+                        Median = n.Median
+                    })
+                );
+
                 await _ingredientRepository.UpdateAsync(ingredient);
             });
         }
@@ -297,5 +318,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             return Enumerable.Empty<IngredientNameResponse>();
         }
+
     }
 }

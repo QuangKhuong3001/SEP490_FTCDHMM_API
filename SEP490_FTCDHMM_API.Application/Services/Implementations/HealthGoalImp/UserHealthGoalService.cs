@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Implementations
+namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
 {
     public class UserHealthGoalService : IUserHealthGoalService
     {
@@ -31,35 +31,50 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (request.ExpiredAtUtc != null && request.ExpiredAtUtc <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Thời gian mục tiêu không hợp lệ");
 
-            var goalExist = await _healthGoalRepopository.ExistsAsync(u => u.Id == targetId);
-            var customExist = await _customHealthGoalRepository.ExistsAsync(u => u.Id == targetId);
-            if (!goalExist && !customExist)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
+            var type = HealthGoalType.From(request.Type);
 
-            var exist = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
-            if (exist != null)
+            if (type == HealthGoalType.SYSTEM)
             {
-                await _userHealthGoalRepository.DeleteAsync(exist);
-            }
+                var goalExist = await _healthGoalRepopository.ExistsAsync(u => u.Id == targetId);
+                if (!goalExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
-            if (goalExist)
-            {
-                var newGoal = new UserHealthGoal
+                var exist = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
+                if (exist != null)
                 {
-                    UserId = userId,
-                    HealthGoalId = targetId,
-                    ExpiredAtUtc = request.ExpiredAtUtc
-                };
-                await _userHealthGoalRepository.AddAsync(newGoal);
-            }
-            else
-            {
+                    await _userHealthGoalRepository.DeleteAsync(exist);
+                }
+
                 var newCustomGoal = new UserHealthGoal
                 {
                     UserId = userId,
                     CustomHealthGoalId = targetId,
+                    Type = type,
                     ExpiredAtUtc = request.ExpiredAtUtc
                 };
+
+                await _userHealthGoalRepository.AddAsync(newCustomGoal);
+            }
+            else if (type == HealthGoalType.CUSTOM)
+            {
+                var customExist = await _customHealthGoalRepository.ExistsAsync(u => u.Id == targetId);
+                if (!customExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
+
+                var exist = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
+                if (exist != null)
+                {
+                    await _userHealthGoalRepository.DeleteAsync(exist);
+                }
+
+                var newCustomGoal = new UserHealthGoal
+                {
+                    UserId = userId,
+                    CustomHealthGoalId = targetId,
+                    Type = type,
+                    ExpiredAtUtc = request.ExpiredAtUtc
+                };
+
                 await _userHealthGoalRepository.AddAsync(newCustomGoal);
             }
         }
@@ -72,13 +87,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task RemoveFromCurrent(Guid userId, Guid Id)
+        public async Task RemoveFromCurrent(Guid userId)
         {
-            var userHealthGoals = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
-            if (userHealthGoals == null)
+            var current = await _userHealthGoalRepository.GetActiveGoalByUserIdAsync(userId);
+            if (current == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Bạn hiện đang không có mục tiêu sữc khỏe");
 
-            await _userHealthGoalRepository.DeleteAsync(userHealthGoals);
+            await _userHealthGoalRepository.DeleteAsync(current);
         }
     }
 }

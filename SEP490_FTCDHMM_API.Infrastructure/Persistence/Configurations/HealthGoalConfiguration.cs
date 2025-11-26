@@ -23,6 +23,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .WithOne(x => x.HealthGoal)
                 .HasForeignKey(x => x.HealthGoalId)
                 .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 
-namespace SEP490_FTCDHMM_API.Api.Controllers
+namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
 {
     [Route("api/[controller]")]
     [ApiController]

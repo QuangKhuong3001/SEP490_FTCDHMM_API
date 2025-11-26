@@ -10,16 +10,17 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public required Guid AuthorId { get; set; }
         public AppUser Author { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
-        public required DifficultyValue Difficulty { get; set; }
+        public DifficultyValue Difficulty { get; set; } = DifficultyValue.Medium;
         public int CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public required int Ration { get; set; }
         public Guid? ImageId { get; set; }
         public Image? Image { get; set; }
-        public decimal? Calories { get; set; }
+        public decimal Calories { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public int NumberOfRatings { get; set; } = 0;
-        public double Rating { get; set; } = 0;
+        public int ViewCount { get; set; } = 0;
+        public int RatingCount { get; set; } = 0;
+        public double AvgRating { get; set; } = 0;
 
         public ICollection<CookingStep> CookingSteps { get; set; } = new List<CookingStep>();
         public ICollection<Label> Labels { get; set; } = new List<Label>();

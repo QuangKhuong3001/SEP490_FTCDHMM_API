@@ -1,6 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 
-namespace SEP490_FTCDHMM_API.Application.Dtos.RatingDtos
+namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating
 {
     public class RatingDetailsResponse
     {

@@ -18,6 +18,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         {
             return await _dbContext.UserHealthGoals
                 .Where(u => u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow)
+                .Include(u => u.CustomHealthGoal)
+                    .ThenInclude(ch => ch!.Targets)
+                .Include(u => u.HealthGoal)
+                    .ThenInclude(h => h!.Targets)
                 .FirstOrDefaultAsync(uhg => uhg.UserId == userId);
         }
     }
