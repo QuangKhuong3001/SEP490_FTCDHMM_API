@@ -41,6 +41,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Rating> Ratings { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
