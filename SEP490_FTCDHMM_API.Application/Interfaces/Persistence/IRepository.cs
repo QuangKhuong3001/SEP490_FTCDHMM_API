@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
             Expression<Func<T, bool>>? predicate = null,
             Func<IQueryable<T>, IQueryable<T>>? include = null);
 
+        Task SaveChangeAsync();
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task UpdateAsync(T entity);
@@ -19,6 +20,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
         Task<bool> IdsExistAsync(List<Guid> ids);
+        Task<bool> IdsExistAsync(IEnumerable<Guid> ids);
         Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
             int pageNumber,
             int pageSize,

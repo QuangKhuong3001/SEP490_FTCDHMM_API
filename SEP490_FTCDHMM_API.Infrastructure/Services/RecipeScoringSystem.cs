@@ -11,11 +11,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
     {
         private readonly FitScoreWeightsSettings _weightsSettings;
         private readonly INutrientIdProvider _nutrientIdProvider;
+        private readonly MealDistributionSettings _mealDistributionSettings;
 
-        public RecipeScoringSystem(IOptions<FitScoreWeightsSettings> weightsSettings, INutrientIdProvider nutrientIdProvider)
+        public RecipeScoringSystem(
+            IOptions<FitScoreWeightsSettings> weightsSettings,
+            IOptions<MealDistributionSettings> mealDistributionSettings,
+            INutrientIdProvider nutrientIdProvider)
         {
+            _mealDistributionSettings = mealDistributionSettings.Value;
             _weightsSettings = weightsSettings.Value;
             _nutrientIdProvider = nutrientIdProvider;
+        }
+
+        private enum MealType
+        {
+            Breakfast,
+            Lunch,
+            Dinner
         }
 
         public double CalculateFinalScore(AppUser user, Recipe recipe)
@@ -151,16 +163,40 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return Math.Clamp(score, 0, 1);
         }
 
+        private MealType GetCurrentMeal()
+        {
+            var now = DateTime.Now.TimeOfDay;
 
+            if (now >= new TimeSpan(5, 0, 0) && now < new TimeSpan(11, 0, 0))
+                return MealType.Breakfast;
+
+            if (now >= new TimeSpan(11, 0, 0) && now < new TimeSpan(16, 0, 0))
+                return MealType.Lunch;
+
+            return MealType.Dinner;
+        }
         private double CalculateTdeeFit(Recipe recipe, UserHealthMetric? metric)
         {
             if (metric == null)
                 return 0;
 
-            var tdee = metric.TDEE;
+            var meal = GetCurrentMeal();
 
-            double diff = Math.Abs((double)recipe.Calories - (double)tdee);
-            double score = 1 - diff / (double)tdee;
+            double mealPct = meal switch
+            {
+                MealType.Breakfast => _mealDistributionSettings.Breakfast,
+                MealType.Lunch => _mealDistributionSettings.Lunch,
+                MealType.Dinner => _mealDistributionSettings.Dinner,
+                _ => 1.0 / 3.0
+            };
+
+            double tdee = (double)metric.TDEE;
+            double targetCalories = tdee * mealPct;
+
+            var caloriesPerServing = (double)recipe.Calories / recipe.Ration;
+
+            double diff = Math.Abs(caloriesPerServing - (double)targetCalories);
+            double score = 1 - diff / (double)targetCalories;
 
             return Math.Clamp(score, 0, 1);
         }

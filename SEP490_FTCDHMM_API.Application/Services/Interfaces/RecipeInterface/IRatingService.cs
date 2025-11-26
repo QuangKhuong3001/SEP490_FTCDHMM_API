@@ -1,6 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
+namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
 {
     public interface IRatingService
     {

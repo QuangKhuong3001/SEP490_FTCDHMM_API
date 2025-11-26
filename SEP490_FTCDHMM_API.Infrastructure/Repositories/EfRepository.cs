@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 {
@@ -48,6 +49,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 query = include(query);
 
             return await query.ToListAsync();
+        }
+
+        public async Task SaveChangeAsync()
+        {
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -97,15 +103,49 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             if (ids == null || ids.Count == 0)
                 return false;
 
+            var property = typeof(T).GetProperty("Id");
+            if (property == null || property.PropertyType != typeof(Guid))
+                throw new AppException(AppResponseCode.INVALID_ACTION, $"Đối tượng {typeof(T).Name} không có property Id.");
+
             var parameter = Expression.Parameter(typeof(T), "e");
-            var property = Expression.PropertyOrField(parameter, "Id");
-            var containsMethod = typeof(List<Guid>).GetMethod(nameof(List<Guid>.Contains), new[] { typeof(Guid) })!;
-            var containsCall = Expression.Call(Expression.Constant(ids), containsMethod, property);
+
+            var propertyExpr = Expression.Property(parameter, property);
+
+            var containsMethod = typeof(List<Guid>).GetMethod(nameof(List<Guid>.Contains), new[] { typeof(Guid) });
+            var containsCall = Expression.Call(Expression.Constant(ids), containsMethod!, propertyExpr);
+
             var lambda = Expression.Lambda<Func<T, bool>>(containsCall, parameter);
 
             var count = await _dbContext.Set<T>().CountAsync(lambda);
             return count == ids.Count;
         }
+
+        public async Task<bool> IdsExistAsync(IEnumerable<Guid> ids)
+        {
+            if (ids == null || !ids.Any())
+                return false;
+
+            var idList = ids.Distinct().ToList();
+
+            var param = Expression.Parameter(typeof(T), "e");
+            var property = Expression.PropertyOrField(param, "Id");
+
+            var containsMethod = typeof(List<Guid>)
+                .GetMethod(nameof(List<Guid>.Contains), new[] { typeof(Guid) });
+
+            var containsCall = Expression.Call(
+                Expression.Constant(idList),
+                containsMethod!,
+                property
+            );
+
+            var lambda = Expression.Lambda<Func<T, bool>>(containsCall, param);
+
+            var count = await _dbContext.Set<T>().CountAsync(lambda);
+
+            return count == idList.Count;
+        }
+
 
         public async Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
             int pageNumber,

@@ -30,7 +30,7 @@ using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Api.Configurations
 {
-    public static class DependencyInjection
+    public static class ServiceConfigurations
     {
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -162,6 +162,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<AppSettings>(configuration.GetSection("Application"));
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
+            services.Configure<MealDistributionSettings>(configuration.GetSection("MealDistribution"));
             services.Configure<FitScoreWeightsSettings>(configuration.GetSection("FitScoreWeightsSettings"));
 
             //job
@@ -240,7 +241,12 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //recipe
             services.AddScoped<IRecipeRepository, RecipeRepository>();
-            services.AddScoped<IRecipeService, RecipeService>();
+            services.AddScoped<IRecipeValidationService, RecipeValidationService>();
+            services.AddScoped<IRecipeImageService, RecipeImageService>();
+            services.AddScoped<IRecipeNutritionService, RecipeNutritionService>();
+            services.AddScoped<IRecipeBehaviorService, RecipeBehaviorService>();
+            services.AddScoped<IRecipeCommandService, RecipeCommandService>();
+            services.AddScoped<IRecipeQueryService, RecipeQueryService>();
 
             //userRecipeView
             services.AddScoped<IUserRecipeViewRepository, UserRecipeViewRepository>();
@@ -320,6 +326,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRecommentdationService, RecommendationService>();
             services.AddScoped<IRecipeScoringSystem, RecipeScoringSystem>();
 
+            //userbehavior
+            services.AddScoped<IUserBehaviorRepository, UserBehaviorRepository>();
         }
     }
 }
