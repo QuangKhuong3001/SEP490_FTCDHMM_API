@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -20,7 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             _recipeScoringSystem = recipeScoringSystem;
         }
 
-        public async Task<List<RecipeRankResponse>> RecommendAsync(Guid userId)
+        public async Task<PagedResult<RecipeRankResponse>> RecommendAsync(Guid userId, PaginationParams request)
         {
             var user = await _userRepository.GetByIdAsync(
                 id: userId,
@@ -43,20 +44,35 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             var recipes = await _recipeRepository.GetActiveRecentRecipesAsync();
 
-            var results = new List<RecipeRankResponse>();
+            var ranked = new List<RecipeRankResponse>();
 
             foreach (var r in recipes)
             {
                 var final = _recipeScoringSystem.CalculateFinalScore(user, r);
 
-                results.Add(new RecipeRankResponse
+                ranked.Add(new RecipeRankResponse
                 {
                     RecipeId = r.Id,
                     Score = final,
                 });
             }
 
-            return results.OrderByDescending(x => x.Score).Take(20).ToList();
+            var sorted = ranked.OrderByDescending(x => x.Score);
+
+            var totalCount = sorted.Count();
+
+            var pagedItems = sorted
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            return new PagedResult<RecipeRankResponse>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
     }
 }
