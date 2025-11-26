@@ -6,6 +6,6 @@
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public ICollection<HealthGoalTarget> Targets { get; set; } = new List<HealthGoalTarget>();
+        public ICollection<HealthGoalTarget> Targets { get; set; } = null!;
     }
 }

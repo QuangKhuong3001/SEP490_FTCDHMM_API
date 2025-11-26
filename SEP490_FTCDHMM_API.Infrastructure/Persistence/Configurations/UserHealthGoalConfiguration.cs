@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
@@ -13,9 +14,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.HasKey(x => x.UserId);
 
             builder.HasOne(x => x.User)
-                .WithOne()
+                .WithOne(u => u.UserHealthGoal)
                 .HasForeignKey<UserHealthGoal>(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(u => u.Type)
+                .HasConversion(
+                    g => g.Value,
+                    v => HealthGoalType.From(v)
+                )
+                .HasDefaultValueSql("'CUSTOM'");
 
             builder.HasOne(x => x.HealthGoal)
                 .WithMany()

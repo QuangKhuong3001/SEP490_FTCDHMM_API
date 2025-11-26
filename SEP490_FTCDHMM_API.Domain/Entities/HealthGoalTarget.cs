@@ -6,8 +6,11 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     {
         public Guid Id { get; set; }
 
-        public Guid HealthGoalId { get; set; }
-        public HealthGoal HealthGoal { get; set; } = null!;
+        public Guid? HealthGoalId { get; set; }
+        public HealthGoal? HealthGoal { get; set; }
+
+        public Guid? CustomHealthGoalId { get; set; }
+        public CustomHealthGoal? CustomHealthGoal { get; set; }
 
         public Guid NutrientId { get; set; }
         public Nutrient Nutrient { get; set; } = null!;

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -63,8 +64,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var avg = allRatings.Average(r => r.Score);
 
-            recipe.Rating = avg;
-            recipe.NumberOfRatings = allRatings.Count;
+            recipe.AvgRating = avg;
+            recipe.RatingCount = allRatings.Count;
 
             await _recipeRepository.UpdateAsync(recipe);
 

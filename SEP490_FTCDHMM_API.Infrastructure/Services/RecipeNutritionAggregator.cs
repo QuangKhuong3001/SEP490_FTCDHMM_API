@@ -45,6 +45,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
             recipe.Calories = profile.TotalCalories;
 
+            _appDbContext.Recipes.Update(recipe);
+
             await _appDbContext.RecipeNutritionAggregates.AddRangeAsync(aggregates);
             await _appDbContext.SaveChangesAsync();
         }

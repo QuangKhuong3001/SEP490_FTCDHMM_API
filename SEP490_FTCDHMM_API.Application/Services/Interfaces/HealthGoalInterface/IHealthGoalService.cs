@@ -1,6 +1,7 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
+namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface
 {
     public interface IHealthGoalService
     {

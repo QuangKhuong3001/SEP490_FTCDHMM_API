@@ -14,7 +14,11 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Implementations;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
@@ -158,6 +162,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<AppSettings>(configuration.GetSection("Application"));
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
+            services.Configure<FitScoreWeightsSettings>(configuration.GetSection("FitScoreWeightsSettings"));
 
             //job
             services.AddScoped<IExpireUserDietRestrictionsJob, ExpireUserDietRestrictionsJob>();
@@ -272,9 +277,11 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICustomHealthGoalService, CustomHealthGoalService>();
 
             //RecipeScore
-            services.AddScoped<IRecipeGoalAnalysisService, RecipeGoalAnalysisService>();
             services.AddScoped<IRecipeNutritionAggregator, RecipeNutritionAggregator>();
 
+            //nutrientCalculator
+            services.AddScoped<INutrientIdProvider, NutrientIdProvider>();
+            services.AddScoped<IIngredientNutritionCalculator, IngredientNutritionCalculator>();
 
             //userhealthgoal
             services.AddScoped<IUserHealthGoalRepository, UserHealthGoalRepository>();
@@ -308,6 +315,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IDraftRecipeRepository, DraftRecipeRepository>();
 
             services.AddScoped<IDraftRecipeService, DraftRecipeService>();
+
+            //recommentdation
+            services.AddScoped<IRecommentdationService, RecommendationService>();
+            services.AddScoped<IRecipeScoringSystem, RecipeScoringSystem>();
 
         }
     }

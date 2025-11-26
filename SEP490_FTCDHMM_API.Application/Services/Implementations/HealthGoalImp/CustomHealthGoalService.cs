@@ -2,13 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CustomHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Implementations
+namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
 {
     public class CustomHealthGoalService : ICustomHealthGoalService
     {
@@ -39,29 +40,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             var totalPct = 0m;
+
             foreach (var nutrient in request.Targets)
             {
-                var targetType = NutrientTargetType.From(nutrient.TargetType);
-
-                // Validate based on target type
-                if (targetType == NutrientTargetType.Absolute)
-                {
-                    if (!nutrient.MinValue.HasValue || !nutrient.MaxValue.HasValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                    if (nutrient.MaxValue <= nutrient.MinValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-                }
-                else if (targetType == NutrientTargetType.EnergyPercent)
-                {
-                    if (!nutrient.MinEnergyPct.HasValue || !nutrient.MaxEnergyPct.HasValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                    if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-
-                    totalPct += nutrient.MaxEnergyPct ?? 0;
-                }
+                this.IsValidInput(nutrient);
+                totalPct += nutrient.MaxEnergyPct ?? 0;
             }
 
             if (totalPct > 100)
@@ -81,7 +64,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 UserId = userId,
                 Name = request.Name,
                 Description = request.Description,
-                Targets = request.Targets.Select(t => new CustomHealthGoalTarget
+                Targets = request.Targets.Select(t => new HealthGoalTarget
                 {
                     NutrientId = t.NutrientId,
                     TargetType = NutrientTargetType.From(t.TargetType),
@@ -126,27 +109,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var totalPct = 0m;
             foreach (var nutrient in request.Targets)
             {
-                var targetType = NutrientTargetType.From(nutrient.TargetType);
-
-                // Validate based on target type
-                if (targetType == NutrientTargetType.Absolute)
-                {
-                    if (!nutrient.MinValue.HasValue || !nutrient.MaxValue.HasValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                    if (nutrient.MaxValue <= nutrient.MinValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-                }
-                else if (targetType == NutrientTargetType.EnergyPercent)
-                {
-                    if (!nutrient.MinEnergyPct.HasValue || !nutrient.MaxEnergyPct.HasValue)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                    if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-
-                    totalPct += nutrient.MaxEnergyPct ?? 0;
-                }
+                this.IsValidInput(nutrient);
+                totalPct += nutrient.MaxEnergyPct ?? 0;
             }
 
             if (totalPct > 100)
@@ -174,7 +138,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             healthGoal.Name = request.Name;
             healthGoal.Description = request.Description;
-            healthGoal.Targets = request.Targets.Select(t => new CustomHealthGoalTarget
+            healthGoal.Targets = request.Targets.Select(t => new HealthGoalTarget
             {
                 NutrientId = t.NutrientId,
                 TargetType = NutrientTargetType.From(t.TargetType),
@@ -213,6 +177,28 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
             await _customHealthGoalRepository.DeleteAsync(goal);
+        }
+
+        private bool IsValidInput(NutrientTargetRequest nutrient)
+        {
+            if (nutrient.TargetType == NutrientTargetType.Absolute.Value)
+            {
+                if (!(nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue))
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
+
+                if (nutrient.MaxValue <= nutrient.MinValue)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+            }
+            else if (nutrient.TargetType == NutrientTargetType.EnergyPercent.Value)
+            {
+                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue))
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
+
+                if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+            }
+
+            return false;
         }
     }
 

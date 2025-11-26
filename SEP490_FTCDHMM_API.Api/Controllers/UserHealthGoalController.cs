@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.UserHealthGoalDtos;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
@@ -48,17 +48,15 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-
-
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> RemoveFromCurrent(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> RemoveFromCurrent()
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthGoalService.RemoveFromCurrent(userId, id);
+            await _userHealthGoalService.RemoveFromCurrent(userId);
             return Ok();
         }
     }

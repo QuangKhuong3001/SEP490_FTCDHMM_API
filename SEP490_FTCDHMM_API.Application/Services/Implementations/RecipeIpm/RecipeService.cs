@@ -3,14 +3,14 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
-using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
@@ -18,7 +18,7 @@ using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 using SEP490_FTCDHMM_API.Shared.Utils;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Implementations
+namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 {
     public class RecipeService : IRecipeService
     {
@@ -111,10 +111,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
             var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
-            if (!(ingredientExists))
+            if (!ingredientExists)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
 
-            if (!(labelExists))
+            if (!labelExists)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
 
             if (ingredientIds.HasDuplicate())
@@ -160,11 +160,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 foreach (var userIdToTag in distinctIds)
                 {
                     if (userIdToTag == userId)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể tự tag chính mình.");
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể tự gắn thẻ chính mình.");
 
                     var exists = await _userRepository.ExistsAsync(u => u.Id == userIdToTag);
                     if (!exists)
-                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+                        throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION,
+                            $"Người dùng {userIdToTag} không tồn tại.");
 
                     recipe.RecipeUserTags.Add(new RecipeUserTag
                     {
@@ -222,8 +223,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(r => r.RecipeIngredients)
                         .ThenInclude(ri => ri.Ingredient)
-                        .ThenInclude(i => i.IngredientNutrients)
-                        .ThenInclude(n => n.Nutrient)
+                            .ThenInclude(i => i.IngredientNutrients)
+                                .ThenInclude(n => n.Nutrient)
             );
 
             await _recipeNutritionAggregator.AggregateAndSaveAsync(fullRecipe!);
@@ -255,10 +256,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
             var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
-            if (!(ingredientExists))
+            if (!ingredientExists)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
 
-            if (!(labelExists))
+            if (!labelExists)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
 
             if (ingredientIds.HasDuplicate())
@@ -431,7 +432,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task DeleteRecipe(Guid userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if ((recipe == null) || (recipe.IsDeleted == true))
+            if (recipe == null || recipe.IsDeleted == true)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -455,9 +456,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     f.Ration == request.Ration)
                 && (request.MaxCookTime == null ||
                     f.CookTime < request.MaxCookTime)
-                && ((!request.LabelIds.Any()) ||
+                && (!request.LabelIds.Any() ||
                     f.Labels.Any(l => request.LabelIds.Contains(l.Id)))
-                && ((!request.IngredientIds.Any()) ||
+                && (!request.IngredientIds.Any() ||
                     f.RecipeIngredients.Any(ri => request.IngredientIds.Contains(ri.IngredientId)))
                 && (string.IsNullOrEmpty(request.Keyword) ||
                     f.Name.Contains(request.Keyword));
@@ -469,8 +470,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 "time_asc" => q => q.OrderBy(r => r.CookTime),
                 "time_desc" => q => q.OrderByDescending(r => r.CookTime),
                 "latest" => q => q.OrderByDescending(r => r.UpdatedAtUtc),
-                "rate_asc" => q => q.OrderBy(r => r.Rating),
-                "rate_desc" => q => q.OrderByDescending(r => r.Rating),
+                "rate_asc" => q => q.OrderBy(r => r.AvgRating),
+                "rate_desc" => q => q.OrderByDescending(r => r.AvgRating),
+                "view_asc" => q => q.OrderByDescending(r => r.ViewCount),
+                "view_desc" => q => q.OrderByDescending(r => r.ViewCount),
                 _ => q => q.OrderByDescending(r => r.UpdatedAtUtc)
             };
 
@@ -525,7 +528,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
-            if ((recipe == null) || (recipe.IsDeleted))
+            if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var user = await _userRepository.GetByIdAsync(userId);
@@ -541,6 +544,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     RecipeId = recipeId,
                     UserId = userId,
                 });
+
+                recipe.ViewCount++;
+                await _recipeRepository.UpdateAsync(recipe);
             }
 
             var isFavorited = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -771,7 +777,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = paginationParams.PageSize
             };
         }
-        public async Task<RecipeRatingResponse> GetAverageScore(Guid recipeId)
+        public async Task<RecipeRatingResponse> GetRecipeRating(Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.IsDeleted)
@@ -782,7 +788,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<PagedResult<RatingDetailsResponse>> GetRating(Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetails(Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,

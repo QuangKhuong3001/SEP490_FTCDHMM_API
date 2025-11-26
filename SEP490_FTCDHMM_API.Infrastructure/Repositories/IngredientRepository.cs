@@ -20,7 +20,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 .AsNoTracking()
                 .Where(i => EF.Functions.Like(i.Name.ToLower(), $"%{keyword}%"))
                 .OrderByDescending(i => i.Name.ToLower().StartsWith(keyword))
-                .ThenByDescending(i => i.PopularityScore)
                 .ThenBy(i => i.Name.Length)
                 .Take(5)
                 .ToListAsync(ct);

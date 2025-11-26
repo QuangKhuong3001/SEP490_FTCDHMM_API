@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 
-namespace SEP490_FTCDHMM_API.Api.Controllers
+namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -153,8 +153,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("{recipeId:guid}/score")]
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
-            var avg = await _recipeService.GetAverageScore(recipeId);
-            return Ok(avg);
+            var avg = await _recipeService.GetRecipeRating(recipeId);
+            return Ok(new { averageRating = avg });
         }
 
         [AllowAnonymous]
@@ -163,7 +163,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
-            var result = await _recipeService.GetRating(recipeId, appRequest);
+            var result = await _recipeService.GetRatingDetails(recipeId, appRequest);
             return Ok(result);
         }
 

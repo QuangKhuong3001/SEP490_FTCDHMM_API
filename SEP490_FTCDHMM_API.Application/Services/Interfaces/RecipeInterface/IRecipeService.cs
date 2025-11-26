@@ -1,10 +1,10 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
-using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 
-namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
+namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
 {
     public interface IRecipeService
     {
@@ -21,8 +21,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task UnsaveRecipe(Guid userId, Guid recipeId);
         Task<PagedResult<MyRecipeResponse>> GetRecipeByUserId(Guid userId, RecipePaginationParams paginationParams);
         Task<PagedResult<MyRecipeResponse>> GetRecipeByUserName(string userName, RecipePaginationParams paginationParams);
-        Task<RecipeRatingResponse> GetAverageScore(Guid recipeId);
-        Task<PagedResult<RatingDetailsResponse>> GetRating(Guid recipeId, RecipePaginationParams request);
+        Task<RecipeRatingResponse> GetRecipeRating(Guid recipeId);
+        Task<PagedResult<RatingDetailsResponse>> GetRatingDetails(Guid recipeId, RecipePaginationParams request);
         Task<PagedResult<RecipeResponse>> GetHistory(Guid userId, RecipePaginationParams request);
     }
 }

@@ -24,6 +24,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                     .ThenInclude(chg => chg!.Targets)
                         .ThenInclude(t => t.Nutrient)
                 .Where(u => u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow)
+                .Include(u => u.CustomHealthGoal)
+                    .ThenInclude(ch => ch!.Targets)
+                .Include(u => u.HealthGoal)
+                    .ThenInclude(h => h!.Targets)
                 .FirstOrDefaultAsync(uhg => uhg.UserId == userId);
         }
     }

@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder.HasOne(x => x.User)
-                   .WithMany()
+                    .WithMany(u => u.HealthMetrics)
                    .HasForeignKey(x => x.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
