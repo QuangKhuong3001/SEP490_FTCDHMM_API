@@ -9,7 +9,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
     {
         public CookingStepMappingProfile()
         {
-            CreateMap<CookingStep, CookingStepResponse>();
+            CreateMap<CookingStep, CookingStepResponse>()
+                .ForMember(
+                    dest => dest.CookingStepImages,
+                    opt => opt.MapFrom(cs => cs.CookingStepImages)
+                );
         }
     }
 }

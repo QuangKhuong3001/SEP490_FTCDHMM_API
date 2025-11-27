@@ -66,6 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                     Id = Guid.NewGuid(),
                     Instruction = step.Instruction.Trim(),
                     StepOrder = step.StepOrder,
+                    RecipeId = recipe.Id,
                     Recipe = recipe
                 };
 
@@ -111,6 +112,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipe.Id);
 
             var steps = await CreateCookingStepsAsync(newSteps, recipe, userId);
+            recipe.CookingSteps.Clear();
             recipe.CookingSteps = steps;
         }
     }
