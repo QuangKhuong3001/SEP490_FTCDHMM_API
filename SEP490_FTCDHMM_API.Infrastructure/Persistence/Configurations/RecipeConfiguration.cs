@@ -79,6 +79,41 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .WithOne()
                 .HasForeignKey<Recipe>(r => r.ImageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(r => r.FavoritedBy)
+                .WithOne(f => f.Recipe)
+                .HasForeignKey(f => f.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.SavedBy)
+                .WithOne(s => s.Recipe)
+                .HasForeignKey(s => s.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.Views)
+                .WithOne(v => v.Recipe)
+                .HasForeignKey(v => v.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.Comments)
+                .WithOne(c => c.Recipe)
+                .HasForeignKey(c => c.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.Ratings)
+                .WithOne(r => r.Recipe)
+                .HasForeignKey(r => r.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.RecipeUserTags)
+                .WithOne(t => t.Recipe)
+                .HasForeignKey(t => t.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(r => r.NutritionAggregates)
+                .WithOne(n => n.Recipe)
+                .HasForeignKey(n => n.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
