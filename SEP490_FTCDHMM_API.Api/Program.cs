@@ -30,7 +30,12 @@ builder.Services.AddSignalR(options =>
     options.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15s - gửi keepalive ping
     options.HandshakeTimeout = TimeSpan.FromSeconds(10); // 10s - handshake timeout
 });
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
+    });
 
 builder.Services.AddAuthorization();
 
