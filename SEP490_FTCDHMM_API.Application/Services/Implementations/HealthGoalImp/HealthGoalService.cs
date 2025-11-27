@@ -45,8 +45,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
             {
                 // Validate based on targetType
                 var targetType = nutrient.TargetType?.ToUpper() ?? "ABSOLUTE";
-                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue) || nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
                 if (targetType == "ABSOLUTE")
                 {
@@ -119,8 +117,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
             {
                 // Validate based on targetType
                 var targetType = nutrient.TargetType?.ToUpper() ?? "ABSOLUTE";
-                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue) || nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
                 if (targetType == "ABSOLUTE")
                 {

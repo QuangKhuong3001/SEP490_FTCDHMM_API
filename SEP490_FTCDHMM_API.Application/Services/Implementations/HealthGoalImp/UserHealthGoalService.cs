@@ -45,15 +45,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                     await _userHealthGoalRepository.DeleteAsync(exist);
                 }
 
-                var newCustomGoal = new UserHealthGoal
+                var newSystemGoal = new UserHealthGoal
                 {
                     UserId = userId,
-                    CustomHealthGoalId = targetId,
+                    HealthGoalId = targetId,
                     Type = type,
                     ExpiredAtUtc = request.ExpiredAtUtc
                 };
 
-                await _userHealthGoalRepository.AddAsync(newCustomGoal);
+                await _userHealthGoalRepository.AddAsync(newSystemGoal);
             }
             else if (type == HealthGoalType.CUSTOM)
             {
