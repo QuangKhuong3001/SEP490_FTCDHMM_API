@@ -55,7 +55,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             recipe.Image = newImage;
         }
 
-        public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe, Guid userId)
+        public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Guid recipeId, Guid userId)
         {
             var result = new List<CookingStep>();
 
@@ -66,8 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                     Id = Guid.NewGuid(),
                     Instruction = step.Instruction.Trim(),
                     StepOrder = step.StepOrder,
-                    RecipeId = recipe.Id,
-                    Recipe = recipe
+                    RecipeId = recipeId
                 };
 
                 var imageRequests = step.Images?.ToList() ?? new List<CookingStepImageRequest>();
@@ -99,21 +98,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             return result;
         }
 
-        public async Task ReplaceCookingStepsAsync(Recipe recipe, IEnumerable<CookingStepRequest> newSteps, Guid userId)
+        public async Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps, Guid userId)
         {
-            foreach (var oldStep in recipe.CookingSteps)
+            // Delete old cooking steps from database (cascade will delete images)
+            await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipeId);
+
+            // Create new steps if any provided
+            if (newSteps == null || !newSteps.Any())
+                return;
+
+            var steps = await CreateCookingStepsAsync(newSteps, recipeId, userId);
+
+            // Add new steps to repository to persist them
+            if (steps?.Any() == true)
             {
-                foreach (var si in oldStep.CookingStepImages)
-                {
-                    await _imageService.DeleteImageAsync(si.ImageId);
-                }
+                await _cookingStepRepository.AddRangeAsync(steps);
             }
-
-            await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipe.Id);
-
-            var steps = await CreateCookingStepsAsync(newSteps, recipe, userId);
-            recipe.CookingSteps.Clear();
-            recipe.CookingSteps = steps;
         }
     }
 }

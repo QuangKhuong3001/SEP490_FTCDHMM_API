@@ -101,7 +101,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
 
-            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
+            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe.Id, userId);
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);
@@ -136,9 +136,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 include: q => q
                     .Include(r => r.Labels)
                     .Include(r => r.RecipeIngredients)
-                    .Include(r => r.CookingSteps)
-                        .ThenInclude(cs => cs.CookingStepImages)
-                            .ThenInclude(si => si.Image)
                     .Include(r => r.RecipeUserTags)
             );
 
@@ -185,10 +182,26 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 }
             }
 
-            await _imageService.ReplaceCookingStepsAsync(recipe, request.CookingSteps, userId);
-
+            // Update recipe first (without cooking steps in the change tracker)
             await _recipeRepository.UpdateAsync(recipe);
-            await _nutritionService.AggregateAsync(recipe);
+
+            // Replace cooking steps separately after recipe is saved
+            await _imageService.ReplaceCookingStepsAsync(recipeId, request.CookingSteps, userId);
+
+            // Reload recipe with cooking steps for nutrition aggregation
+            var updatedRecipe = await _recipeRepository.GetByIdAsync(recipeId,
+                include: q => q
+                    .Include(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
+                            .ThenInclude(i => i.IngredientNutrients)
+                                .ThenInclude(n => n.Nutrient)
+                    .Include(r => r.CookingSteps)
+            );
+
+            if (updatedRecipe != null)
+            {
+                await _nutritionService.AggregateAsync(updatedRecipe);
+            }
         }
 
         public async Task DeleteRecipeAsync(Guid userId, Guid recipeId)
