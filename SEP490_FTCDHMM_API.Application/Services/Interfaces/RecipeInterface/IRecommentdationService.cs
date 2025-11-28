@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
 {
     public interface IRecommentdationService
     {
-        Task<PagedResult<RecipeRankResponse>> RecommendAsync(Guid userId, PaginationParams request);
+        Task<PagedResult<RecommendedRecipeResponse>> RecommendAsync(Guid userId, PaginationParams request);
 
     }
 }

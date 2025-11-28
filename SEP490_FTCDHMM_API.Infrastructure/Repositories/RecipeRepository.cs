@@ -27,5 +27,22 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Recipe>> GetActiveRecentRecipesWithDetailsAsync()
+        {
+            var oneYearAgo = DateTime.UtcNow.AddMonths(-12);
+
+            return await _context.Recipes
+                .Where(r => !r.IsDeleted &&
+                            r.CreatedAtUtc >= oneYearAgo)
+                .Include(r => r.Author).ThenInclude(u => u.Avatar)
+                .Include(r => r.Image)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.Labels)
+                .Include(r => r.NutritionAggregates)
+                    .ThenInclude(na => na.Nutrient)
+                .ToListAsync();
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings
@@ -24,6 +25,25 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 ).ForMember(
                     dest => dest.Labels,
                     opt => opt.MapFrom(r => r.Labels)
+                );
+
+            CreateMap<Recipe, RecommendedRecipeResponse>()
+                .ForMember(
+                    dest => dest.ImageUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<Recipe, RecommendedRecipeResponse>>()
+                )
+                .ForMember(
+                    dest => dest.Author,
+                    opt => opt.MapFrom(r => r.Author)
+                ).ForMember(
+                    dest => dest.Ingredients,
+                    opt => opt.MapFrom(r => r.RecipeIngredients)
+                ).ForMember(
+                    dest => dest.Labels,
+                    opt => opt.MapFrom(r => r.Labels)
+                ).ForMember(
+                    dest => dest.Score,
+                    opt => opt.Ignore()
                 );
 
             CreateMap<RecipeUserTag, DraftRecipeUserTaggedResponse>()
