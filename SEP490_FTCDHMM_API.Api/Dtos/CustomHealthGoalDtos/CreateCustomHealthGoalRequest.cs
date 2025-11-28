@@ -12,6 +12,8 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.CustomHealthGoalDtos
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string? Description { get; set; }
 
+        public DateTime? ExpiredAtUtc { get; set; }
+
         [Required(ErrorMessage = "At least one nutrient target is required.")]
         [MinLength(1, ErrorMessage = "Please define at least one nutrient target.")]
         public List<NutrientTargetRequest> Targets { get; set; } = new();

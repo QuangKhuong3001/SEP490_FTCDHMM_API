@@ -20,6 +20,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                         src.HealthGoal != null
                             ? src.HealthGoal.Description
                             : src.CustomHealthGoal?.Description))
+                .ForMember(dest => dest.ExpiredAtUtc, opt =>
+                    opt.MapFrom(src => src.ExpiredAtUtc))
                 .ForMember(dest => dest.Targets, opt =>
                     opt.MapFrom((src, dest) =>
                         src.HealthGoal != null

@@ -7,6 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.CustomHealthGoalDtos
     {
         public required string Name { get; set; }
         public string? Description { get; set; }
+        public DateTime? ExpiredAtUtc { get; set; }
         public List<NutrientTargetRequest> Targets { get; set; } = new();
     }
 }

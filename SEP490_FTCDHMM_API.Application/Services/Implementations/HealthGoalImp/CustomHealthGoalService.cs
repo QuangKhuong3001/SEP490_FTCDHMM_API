@@ -88,7 +88,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
             var userHealthGoal = new UserHealthGoal
             {
                 UserId = userId,
-                CustomHealthGoalId = goal.Id
+                CustomHealthGoalId = goal.Id,
+                ExpiredAtUtc = request.ExpiredAtUtc
             };
             await _userHealthGoalRepository.AddAsync(userHealthGoal);
         }
