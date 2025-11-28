@@ -13,7 +13,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.HasKey(x => new { x.RecipeId, x.TaggedUserId });
 
             builder.HasOne(x => x.Recipe)
-                   .WithMany()
+                   .WithMany(r => r.RecipeUserTags)
                    .HasForeignKey(x => x.RecipeId)
                    .OnDelete(DeleteBehavior.Cascade);
 

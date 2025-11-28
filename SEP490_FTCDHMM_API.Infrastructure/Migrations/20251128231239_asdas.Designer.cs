@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251128231239_asdas")]
+    partial class asdas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1186,7 +1189,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 28, 23, 17, 14, 14, DateTimeKind.Utc).AddTicks(2162),
+                            CreatedAtUTC = new DateTime(2025, 11, 28, 23, 12, 38, 845, DateTimeKind.Utc).AddTicks(405),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2183,7 +2186,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("TaggedUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("RecipeId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("RecipeId", "TaggedUserId");
+
+                    b.HasIndex("RecipeId1");
 
                     b.HasIndex("TaggedUserId");
 
@@ -2884,10 +2892,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeUserTag", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Recipe")
-                        .WithMany("RecipeUserTags")
+                        .WithMany()
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", null)
+                        .WithMany("RecipeUserTags")
+                        .HasForeignKey("RecipeId1");
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "TaggedUser")
                         .WithMany()

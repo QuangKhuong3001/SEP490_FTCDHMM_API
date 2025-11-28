@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
@@ -7,10 +8,10 @@ using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
-namespace SEP490_FTCDHMM_API.Api.Controllers
+namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
 {
     [ApiController]
-    [Route("api/recipes")]
+    [Route("api/recipe")]
     public class RecipeQueryController : ControllerBase
     {
         private readonly IRecipeQueryService _recipeQueryService;
@@ -34,7 +35,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("{recipeId}")]
         public async Task<IActionResult> GetDetails(Guid recipeId)
         {
-            var userId = Guid.Parse(User.Identity!.Name!);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _recipeQueryService.GetRecipeDetailsAsync(userId, recipeId);
             return Ok(result);
         }
@@ -43,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetFavorites([FromQuery] FavoriteRecipeFilterRequest request)
         {
-            var userId = Guid.Parse(User.Identity!.Name!);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest>(request);
 
             var result = await _recipeQueryService.GetFavoriteListAsync(userId, appRequest);
@@ -54,7 +55,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetSaved([FromQuery] SaveRecipeFilterRequest request)
         {
-            var userId = Guid.Parse(User.Identity!.Name!);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UserSaveRecipe.SaveRecipeFilterRequest>(request);
 
             var result = await _recipeQueryService.GetSavedListAsync(userId, appRequest);
@@ -65,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetHistory([FromQuery] RecipePaginationParams request)
         {
-            var userId = Guid.Parse(User.Identity!.Name!);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
             var result = await _recipeQueryService.GetHistoryAsync(userId, appRequest);
@@ -98,5 +99,17 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var avg = await _recipeQueryService.GetRecipeRatingAsync(recipeId);
             return Ok(new { averageRating = avg });
         }
+
+
+        [HttpGet("myRecipe")]
+        public async Task<IActionResult> GetMyRecipeList([FromQuery] RecipePaginationParams request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
+            var result = await _recipeQueryService.GetRecipeByUserIdAsync(userId, appRequest);
+            return Ok(result);
+        }
+
     }
 }
