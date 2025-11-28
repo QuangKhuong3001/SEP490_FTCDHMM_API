@@ -92,7 +92,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
                 var exists = await _userRepository.ExistsAsync(u => u.Id == id);
                 if (!exists)
-                    throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, $"Người dùng {id} không tồn tại.");
+                    throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, $"Người dùng không tồn tại.");
             }
         }
 
@@ -106,10 +106,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         public Task ValidateRecipeOwnerAsync(Guid userId, Recipe recipe)
         {
             if (recipe.AuthorId != userId)
-                throw new AppException(AppResponseCode.FORBIDDEN);
+                throw new AppException(AppResponseCode.FORBIDDEN, "Bạn không có quyền chỉnh sửa công thức");
 
             if (recipe.IsDeleted)
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             return Task.CompletedTask;
         }
