@@ -92,6 +92,10 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.AverageRating,
                     opt => opt.MapFrom(src => src.AvgRating)
+                )
+                .ForMember(
+                    dest => dest.NumberOfRatings,
+                    opt => opt.MapFrom(src => src.RatingCount)
                 );
         }
     }
