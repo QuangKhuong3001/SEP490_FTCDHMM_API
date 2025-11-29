@@ -140,7 +140,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var followerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _userService.FollowUserAsync(followerId, followeeId);
-            return Ok(new { message = "Theo dõi thành công." });
+            return Ok();
         }
 
         [Authorize]
@@ -149,7 +149,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var followerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _userService.UnfollowUserAsync(followerId, followeeId);
-            return Ok(new { message = "Bỏ theo dõi thành công." });
+            return Ok();
         }
 
         [Authorize]
@@ -201,7 +201,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             await _userService.ChangeRole(userId, appRequest);
 
-            return Ok(new { Message = "Người dùng đã được gán vai trò thành công." });
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("taggable-users")]
+        public async Task<IActionResult> GetTaggableUsers([FromQuery] string? keyword)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var users = await _userService.GetMentionableUsersAsync(userId, keyword);
+
+            return Ok(users);
         }
     }
 }

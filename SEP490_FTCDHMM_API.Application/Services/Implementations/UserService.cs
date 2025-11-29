@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos.Mention;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -423,6 +424,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
             user.RoleId = request.RoleId;
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task<IEnumerable<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword)
+        {
+            var users = await _userRepository.GetTaggableUsersAsync(userId, keyword);
+
+            var result = _mapper.Map<IEnumerable<MentionUserResponse>>(users);
+            return result;
         }
     }
 }

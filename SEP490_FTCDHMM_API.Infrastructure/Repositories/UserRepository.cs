@@ -19,5 +19,31 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 .Where(u => u.UserName == userName)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<AppUser>> GetTaggableUsersAsync(Guid userId, string? keyword)
+        {
+            keyword = keyword?.Trim().ToLower();
+
+            var following = _dbContext.UserFollows
+                .Where(f => f.FollowerId == userId)
+                .Select(f => f.Followee);
+
+            var followers = _dbContext.UserFollows
+                .Where(f => f.FolloweeId == userId)
+                .Select(f => f.Follower);
+
+            var query = following.Union(followers)
+                .Where(u => u.Id != userId)
+                .Distinct();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(u =>
+                    (u.FirstName + " " + u.LastName).ToLower().Contains(keyword));
+            }
+
+            return await query.ToListAsync();
+        }
+
     }
 }

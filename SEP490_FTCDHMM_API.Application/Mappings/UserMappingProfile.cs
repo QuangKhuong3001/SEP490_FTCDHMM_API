@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos.Mention;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -26,6 +27,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                .ForMember(
                     dest => dest.AvatarUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<AppUser, UserInteractionResponse>>());
+
+            CreateMap<AppUser, MentionUserResponse>();
         }
     }
 }
