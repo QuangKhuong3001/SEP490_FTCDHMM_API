@@ -1,16 +1,14 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
+namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
 {
-    public class RecipeResponse
+    public class MyRecipeResponse
     {
         public Guid Id { get; set; }
         public required string Name { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
-        public required UserInteractionResponse Author { get; set; }
         public required DifficultyValue Difficulty { get; set; }
         public decimal CookTime { get; set; }
         public required int Ration { get; set; }
@@ -19,5 +17,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public required List<RecipeIngredientResponse> Ingredients { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
+        public RecipeParentResponse? Parent { get; set; }
     }
 }

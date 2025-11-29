@@ -73,6 +73,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 Difficulty = DifficultyValue.From(request.Difficulty),
                 CookTime = request.CookTime,
                 Labels = labels.ToList(),
+                CreatedAtUtc = DateTime.UtcNow,
+                UpdatedAtUtc = DateTime.UtcNow,
                 Ration = request.Ration,
                 RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
                 {
@@ -308,6 +310,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 CookTime = request.CookTime,
                 Labels = labels.ToList(),
                 Ration = request.Ration,
+                CreatedAtUtc = DateTime.UtcNow,
+                UpdatedAtUtc = DateTime.UtcNow,
+                ParentId = parentId,
                 RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
                 {
                     IngredientId = i.IngredientId,

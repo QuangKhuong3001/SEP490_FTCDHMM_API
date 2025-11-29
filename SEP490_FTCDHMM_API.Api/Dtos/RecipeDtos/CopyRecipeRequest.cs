@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.RecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 {

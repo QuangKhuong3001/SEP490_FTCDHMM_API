@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData
                 var result = await userManager.CreateAsync(newAdmin, adminConfig.Password);
                 if (!result.Succeeded)
                 {
-                    throw new Exception($"Failed to create Admin user: {string.Join(";", result.Errors.Select(e => e.Description))}");
+                    throw new Exception($"Thất bại khi tạo tài khoản admin: {string.Join(";", result.Errors.Select(e => e.Description))}");
                 }
             }
             else
