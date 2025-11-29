@@ -2,6 +2,7 @@
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 {
@@ -60,6 +61,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             imageIds = imageIds.Distinct().ToList();
 
             await MarkDeletedAsync(imageIds);
+        }
+
+        public async Task<Image> GetDefaultImageAsync()
+        {
+            var defaultImage = await _dbContext.Images
+                .FirstOrDefaultAsync(i => i.Key == "images/default/no-image.png");
+
+            if (defaultImage == null)
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND, "Không tồn tại ảnh mặc định trong hệ thống");
+            }
+
+            return defaultImage;
         }
 
     }

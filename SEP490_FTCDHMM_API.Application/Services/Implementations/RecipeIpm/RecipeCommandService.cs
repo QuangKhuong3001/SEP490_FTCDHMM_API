@@ -13,8 +13,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
     {
         private readonly IRecipeRepository _recipeRepository;
         private readonly ILabelRepository _labelRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IIngredientRepository _ingredientRepository;
         private readonly IRecipeUserTagRepository _recipeUserTagRepository;
         private readonly IDraftRecipeRepository _draftRecipeRepository;
         private readonly IUserFavoriteRecipeRepository _userFavoriteRecipeRepository;
@@ -27,8 +25,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
             ILabelRepository labelRepository,
-            IUserRepository userRepository,
-            IIngredientRepository ingredientRepository,
             IRecipeUserTagRepository recipeUserTagRepository,
             IDraftRecipeRepository draftRecipeRepository,
             IUserFavoriteRecipeRepository userFavoriteRecipeRepository,
@@ -40,8 +36,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         {
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
-            _userRepository = userRepository;
-            _ingredientRepository = ingredientRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _draftRecipeRepository = draftRecipeRepository;
             _userFavoriteRecipeRepository = userFavoriteRecipeRepository;
@@ -52,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             _behaviorService = behaviorService;
         }
 
-        public async Task<Guid> CreateRecipeAsync(Guid userId, CreateRecipeRequest request)
+        public async Task CreateRecipeAsync(Guid userId, CreateRecipeRequest request)
         {
             var description = string.IsNullOrWhiteSpace(request.Description)
                 ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
@@ -115,8 +109,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             );
 
             await _nutritionService.AggregateAsync(fullRecipe!);
-
-            return recipe.Id;
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)
@@ -277,6 +269,80 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _userSaveRecipeRepository.DeleteAsync(exist.First());
             await _behaviorService.RecordUnsaveAsync(userId, recipeId);
+        }
+
+        public async Task CopyRecipe(Guid userId, Guid parentId, CopyRecipeRequest request)
+        {
+            var description = string.IsNullOrWhiteSpace(request.Description)
+               ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
+               : request.Description.Trim();
+
+            await _validator.ValidateUserExistsAsync(userId);
+            await _validator.ValidateLabelsAsync(request.LabelIds);
+            await _validator.ValidateIngredientsAsync(request.Ingredients.Select(i => i.IngredientId));
+            await _validator.ValidateCookingStepsAsync(request.CookingSteps);
+            await _validator.ValidateTaggedUsersAsync(userId, request.TaggedUserIds);
+
+            var parent = await _recipeRepository.GetByIdAsync(parentId);
+            if (parent == null || parent.IsDeleted)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức được sao chép không tồn tại");
+
+            if (parent.ParentId.HasValue)
+            {
+                parentId = parent.ParentId.Value;
+            }
+
+            var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
+            if (draftExist != null)
+                await _draftRecipeRepository.DeleteAsync(draftExist);
+
+            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
+
+            var recipe = new Recipe
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Description = description,
+                AuthorId = userId,
+                Difficulty = DifficultyValue.From(request.Difficulty),
+                CookTime = request.CookTime,
+                Labels = labels.ToList(),
+                Ration = request.Ration,
+                RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
+                {
+                    IngredientId = i.IngredientId,
+                    QuantityGram = i.QuantityGram
+                }).ToList()
+            };
+
+            if (request.TaggedUserIds.Any())
+            {
+                foreach (var tagUserId in request.TaggedUserIds.Distinct())
+                {
+                    recipe.RecipeUserTags.Add(new RecipeUserTag
+                    {
+                        RecipeId = recipe.Id,
+                        TaggedUserId = tagUserId
+                    });
+                }
+            }
+
+            await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+
+            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
+            recipe.CookingSteps = steps;
+
+            await _recipeRepository.AddAsync(recipe);
+
+            var fullRecipe = await _recipeRepository.GetByIdAsync(recipe.Id,
+                include: q => q
+                    .Include(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
+                            .ThenInclude(i => i.IngredientNutrients)
+                                .ThenInclude(n => n.Nutrient)
+            );
+
+            await _nutritionService.AggregateAsync(fullRecipe!);
         }
     }
 }

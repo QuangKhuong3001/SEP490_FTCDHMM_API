@@ -201,7 +201,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return (items, totalCount);
         }
 
-        public async Task<T?> GetLatestAsync<TKey>(
+        public async Task<T?> FirstOrDefaultAsync<TKey>(
             Expression<Func<T, TKey>> orderByDescendingKeySelector,
             Expression<Func<T, bool>>? predicate = null,
             Func<IQueryable<T>, IQueryable<T>>? include = null)

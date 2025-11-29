@@ -1186,7 +1186,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 28, 23, 17, 14, 14, DateTimeKind.Utc).AddTicks(2162),
+                            CreatedAtUTC = new DateTime(2025, 11, 29, 18, 12, 58, 376, DateTimeKind.Utc).AddTicks(8598),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2101,6 +2101,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("RatingCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -2124,6 +2127,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("ImageId")
                         .IsUnique()
                         .HasFilter("[ImageId] IS NOT NULL");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Recipes", (string)null);
                 });
@@ -2838,9 +2843,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "ImageId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.Navigation("Author");
 
                     b.Navigation("Image");
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeIngredient", b =>

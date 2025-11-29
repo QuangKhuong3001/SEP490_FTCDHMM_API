@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
+namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.RecipeIngredient
 {
     public class RecipeIngredientRequest
     {

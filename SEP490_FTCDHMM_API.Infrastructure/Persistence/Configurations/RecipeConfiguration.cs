@@ -61,6 +61,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasForeignKey(r => r.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(r => r.Parent)
+                .WithMany()
+                .HasForeignKey(r => r.ParentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             builder.HasMany(r => r.Labels)
                 .WithMany(l => l.Recipes)
                 .UsingEntity(j => j.ToTable("RecipeLabels"));

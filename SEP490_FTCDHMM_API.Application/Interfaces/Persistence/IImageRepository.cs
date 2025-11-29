@@ -7,5 +7,6 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
         Task MarkDeletedAsync(Guid? imageId);
         Task MarkDeletedAsync(List<Guid> imageIds);
         Task MarkDeletedStepsImageFromDraftAsync(DraftRecipe draft);
+        Task<Image> GetDefaultImageAsync();
     }
 }

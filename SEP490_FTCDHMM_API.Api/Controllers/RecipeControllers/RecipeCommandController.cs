@@ -28,11 +28,11 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.CreateRecipeRequest>(request);
 
-            var recipeId = await _recipeCommandService.CreateRecipeAsync(userId, appRequest);
-            return Ok(new { RecipeId = recipeId });
+            await _recipeCommandService.CreateRecipeAsync(userId, appRequest);
+            return Ok();
         }
 
-        [HttpPut("{recipeId}")]
+        [HttpPut("{recipeId:guid}")]
         public async Task<IActionResult> Update(Guid recipeId, [FromForm] UpdateRecipeRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -42,7 +42,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok();
         }
 
-        [HttpDelete("{recipeId}")]
+        [HttpDelete("{recipeId:guid}")]
         public async Task<IActionResult> Delete(Guid recipeId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -51,7 +51,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok();
         }
 
-        [HttpPost("{recipeId}/favorite")]
+        [HttpPost("{recipeId:guid}/favorite")]
         public async Task<IActionResult> AddToFavorite(Guid recipeId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -59,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok();
         }
 
-        [HttpDelete("{recipeId}/favorite")]
+        [HttpDelete("{recipeId:guid}/favorite")]
         public async Task<IActionResult> RemoveFromFavorite(Guid recipeId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -68,7 +68,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         }
 
 
-        [HttpPost("{recipeId}/save")]
+        [HttpPost("{recipeId:guid}/save")]
         public async Task<IActionResult> Save(Guid recipeId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -76,12 +76,22 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok();
         }
 
-        [HttpDelete("{recipeId}/save")]
+        [HttpDelete("{recipeId:guid}/save")]
         public async Task<IActionResult> Unsave(Guid recipeId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             await _recipeCommandService.UnsaveRecipeAsync(userId, recipeId);
+            return Ok();
+        }
+
+        [HttpPost("{parentId:guid}/copy")]
+        public async Task<IActionResult> Copy(Guid parentId, CopyRecipeRequest request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.CopyRecipeRequest>(request);
+
+            await _recipeCommandService.CopyRecipe(userId, parentId, appRequest);
             return Ok();
         }
     }

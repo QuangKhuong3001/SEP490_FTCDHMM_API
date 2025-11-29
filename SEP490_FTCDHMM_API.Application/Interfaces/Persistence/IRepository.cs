@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
             string[]? searchProperties = null,
             Func<IQueryable<T>, IQueryable<T>>? include = null);
 
-        Task<T?> GetLatestAsync<TKey>(
+        Task<T?> FirstOrDefaultAsync<TKey>(
             Expression<Func<T, TKey>> orderByDescendingKeySelector,
             Expression<Func<T, bool>>? predicate = null,
             Func<IQueryable<T>, IQueryable<T>>? include = null);

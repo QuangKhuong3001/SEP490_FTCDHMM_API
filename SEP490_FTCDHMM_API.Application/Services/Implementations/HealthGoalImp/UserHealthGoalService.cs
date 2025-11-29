@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 if (!goalExist)
                     throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
-                var exist = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
+                var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (exist != null)
                 {
                     await _userHealthGoalRepository.DeleteAsync(exist);
@@ -61,7 +61,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 if (!customExist)
                     throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
-                var exist = await _userHealthGoalRepository.GetLatestAsync(c => c.UserId == userId);
+                var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (exist != null)
                 {
                     await _userHealthGoalRepository.DeleteAsync(exist);

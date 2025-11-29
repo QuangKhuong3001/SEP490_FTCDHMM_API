@@ -58,12 +58,12 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpPut("{id:guid}")]
         [Authorize(Policy = PermissionPolicies.Ingredient_Update)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateIngredientRequest dto, CancellationToken ct)
+        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateIngredientRequest dto)
         {
 
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.UpdateIngredientRequest>(dto);
 
-            await _ingredientService.UpdateIngredient(id, appDto, ct);
+            await _ingredientService.UpdateIngredient(id, appDto);
             return Ok();
         }
 
@@ -82,6 +82,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var appRequest = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientDetection.IngredientDetectionUploadRequest>(request);
 
             var result = await _ingredientDetectionService.DetectIngredientsAsync(appRequest);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("getForRecipe")]
+        public async Task<IActionResult> GetForRecipe([FromQuery] string keyword)
+        {
+            var result = await _ingredientService.GetTop5Async(keyword);
             return Ok(result);
         }
     }

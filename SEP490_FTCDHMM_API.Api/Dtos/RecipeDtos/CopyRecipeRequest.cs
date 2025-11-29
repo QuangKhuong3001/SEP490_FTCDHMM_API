@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 {
-    public class CreateRecipeRequest
+    public class CopyRecipeRequest
     {
         [Required(ErrorMessage = "Tên công thức không được để trống")]
         [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên công thức phải từ 1-255 ký tự")]
@@ -32,6 +32,5 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         [Required(ErrorMessage = "Công thức phải có ít nhất một bước")]
         public required List<CookingStepRequest> CookingSteps { get; set; }
         public List<Guid> TaggedUserIds { get; set; } = new();
-
     }
 }

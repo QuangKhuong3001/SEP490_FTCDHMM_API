@@ -8,9 +8,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<PagedResult<IngredientResponse>> GetList(IngredientFilterRequest dto);
         Task<IngredientDetailsResponse> GetDetails(Guid ingredientId);
         Task CreateIngredient(CreateIngredientRequest dto);
-        Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto, CancellationToken ct);
+        Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto);
         Task DeleteIngredient(Guid ingredientId);
-        Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default);
+        Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword);
 
     }
 }

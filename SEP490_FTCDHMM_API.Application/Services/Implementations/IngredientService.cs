@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.Nutrient;
+using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.USDA;
 using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -22,20 +23,26 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IIngredientRepository _ingredientRepository;
         private readonly IIngredientCategoryRepository _ingredientCategoryRepository;
         private readonly IS3ImageService _s3ImageService;
+        private readonly IImageRepository _imageRepository;
         private readonly INutrientRepository _nutrientRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUsdaApiService _usdaApi;
         private readonly IIngredientNutritionCalculator _ingredientNutritionCalculator;
+        private readonly ITranslateService _translateService;
         //private readonly ICacheService _cache;
 
         private readonly TimeSpan _ttl = TimeSpan.FromMinutes(10);
-        private const int MinLenth = 2;
+        private const int MinLength = 2;
 
         public IngredientService(IIngredientRepository ingredientRepository,
             IIngredientCategoryRepository ingredientCategoryRepository,
             IS3ImageService s3ImageService,
+            IImageRepository imageRepository,
             IIngredientNutritionCalculator ingredientNutritionCalculator,
+            ITranslateService translateService,
             INutrientRepository nutrientRepository,
+            IUsdaApiService usdaApi,
             IMapper mapper, IUnitOfWork unitOfWork)
         //ICacheService cache)
         {
@@ -43,6 +50,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _ingredientCategoryRepository = ingredientCategoryRepository;
             _s3ImageService = s3ImageService;
             _nutrientRepository = nutrientRepository;
+            _imageRepository = imageRepository;
+            _translateService = translateService;
+            _usdaApi = usdaApi;
             _ingredientNutritionCalculator = ingredientNutritionCalculator;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -180,7 +190,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _ingredientRepository.DeleteAsync(ingredient);
         }
 
-        public async Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto, CancellationToken ct)
+        public async Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto)
         {
             await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
             {
@@ -295,29 +305,147 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default)
+        //public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default)
+        //{
+        //    if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLenth)
+        //        return Enumerable.Empty<IngredientNameResponse>();
+
+        //    keyword = keyword.Trim();
+        //    var key = $"ingredient:search:{keyword.ToLowerInvariant()}";
+
+        //    //var cached = await _cache.GetAsync<List<IngredientNameResponse>>(key, ct);
+        //    //if (cached is { Count: > 0 }) return cached;
+
+        //    var dbItems = await _ingredientRepository.GetTop5Async(keyword, ct);
+
+        //    var mapped = _mapper.Map<List<IngredientNameResponse>>(dbItems);
+
+        //    if (mapped.Count > 0)
+        //    {
+        //        //await _cache.SetAsync(key, mapped, _ttl, ct);
+        //        return mapped;
+        //    }
+
+        //    return Enumerable.Empty<IngredientNameResponse>();
+        //}
+
+        public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword)
         {
-            if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLenth)
+            if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLength)
                 return Enumerable.Empty<IngredientNameResponse>();
 
             keyword = keyword.Trim();
-            var key = $"ingredient:search:{keyword.ToLowerInvariant()}";
 
-            //var cached = await _cache.GetAsync<List<IngredientNameResponse>>(key, ct);
-            //if (cached is { Count: > 0 }) return cached;
+            var dbItems = await _ingredientRepository.GetTop5Async(keyword);
+            if (dbItems.Count > 0)
+                return _mapper.Map<List<IngredientNameResponse>>(dbItems);
 
-            var dbItems = await _ingredientRepository.GetTop5Async(keyword, ct);
+            var translated = await _translateService.TranslateToEnglishAsync(keyword);
 
-            var mapped = _mapper.Map<List<IngredientNameResponse>>(dbItems);
+            var created = await CreateIngredientFromUsdaAsync(translated);
+            if (created == null)
+                return Enumerable.Empty<IngredientNameResponse>();
 
-            if (mapped.Count > 0)
-            {
-                //await _cache.SetAsync(key, mapped, _ttl, ct);
-                return mapped;
-            }
-
-            return Enumerable.Empty<IngredientNameResponse>();
+            return new List<IngredientNameResponse> { created };
         }
 
+        private async Task<IngredientNameResponse?> CreateIngredientFromUsdaAsync(string vietName)
+        {
+            if (await _ingredientRepository.ExistsAsync(u => u.Name == vietName))
+            {
+                var dbItems = await _ingredientRepository.GetTop5Async(vietName);
+                return _mapper.Map<IngredientNameResponse>(dbItems.First());
+            }
+
+            var searchResults = await _usdaApi.SearchAsync(vietName);
+            if (searchResults == null)
+                return null;
+
+            var detail = await _usdaApi.GetDetailAsync(searchResults.FdcId);
+            if (detail == null)
+                return null;
+
+            var systemNutrients = await _nutrientRepository.GetAllAsync();
+
+            var defaultImage = await _imageRepository.GetDefaultImageAsync();
+
+            const string USDA_CATEGORY_NAME = "USDA Imported";
+            var category = await _ingredientCategoryRepository.FirstOrDefaultAsync(u => u.Name == USDA_CATEGORY_NAME);
+            if (category == null)
+            {
+                category = new IngredientCategory
+                {
+                    Name = USDA_CATEGORY_NAME
+                };
+                await _ingredientCategoryRepository.AddAsync(category);
+            }
+
+            var ingredient = new Ingredient
+            {
+                Id = Guid.NewGuid(),
+                Name = vietName,
+                Description = detail.Description,
+                LastUpdatedUtc = DateTime.UtcNow,
+                Calories = ExtractCalories(detail),
+                ImageId = defaultImage.Id,
+                Image = defaultImage
+            };
+
+            ingredient.Categories.Add(category);
+            ingredient.IngredientNutrients = MapNutrients(detail, ingredient, systemNutrients);
+
+            await _ingredientRepository.AddAsync(ingredient);
+
+            return new IngredientNameResponse
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name
+            };
+        }
+
+        private static decimal ExtractCalories(UsdaFoodDetail detail)
+        {
+            var kcal = detail.FoodNutrients
+                .FirstOrDefault(n =>
+                    n.Nutrient.Name.Contains("energy", StringComparison.OrdinalIgnoreCase) &&
+                    n.Nutrient.UnitName.Equals("kcal", StringComparison.OrdinalIgnoreCase))
+                ?.Amount;
+
+            return kcal.HasValue ? (decimal)kcal.Value : 0m;
+        }
+
+        private static List<IngredientNutrient> MapNutrients(
+            UsdaFoodDetail detail,
+            Ingredient ingredient,
+            IList<Nutrient> systemNutrients)
+        {
+            var list = new List<IngredientNutrient>();
+
+            foreach (var usda in detail.FoodNutrients)
+            {
+                var usdaNameNorm =
+                    ViStringExtensions.RemoveDiacritics(usda.Nutrient.Name.ToLower());
+
+                var sys = systemNutrients.FirstOrDefault(n =>
+                    ViStringExtensions.RemoveDiacritics(n.Name.ToLower())
+                        .Equals(usdaNameNorm, StringComparison.OrdinalIgnoreCase));
+
+                if (sys == null)
+                    continue;
+
+                list.Add(new IngredientNutrient
+                {
+                    IngredientId = ingredient.Id,
+                    Ingredient = ingredient,
+                    NutrientId = sys.Id,
+                    Nutrient = sys,
+                    MedianValue = usda.Amount ?? 0m,
+                    MinValue = usda.Amount,
+                    MaxValue = usda.Amount
+                });
+            }
+
+            return list;
+        }
     }
 }

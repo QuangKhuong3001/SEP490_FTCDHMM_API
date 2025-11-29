@@ -21,6 +21,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public int ViewCount { get; set; } = 0;
         public int RatingCount { get; set; } = 0;
         public double AvgRating { get; set; } = 0;
+        public Guid? ParentId { get; set; }
+        public Recipe? Parent { get; set; }
 
         public ICollection<CookingStep> CookingSteps { get; set; } = new List<CookingStep>();
         public ICollection<Label> Labels { get; set; } = new List<Label>();

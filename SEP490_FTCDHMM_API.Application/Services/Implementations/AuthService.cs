@@ -56,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var existing = await _userManager.FindByEmailAsync(dto.Email);
             if (existing != null)
-                throw new AppException(AppResponseCode.EXISTS);
+                throw new AppException(AppResponseCode.EXISTS, "Email đã được sử dụng");
 
             var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);
 

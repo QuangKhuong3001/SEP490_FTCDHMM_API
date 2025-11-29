@@ -13,7 +13,6 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Implementations;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
-using SEP490_FTCDHMM_API.Application.Services;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm;
@@ -165,6 +164,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
             services.Configure<MealDistributionSettings>(configuration.GetSection("MealDistribution"));
             services.Configure<FitScoreWeightsSettings>(configuration.GetSection("FitScoreWeightsSettings"));
+            services.Configure<USDASettings>(configuration.GetSection("Usda"));
 
             //job
             services.AddScoped<IExpireUserDietRestrictionsJob, ExpireUserDietRestrictionsJob>();
@@ -174,8 +174,11 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //redis
             //services.AddScoped<ICacheService, RedisCacheService>();
 
+            //translate
+            services.AddScoped<ITranslateService, GoogleTranslateService>();
+
             //usda
-            //services.AddScoped<IUsdaApiService, UsdaApiService>();
+            services.AddScoped<IUsdaApiService, UsdaApiService>();
 
             //rollback
             services.AddScoped<IUnitOfWork, UnitOfWork>();

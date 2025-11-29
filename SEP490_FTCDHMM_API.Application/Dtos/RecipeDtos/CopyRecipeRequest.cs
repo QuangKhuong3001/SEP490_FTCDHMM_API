@@ -4,7 +4,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {
-    public class CreateRecipeRequest
+    public class CopyRecipeRequest
     {
         public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;

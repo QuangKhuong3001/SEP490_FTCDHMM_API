@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.RecipeIngredient;
 using APIDtos = SEP490_FTCDHMM_API.Api.Dtos;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
@@ -23,7 +23,9 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
 
             CreateMap<APIDtos.RecipeDtos.UpdateRecipeRequest, ApplicationDtos.RecipeDtos.UpdateRecipeRequest>();
 
-            CreateMap<APIDtos.RecipeDtos.RecipeIngredientRequest, RecipeIngredientRequest>();
+            CreateMap<RecipeIngredientRequest, ApplicationDtos.RecipeDtos.RecipeIngredient.RecipeIngredientRequest>();
+
+            CreateMap<APIDtos.RecipeDtos.CopyRecipeRequest, ApplicationDtos.RecipeDtos.CopyRecipeRequest>();
         }
     }
 }

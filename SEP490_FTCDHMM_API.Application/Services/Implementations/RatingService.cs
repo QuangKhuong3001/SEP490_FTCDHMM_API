@@ -9,7 +9,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Application.Services
+namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
     public class RatingService : IRatingService
     {
@@ -43,7 +43,7 @@ namespace SEP490_FTCDHMM_API.Application.Services
             if (recipe == null || recipe.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
-            var existingRating = await _ratingRepository.GetLatestAsync(
+            var existingRating = await _ratingRepository.FirstOrDefaultAsync(
                 orderByDescendingKeySelector: r => r.CreatedAtUtc,
                 predicate: r => r.UserId == userId
                                 && r.RecipeId == recipeId);

@@ -180,7 +180,7 @@ public class RecipeBehaviorService : IRecipeBehaviorService
 
     public async Task RecordUpdateRatingAsync(Guid userId, Guid recipeId, int newRating)
     {
-        var old = await _ratingRepository.GetLatestAsync(r => r.UserId == userId && r.RecipeId == recipeId);
+        var old = await _ratingRepository.FirstOrDefaultAsync(r => r.UserId == userId && r.RecipeId == recipeId);
         if (old == null)
             throw new AppException(AppResponseCode.NOT_FOUND, "Bạn chưa đánh giá công thức này.");
 
