@@ -220,9 +220,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
         public async Task<PagedResult<MyRecipeResponse>> GetRecipeByUserNameAsync(string userName, RecipePaginationParams paginationParams)
         {
-            var user = await _userRepository.GetLatestAsync(u => u.UserName == userName);
+            var user = await _userRepository.GetByUserNameAsync(userName);
             if (user == null)
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng không tồn tại");
 
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                  q.Include(r => r.Image)
