@@ -48,7 +48,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 var newCustomGoal = new UserHealthGoal
                 {
                     UserId = userId,
-                    CustomHealthGoalId = targetId,
+                    HealthGoalId = targetId,
                     Type = type,
                     ExpiredAtUtc = request.ExpiredAtUtc
                 };

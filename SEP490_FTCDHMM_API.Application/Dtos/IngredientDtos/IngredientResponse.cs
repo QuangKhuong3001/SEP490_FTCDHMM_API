@@ -7,6 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos
         public Guid Id { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
+        public decimal Calories { get; set; }
         public List<IngredientCategoryResponse> CategoryNames { get; set; } = new();
         public DateTime LastUpdatedUtc { get; set; }
     }

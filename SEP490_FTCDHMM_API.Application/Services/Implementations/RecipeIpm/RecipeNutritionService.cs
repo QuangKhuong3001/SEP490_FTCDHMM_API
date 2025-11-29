@@ -1,4 +1,5 @@
-﻿using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
+﻿using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 
@@ -7,21 +8,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
     public class RecipeNutritionService : IRecipeNutritionService
     {
         private readonly IRecipeNutritionAggregator _recipeNutritionAggregator;
+        private readonly IRecipeRepository _recipeRepository;
 
-        public RecipeNutritionService(IRecipeNutritionAggregator recipeNutritionAggregator)
+        public RecipeNutritionService(IRecipeNutritionAggregator recipeNutritionAggregator, IRecipeRepository recipeRepository)
         {
             _recipeNutritionAggregator = recipeNutritionAggregator;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task AggregateAsync(Recipe recipe)
         {
             await _recipeNutritionAggregator.AggregateAndSaveAsync(recipe);
-        }
-
-        public decimal GetCaloriesPerServing(Recipe recipe)
-        {
-            var ration = recipe.Ration <= 0 ? 1 : recipe.Ration;
-            return recipe.Calories / ration;
         }
     }
 }

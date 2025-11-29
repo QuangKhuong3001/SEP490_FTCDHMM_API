@@ -332,6 +332,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //userbehavior
             services.AddScoped<IUserBehaviorRepository, UserBehaviorRepository>();
+
+            //recipeingredient
+            services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
+
         }
     }
 }

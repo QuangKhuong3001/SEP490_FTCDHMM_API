@@ -21,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly IRecipeImageService _imageService;
         private readonly IRecipeNutritionService _nutritionService;
         private readonly IRecipeBehaviorService _behaviorService;
+        private readonly IRecipeIngredientRepository _recipeIngredientRepository;
 
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
@@ -30,6 +31,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             IUserFavoriteRecipeRepository userFavoriteRecipeRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
             IRecipeValidationService validator,
+            IRecipeIngredientRepository recipeIngredientRepository,
             IRecipeImageService imageService,
             IRecipeNutritionService nutritionService,
             IRecipeBehaviorService behaviorService)
@@ -38,6 +40,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             _labelRepository = labelRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _draftRecipeRepository = draftRecipeRepository;
+            _recipeIngredientRepository = recipeIngredientRepository;
             _userFavoriteRecipeRepository = userFavoriteRecipeRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _validator = validator;
@@ -130,9 +133,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 include: q => q
                     .Include(r => r.Labels)
                     .Include(r => r.RecipeIngredients)
-                    .Include(r => r.CookingSteps)
-                        .ThenInclude(cs => cs.CookingStepImages)
-                            .ThenInclude(si => si.Image)
                     .Include(r => r.RecipeUserTags)
             );
 
@@ -141,8 +141,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
 
-            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
-
             recipe.Name = request.Name;
             recipe.Description = description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
@@ -150,10 +148,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             recipe.Ration = request.Ration;
             recipe.UpdatedAtUtc = DateTime.UtcNow;
 
+            var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
             recipe.Labels.Clear();
             recipe.Labels = labels.ToList();
 
-            recipe.RecipeIngredients.Clear();
+            var oldIngredients = recipe.RecipeIngredients.ToList();
+            if (oldIngredients.Any())
+                await _recipeIngredientRepository.DeleteRangeAsync(oldIngredients);
+
             recipe.RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
             {
                 RecipeId = recipeId,
@@ -163,27 +165,38 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _imageService.ReplaceRecipeImageAsync(recipe, request.Image, userId);
 
-            var existingTags = await _recipeUserTagRepository.GetAllAsync(t => t.RecipeId == recipe.Id);
-            if (existingTags.Any())
-                await _recipeUserTagRepository.DeleteRangeAsync(existingTags);
+            var oldTags = await _recipeUserTagRepository.GetAllAsync(t => t.RecipeId == recipe.Id);
+            if (oldTags.Any())
+                await _recipeUserTagRepository.DeleteRangeAsync(oldTags);
 
             if (request.TaggedUserIds.Any())
             {
-                foreach (var tagUserId in request.TaggedUserIds.Distinct())
+                foreach (var userTagId in request.TaggedUserIds.Distinct())
                 {
                     recipe.RecipeUserTags.Add(new RecipeUserTag
                     {
                         RecipeId = recipe.Id,
-                        TaggedUserId = tagUserId,
+                        TaggedUserId = userTagId
                     });
                 }
             }
 
-            await _imageService.ReplaceCookingStepsAsync(recipe, request.CookingSteps, userId);
+            await _imageService.ReplaceCookingStepsAsync(recipe.Id, request.CookingSteps, userId);
 
             await _recipeRepository.UpdateAsync(recipe);
-            await _nutritionService.AggregateAsync(recipe);
+
+            var fullRecipe = await _recipeRepository.GetByIdAsync(
+                recipe.Id,
+                include: q => q
+                    .Include(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
+                            .ThenInclude(i => i.IngredientNutrients)
+                                .ThenInclude(n => n.Nutrient)
+            );
+
+            await _nutritionService.AggregateAsync(fullRecipe!);
         }
+
 
         public async Task DeleteRecipeAsync(Guid userId, Guid recipeId)
         {

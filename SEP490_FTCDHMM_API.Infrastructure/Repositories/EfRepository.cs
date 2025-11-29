@@ -70,7 +70,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
         public async Task UpdateAsync(T entity)
         {
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            var entry = _dbContext.Entry(entity);
+
+            if (entry.State == EntityState.Detached)
+            {
+                entry.State = EntityState.Modified;
+            }
             await _dbContext.SaveChangesAsync();
         }
 

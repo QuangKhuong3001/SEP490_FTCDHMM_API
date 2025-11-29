@@ -1,4 +1,5 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep.CookingStepImage;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
@@ -66,7 +67,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                     Id = Guid.NewGuid(),
                     Instruction = step.Instruction.Trim(),
                     StepOrder = step.StepOrder,
-                    Recipe = recipe
+                    RecipeId = recipe.Id
                 };
 
                 var imageRequests = step.Images?.ToList() ?? new List<CookingStepImageRequest>();
@@ -87,7 +88,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                             Id = Guid.NewGuid(),
                             CookingStepId = newStep.Id,
                             ImageOrder = img.ImageOrder,
-                            Image = uploaded
+                            ImageId = uploaded.Id
                         });
                     }
                 }
@@ -98,9 +99,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             return result;
         }
 
-        public async Task ReplaceCookingStepsAsync(Recipe recipe, IEnumerable<CookingStepRequest> newSteps, Guid userId)
+        public async Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps, Guid userId)
         {
-            foreach (var oldStep in recipe.CookingSteps)
+            var oldSteps = await _cookingStepRepository.GetAllAsync(r => r.RecipeId == recipeId,
+                include: q => q
+                    .Include(s => s.CookingStepImages));
+
+            foreach (var oldStep in oldSteps)
             {
                 foreach (var si in oldStep.CookingStepImages)
                 {
@@ -108,10 +113,49 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 }
             }
 
-            await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipe.Id);
+            await _cookingStepRepository.DeleteStepsByRecipeIdAsync(recipeId);
 
-            var steps = await CreateCookingStepsAsync(newSteps, recipe, userId);
-            recipe.CookingSteps = steps;
+            var newStepEntities = new List<CookingStep>();
+
+            foreach (var step in newSteps.OrderBy(s => s.StepOrder))
+            {
+                var newStep = new CookingStep
+                {
+                    Id = Guid.NewGuid(),
+                    Instruction = step.Instruction.Trim(),
+                    StepOrder = step.StepOrder,
+                    RecipeId = recipeId
+                };
+
+                var imageRequests = step.Images?.ToList() ?? new List<CookingStepImageRequest>();
+                if (imageRequests.Any())
+                {
+                    newStep.CookingStepImages = new List<CookingStepImage>();
+
+                    foreach (var img in imageRequests)
+                    {
+                        var uploaded = await _imageService.UploadImageAsync(
+                            img.Image,
+                            StorageFolder.COOKING_STEPS,
+                            userId
+                        );
+
+                        newStep.CookingStepImages.Add(new CookingStepImage
+                        {
+                            Id = Guid.NewGuid(),
+                            CookingStepId = newStep.Id,
+                            ImageOrder = img.ImageOrder,
+                            ImageId = uploaded.Id
+                        });
+                    }
+                }
+
+                newStepEntities.Add(newStep);
+            }
+
+            await _cookingStepRepository.AddRangeAsync(newStepEntities);
         }
+
+
     }
 }

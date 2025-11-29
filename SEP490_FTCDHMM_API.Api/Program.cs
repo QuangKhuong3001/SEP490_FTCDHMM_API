@@ -25,12 +25,16 @@ builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddSignalR(options =>
 {
-    // Configure keepalive to prevent timeout
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 60s - timeout nếu client không respond
-    options.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15s - gửi keepalive ping
-    options.HandshakeTimeout = TimeSpan.FromSeconds(10); // 10s - handshake timeout
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(10);
 });
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
+    });
 
 builder.Services.AddAuthorization();
 
@@ -44,7 +48,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API for SEP490 FTCDHMM Project"
     });
 
-    // Define the security scheme
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -55,7 +58,6 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
-    // Make sure swagger UI requires a Bearer token to be specified
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {

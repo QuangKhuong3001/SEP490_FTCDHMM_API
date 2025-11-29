@@ -208,7 +208,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             await _s3Client.DeleteObjectAsync(deleteRequest);
 
-            _dbContext.Images.Remove(image);
+            image.IsDeleted = true;
+            _dbContext.Images.Update(image);
             await _dbContext.SaveChangesAsync();
         }
 
