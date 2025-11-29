@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
@@ -14,6 +15,22 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.ImageUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<Recipe, RecipeResponse>>()
+                )
+                .ForMember(
+                    dest => dest.Author,
+                    opt => opt.MapFrom(r => r.Author)
+                ).ForMember(
+                    dest => dest.Ingredients,
+                    opt => opt.MapFrom(r => r.RecipeIngredients)
+                ).ForMember(
+                    dest => dest.Labels,
+                    opt => opt.MapFrom(r => r.Labels)
+                );
+
+            CreateMap<Recipe, RecipeRankResponse>()
+                .ForMember(
+                    dest => dest.ImageUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<Recipe, RecipeRankResponse>>()
                 )
                 .ForMember(
                     dest => dest.Author,

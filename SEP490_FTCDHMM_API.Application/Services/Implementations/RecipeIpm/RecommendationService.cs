@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -13,11 +14,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly IUserRepository _userRepository;
         private readonly IRecipeRepository _recipeRepository;
         private readonly IRecipeScoringSystem _recipeScoringSystem;
+        private readonly IMapper _mapper;
 
-        public RecommendationService(IUserRepository userRepository, IRecipeRepository recipeRepository, IRecipeScoringSystem recipeScoringSystem)
+        public RecommendationService(
+            IUserRepository userRepository,
+            IRecipeRepository recipeRepository,
+            IMapper mapper,
+            IRecipeScoringSystem recipeScoringSystem)
         {
             _userRepository = userRepository;
             _recipeRepository = recipeRepository;
+            _mapper = mapper;
             _recipeScoringSystem = recipeScoringSystem;
         }
 
@@ -50,11 +57,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             {
                 var final = _recipeScoringSystem.CalculateFinalScore(user, r);
 
-                ranked.Add(new RecipeRankResponse
-                {
-                    RecipeId = r.Id,
-                    Score = final,
-                });
+                var result = _mapper.Map<RecipeRankResponse>(r);
+                result.Score = final;
+                ranked.Add(result);
             }
 
             var sorted = ranked.OrderByDescending(x => x.Score);
