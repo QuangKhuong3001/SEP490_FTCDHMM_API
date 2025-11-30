@@ -86,38 +86,65 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return dto;
         }
 
+        public async Task<List<ReportResponse>> GetByTargetIdAsync(Guid targetId)
+        {
+            var reports = await _reportRepository.GetAllAsync(
+                predicate: r => r.TargetId == targetId,
+                include: q => q.Include(r => r.Reporter)
+            );
+
+            var result = new List<ReportResponse>();
+            foreach (var report in reports)
+            {
+                var dto = _mapper.Map<ReportResponse>(report);
+                dto.TargetName = await ResolveTargetNameAsync(report);
+                result.Add(dto);
+            }
+
+            return result;
+        }
+
         public async Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request)
         {
             //
-            // 1. Tạo FILTER (không dùng And)
-            //
-            Expression<Func<Report, bool>> filter = r =>
-                (string.IsNullOrEmpty(request.Type) ||
-                    r.TargetType.Value == ReportObjectType.From(request.Type).Value)
-                &&
-                (string.IsNullOrEmpty(request.Status) ||
-                    r.Status.Value == ReportStatus.From(request.Status).Value)
-                &&
-                (string.IsNullOrEmpty(request.Keyword) ||
-                    r.Description.Contains(request.Keyword));
-
-            //
-            // 2. Include
-            //
-            Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
-
-            //
-            // 3. Lấy toàn bộ report theo filter (KHÔNG phân trang tại DB)
+            // 1. Get all reports with includes
             //
             var reports = await _reportRepository.GetAllAsync(
-                predicate: filter,
-                include: include
+                predicate: null,
+                include: q => q.Include(r => r.Reporter)
             );
+
+            //
+            // 2. Apply filters in-memory
+            //
+            var filtered = reports.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(request.Type))
+            {
+                var targetTypeValue = ReportObjectType.From(request.Type).Value;
+                filtered = filtered.Where(r => r.TargetType.Value == targetTypeValue);
+            }
+
+            if (!string.IsNullOrEmpty(request.Status))
+            {
+                var statusValue = ReportStatus.From(request.Status).Value;
+                filtered = filtered.Where(r => r.Status.Value == statusValue);
+            }
+
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                filtered = filtered.Where(r => r.Description.Contains(request.Keyword));
+            }
+
+            //
+            // 3. Convert to list
+            //
+            var filteredReports = filtered.ToList();
 
             //
             // 4. Group theo (TargetType + TargetId)
             //
-            var grouped = reports
+            var grouped = filteredReports
                 .GroupBy(r => new { r.TargetType.Value, r.TargetId })
                 .Select(g => new
                 {

@@ -47,6 +47,15 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var result = await _service.GetByIdAsync(id);
             return Ok(result);
         }
+
+        [Authorize(Policy = PermissionPolicies.Report_View)]
+        [HttpGet("target/{targetId:guid}")]
+        public async Task<IActionResult> GetByTargetId(Guid targetId)
+        {
+            var result = await _service.GetByTargetIdAsync(targetId);
+            return Ok(result);
+        }
+
         [Authorize(Policy = PermissionPolicies.Report_View)]
         [HttpGet("summary")]
 
