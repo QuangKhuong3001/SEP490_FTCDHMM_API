@@ -336,6 +336,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //recipeingredient
             services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
 
+            //report
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IReportService, ReportService>();
         }
     }
 }

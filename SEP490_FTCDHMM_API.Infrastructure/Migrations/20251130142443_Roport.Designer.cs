@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130142443_Roport")]
+    partial class Roport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1240,7 +1243,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 29, 18, 12, 58, 376, DateTimeKind.Utc).AddTicks(8598),
+                            CreatedAtUTC = new DateTime(2025, 11, 30, 14, 24, 43, 263, DateTimeKind.Utc).AddTicks(8330),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2178,9 +2181,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("RatingCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -2204,8 +2204,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("ImageId")
                         .IsUnique()
                         .HasFilter("[ImageId] IS NOT NULL");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("Recipes", (string)null);
                 });
@@ -2265,7 +2263,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("TaggedUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("RecipeId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("RecipeId", "TaggedUserId");
+
+                    b.HasIndex("RecipeId1");
 
                     b.HasIndex("TaggedUserId");
 
@@ -2481,39 +2484,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserHealthMetrics");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserLabelStat", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("LabelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Favorites")
-                        .HasColumnType("int");
-
-                    b.Property<double>("RatingSum")
-                        .HasColumnType("float");
-
-                    b.Property<int>("Ratings")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Saves")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SearchClicks")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Views")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "LabelId");
-
-                    b.HasIndex("LabelId");
-
-                    b.ToTable("UserLabelStats", (string)null);
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserRecipeView", b =>
@@ -2966,16 +2936,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "ImageId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Author");
 
                     b.Navigation("Image");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeIngredient", b =>
@@ -3019,10 +2982,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeUserTag", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Recipe")
-                        .WithMany("RecipeUserTags")
+                        .WithMany()
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", null)
+                        .WithMany("RecipeUserTags")
+                        .HasForeignKey("RecipeId1");
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "TaggedUser")
                         .WithMany()
@@ -3141,25 +3108,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserLabelStat", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Label", "Label")
-                        .WithMany()
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Label");
 
                     b.Navigation("User");
                 });

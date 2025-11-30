@@ -36,8 +36,9 @@
         public const string Rating_Delete = "Rating:Delete";
         public const string Rating_Update = "Rating:Update";
 
-
-
+        public const string Report_View = "Report:View";
+        public const string Report_Approve = "Report:Approve";
+        public const string Report_Reject = "Report:Reject";
     }
 
 }
