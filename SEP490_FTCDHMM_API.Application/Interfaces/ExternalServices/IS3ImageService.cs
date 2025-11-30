@@ -13,6 +13,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices
         Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder, Guid? userId);
         string? GeneratePreSignedUrl(string? key);
         Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url, Guid uploadedById);
+        Task<Image?> CopyImageAsync(Guid sourceImageId, StorageFolder folder, Guid uploadedById);
         Task DeleteImageAsync(Guid imageId);
     }
 }

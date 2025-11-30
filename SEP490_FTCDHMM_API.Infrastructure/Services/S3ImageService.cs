@@ -213,6 +213,41 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<Image?> CopyImageAsync(Guid sourceImageId, StorageFolder folder, Guid uploadedById)
+        {
+            var sourceImage = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == sourceImageId && !i.IsDeleted);
+            if (sourceImage == null)
+                return null;
+
+            var newId = Guid.NewGuid();
+            var extension = Path.GetExtension(sourceImage.Key);
+            var newKey = $"{folder}/{newId}{extension}";
+
+            var copyRequest = new CopyObjectRequest
+            {
+                SourceBucket = _settings.BucketName,
+                SourceKey = sourceImage.Key,
+                DestinationBucket = _settings.BucketName,
+                DestinationKey = newKey
+            };
+
+            await _s3Client.CopyObjectAsync(copyRequest);
+
+            var newImage = new Image
+            {
+                Id = newId,
+                Key = newKey,
+                ContentType = sourceImage.ContentType,
+                UploadedById = uploadedById,
+                CreatedAtUTC = DateTime.UtcNow
+            };
+
+            _dbContext.Images.Add(newImage);
+            await _dbContext.SaveChangesAsync();
+
+            return newImage;
+        }
+
         private bool IsImage(IFormFile file)
         {
             using var stream = file.OpenReadStream();

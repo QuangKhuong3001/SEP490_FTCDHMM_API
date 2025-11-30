@@ -20,10 +20,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return await _context.Recipes
                 .Where(r => !r.IsDeleted &&
                             r.CreatedAtUtc >= oneYearAgo)
+                .Include(r => r.Author)
+                    .ThenInclude(u => u.Avatar)
+                .Include(r => r.Image)
+                .Include(r => r.Labels)
                 .Include(r => r.RecipeIngredients)
                     .ThenInclude(r => r.Ingredient)
                 .Include(r => r.NutritionAggregates)
                     .ThenInclude(na => na.Nutrient)
+                .Include(r => r.Parent)
                 .ToListAsync();
         }
 

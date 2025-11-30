@@ -345,7 +345,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            // If user uploaded a new image, use it; otherwise copy from parent recipe
+            if (request.Image != null)
+            {
+                await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            }
+            else
+            {
+                await _imageService.CopyRecipeImageFromParentAsync(recipe, parent, userId);
+            }
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
             recipe.CookingSteps = steps;

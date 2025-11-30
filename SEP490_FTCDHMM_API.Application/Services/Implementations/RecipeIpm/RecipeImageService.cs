@@ -56,6 +56,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             recipe.Image = newImage;
         }
 
+        public async Task CopyRecipeImageFromParentAsync(Recipe recipe, Recipe parent, Guid userId)
+        {
+            if (!parent.ImageId.HasValue)
+                return;
+
+            var copiedImage = await _imageService.CopyImageAsync(
+                parent.ImageId.Value,
+                StorageFolder.RECIPES,
+                userId
+            );
+
+            if (copiedImage != null)
+            {
+                recipe.Image = copiedImage;
+            }
+        }
+
         public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe, Guid userId)
         {
             var result = new List<CookingStep>();
