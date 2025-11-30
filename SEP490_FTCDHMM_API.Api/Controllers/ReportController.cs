@@ -3,10 +3,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.ReportDtos;
-using SEP490_FTCDHMM_API.Application.Dtos.ReportDtos;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Constants;
+using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [ApiController]
@@ -21,104 +21,71 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _service = service;
             _mapper = mapper;
         }
-
-        // =====================================
-        // 🔥 HELPER: Lấy UserId từ JWT token
-        // =====================================
         private Guid GetUserId()
         {
-            var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrWhiteSpace(val))
-                throw new AppException(AppResponseCode.UNAUTHORIZED, "Bạn chưa đăng nhập.");
-
-            return Guid.Parse(val);
+            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
 
-        // =====================================
-        // ⭐ 1. CREATE REPORT
-        // =====================================
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateReportRequest request)
         {
-            var reporterId = GetUserId();
-            var appRequest = _mapper.Map<ReportRequest>(request);
+            var userId = GetUserId();
 
-            await _service.CreateReportAsync(reporterId, appRequest);
+            var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportRequest>(request);
+
+            await _service.CreateAsync(userId, appRequest);
 
             return Ok(new { message = "Report created successfully." });
         }
 
-        // =====================================
-        // ⭐ 2. GET ALL PENDING (ADMIN)
-        // =====================================
-        [HttpGet("pending")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetPending()
-        {
-            var result = await _service.GetAllPendingAsync();
-            return Ok(result);
-        }
-
-        // =====================================
-        // ⭐ 3. GET BY TYPE (ADMIN)
-        // =====================================
-        [HttpGet("type/{type}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetByType(string type)
-        {
-            var result = await _service.GetReportsByTypeAsync(type);
-            return Ok(result);
-        }
-
-        // =====================================
-        // ⭐ 4. GET REPORT BY ID (ADMIN)
-        // =====================================
+        [Authorize(Policy = PermissionPolicies.Report_View)]
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetByIdAsync(id);
             return Ok(result);
         }
+        [Authorize(Policy = PermissionPolicies.Report_View)]
+        [HttpGet("summary")]
 
-        // =====================================
-        // ⭐ 5. APPROVE REPORT (ADMIN)
-        // =====================================
+        public async Task<IActionResult> GetSummary([FromQuery] ReportFilterRequest request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportFilterRequest>(request);
+            var result = await _service.GetSummaryAsync(appRequest);
+            return Ok(result);
+        }
+
+        [Authorize(Policy = PermissionPolicies.Report_Approve)]
         [HttpPost("{id:guid}/approve")]
-        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Approve(Guid id)
         {
             var adminId = GetUserId();
-            await _service.ApproveAsync(id, adminId);
+            var result = await _service.ApproveAsync(id, adminId);
 
-            return Ok(new { message = "Report approved." });
+            return Ok(new
+            {
+
+                targetType = result.Type,
+                targetId = result.TargetId
+            });
         }
-
-        // =====================================
-        // ⭐ 6. REJECT REPORT (ADMIN)
-        // =====================================
+        [Authorize(Policy = PermissionPolicies.Report_Reject)]
         [HttpPost("{id:guid}/reject")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Reject(Guid id)
+
+        public async Task<IActionResult> Reject(Guid id, [FromBody] RejectReportRequest request)
         {
             var adminId = GetUserId();
-            await _service.RejectAsync(id, adminId);
 
-            return Ok(new { message = "Report rejected." });
+            var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.RejectReportRequest>(request);
+
+            await _service.RejectAsync(id, adminId, appRequest.Reason);
+
+            return Ok(new { message = "Report rejected successfully." });
         }
 
-        // =====================================
-        // ⭐ 7. DELETE REPORT (ADMIN)
-        // =====================================
-        [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            await _service.DeleteAsync(id);
 
-            return Ok(new { message = "Report deleted." });
-        }
     }
 }

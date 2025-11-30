@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.ReportDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -10,250 +13,290 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
     public class ReportService : IReportService
     {
-        private readonly IReportRepository _reportRepo;
-        private readonly IUserRepository _userRepo;
-        private readonly IRecipeRepository _recipeRepo;
-        private readonly ICommentRepository _commentRepo;
-        private readonly IRatingRepository _ratingRepo;
+        private readonly IReportRepository _reportRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IRecipeRepository _recipeRepository;
+        private readonly ICommentRepository _commentRepository;
+        private readonly IRatingRepository _ratingRepository;
         private readonly IMapper _mapper;
 
         public ReportService(
-            IReportRepository reportRepo,
-            IUserRepository userRepo,
-            IRecipeRepository recipeRepo,
-            ICommentRepository commentRepo,
-            IRatingRepository ratingRepo,
+            IReportRepository reportRepository,
+            IUserRepository userRepository,
+            IRecipeRepository recipeRepository,
+            ICommentRepository commentRepository,
+            IRatingRepository ratingRepository,
             IMapper mapper)
         {
-            _reportRepo = reportRepo;
-            _userRepo = userRepo;
-            _recipeRepo = recipeRepo;
-            _commentRepo = commentRepo;
-            _ratingRepo = ratingRepo;
+            _reportRepository = reportRepository;
+            _userRepository = userRepository;
+            _recipeRepository = recipeRepository;
+            _commentRepository = commentRepository;
+            _ratingRepository = ratingRepository;
             _mapper = mapper;
         }
 
-        // ========================================================
-        // CREATE
-        // ========================================================
-        public async Task<bool> CreateReportAsync(Guid reporterId, ReportRequest request)
+
+
+        public async Task CreateAsync(Guid reporterId, ReportRequest request)
         {
-            if (reporterId == request.TargetId)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể report chính mình");
+
+            var reporter = await _userRepository.GetByIdAsync(reporterId);
+            if (reporter == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Tài khoản không tồn tại.");
+
+            if (reporterId == request.TargetId && request.TargetType.Trim().ToUpperInvariant() == "USER")
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể report chính mình.");
+
+            var targetType = ReportObjectType.From(request.TargetType);
+
+
+            var description = request.Description?.Trim() ?? string.Empty;
 
             var report = new Report
             {
+                Id = Guid.NewGuid(),
                 ReporterId = reporterId,
                 TargetId = request.TargetId,
-                TargetType = ReportObjectType.From(request.TargetType),
-                Description = request.Description ?? "",
+                TargetType = targetType,
+                Description = description,
                 Status = ReportStatus.Pending,
                 ReviewedBy = null,
                 ReviewedAtUtc = null,
-                CreatedAtUtc = DateTime.UtcNow,
+                CreatedAtUtc = DateTime.UtcNow
             };
 
-            await _reportRepo.AddAsync(report);
-            return true;
+            await _reportRepository.AddAsync(report);
         }
 
-        // ========================================================
-        // GET BY ID
-        // ========================================================
+
         public async Task<ReportResponse> GetByIdAsync(Guid id)
         {
-            var report = await _reportRepo.GetByIdAsync(id);
+            var report = await _reportRepository.GetByIdAsync(
+                id,
+                r => r.Reporter
+            );
 
             if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
 
             var dto = _mapper.Map<ReportResponse>(report);
-            dto.TargetName = await ResolveTargetName(report);
+            dto.TargetName = await ResolveTargetNameAsync(report);
 
             return dto;
         }
 
-        // ========================================================
-        // GET BY TYPE (sửa để dùng ==)
-        // ========================================================
-        public async Task<IReadOnlyList<ReportResponse>> GetReportsByTypeAsync(string type)
+        public async Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request)
         {
-            var targetType = ReportObjectType.From(type);
+            //
+            // 1. Tạo FILTER (không dùng And)
+            //
+            Expression<Func<Report, bool>> filter = r =>
+                (string.IsNullOrEmpty(request.Type) ||
+                    r.TargetType.Value == ReportObjectType.From(request.Type).Value)
+                &&
+                (string.IsNullOrEmpty(request.Status) ||
+                    r.Status.Value == ReportStatus.From(request.Status).Value)
+                &&
+                (string.IsNullOrEmpty(request.Keyword) ||
+                    r.Description.Contains(request.Keyword));
 
-            var reports = await _reportRepo.GetAllAsync(r => r.TargetType == targetType);
+            //
+            // 2. Include
+            //
+            Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
 
-            return await ConvertToListAsync(reports);
+            //
+            // 3. Lấy toàn bộ report theo filter (KHÔNG phân trang tại DB)
+            //
+            var reports = await _reportRepository.GetAllAsync(
+                predicate: filter,
+                include: include
+            );
+
+            //
+            // 4. Group theo (TargetType + TargetId)
+            //
+            var grouped = reports
+                .GroupBy(r => new { r.TargetType.Value, r.TargetId })
+                .Select(g => new
+                {
+                    TargetType = g.Key.Value,
+                    TargetId = g.Key.TargetId,
+                    Count = g.Count(),
+                    LatestAt = g.Max(x => x.CreatedAtUtc)
+                })
+                .OrderByDescending(x => x.Count)
+                .ThenByDescending(x => x.LatestAt)
+                .ToList();
+
+            //
+            // 5. Build danh sách DTO
+            //
+            var resultList = new List<ReportSummaryResponse>();
+
+            foreach (var g in grouped)
+            {
+                // tạo object Report giả để reuse ResolveTargetNameAsync
+                var temp = new Report
+                {
+                    TargetId = g.TargetId,
+                    TargetType = ReportObjectType.From(g.TargetType)
+                };
+
+                var targetName = await ResolveTargetNameAsync(temp);
+
+                resultList.Add(new ReportSummaryResponse
+                {
+                    TargetType = g.TargetType,
+                    TargetId = g.TargetId,
+                    TargetName = targetName,
+                    Count = g.Count,
+                    LatestReportAtUtc = g.LatestAt
+                });
+            }
+
+            //
+            // 6. Phân trang
+            //
+            var totalCount = resultList.Count;
+            var pagedItems = resultList
+                .Skip((request.PaginationParams.PageNumber - 1) * request.PaginationParams.PageSize)
+                .Take(request.PaginationParams.PageSize)
+                .ToList();
+
+            //
+            // 7. Return
+            //
+            return new PagedResult<ReportSummaryResponse>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = request.PaginationParams.PageNumber,
+                PageSize = request.PaginationParams.PageSize
+            };
         }
 
-        // ========================================================
-        // GET ALL PENDING (sửa sang ==)
-        // ========================================================
-        public async Task<IReadOnlyList<ReportResponse>> GetAllPendingAsync()
-        {
-            var reports = await _reportRepo.GetAllAsync(r => r.Status == ReportStatus.Pending);
-            return await ConvertToListAsync(reports);
-        }
 
-        // ========================================================
-        // APPROVE
-        // ========================================================
-        public async Task<bool> ApproveAsync(Guid reportId, Guid adminId)
+
+        public async Task<(string Type, Guid TargetId)> ApproveAsync(Guid reportId, Guid adminId)
         {
-            var report = await _reportRepo.GetByIdAsync(reportId);
+            var report = await _reportRepository.GetByIdAsync(reportId);
 
             if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
 
             if (report.Status == ReportStatus.Approved)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã được duyệt");
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã được duyệt trước đó.");
 
             report.Status = ReportStatus.Approved;
             report.ReviewedBy = adminId;
             report.ReviewedAtUtc = DateTime.UtcNow;
 
-            await _reportRepo.UpdateAsync(report);
+            await _reportRepository.UpdateAsync(report);
 
-            await HandleApproveAction(report);
-
-            return true;
+            return (report.TargetType.Value, report.TargetId);
         }
 
-        // ========================================================
-        // REJECT
-        // ========================================================
-        public async Task<bool> RejectAsync(Guid reportId, Guid adminId)
+
+        public async Task RejectAsync(Guid reportId, Guid adminId, string reason)
         {
-            var report = await _reportRepo.GetByIdAsync(reportId);
+            if (string.IsNullOrWhiteSpace(reason))
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Lý do từ chối không được để trống.");
+
+            var report = await _reportRepository.GetByIdAsync(reportId);
 
             if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
 
             if (report.Status == ReportStatus.Rejected)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã bị từ chối trước đó");
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã bị từ chối trước đó.");
 
             report.Status = ReportStatus.Rejected;
             report.ReviewedBy = adminId;
             report.ReviewedAtUtc = DateTime.UtcNow;
+            report.RejectReason = reason;
 
-            await _reportRepo.UpdateAsync(report);
-            return true;
+            await _reportRepository.UpdateAsync(report);
         }
 
-        // ========================================================
-        // DELETE
-        // ========================================================
-        public async Task<bool> DeleteAsync(Guid id)
+
+
+
+        private async Task<bool> TargetExistsAsync(ReportObjectType targetType, Guid targetId)
         {
-            var report = await _reportRepo.GetByIdAsync(id);
+            if (targetType == ReportObjectType.Recipe)
+            {
+                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && !r.IsDeleted);
+            }
 
-            if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại");
+            if (targetType == ReportObjectType.User)
+            {
+                return await _userRepository.ExistsAsync(u => u.Id == targetId);
+            }
 
-            await _reportRepo.DeleteAsync(report);
-            return true;
+            if (targetType == ReportObjectType.Comment)
+            {
+                return await _commentRepository.ExistsAsync(c => c.Id == targetId);
+            }
+
+            if (targetType == ReportObjectType.Rating)
+            {
+                return await _ratingRepository.ExistsAsync(r => r.Id == targetId);
+            }
+
+            return false;
         }
 
-        // ========================================================
-        // PRIVATE HELPERS (refactor sang ==)
-        // ========================================================
-        private async Task<string> ResolveTargetName(Report report)
+        private async Task<string> ResolveTargetNameAsync(Report report)
         {
-            // --- RECIPE ---
             if (report.TargetType == ReportObjectType.Recipe)
             {
-                var recipe = await _recipeRepo.GetByIdAsync(report.TargetId);
+                var recipe = await _recipeRepository.GetByIdAsync(report.TargetId);
                 return recipe?.Name?.Trim() ?? "Unknown Recipe";
             }
 
-            // --- USER ---
             if (report.TargetType == ReportObjectType.User)
             {
-                var user = await _userRepo.GetByIdAsync(report.TargetId);
+                var user = await _userRepository.GetByIdAsync(report.TargetId);
                 if (user == null)
                     return "Unknown User";
 
-                var full = $"{user.FirstName?.Trim()} {user.LastName?.Trim()}".Trim();
+                var first = user.FirstName?.Trim() ?? "";
+                var last = user.LastName?.Trim() ?? "";
+                var full = $"{first} {last}".Trim();
+
                 return string.IsNullOrWhiteSpace(full) ? "Unknown User" : full;
             }
 
-            // --- COMMENT ---
             if (report.TargetType == ReportObjectType.Comment)
             {
-                var cmt = await _commentRepo.GetByIdAsync(report.TargetId);
-                var text = cmt?.Content?.Trim();
-                return string.IsNullOrWhiteSpace(text) ? "(no content)" : text;
+                var comment = await _commentRepository.GetByIdAsync(report.TargetId);
+                var content = comment?.Content?.Trim();
+
+                if (string.IsNullOrWhiteSpace(content))
+                    return "(no content)";
+
+                return content;
             }
 
-            // --- RATING ---
             if (report.TargetType == ReportObjectType.Rating)
             {
-                var rating = await _ratingRepo.GetByIdAsync(report.TargetId);
-
+                var rating = await _ratingRepository.GetByIdAsync(report.TargetId);
                 if (rating == null)
                     return "Unknown Rating";
 
-                if (string.IsNullOrWhiteSpace(rating.Feedback))
+                var feedback = rating.Feedback?.Trim();
+
+                if (string.IsNullOrWhiteSpace(feedback))
                     return $"{rating.Score} stars";
 
-                return $"{rating.Score} stars — {rating.Feedback}";
+                return $"{rating.Score} stars — {feedback}";
             }
 
             return "Unknown";
         }
 
-        private async Task HandleApproveAction(Report report)
-        {
-            // COMMENT → xóa
-            if (report.TargetType == ReportObjectType.Comment)
-            {
-                var cmt = await _commentRepo.GetByIdAsync(report.TargetId);
-                if (cmt != null)
-                    await _commentRepo.DeleteAsync(cmt);
-            }
 
-            // RATING → xoá
-            if (report.TargetType == ReportObjectType.Rating)
-            {
-                var rating = await _ratingRepo.GetByIdAsync(report.TargetId);
-                if (rating != null)
-                    await _ratingRepo.DeleteAsync(rating);
-            }
-
-            // USER → khoá user
-            if (report.TargetType == ReportObjectType.User)
-            {
-                var user = await _userRepo.GetByIdAsync(report.TargetId);
-                if (user != null)
-                {
-                    user.LockReason = "Tài khoản bị report và admin đã phê duyệt";
-                    await _userRepo.UpdateAsync(user);
-                }
-            }
-
-            // RECIPE → ẩn recipe
-            if (report.TargetType == ReportObjectType.Recipe)
-            {
-                var recipe = await _recipeRepo.GetByIdAsync(report.TargetId);
-                if (recipe != null)
-                {
-                    recipe.IsDeleted = true;
-                    await _recipeRepo.UpdateAsync(recipe);
-                }
-            }
-        }
-
-        private async Task<IReadOnlyList<ReportResponse>> ConvertToListAsync(IList<Report> reports)
-        {
-            var list = new List<ReportResponse>();
-
-            foreach (var report in reports)
-            {
-                var dto = _mapper.Map<ReportResponse>(report);
-                dto.TargetName = await ResolveTargetName(report);
-                list.Add(dto);
-            }
-
-            return list;
-        }
     }
 }

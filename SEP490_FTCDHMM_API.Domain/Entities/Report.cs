@@ -12,6 +12,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public ReportStatus Status { get; set; } = ReportStatus.Pending;
         public Guid? ReviewedBy { get; set; }
+        public string? RejectReason { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime? ReviewedAtUtc { get; set; }
     }

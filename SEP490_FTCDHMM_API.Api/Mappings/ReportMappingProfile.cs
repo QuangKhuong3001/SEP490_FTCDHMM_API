@@ -9,6 +9,11 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public ReportMappingProfile()
         {
             CreateMap<APIDtos.ReportDtos.CreateReportRequest, ApplicationDtos.ReportDtos.ReportRequest>();
+
+
+            CreateMap<APIDtos.ReportDtos.ReportFilterRequest, ApplicationDtos.ReportDtos.ReportFilterRequest>();
+
+            CreateMap<APIDtos.ReportDtos.RejectReportRequest, ApplicationDtos.ReportDtos.RejectReportRequest>();
         }
     }
 }

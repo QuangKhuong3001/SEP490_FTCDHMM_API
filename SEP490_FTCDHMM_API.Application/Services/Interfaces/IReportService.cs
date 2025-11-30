@@ -1,16 +1,16 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.ReportDtos;
+﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
+using SEP490_FTCDHMM_API.Application.Dtos.ReportDtos;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IReportService
     {
-        Task<bool> CreateReportAsync(Guid reporterId, ReportRequest request);
-        Task<IReadOnlyList<ReportResponse>> GetAllPendingAsync();
-        Task<IReadOnlyList<ReportResponse>> GetReportsByTypeAsync(string type);
+        Task CreateAsync(Guid reporterId, ReportRequest request);
         Task<ReportResponse> GetByIdAsync(Guid id);
-        Task<bool> ApproveAsync(Guid reportId, Guid adminId);
-        Task<bool> RejectAsync(Guid reportId, Guid adminId);
-        Task<bool> DeleteAsync(Guid reportId);
+        Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request);
+        Task<(string Type, Guid TargetId)> ApproveAsync(Guid reportId, Guid adminId);
+        Task RejectAsync(Guid reportId, Guid adminId, string reason);
     }
+
 }
 

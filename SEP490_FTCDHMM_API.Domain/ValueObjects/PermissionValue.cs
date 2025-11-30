@@ -37,6 +37,10 @@
         public static readonly PermissionValue Rating_Create = new("Rating", "Create");
         public static readonly PermissionValue Rating_Delete = new("Rating", "Delete");
         public static readonly PermissionValue Rating_Update = new("Rating", "Update");
+
+        public static readonly PermissionValue Report_View = new("Report", "View");
+        public static readonly PermissionValue Report_Approve = new("Report", "Approve");
+        public static readonly PermissionValue Report_Reject = new("Report", "Reject");
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -61,7 +65,11 @@
             Comment_Update,
             Rating_Create,
             Rating_Delete,
-            Rating_Update
+            Rating_Update,
+            Report_View,
+            Report_Approve,
+            Report_Reject
+
         };
     }
 }
