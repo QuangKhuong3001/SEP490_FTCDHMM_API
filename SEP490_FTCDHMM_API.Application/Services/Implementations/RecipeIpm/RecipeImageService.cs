@@ -122,11 +122,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 include: q => q
                     .Include(s => s.CookingStepImages));
 
+            // Collect all existing image IDs that should be kept
+            var existingImageIdsToKeep = newSteps
+                .SelectMany(s => s.Images ?? new List<CookingStepImageRequest>())
+                .Where(img => img.ExistingImageId.HasValue)
+                .Select(img => img.ExistingImageId!.Value)
+                .ToHashSet();
+
+            // Delete only images that are NOT being kept
             foreach (var oldStep in oldSteps)
             {
                 foreach (var si in oldStep.CookingStepImages)
                 {
-                    await _imageService.DeleteImageAsync(si.ImageId);
+                    if (!existingImageIdsToKeep.Contains(si.ImageId))
+                    {
+                        await _imageService.DeleteImageAsync(si.ImageId);
+                    }
                 }
             }
 
@@ -151,18 +162,35 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
                     foreach (var img in imageRequests)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(
-                            img.Image,
-                            StorageFolder.COOKING_STEPS,
-                            userId
-                        );
+                        Guid imageId;
+
+                        if (img.ExistingImageId.HasValue)
+                        {
+                            // Keep the existing image
+                            imageId = img.ExistingImageId.Value;
+                        }
+                        else if (img.Image != null)
+                        {
+                            // Upload new image
+                            var uploaded = await _imageService.UploadImageAsync(
+                                img.Image,
+                                StorageFolder.COOKING_STEPS,
+                                userId
+                            );
+                            imageId = uploaded.Id;
+                        }
+                        else
+                        {
+                            // Skip if neither existing nor new image is provided
+                            continue;
+                        }
 
                         newStep.CookingStepImages.Add(new CookingStepImage
                         {
                             Id = Guid.NewGuid(),
                             CookingStepId = newStep.Id,
                             ImageOrder = img.ImageOrder,
-                            ImageId = uploaded.Id
+                            ImageId = imageId
                         });
                     }
                 }
