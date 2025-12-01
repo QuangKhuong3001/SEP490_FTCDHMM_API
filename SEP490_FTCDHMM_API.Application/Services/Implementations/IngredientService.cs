@@ -349,15 +349,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return new List<IngredientNameResponse> { created };
         }
 
-        private async Task<IngredientNameResponse?> CreateIngredientFromUsdaAsync(string vietName)
+        private async Task<IngredientNameResponse?> CreateIngredientFromUsdaAsync(string translated)
         {
+            var vietName = await _translateService.TranslateToVietnameseAsync(translated);
+
             if (await _ingredientRepository.ExistsAsync(u => u.Name == vietName))
             {
                 var dbItems = await _ingredientRepository.GetTop5Async(vietName);
                 return _mapper.Map<IngredientNameResponse>(dbItems.First());
             }
 
-            var searchResults = await _usdaApi.SearchAsync(vietName);
+            var searchResults = await _usdaApi.SearchAsync(translated);
             if (searchResults == null)
                 return null;
 

@@ -43,6 +43,33 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 .GetProperty("translatedText")
                 .GetString() ?? "";
         }
+
+        public async Task<string> TranslateToVietnameseAsync(string english)
+        {
+            var url = $"https://translation.googleapis.com/language/translate/v2?key={_apiKey}";
+
+            var body = new
+            {
+                q = english,
+                source = "en",
+                target = "vi",
+                format = "text"
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+
+            var resp = await _http.PostAsync(url, content);
+            resp.EnsureSuccessStatusCode();
+
+            using var stream = await resp.Content.ReadAsStreamAsync();
+            var json = await JsonSerializer.DeserializeAsync<JsonElement>(stream);
+
+            return json
+                .GetProperty("data")
+                .GetProperty("translations")[0]
+                .GetProperty("translatedText")
+                .GetString() ?? "";
+        }
     }
 
 }
