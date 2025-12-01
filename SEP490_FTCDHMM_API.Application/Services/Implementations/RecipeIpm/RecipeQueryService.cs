@@ -262,7 +262,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             return result;
         }
 
-        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid recipeId, RecipePaginationParams request, Guid? currentUserId = null)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
@@ -286,6 +286,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 .ToList();
 
             var result = _mapper.Map<IEnumerable<RatingDetailsResponse>>(pagedRatings);
+
+            // Set IsOwner for each rating
+            if (currentUserId.HasValue)
+            {
+                foreach (var rating in result)
+                {
+                    rating.IsOwner = rating.UserInteractionResponse.Id == currentUserId.Value;
+                }
+            }
 
             return new PagedResult<RatingDetailsResponse>
             {

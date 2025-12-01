@@ -88,7 +88,12 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
-            var result = await _recipeQueryService.GetRatingDetailsAsync(recipeId, appRequest);
+            // Get current user ID if authenticated
+            Guid? currentUserId = User.Identity?.IsAuthenticated == true
+                ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+                : null;
+
+            var result = await _recipeQueryService.GetRatingDetailsAsync(recipeId, appRequest, currentUserId);
             return Ok(result);
         }
 
