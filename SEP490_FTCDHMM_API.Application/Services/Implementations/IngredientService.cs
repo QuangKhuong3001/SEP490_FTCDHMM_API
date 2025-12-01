@@ -94,9 +94,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 pageNumber: dto.PaginationParams.PageNumber,
                 pageSize: dto.PaginationParams.PageSize,
                 filter: filter,
-                orderBy: q => q.OrderByKeyword(dto.Keyword,
-                                           i => i.Name,
-                                           i => i.Description),
+                orderBy: q =>
+                {
+                    var ordered = q.OrderByDescending(i => i.IsNew);
+
+                    if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                    {
+                        ordered = ordered.ThenByKeyword(dto.Keyword,
+                                                        i => i.Name,
+                                                        i => i.Description);
+                    }
+
+                    return ordered;
+                },
                 keyword: dto.Keyword,
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
@@ -300,34 +310,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (ingredient == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            ingredient.IsNew = false;
+            await _ingredientRepository.UpdateAsync(ingredient);
+
             var result = _mapper.Map<IngredientDetailsResponse>(ingredient);
 
             return result;
         }
-
-        //public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword, CancellationToken ct = default)
-        //{
-        //    if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLenth)
-        //        return Enumerable.Empty<IngredientNameResponse>();
-
-        //    keyword = keyword.Trim();
-        //    var key = $"ingredient:search:{keyword.ToLowerInvariant()}";
-
-        //    //var cached = await _cache.GetAsync<List<IngredientNameResponse>>(key, ct);
-        //    //if (cached is { Count: > 0 }) return cached;
-
-        //    var dbItems = await _ingredientRepository.GetTop5Async(keyword, ct);
-
-        //    var mapped = _mapper.Map<List<IngredientNameResponse>>(dbItems);
-
-        //    if (mapped.Count > 0)
-        //    {
-        //        //await _cache.SetAsync(key, mapped, _ttl, ct);
-        //        return mapped;
-        //    }
-
-        //    return Enumerable.Empty<IngredientNameResponse>();
-        //}
 
         public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword)
         {
@@ -382,15 +371,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 await _ingredientCategoryRepository.AddAsync(category);
             }
 
+            var descriptionViet = await _translateService.TranslateToVietnameseAsync(detail.Description);
+
             var ingredient = new Ingredient
             {
                 Id = Guid.NewGuid(),
                 Name = vietName,
-                Description = detail.Description,
+                Description = descriptionViet,
                 LastUpdatedUtc = DateTime.UtcNow,
                 Calories = ExtractCalories(detail),
                 ImageId = defaultImage.Id,
-                Image = defaultImage
+                Image = defaultImage,
+                IsNew = true
             };
 
             ingredient.Categories.Add(category);

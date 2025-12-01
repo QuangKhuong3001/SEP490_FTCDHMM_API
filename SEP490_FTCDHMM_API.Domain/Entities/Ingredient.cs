@@ -9,6 +9,7 @@
         public decimal Calories { get; set; }
         public Guid ImageId { get; set; }
         public required Image Image { get; set; }
+        public bool IsNew { get; set; } = false;
 
         public ICollection<IngredientCategory> Categories { get; set; } = new List<IngredientCategory>();
 

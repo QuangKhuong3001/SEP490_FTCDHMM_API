@@ -29,6 +29,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .IsUnicode(true)
                 .IsRequired(false);
 
+            builder.Property(u => u.IsNew)
+               .IsRequired()
+               .HasDefaultValue(false);
+
             builder.HasOne(i => i.Image)
                 .WithMany()
                 .HasForeignKey(i => i.ImageId)

@@ -32,11 +32,11 @@ public class DraftRecipeConfiguration : IEntityTypeConfiguration<DraftRecipe>
         builder.HasOne(x => x.Author)
             .WithMany()
             .HasForeignKey(x => x.AuthorId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.Image)
             .WithMany()
             .HasForeignKey(x => x.ImageId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
