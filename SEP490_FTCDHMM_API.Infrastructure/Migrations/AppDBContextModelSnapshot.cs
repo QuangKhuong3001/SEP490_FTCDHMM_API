@@ -1046,8 +1046,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId")
-                        .IsUnique();
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("ImageId");
 
@@ -1240,7 +1239,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 11, 29, 18, 12, 58, 376, DateTimeKind.Utc).AddTicks(8598),
+                            CreatedAtUTC = new DateTime(2025, 12, 1, 18, 51, 38, 232, DateTimeKind.Utc).AddTicks(8897),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1262,6 +1261,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Property<Guid>("ImageId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsNew")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("LastUpdatedUtc")
                         .ValueGeneratedOnAdd()
@@ -2407,6 +2411,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid?>("HealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("StartedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -2776,15 +2783,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "Author")
-                        .WithOne()
-                        .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Author");
 

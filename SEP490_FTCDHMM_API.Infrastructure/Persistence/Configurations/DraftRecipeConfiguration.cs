@@ -11,8 +11,7 @@ public class DraftRecipeConfiguration : IEntityTypeConfiguration<DraftRecipe>
 
         builder.HasKey(x => x.Id);
 
-        builder.HasIndex(x => x.AuthorId)
-            .IsUnique();
+        builder.Property(x => x.AuthorId);
 
         builder.Property(x => x.Name)
             .HasMaxLength(255);
@@ -31,13 +30,13 @@ public class DraftRecipeConfiguration : IEntityTypeConfiguration<DraftRecipe>
             .HasMaxLength(50);
 
         builder.HasOne(x => x.Author)
-            .WithOne()
-            .HasForeignKey<DraftRecipe>(x => x.AuthorId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => x.AuthorId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.Image)
             .WithMany()
             .HasForeignKey(x => x.ImageId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

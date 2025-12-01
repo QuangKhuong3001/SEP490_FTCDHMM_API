@@ -1,6 +1,5 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 

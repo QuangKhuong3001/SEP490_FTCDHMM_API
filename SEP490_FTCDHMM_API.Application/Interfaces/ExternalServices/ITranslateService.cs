@@ -3,6 +3,7 @@
     public interface ITranslateService
     {
         Task<string> TranslateToEnglishAsync(string vietnamese);
+        Task<string> TranslateToVietnameseAsync(string english);
     }
 
 }

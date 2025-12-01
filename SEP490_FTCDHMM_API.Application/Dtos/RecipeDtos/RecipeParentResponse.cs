@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
+﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {
     public class RecipeParentResponse
     {

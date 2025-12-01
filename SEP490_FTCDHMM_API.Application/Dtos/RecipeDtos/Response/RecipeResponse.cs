@@ -1,5 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -20,5 +21,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public RecipeParentResponse? Parent { get; set; }
+        public List<DraftUserRecipeTagged> TaggedUserIds { get; set; } = new();
     }
 }

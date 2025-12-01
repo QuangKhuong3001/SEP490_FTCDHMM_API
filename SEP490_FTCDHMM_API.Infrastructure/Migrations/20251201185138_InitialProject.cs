@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialProject : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -137,37 +138,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         name: "FK_AspNetRoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HealthGoalTargets",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NutrientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TargetType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MinValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MaxValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MinEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    MaxEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    Weight = table.Column<decimal>(type: "decimal(9,3)", precision: 9, scale: 3, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HealthGoalTargets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HealthGoalTargets_HealthGoals_HealthGoalId",
-                        column: x => x.HealthGoalId,
-                        principalTable: "HealthGoals",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_HealthGoalTargets_Nutrients_NutrientId",
-                        column: x => x.NutrientId,
-                        principalTable: "Nutrients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -316,34 +286,39 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomHealthGoalTargets",
+                name: "HealthGoalTargets",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomHealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CustomHealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     NutrientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TargetType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MinValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MaxValue = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: true),
-                    MinEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    MaxEnergyPct = table.Column<decimal>(type: "decimal(6,4)", precision: 6, scale: 4, nullable: true),
-                    Weight = table.Column<decimal>(type: "decimal(9,3)", precision: 9, scale: 3, nullable: false)
+                    TargetType = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'ABSOLUTE'"),
+                    MinValue = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true),
+                    MaxValue = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true),
+                    MinEnergyPct = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    MaxEnergyPct = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: true),
+                    Weight = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomHealthGoalTargets", x => x.Id);
+                    table.PrimaryKey("PK_HealthGoalTargets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CustomHealthGoalTargets_CustomHealthGoals_CustomHealthGoalId",
+                        name: "FK_HealthGoalTargets_CustomHealthGoals_CustomHealthGoalId",
                         column: x => x.CustomHealthGoalId,
                         principalTable: "CustomHealthGoals",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_CustomHealthGoalTargets_Nutrients_NutrientId",
+                        name: "FK_HealthGoalTargets_HealthGoals_HealthGoalId",
+                        column: x => x.HealthGoalId,
+                        principalTable: "HealthGoals",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_HealthGoalTargets_Nutrients_NutrientId",
                         column: x => x.NutrientId,
                         principalTable: "Nutrients",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -487,10 +462,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     LastUpdatedUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     Calories = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
-                    UsageFrequency = table.Column<int>(type: "int", nullable: false),
-                    SearchCount = table.Column<int>(type: "int", nullable: false),
-                    PopularityScore = table.Column<double>(type: "float", nullable: false),
-                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsNew = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -608,14 +581,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    Difficulty = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Difficulty = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'MEDIUM'"),
                     CookTime = table.Column<int>(type: "int", nullable: false),
                     UpdatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Ration = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Calories = table.Column<decimal>(type: "decimal(10,3)", nullable: true),
+                    Calories = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Rating = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0)
+                    ViewCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    RatingCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    AvgRating = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -626,6 +602,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         principalTable: "Images",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Recipes_Recipes_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Recipes",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Recipes_Users_AuthorId",
                         column: x => x.AuthorId,
@@ -664,7 +645,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CustomHealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ExpiredAtUtc = table.Column<DateTime>(type: "date", nullable: true)
+                    ExpiredAtUtc = table.Column<DateTime>(type: "date", nullable: true),
+                    StartedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'CUSTOM'")
                 },
                 constraints: table =>
                 {
@@ -693,7 +676,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     WeightKg = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
                     HeightCm = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
                     BMI = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
@@ -703,7 +685,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     BMR = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
                     TDEE = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RecordedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    RecordedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -745,6 +728,36 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserIngredientRestrictions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLabelStats",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LabelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Views = table.Column<int>(type: "int", nullable: false),
+                    SearchClicks = table.Column<int>(type: "int", nullable: false),
+                    Favorites = table.Column<int>(type: "int", nullable: false),
+                    Saves = table.Column<int>(type: "int", nullable: false),
+                    Ratings = table.Column<int>(type: "int", nullable: false),
+                    RatingSum = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLabelStats", x => new { x.UserId, x.LabelId });
+                    table.ForeignKey(
+                        name: "FK_UserLabelStats_Labels_LabelId",
+                        column: x => x.LabelId,
+                        principalTable: "Labels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserLabelStats_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -860,8 +873,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 columns: table => new
                 {
                     RecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaggedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RecipeId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    TaggedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -872,11 +884,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         principalTable: "Recipes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RecipeUserTags_Recipes_RecipeId1",
-                        column: x => x.RecipeId1,
-                        principalTable: "Recipes",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RecipeUserTags_Users_TaggedUserId",
                         column: x => x.TaggedUserId,
@@ -963,7 +970,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Images",
                 columns: new[] { "Id", "ContentType", "CreatedAtUTC", "IsDeleted", "Key", "UploadedById" },
-                values: new object[] { new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"), "image/png", new DateTime(2025, 11, 23, 7, 45, 11, 793, DateTimeKind.Utc).AddTicks(1674), false, "images/default/no-image.png", null });
+                values: new object[] { new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"), "image/png", new DateTime(2025, 12, 1, 18, 51, 38, 232, DateTimeKind.Utc).AddTicks(8897), false, "images/default/no-image.png", null });
 
             migrationBuilder.InsertData(
                 table: "IngredientCategories",
@@ -1278,16 +1285,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomHealthGoalTargets_CustomHealthGoalId",
-                table: "CustomHealthGoalTargets",
-                column: "CustomHealthGoalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CustomHealthGoalTargets_NutrientId",
-                table: "CustomHealthGoalTargets",
-                column: "NutrientId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_DraftCookingStepImages_DraftCookingStepId",
                 table: "DraftCookingStepImages",
                 column: "DraftCookingStepId");
@@ -1310,8 +1307,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_DraftRecipes_AuthorId",
                 table: "DraftRecipes",
-                column: "AuthorId",
-                unique: true);
+                column: "AuthorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DraftRecipes_ImageId",
@@ -1327,6 +1323,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "IX_EmailOtps_SentToId",
                 table: "EmailOtps",
                 column: "SentToId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthGoalTargets_CustomHealthGoalId",
+                table: "HealthGoalTargets",
+                column: "CustomHealthGoalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HealthGoalTargets_HealthGoalId",
@@ -1429,9 +1430,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 filter: "[ImageId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecipeUserTags_RecipeId1",
-                table: "RecipeUserTags",
-                column: "RecipeId1");
+                name: "IX_Recipes_ParentId",
+                table: "Recipes",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RecipeUserTags_TaggedUserId",
@@ -1495,6 +1496,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "IX_UserIngredientRestrictions_UserId",
                 table: "UserIngredientRestrictions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserLabelStats_LabelId",
+                table: "UserLabelStats",
+                column: "LabelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRecipeViews_RecipeId",
@@ -1661,16 +1667,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 table: "DraftRecipes",
                 column: "ImageId",
                 principalTable: "Images",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_DraftRecipes_Users_AuthorId",
                 table: "DraftRecipes",
                 column: "AuthorId",
                 principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_DraftRecipeUserTags_Users_TaggedUserId",
@@ -1724,9 +1728,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "CookingStepImages");
-
-            migrationBuilder.DropTable(
-                name: "CustomHealthGoalTargets");
 
             migrationBuilder.DropTable(
                 name: "DraftCookingStepImages");
@@ -1783,6 +1784,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "UserIngredientRestrictions");
 
             migrationBuilder.DropTable(
+                name: "UserLabelStats");
+
+            migrationBuilder.DropTable(
                 name: "UserRecipeViews");
 
             migrationBuilder.DropTable(
@@ -1796,9 +1800,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "DraftCookingSteps");
-
-            migrationBuilder.DropTable(
-                name: "Labels");
 
             migrationBuilder.DropTable(
                 name: "Nutrients");
@@ -1819,16 +1820,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "Ingredients");
 
             migrationBuilder.DropTable(
-                name: "Recipes");
+                name: "Labels");
 
             migrationBuilder.DropTable(
-                name: "DraftRecipes");
+                name: "Recipes");
 
             migrationBuilder.DropTable(
                 name: "NutrientUnits");
 
             migrationBuilder.DropTable(
                 name: "PermissionDomains");
+
+            migrationBuilder.DropTable(
+                name: "DraftRecipes");
 
             migrationBuilder.DropTable(
                 name: "Roles");

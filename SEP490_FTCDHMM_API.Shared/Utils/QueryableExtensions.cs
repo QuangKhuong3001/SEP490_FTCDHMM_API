@@ -73,6 +73,48 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
 
             return ordered ?? (IOrderedQueryable<T>)query;
         }
+
+        public static IOrderedQueryable<T> ThenByKeyword<T>(
+        this IOrderedQueryable<T> query,
+        string? keyword,
+        params Expression<Func<T, string?>>[] properties)
+        {
+            if (string.IsNullOrWhiteSpace(keyword) || properties.Length == 0)
+                return query;
+
+            keyword = keyword.ToLower();
+
+            foreach (var prop in properties)
+            {
+                var param = prop.Parameters[0];
+
+                var toLower = typeof(string)
+                    .GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+                var loweredProp = Expression.Call(prop.Body, toLower);
+
+                var keywordConst = Expression.Constant(keyword);
+
+                var eq = Expression.Equal(loweredProp, keywordConst);
+                var eqLambda = Expression.Lambda<Func<T, bool>>(eq, param);
+
+                var startsWith = typeof(string)
+                    .GetMethod(nameof(string.StartsWith), new[] { typeof(string) })!;
+                var startsWithCall = Expression.Call(loweredProp, startsWith, keywordConst);
+                var startsWithLambda = Expression.Lambda<Func<T, bool>>(startsWithCall, param);
+
+                var contains = typeof(string)
+                    .GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+                var containsCall = Expression.Call(loweredProp, contains, keywordConst);
+                var containsLambda = Expression.Lambda<Func<T, bool>>(containsCall, param);
+
+                query = query
+                    .ThenByDescending(eqLambda)
+                    .ThenByDescending(startsWithLambda)
+                    .ThenByDescending(containsLambda);
+            }
+
+            return query;
+        }
     }
 
 }

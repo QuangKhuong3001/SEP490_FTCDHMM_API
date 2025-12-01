@@ -2,6 +2,7 @@
 {
     public class USDASettings
     {
-        public string ApiKey = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
     }
+
 }
