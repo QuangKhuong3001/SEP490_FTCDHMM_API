@@ -1239,7 +1239,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 1, 18, 51, 38, 232, DateTimeKind.Utc).AddTicks(8897),
+                            CreatedAtUTC = new DateTime(2025, 12, 1, 20, 17, 51, 666, DateTimeKind.Utc).AddTicks(1607),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });

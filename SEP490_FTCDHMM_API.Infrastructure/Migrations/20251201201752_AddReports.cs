@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Roport : Migration
+    public partial class AddReports : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                 column: "CreatedAtUTC",
-                value: new DateTime(2025, 11, 30, 14, 24, 43, 263, DateTimeKind.Utc).AddTicks(8330));
+                value: new DateTime(2025, 12, 1, 20, 17, 51, 666, DateTimeKind.Utc).AddTicks(1607));
 
             migrationBuilder.InsertData(
                 table: "PermissionDomains",
@@ -166,7 +166,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                 column: "CreatedAtUTC",
-                value: new DateTime(2025, 11, 26, 1, 47, 9, 549, DateTimeKind.Utc).AddTicks(5788));
+                value: new DateTime(2025, 12, 1, 18, 51, 38, 232, DateTimeKind.Utc).AddTicks(8897));
         }
     }
 }
