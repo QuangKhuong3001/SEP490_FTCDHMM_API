@@ -3,6 +3,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep.CookingStepImag
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 using SEP490_FTCDHMM_API.Shared.Utils;
 
@@ -106,9 +107,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         public Task ValidateRecipeOwnerAsync(Guid userId, Recipe recipe)
         {
             if (recipe.AuthorId != userId)
-                throw new AppException(AppResponseCode.FORBIDDEN, "Bạn không có quyền chỉnh sửa công thức");
+                throw new AppException(AppResponseCode.ACCESS_DENIED, "Bạn không có quyền chỉnh sửa công thức");
 
-            if (recipe.IsDeleted)
+            if (recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             return Task.CompletedTask;

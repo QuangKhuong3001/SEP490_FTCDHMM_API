@@ -7,6 +7,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
@@ -40,7 +41,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
 
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             var existingRating = await _ratingRepository.FirstOrDefaultAsync(

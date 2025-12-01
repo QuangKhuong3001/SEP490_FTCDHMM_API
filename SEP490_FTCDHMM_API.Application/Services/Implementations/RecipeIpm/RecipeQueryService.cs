@@ -25,6 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly IMapper _mapper;
         private readonly IRecipeBehaviorService _behaviorService;
 
+
         public RecipeQueryService(
             IRecipeRepository recipeRepository,
             IUserRepository userRepository,
@@ -46,7 +47,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         public async Task<PagedResult<RecipeResponse>> GetAllRecipesAsync(RecipeFilterRequest request)
         {
             Expression<Func<Recipe, bool>> filter = f =>
-                !f.IsDeleted
+                f.Status == RecipeStatus.Posted
                 && (request.Difficulty == null || f.Difficulty == DifficultyValue.From(request.Difficulty))
                 && (request.Ration == null || f.Ration == request.Ration)
                 && (request.MaxCookTime == null || f.CookTime < request.MaxCookTime)
@@ -109,15 +110,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
-            if (recipe == null || recipe.IsDeleted)
-                throw new AppException(AppResponseCode.NOT_FOUND);
+            await this.ValidateAccessRecipeAsync(userId, recipe);
 
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            await _behaviorService.RecordViewAsync(userId, recipe);
-            await _recipeRepository.UpdateAsync(recipe);
+            await _behaviorService.RecordViewAsync(userId, recipe!);
+            await _recipeRepository.UpdateAsync(recipe!);
 
             var isFavorited = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
             var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
@@ -138,7 +138,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var (items, totalCount) = await _userFavoriteRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.Status == RecipeStatus.Posted,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe).ThenInclude(r => r.Author).ThenInclude(u => u.Avatar)
@@ -167,7 +167,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var (items, totalCount) = await _userSaveRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
-                filter: f => f.UserId == userId && f.Recipe.IsDeleted == false,
+                filter: f => f.UserId == userId && f.Recipe.Status == RecipeStatus.Posted,
                 orderBy: q => q.OrderByDescending(f => f.CreatedAtUtc),
                 include: q => q
                     .Include(f => f.Recipe).ThenInclude(r => r.Author).ThenInclude(u => u.Avatar)
@@ -203,7 +203,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
                 pageSize: paginationParams.PageSize,
-                filter: f => !f.IsDeleted && f.AuthorId == userId,
+                filter: f => f.Status == RecipeStatus.Posted && f.AuthorId == userId,
                 orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
                 include: include
             );
@@ -235,7 +235,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
                 pageSize: paginationParams.PageSize,
-                filter: f => !f.IsDeleted && f.AuthorId == user.Id,
+                filter: f => f.Status == RecipeStatus.Posted && f.AuthorId == user.Id,
                 orderBy: o => o.OrderByDescending(r => r.CreatedAtUtc),
                 include: include
             );
@@ -251,17 +251,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             };
         }
 
-        public async Task<RecipeRatingResponse> GetRecipeRatingAsync(Guid recipeId)
+        public async Task<RecipeRatingResponse> GetRecipeRatingAsync(Guid userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            await this.ValidateAccessRecipeAsync(userId, recipe);
 
             var result = _mapper.Map<RecipeRatingResponse>(recipe);
             return result;
         }
 
-        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid userId, Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
@@ -269,11 +269,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                                .ThenInclude(rt => rt.User)
                                .ThenInclude(u => u.Avatar));
 
-            if (recipe == null || recipe.IsDeleted)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+            await this.ValidateAccessRecipeAsync(userId, recipe);
 
-            var query = recipe.Ratings
-                .Where(v => !v.Recipe.IsDeleted)
+            var query = recipe!.Ratings
                 .OrderByDescending(v => v.CreatedAtUtc)
                 .AsQueryable();
 
@@ -311,7 +309,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var query = user.ViewedRecipes
-                .Where(v => !v.Recipe.IsDeleted)
+                .Where(v => v.Recipe.Status == RecipeStatus.Posted)
                 .OrderByDescending(v => v.ViewedAtUtc)
                 .Select(v => v.Recipe)
                 .AsQueryable();
@@ -333,5 +331,45 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 PageSize = request.PageSize
             };
         }
+
+        public async Task<PagedResult<RecipeManagementResponse>> GetPendingListAsync(PaginationParams request)
+        {
+            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
+                q.Include(r => r.Author).ThenInclude(u => u.Avatar)
+                 .Include(r => r.Image)
+                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
+                 .Include(r => r.Labels)
+                 .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
+                 .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+
+            var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize,
+                orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),
+                include: include
+            );
+
+            var result = _mapper.Map<IReadOnlyList<RecipeManagementResponse>>(items);
+
+            return new PagedResult<RecipeManagementResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        private Task ValidateAccessRecipeAsync(Guid userId, Recipe? recipe)
+        {
+            if (recipe == null || recipe.Status == RecipeStatus.Deleted)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            if (recipe.Status != RecipeStatus.Posted && recipe.AuthorId != userId)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            return Task.CompletedTask;
+        }
+
     }
 }

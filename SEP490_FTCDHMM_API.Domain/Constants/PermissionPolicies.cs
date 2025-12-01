@@ -36,7 +36,10 @@
         public const string Rating_Delete = "Rating:Delete";
         public const string Rating_Update = "Rating:Update";
 
-
+        public const string Recipe_ManagementView = "Recipe:ManagementView";
+        public const string Recipe_Delete = "Recipe:Delete";
+        public const string Recipe_Lock = "Recipe:Lock";
+        public const string Recipe_Approve = "Recipe:Approve";
 
     }
 

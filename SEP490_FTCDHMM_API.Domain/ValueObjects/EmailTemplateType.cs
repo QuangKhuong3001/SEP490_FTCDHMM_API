@@ -9,6 +9,9 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
         public static readonly EmailTemplateType ModeratorCreated = new("MODERATORCREATED");
         public static readonly EmailTemplateType LockAccount = new("LOCKACCOUNT");
         public static readonly EmailTemplateType UnlockAccount = new("UNLOCKACCOUNT");
+        public static readonly EmailTemplateType RejectRecipe = new("REJECTRECIPE");
+        public static readonly EmailTemplateType LockRecipe = new("LOCKRECIPE");
+        public static readonly EmailTemplateType DeleteRecipe = new("DELETERECIPE");
 
         public override string ToString() => Value;
 
@@ -21,6 +24,9 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "MODERATORCREATED" => ModeratorCreated,
                 "LOCKACCOUNT" => LockAccount,
                 "UNLOCKACCOUNT" => UnlockAccount,
+                "REJECTRECIPE" => RejectRecipe,
+                "LOCKRECIPE" => LockRecipe,
+                "DELETERECIPE" => DeleteRecipe,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }

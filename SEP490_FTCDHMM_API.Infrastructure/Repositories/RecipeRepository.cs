@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
@@ -18,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             var oneYearAgo = DateTime.UtcNow.AddMonths(-12);
 
             return await _context.Recipes
-                .Where(r => !r.IsDeleted &&
+                .Where(r => r.Status == RecipeStatus.Posted &&
                             r.CreatedAtUtc >= oneYearAgo)
                 .Include(r => r.RecipeIngredients)
                     .ThenInclude(r => r.Ingredient)
