@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos
 {
     public class DraftRecipeRequest
     {
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;
         public required string Difficulty { get; set; }
         public int CookTime { get; set; }

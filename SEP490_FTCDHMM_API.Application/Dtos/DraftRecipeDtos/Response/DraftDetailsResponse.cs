@@ -1,12 +1,13 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftRecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 
-namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos
+namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response
 {
-    public class DraftRecipeResponse
+    public class DraftDetailsResponse
     {
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;
         public required string Difficulty { get; set; }
         public int CookTime { get; set; }

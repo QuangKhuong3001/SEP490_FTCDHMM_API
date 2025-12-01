@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep.DraftCookingStepImage;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftRecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftUserTagged;
+using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings
@@ -11,24 +12,28 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
     {
         public DraftRecipeMappingProfile()
         {
-            //request
+            //response
+            CreateMap<DraftRecipe, DraftDetailsResponse>()
+            .ForMember(dest => dest.ImageUrl,
+                opt => opt.MapFrom<UniversalImageUrlResolver<DraftRecipe, DraftDetailsResponse>>()
+            )
+            .ForMember(dest => dest.Ingredients,
+                opt => opt.MapFrom(src => src.DraftRecipeIngredients)
+            )
+            .ForMember(dest => dest.Labels,
+                opt => opt.MapFrom(src => src.Labels))
+            .ForMember(dest => dest.TaggedUser,
+                opt => opt.MapFrom(src => src.DraftRecipeUserTags)
+            )
+            .ForMember(dest => dest.CookingSteps,
+                opt => opt.MapFrom(src => src.DraftCookingSteps)
+            );
+
+
             CreateMap<DraftRecipe, DraftRecipeResponse>()
                 .ForMember(
                     dest => dest.ImageUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<DraftRecipe, DraftRecipeResponse>>()
-                )
-                .ForMember(
-                    dest => dest.Ingredients,
-                    opt => opt.MapFrom(r => r.DraftRecipeIngredients)
-                ).ForMember(
-                    dest => dest.Labels,
-                    opt => opt.MapFrom(r => r.Labels)
-                ).ForMember(
-                    dest => dest.TaggedUser,
-                    opt => opt.MapFrom(r => r.DraftRecipeUserTags)
-                ).ForMember(
-                    dest => dest.CookingSteps,
-                    opt => opt.MapFrom(r => r.DraftCookingSteps)
                 );
 
             //member

@@ -1,11 +1,14 @@
-﻿using SEP490_FTCDHMM_API.Api.Dtos.DraftRecipeDtos.DraftCookingStep;
+﻿using System.ComponentModel.DataAnnotations;
+using SEP490_FTCDHMM_API.Api.Dtos.DraftRecipeDtos.DraftCookingStep;
 using SEP490_FTCDHMM_API.Api.Dtos.DraftRecipeDtos.DraftRecipeIngredient;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.DraftRecipeDtos
 {
     public class DraftRecipeRequest
     {
-        public string? Name { get; set; }
+        [Required(ErrorMessage = "Tên không được để trống.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Tên phải từ 3 đến 100 ký tự")]
+        public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;
         public string Difficulty { get; set; } = "Easy";
         public int CookTime { get; set; }

@@ -1,7 +1,7 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
-using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
+﻿using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public required List<CookingStepResponse> CookingSteps { get; set; }
         public required List<LabelResponse> Labels { get; set; }
         public required List<RecipeIngredientResponse> Ingredients { get; set; }
-        public required List<DraftRecipeUserTaggedResponse> RecipeTaggeds { get; set; }
+        public List<DraftUserRecipeTagged> TaggedUser { get; set; } = new();
         public RecipeParentResponse? Parent { get; set; }
 
     }

@@ -5,15 +5,14 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.CustomHealthGoalDtos
 {
     public class CreateCustomHealthGoalRequest
     {
-        [Required(ErrorMessage = "Health goal name is required.")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 100 characters.")]
+        [Required(ErrorMessage = "Tên không được để trống")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Tên phải từ 3 đến 100 ký tự")]
         public string Name { get; set; } = null!;
 
-        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [StringLength(500, ErrorMessage = "Thông tin chi tiết không vượt quá 500 ký tự ")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "At least one nutrient target is required.")]
-        [MinLength(1, ErrorMessage = "Please define at least one nutrient target.")]
+        [Required(ErrorMessage = "Dinh dưỡng không được để trống")]
         public List<NutrientTargetRequest> Targets { get; set; } = new();
     }
 }

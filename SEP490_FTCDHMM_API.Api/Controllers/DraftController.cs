@@ -23,22 +23,42 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateDraft(DraftRecipeRequest request)
+        public async Task<IActionResult> Create(DraftRecipeRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var appRequest = _mapper.Map<ApplicationDtos.DraftRecipeDtos.DraftRecipeRequest>(request);
 
-            await _draftRecipeService.CreateOrUpdateDraftAsync(userId, appRequest);
+            await _draftRecipeService.CreateDraftAsync(userId, appRequest);
+            return Ok();
+        }
+
+        [HttpPut("{draftId:guid}")]
+        public async Task<IActionResult> Update(Guid draftId, DraftRecipeRequest request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var appRequest = _mapper.Map<ApplicationDtos.DraftRecipeDtos.DraftRecipeRequest>(request);
+
+            await _draftRecipeService.UpdateDraftAsync(userId, draftId, appRequest);
             return Ok();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDraft()
+        public async Task<IActionResult> List()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var result = await _draftRecipeService.GetDraftAsync(userId);
+            var result = await _draftRecipeService.GetDraftsAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("{draftId:guid}")]
+        public async Task<IActionResult> GetById(Guid draftId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var result = await _draftRecipeService.GetDraftByIdAsync(userId, draftId);
             return Ok(result);
         }
     }

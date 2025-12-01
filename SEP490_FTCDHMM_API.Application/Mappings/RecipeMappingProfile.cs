@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftUserTagged;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
@@ -72,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     dest => dest.Ingredients,
                     opt => opt.MapFrom(r => r.RecipeIngredients)
                 ).ForMember(
-                    dest => dest.RecipeTaggeds,
+                    dest => dest.TaggedUser,
                     opt => opt.MapFrom(r => r.RecipeUserTags)
                 );
 

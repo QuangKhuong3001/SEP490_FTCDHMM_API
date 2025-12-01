@@ -39,7 +39,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             // Connect with SQL Server
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("MyCnn")));
+                options.UseSqlServer(configuration.GetConnectionString("MyCnn"),
+                        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
 
             //cache
