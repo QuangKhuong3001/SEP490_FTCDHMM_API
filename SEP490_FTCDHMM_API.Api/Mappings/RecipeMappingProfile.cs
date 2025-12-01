@@ -13,10 +13,12 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
 
             CreateMap<APIDtos.RecipeDtos.CookingStep.CookingStepRequest, ApplicationDtos.RecipeDtos.CookingStep.CookingStepRequest>();
+
             CreateMap<APIDtos.RecipeDtos.CookingStep.CookingStepImage.CookingStepImageRequest, ApplicationDtos.RecipeDtos.CookingStep.CookingStepImage.CookingStepImageRequest>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
 
             CreateMap<APIDtos.RecipeDtos.RecipeFilterRequest, ApplicationDtos.RecipeDtos.RecipeFilterRequest>();
+
             CreateMap<APIDtos.RecipeDtos.RecipePaginationParams, ApplicationDtos.RecipeDtos.RecipePaginationParams>();
 
             CreateMap<APIDtos.Common.PaginationParams, ApplicationDtos.Common.PaginationParams>();
@@ -26,6 +28,8 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
             CreateMap<RecipeIngredientRequest, ApplicationDtos.RecipeDtos.RecipeIngredient.RecipeIngredientRequest>();
 
             CreateMap<APIDtos.RecipeDtos.CopyRecipeRequest, ApplicationDtos.RecipeDtos.CopyRecipeRequest>();
+
+            CreateMap<APIDtos.RecipeDtos.RecipeManagementReasonRequest, ApplicationDtos.RecipeDtos.RecipeManagementReasonRequest>();
         }
     }
 }

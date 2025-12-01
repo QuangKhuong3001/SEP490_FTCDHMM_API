@@ -17,8 +17,9 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public Guid? ImageId { get; set; }
         public Image? Image { get; set; }
         public decimal Calories { get; set; }
-        public bool IsDeleted { get; set; } = false;
+        public RecipeStatus Status { get; set; } = RecipeStatus.Posted;
         public int ViewCount { get; set; } = 0;
+        public string? Reason { get; set; }
         public int RatingCount { get; set; } = 0;
         public double AvgRating { get; set; } = 0;
         public Guid? ParentId { get; set; }

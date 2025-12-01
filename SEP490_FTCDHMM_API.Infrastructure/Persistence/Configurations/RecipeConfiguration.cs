@@ -24,8 +24,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
             builder.Property(r => r.CreatedAtUtc)
                 .HasDefaultValueSql("GETUTCDATE()");
 
-            builder.Property(r => r.IsDeleted)
-                .HasDefaultValue(false);
+            builder.Property(u => u.Status)
+                .HasConversion(
+                    g => g.Value,
+                    v => RecipeStatus.From(v)
+                )
+                .HasDefaultValueSql("'POSTED'");
 
             builder.Property(x => x.CookTime)
                 .IsRequired();
