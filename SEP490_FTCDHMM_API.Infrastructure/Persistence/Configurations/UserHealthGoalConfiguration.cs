@@ -11,11 +11,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
         {
             builder.ToTable("UserHealthGoals");
 
-            builder.HasKey(x => x.UserId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.User)
-                .WithOne(u => u.UserHealthGoal)
-                .HasForeignKey<UserHealthGoal>(x => x.UserId)
+                .WithMany(u => u.UserHealthGoals)
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.Property(u => u.Type)
@@ -35,10 +35,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasForeignKey(x => x.CustomHealthGoalId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(x => x.UserId).IsUnique();
+            builder.Property(x => x.UserId)
+                .IsRequired();
 
             builder.Property(x => x.ExpiredAtUtc)
-                .HasColumnType("date");
+                .HasColumnType("datetime2")
+                .IsRequired(false);
+
+            builder.Property(x => x.StartedAtUtc)
+               .HasDefaultValueSql("GETUTCDATE()");
         }
     }
 }

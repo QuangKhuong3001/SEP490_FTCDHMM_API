@@ -32,19 +32,26 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
         public double CalculateFinalScore(AppUser user, Recipe recipe)
         {
-            var nutrientFit = CalculateNutrientFit(recipe, user.UserHealthGoal);
+            var nutrientFit = 0d;
+
+            var currentGoal = user.UserHealthGoals
+                .FirstOrDefault(g => g.StartedAtUtc < DateTime.UtcNow && g.ExpiredAtUtc > DateTime.UtcNow);
+            if (currentGoal != null)
+            {
+                nutrientFit = CalculateNutrientFit(recipe, currentGoal);
+            }
+
             var tdeeFit = CalculateTdeeFit(recipe, user.HealthMetrics.FirstOrDefault());
             //var behaviorFit = this.CalculateBehaviorFit(user);
             //var popularity = CalculatePopularityScore(recipe);
-            //var freshness = this.CalculateFreshnessScore(recipe.CreatedAtUtc);
 
             var finalScore =
                 (_weightsSettings.Nutrient * nutrientFit + _weightsSettings.Tdee * tdeeFit
-                //+0.15 * popularity+ 0.22 * behaviorFit + 0.15 * freshness
+                //+0.15 * popularity+ 0.22 * behaviorFit
                 )
                 /
                 (_weightsSettings.Nutrient + _weightsSettings.Tdee
-                //+ 0.15+ 0.22 +0.15 
+                //+ 0.15+ 0.22 
                 );
 
             return finalScore;

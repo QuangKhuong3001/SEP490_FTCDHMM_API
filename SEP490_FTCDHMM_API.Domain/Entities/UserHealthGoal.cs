@@ -4,11 +4,12 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
 {
     public class UserHealthGoal
     {
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid? HealthGoalId { get; set; }
         public Guid? CustomHealthGoalId { get; set; }
+        public DateTime StartedAtUtc { get; set; }
         public DateTime? ExpiredAtUtc { get; set; }
-        public DateTime? StartedAtUtc { get; set; }
         public HealthGoalType Type { get; set; } = HealthGoalType.CUSTOM;
         public AppUser User { get; set; } = null!;
         public HealthGoal? HealthGoal { get; set; }

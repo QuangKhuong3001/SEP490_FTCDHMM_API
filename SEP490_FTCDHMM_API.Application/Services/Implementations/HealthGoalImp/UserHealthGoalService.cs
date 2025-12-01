@@ -42,7 +42,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (exist != null)
                 {
-                    await _userHealthGoalRepository.DeleteAsync(exist);
+                    exist.ExpiredAtUtc = DateTime.UtcNow;
+                    await _userHealthGoalRepository.UpdateAsync(exist);
                 }
 
                 var newCustomGoal = new UserHealthGoal
@@ -50,6 +51,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                     UserId = userId,
                     HealthGoalId = targetId,
                     Type = type,
+                    StartedAtUtc = DateTime.UtcNow,
                     ExpiredAtUtc = request.ExpiredAtUtc
                 };
 
@@ -64,7 +66,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (exist != null)
                 {
-                    await _userHealthGoalRepository.DeleteAsync(exist);
+                    exist.ExpiredAtUtc = DateTime.UtcNow;
+                    await _userHealthGoalRepository.UpdateAsync(exist);
                 }
 
                 var newCustomGoal = new UserHealthGoal
@@ -72,6 +75,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                     UserId = userId,
                     CustomHealthGoalId = targetId,
                     Type = type,
+                    StartedAtUtc = DateTime.UtcNow,
                     ExpiredAtUtc = request.ExpiredAtUtc
                 };
 
@@ -93,7 +97,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
             if (current == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Bạn hiện đang không có mục tiêu sữc khỏe");
 
-            await _userHealthGoalRepository.DeleteAsync(current);
+            current.ExpiredAtUtc = DateTime.UtcNow;
+            await _userHealthGoalRepository.UpdateAsync(current);
+        }
+
+        public async Task<IEnumerable<UserHealthGoalResponse>> GetHistoryGoalAsync(Guid userId)
+        {
+            var history = await _userHealthGoalRepository.GetHistoryByUserIdAsync(userId);
+
+            var result = _mapper.Map<IEnumerable<UserHealthGoalResponse>>(history);
+            return result;
         }
     }
 }

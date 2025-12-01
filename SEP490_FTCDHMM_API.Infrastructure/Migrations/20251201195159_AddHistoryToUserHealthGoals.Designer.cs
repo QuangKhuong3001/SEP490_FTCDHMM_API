@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251201195159_AddHistoryToUserHealthGoals")]
+    partial class AddHistoryToUserHealthGoals
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1185,7 +1188,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 1, 20, 15, 57, 59, DateTimeKind.Utc).AddTicks(8224),
+                            CreatedAtUTC = new DateTime(2025, 12, 1, 19, 51, 58, 710, DateTimeKind.Utc).AddTicks(5722),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2276,20 +2279,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ExpiredAtUtc")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("HealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartedAtUtc")
+                    b.Property<DateTime?>("StartedAtUtc")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
@@ -2300,16 +2303,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValueSql("'CUSTOM'");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("CustomHealthGoalId");
 
                     b.HasIndex("HealthGoalId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("UserHealthGoals", (string)null);
                 });

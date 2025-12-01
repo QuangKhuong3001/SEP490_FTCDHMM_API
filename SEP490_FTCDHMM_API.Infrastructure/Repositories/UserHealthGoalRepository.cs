@@ -16,13 +16,37 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
         public async Task<UserHealthGoal?> GetActiveGoalByUserIdAsync(Guid userId)
         {
+            var now = DateTime.UtcNow;
+
             return await _dbContext.UserHealthGoals
-                .Where(u => u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow)
+                .Where(u =>
+                    u.UserId == userId &&
+                    u.StartedAtUtc <= now &&
+                    (u.ExpiredAtUtc == null || u.ExpiredAtUtc > now)
+                )
                 .Include(u => u.CustomHealthGoal)
                     .ThenInclude(ch => ch!.Targets)
                 .Include(u => u.HealthGoal)
                     .ThenInclude(h => h!.Targets)
-                .FirstOrDefaultAsync(uhg => uhg.UserId == userId);
+                .OrderByDescending(u => u.StartedAtUtc)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<UserHealthGoal>> GetHistoryByUserIdAsync(Guid userId)
+        {
+            var now = DateTime.UtcNow;
+
+            return await _dbContext.UserHealthGoals
+                .Where(u =>
+                    u.UserId == userId &&
+                    u.ExpiredAtUtc < now
+                )
+                .Include(u => u.CustomHealthGoal)
+                    .ThenInclude(ch => ch!.Targets)
+                .Include(u => u.HealthGoal)
+                    .ThenInclude(h => h!.Targets)
+                .OrderByDescending(u => u.StartedAtUtc)
+                .ToListAsync();
         }
     }
 }

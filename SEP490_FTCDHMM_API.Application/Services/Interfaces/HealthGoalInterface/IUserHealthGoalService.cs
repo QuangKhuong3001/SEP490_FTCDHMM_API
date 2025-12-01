@@ -7,6 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface
     {
         Task SetGoalAsync(Guid userId, Guid targetId, UserHealthGoalRequest request);
         Task<UserHealthGoalResponse> GetCurrentGoalAsync(Guid userId);
+        Task<IEnumerable<UserHealthGoalResponse>> GetHistoryGoalAsync(Guid userId);
         Task RemoveFromCurrent(Guid userId);
     }
 }

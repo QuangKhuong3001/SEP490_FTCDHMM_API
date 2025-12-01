@@ -6,7 +6,7 @@ using SEP490_FTCDHMM_API.Api.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
-namespace SEP490_FTCDHMM_API.Api.Controllers
+namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -45,6 +45,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
                 return BadRequest();
 
             var result = await _userHealthGoalService.GetCurrentGoalAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryGoal()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+
+            var result = await _userHealthGoalService.GetHistoryGoalAsync(userId);
             return Ok(result);
         }
 

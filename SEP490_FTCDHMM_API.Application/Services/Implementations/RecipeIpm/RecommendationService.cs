@@ -33,11 +33,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var user = await _userRepository.GetByIdAsync(
                 id: userId,
                 include: q =>
-                    q.Include(u => u.UserHealthGoal)
+                    q.Include(u => u.UserHealthGoals)
                         .ThenInclude(uhg => uhg!.HealthGoal)
                             .ThenInclude(hg => hg!.Targets)
                                 .ThenInclude(t => t.Nutrient)
-                    .Include(u => u.UserHealthGoal)
+                    .Include(u => u.UserHealthGoals)
                         .ThenInclude(uhg => uhg!.CustomHealthGoal)
                             .ThenInclude(chg => chg!.Targets)
                                 .ThenInclude(t => t.Nutrient)
