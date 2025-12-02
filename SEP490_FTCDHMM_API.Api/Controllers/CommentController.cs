@@ -58,7 +58,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Self);
-            return Ok(new { message = "Your comment has been deleted." });
+            return Ok();
         }
 
         [HttpDelete("{commentId:guid}/by-author")]
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.RecipeAuthor);
-            return Ok(new { message = "Comment deleted by recipe author." });
+            return Ok();
         }
 
         [Authorize(Policy = PermissionPolicies.Comment_Delete)]
@@ -75,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _commentService.DeleteAsync(userId, commentId, DeleteMode.Permission);
-            return Ok(new { message = "Comment deleted with elevated permission." });
+            return Ok();
         }
 
     }

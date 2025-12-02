@@ -40,6 +40,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<UserSaveRecipe> UserSaveRecipes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,5 +59,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
             modelBuilder.SeedIngredientCategories();
             modelBuilder.SeedLabels();
         }
+
     }
 }

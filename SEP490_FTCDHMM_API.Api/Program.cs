@@ -109,6 +109,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<RecipeHub>("/hubs/recipe");
 app.MapHub<CommentHub>("/hubs/comments");
+app.MapHub<NotificationHub>("/hubs/notification");
+
 app.MapControllers();
 
 app.Run();

@@ -319,6 +319,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IRealtimeNotifier, SignalRNotifierService>();
+            //Notification
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             //userhealthmetric
             services.AddScoped<IUserHealthMetricRepository, UserHealthMetricRepository>();
@@ -353,6 +356,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //recipeingredient
             services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
 
+            //Notification
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
     }
 }
