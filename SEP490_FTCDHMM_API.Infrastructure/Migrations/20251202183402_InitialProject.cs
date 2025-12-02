@@ -587,8 +587,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     Ration = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Calories = table.Column<decimal>(type: "decimal(10,3)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'POSTED'"),
                     ViewCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RatingCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     AvgRating = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0),
                     ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
@@ -610,6 +611,32 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Recipes_Users_AuthorId",
                         column: x => x.AuthorId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReporterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TargetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TargetType = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    ReviewedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RejectReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReviewedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Users_ReporterId",
+                        column: x => x.ReporterId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -642,16 +669,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 name: "UserHealthGoals",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     HealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CustomHealthGoalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ExpiredAtUtc = table.Column<DateTime>(type: "date", nullable: true),
-                    StartedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StartedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    ExpiredAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "'CUSTOM'")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserHealthGoals", x => x.UserId);
+                    table.PrimaryKey("PK_UserHealthGoals", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserHealthGoals_CustomHealthGoals_CustomHealthGoalId",
                         column: x => x.CustomHealthGoalId,
@@ -970,7 +998,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Images",
                 columns: new[] { "Id", "ContentType", "CreatedAtUTC", "IsDeleted", "Key", "UploadedById" },
-                values: new object[] { new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"), "image/png", new DateTime(2025, 12, 1, 18, 51, 38, 232, DateTimeKind.Utc).AddTicks(8897), false, "images/default/no-image.png", null });
+                values: new object[] { new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"), "image/png", new DateTime(2025, 12, 2, 18, 34, 2, 285, DateTimeKind.Utc).AddTicks(7284), false, "images/default/no-image.png", null });
 
             migrationBuilder.InsertData(
                 table: "IngredientCategories",
@@ -1024,6 +1052,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
+                    { new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969"), "Recipe" },
                     { new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb"), "Ingredient" },
                     { new Guid("58f211a8-1e64-c797-cb94-34ff7945f590"), "ModeratorManagement" },
                     { new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc"), "Comment" },
@@ -1031,6 +1060,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8"), "Rating" },
                     { new Guid("7f3cc217-2b00-adff-c855-c738a34c7183"), "HealthGoal" },
                     { new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b"), "CustomerManagement" },
+                    { new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c"), "Report" },
                     { new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f"), "IngredientCategory" }
                 });
 
@@ -1114,8 +1144,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 values: new object[,]
                 {
                     { new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"), "Create", new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f") },
+                    { new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"), "View", new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c") },
+                    { new Guid("311308d9-db5f-318c-7d23-bf56668c977f"), "Approve", new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c") },
                     { new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"), "Update", new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb") },
                     { new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"), "Update", new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b") },
+                    { new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"), "Reject", new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c") },
                     { new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"), "Update", new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f") },
                     { new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"), "Delete", new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f") },
                     { new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"), "Update", new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc") },
@@ -1124,12 +1157,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"), "Create", new Guid("7f3cc217-2b00-adff-c855-c738a34c7183") },
                     { new Guid("6d22c125-a619-3aac-7483-3c351375f99a"), "Create", new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb") },
                     { new Guid("718dad89-4d50-185d-37e3-841f43d1a787"), "Update", new Guid("58f211a8-1e64-c797-cb94-34ff7945f590") },
+                    { new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"), "Approve", new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969") },
                     { new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"), "Delete", new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f") },
+                    { new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"), "ManagementView", new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969") },
                     { new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"), "Delete", new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8") },
                     { new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"), "Delete", new Guid("7f3cc217-2b00-adff-c855-c738a34c7183") },
                     { new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"), "Create", new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f") },
                     { new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"), "Update", new Guid("7f3cc217-2b00-adff-c855-c738a34c7183") },
                     { new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"), "Delete", new Guid("58f211a8-1e64-c797-cb94-34ff7945f590") },
+                    { new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"), "Delete", new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969") },
                     { new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"), "Create", new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc") },
                     { new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"), "Create", new Guid("58f211a8-1e64-c797-cb94-34ff7945f590") },
                     { new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"), "View", new Guid("58f211a8-1e64-c797-cb94-34ff7945f590") },
@@ -1137,6 +1173,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"), "View", new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b") },
                     { new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"), "Delete", new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb") },
                     { new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"), "Delete", new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc") },
+                    { new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"), "Lock", new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969") },
                     { new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"), "Update", new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8") }
                 });
 
@@ -1146,8 +1183,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 values: new object[,]
                 {
                     { new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("311308d9-db5f-318c-7d23-bf56668c977f"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
@@ -1156,12 +1196,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("6d22c125-a619-3aac-7483-3c351375f99a"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("718dad89-4d50-185d-37e3-841f43d1a787"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
@@ -1169,6 +1212,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
+                    { new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true },
                     { new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"), new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"), true }
                 });
 
@@ -1178,8 +1222,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 values: new object[,]
                 {
                     { new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("311308d9-db5f-318c-7d23-bf56668c977f"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
@@ -1188,12 +1235,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("6d22c125-a619-3aac-7483-3c351375f99a"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("718dad89-4d50-185d-37e3-841f43d1a787"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
@@ -1201,10 +1251,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
+                    { new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"), new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7") },
                     { new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("311308d9-db5f-318c-7d23-bf56668c977f"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
@@ -1213,12 +1267,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("6d22c125-a619-3aac-7483-3c351375f99a"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("718dad89-4d50-185d-37e3-841f43d1a787"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
@@ -1226,6 +1283,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     { new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
+                    { new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") },
                     { new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"), new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728") }
                 });
 
@@ -1440,6 +1498,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 column: "TaggedUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_ReporterId",
+                table: "Reports",
+                column: "ReporterId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionActionId",
                 table: "RolePermissions",
                 column: "PermissionActionId");
@@ -1474,8 +1537,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserHealthGoals_UserId",
                 table: "UserHealthGoals",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserHealthMetrics_UserId",
@@ -1764,6 +1826,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "RecipeUserTags");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "RolePermissions");

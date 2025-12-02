@@ -12,8 +12,8 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251201195159_AddHistoryToUserHealthGoals")]
-    partial class AddHistoryToUserHealthGoals
+    [Migration("20251202183402_InitialProject")]
+    partial class InitialProject
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -372,6 +372,48 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
+                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            IsActive = true
+                        },
+                        new
+                        {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -522,6 +564,48 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
+                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            IsActive = false
+                        },
+                        new
+                        {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
                             IsActive = false
@@ -668,6 +752,48 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
+                            IsActive = false
+                        },
+                        new
+                        {
+                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
+                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
                             IsActive = false
                         });
                 });
@@ -1188,7 +1314,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 1, 19, 51, 58, 710, DateTimeKind.Utc).AddTicks(5722),
+                            CreatedAtUTC = new DateTime(2025, 12, 2, 18, 34, 2, 285, DateTimeKind.Utc).AddTicks(7284),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1967,6 +2093,48 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                             Id = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
                             Name = "Update",
                             PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
+                        },
+                        new
+                        {
+                            Id = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            Name = "Lock",
+                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                        },
+                        new
+                        {
+                            Id = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            Name = "Delete",
+                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                        },
+                        new
+                        {
+                            Id = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            Name = "Approve",
+                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                        },
+                        new
+                        {
+                            Id = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
+                            Name = "ManagementView",
+                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                        },
+                        new
+                        {
+                            Id = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
+                            Name = "View",
+                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
+                        },
+                        new
+                        {
+                            Id = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
+                            Name = "Approve",
+                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
+                        },
+                        new
+                        {
+                            Id = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            Name = "Reject",
+                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
                         });
                 });
 
@@ -2024,6 +2192,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8"),
                             Name = "Rating"
+                        },
+                        new
+                        {
+                            Id = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969"),
+                            Name = "Recipe"
+                        },
+                        new
+                        {
+                            Id = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c"),
+                            Name = "Report"
                         });
                 });
 
@@ -2098,11 +2276,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid?>("ImageId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -2118,6 +2291,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Property<int>("Ration")
                         .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValueSql("'POSTED'");
 
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
@@ -2202,6 +2384,52 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.ToTable("RecipeUserTags", (string)null);
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("RejectReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ReviewedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ReviewedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterId");
+
+                    b.ToTable("Reports", (string)null);
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserDietRestriction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2279,20 +2507,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ExpiredAtUtc")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("HealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("StartedAtUtc")
+                    b.Property<DateTime>("StartedAtUtc")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
@@ -2303,11 +2531,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValueSql("'CUSTOM'");
 
-                    b.HasKey("UserId");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CustomHealthGoalId");
 
                     b.HasIndex("HealthGoalId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserHealthGoals", (string)null);
                 });
@@ -2920,6 +3153,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Recipe");
 
                     b.Navigation("TaggedUser");
+                });
+
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Report", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Reporter");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserDietRestriction", b =>

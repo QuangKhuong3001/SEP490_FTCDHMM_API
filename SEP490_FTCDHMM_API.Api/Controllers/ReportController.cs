@@ -36,7 +36,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             await _service.CreateAsync(userId, appRequest);
 
-            return Ok(new { message = "Report created successfully." });
+            return Ok();
         }
 
         [Authorize(Policy = PermissionPolicies.Report_View)]
@@ -63,14 +63,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> Approve(Guid id)
         {
             var adminId = GetUserId();
-            var result = await _service.ApproveAsync(id, adminId);
+            await _service.ApproveAsync(id, adminId);
 
-            return Ok(new
-            {
-
-                targetType = result.Type,
-                targetId = result.TargetId
-            });
+            return Ok();
         }
         [Authorize(Policy = PermissionPolicies.Report_Reject)]
         [HttpPost("{id:guid}/reject")]
@@ -83,7 +78,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             await _service.RejectAsync(id, adminId, appRequest.Reason);
 
-            return Ok(new { message = "Report rejected successfully." });
+            return Ok();
         }
 
 

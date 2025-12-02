@@ -40,7 +40,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreateAsync(Guid reporterId, ReportRequest request)
         {
-
             var reporter = await _userRepository.GetByIdAsync(reporterId);
             if (reporter == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Tài khoản không tồn tại.");
@@ -48,8 +47,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (reporterId == request.TargetId && request.TargetType.Trim().ToUpperInvariant() == "USER")
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể report chính mình.");
 
-            var targetType = ReportObjectType.From(request.TargetType);
+            await this.TargetExistsAsync(ReportObjectType.From(request.TargetType), request.TargetId);
 
+            var targetType = ReportObjectType.From(request.TargetType);
 
             var description = request.Description?.Trim() ?? string.Empty;
 
@@ -88,9 +88,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request)
         {
-            //
-            // 1. Tạo FILTER (không dùng And)
-            //
             Expression<Func<Report, bool>> filter = r =>
                 (string.IsNullOrEmpty(request.Type) ||
                     r.TargetType.Value == ReportObjectType.From(request.Type).Value)
@@ -101,22 +98,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 (string.IsNullOrEmpty(request.Keyword) ||
                     r.Description.Contains(request.Keyword));
 
-            //
-            // 2. Include
-            //
             Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
 
-            //
-            // 3. Lấy toàn bộ report theo filter (KHÔNG phân trang tại DB)
-            //
             var reports = await _reportRepository.GetAllAsync(
                 predicate: filter,
                 include: include
             );
 
-            //
-            // 4. Group theo (TargetType + TargetId)
-            //
             var grouped = reports
                 .GroupBy(r => new { r.TargetType.Value, r.TargetId })
                 .Select(g => new
@@ -130,14 +118,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .ThenByDescending(x => x.LatestAt)
                 .ToList();
 
-            //
-            // 5. Build danh sách DTO
-            //
             var resultList = new List<ReportSummaryResponse>();
 
             foreach (var g in grouped)
             {
-                // tạo object Report giả để reuse ResolveTargetNameAsync
                 var temp = new Report
                 {
                     TargetId = g.TargetId,
@@ -156,18 +140,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 });
             }
 
-            //
-            // 6. Phân trang
-            //
             var totalCount = resultList.Count;
             var pagedItems = resultList
                 .Skip((request.PaginationParams.PageNumber - 1) * request.PaginationParams.PageSize)
                 .Take(request.PaginationParams.PageSize)
                 .ToList();
 
-            //
-            // 7. Return
-            //
             return new PagedResult<ReportSummaryResponse>
             {
                 Items = pagedItems,
@@ -177,9 +155,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-
-
-        public async Task<(string Type, Guid TargetId)> ApproveAsync(Guid reportId, Guid adminId)
+        public async Task ApproveAsync(Guid reportId, Guid adminId)
         {
             var report = await _reportRepository.GetByIdAsync(reportId);
 
@@ -194,8 +170,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             report.ReviewedAtUtc = DateTime.UtcNow;
 
             await _reportRepository.UpdateAsync(report);
-
-            return (report.TargetType.Value, report.TargetId);
         }
 
 
@@ -220,14 +194,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _reportRepository.UpdateAsync(report);
         }
 
-
-
-
         private async Task<bool> TargetExistsAsync(ReportObjectType targetType, Guid targetId)
         {
             if (targetType == ReportObjectType.Recipe)
             {
-                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && !r.IsDeleted);
+                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status == RecipeStatus.Posted);
             }
 
             if (targetType == ReportObjectType.User)

@@ -76,12 +76,11 @@
             Recipe_Approve,
             Recipe_Delete,
             Recipe_Lock,
-            Recipe_ManagementView
+            Recipe_ManagementView,
             Rating_Update,
             Report_View,
             Report_Approve,
             Report_Reject
-
         };
     }
 }
