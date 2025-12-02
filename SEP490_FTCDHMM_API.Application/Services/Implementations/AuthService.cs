@@ -18,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
@@ -31,6 +32,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IRoleRepository roleRepository,
             IUserRepository userRepository,
             IOtpRepository otpRepo,
+            INotificationRepository notificationRepository,
             IMailService mailService,
             IJwtAuthService jwtService,
             IGoogleProvisioningService googleProvisioningService,
@@ -38,6 +40,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
+            _notificationRepository = notificationRepository;
             _roleRepository = roleRepository;
             _userRepository = userRepository;
             _otpRepo = otpRepo;
@@ -104,8 +107,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Xác Thực tài khoản FitFood Tracker");
-
+            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            await _notificationRepository.AddNotification(null, user.Id, NotificationType.System, "Chào mừng bạn đến với FitFood Tracker", null);
             return (true, Array.Empty<string>());
         }
 
