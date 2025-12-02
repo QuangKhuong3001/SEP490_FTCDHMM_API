@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
@@ -16,6 +17,7 @@ using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
@@ -27,6 +29,7 @@ using SEP490_FTCDHMM_API.Infrastructure.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
 using SEP490_FTCDHMM_API.Infrastructure.Services;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using StackExchange.Redis;
 
 namespace SEP490_FTCDHMM_API.Api.Configurations
 {
@@ -43,13 +46,15 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                         o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
 
-            //cache
-            //services.AddSingleton<IConnectionMultiplexer>(sp =>
-            //{
-            //    var redisConnection = configuration.GetConnectionString("Redis");
-            //    return ConnectionMultiplexer.Connect(redisConnection!);
-            //});
-
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var conn = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis")!);
+                conn.AbortOnConnectFail = false;
+                conn.ConnectRetry = 5;
+                conn.ConnectTimeout = 5000;
+                conn.SyncTimeout = 5000;
+                return ConnectionMultiplexer.Connect(conn);
+            });
 
             //hangfire
             services.AddHangfire(config =>
@@ -173,7 +178,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             // DI External Service
 
             //redis
-            //services.AddScoped<ICacheService, RedisCacheService>();
+            services.AddScoped<ICacheService, RedisCacheService>();
 
             //translate
             services.AddScoped<ITranslateService, GoogleTranslateService>();
@@ -193,8 +198,16 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //S3
             services.AddScoped<IS3ImageService, S3ImageService>();
-            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
-            services.AddAWSService<IAmazonS3>();
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var config = sp.GetRequiredService<IOptions<AwsS3Settings>>().Value;
+
+                return new AmazonS3Client(
+                    config.AccessKey,
+                    config.SecretKey,
+                    Amazon.RegionEndpoint.APSoutheast1
+                );
+            });
 
             //Google
             services.AddHttpClient<IGoogleAuthService, GoogleAuthService>();

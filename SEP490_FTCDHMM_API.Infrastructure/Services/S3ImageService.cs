@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
@@ -32,75 +33,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
         public async Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder, AppUser? uploadedBy)
         {
-            if (!IsImage(file))
-                throw new AppException(AppResponseCode.INVALID_FILE);
-
-            var id = Guid.NewGuid();
-            var extension = Path.GetExtension(file.FileName);
-            var key = $"{folder}/{id}{extension}";
-
-            using var stream = file.OpenReadStream();
-            var transfer = new TransferUtility(_s3Client);
-            await transfer.UploadAsync(stream, _settings.BucketName, key);
-
-            var image = new Image
-            {
-                Id = id,
-                Key = key,
-                ContentType = file.ContentType,
-                UploadedBy = uploadedBy,
-                CreatedAtUTC = DateTime.UtcNow
-            };
-
-            _dbContext.Images.Add(image);
-            await _dbContext.SaveChangesAsync();
-
-            return image;
-        }
-
-        public async Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder, Guid? userId)
-        {
-            if (!IsImage(file))
-                throw new AppException(AppResponseCode.INVALID_FILE);
-
-            var id = Guid.NewGuid();
-            var extension = Path.GetExtension(file.FileName);
-            var key = $"{folder}/{id}{extension}";
-
-            var transfer = new TransferUtility(_s3Client);
-            await transfer.UploadAsync(file.Content, _settings.BucketName, key);
-
-            var image = new Image
-            {
-                Id = id,
-                Key = key,
-                ContentType = file.ContentType,
-                UploadedById = userId,
-                CreatedAtUTC = DateTime.UtcNow
-            };
-
-            await _dbContext.Images.AddAsync(image);
-            await _dbContext.SaveChangesAsync();
-
-            return image;
-        }
-
-
-        public async Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder, AppUser uploadedBy)
-        {
-            var images = new List<Image>();
-            var transfer = new TransferUtility(_s3Client);
-            var id = Guid.NewGuid();
-
-            foreach (var file in files)
+            try
             {
                 if (!IsImage(file))
                     throw new AppException(AppResponseCode.INVALID_FILE);
 
+                var id = Guid.NewGuid();
                 var extension = Path.GetExtension(file.FileName);
                 var key = $"{folder}/{id}{extension}";
 
                 using var stream = file.OpenReadStream();
+                var transfer = new TransferUtility(_s3Client);
                 await transfer.UploadAsync(stream, _settings.BucketName, key);
 
                 var image = new Image
@@ -112,33 +55,127 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     CreatedAtUTC = DateTime.UtcNow
                 };
 
-                images.Add(image);
                 _dbContext.Images.Add(image);
+                await _dbContext.SaveChangesAsync();
+
+                return image;
             }
+            catch (Exception e)
+            {
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE, $"S3 storage đang không hoạt động - {e}");
+            }
+        }
 
-            await _dbContext.SaveChangesAsync();
+        public async Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder, Guid? userId)
+        {
+            try
+            {
+                if (!IsImage(file))
+                    throw new AppException(AppResponseCode.INVALID_FILE);
 
-            return images;
+                var id = Guid.NewGuid();
+                var extension = Path.GetExtension(file.FileName);
+                var key = $"{folder}/{id}{extension}";
+
+                var transfer = new TransferUtility(_s3Client);
+                await transfer.UploadAsync(file.Content, _settings.BucketName, key);
+
+                var image = new Image
+                {
+                    Id = id,
+                    Key = key,
+                    ContentType = file.ContentType,
+                    UploadedById = userId,
+                    CreatedAtUTC = DateTime.UtcNow
+                };
+
+                await _dbContext.Images.AddAsync(image);
+                await _dbContext.SaveChangesAsync();
+
+                return image;
+            }
+            catch (Exception e)
+            {
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE, $"S3 storage đang không hoạt động - {e}");
+            }
+        }
+
+        public async Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder, AppUser uploadedBy)
+        {
+            try
+            {
+                var images = new List<Image>();
+                var transfer = new TransferUtility(_s3Client);
+                var id = Guid.NewGuid();
+
+                foreach (var file in files)
+                {
+                    if (!IsImage(file))
+                        throw new AppException(AppResponseCode.INVALID_FILE);
+
+                    var extension = Path.GetExtension(file.FileName);
+                    var key = $"{folder}/{id}{extension}";
+
+                    using var stream = file.OpenReadStream();
+                    await transfer.UploadAsync(stream, _settings.BucketName, key);
+
+                    var image = new Image
+                    {
+                        Id = id,
+                        Key = key,
+                        ContentType = file.ContentType,
+                        UploadedBy = uploadedBy,
+                        CreatedAtUTC = DateTime.UtcNow
+                    };
+
+                    images.Add(image);
+                    _dbContext.Images.Add(image);
+                }
+
+                await _dbContext.SaveChangesAsync();
+
+                return images;
+            }
+            catch (Exception e)
+            {
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE, $"S3 storage đang không hoạt động - {e}");
+            }
         }
 
         public async Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder, Guid? userId)
         {
-            var result = new List<Image>();
-
-            foreach (var f in files)
+            try
             {
-                var img = await UploadImageAsync(f, folder, userId);
-                result.Add(img);
-            }
+                var result = new List<Image>();
 
-            return result;
+                foreach (var f in files)
+                {
+                    var img = await UploadImageAsync(f, folder, userId);
+                    result.Add(img);
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE, $"S3 storage đang không hoạt động - {e}");
+            }
         }
 
 
         public string? GeneratePreSignedUrl(string? key)
         {
+            var expires = DateTime.UtcNow.AddDays(_settings.ExpiryDays);
+
+            var defaultImageRequest = new GetPreSignedUrlRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = DefaultValues.DEFAULT_IMAGE_KEY,
+                Expires = expires
+            };
+
             if (string.IsNullOrWhiteSpace(key))
-                return null;
+                return _s3Client.GetPreSignedURL(defaultImageRequest);
 
             var request = new GetPreSignedUrlRequest
             {
@@ -147,7 +184,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 Expires = DateTime.UtcNow.AddDays(_settings.ExpiryDays)
             };
 
-            return _s3Client.GetPreSignedURL(request);
+            var result = _s3Client.GetPreSignedURL(request);
+
+            if (result == null)
+            {
+                result = _s3Client.GetPreSignedURL(defaultImageRequest);
+            }
+
+            return result;
         }
 
         public async Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url, Guid uploadedById)
@@ -196,21 +240,28 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
         public async Task DeleteImageAsync(Guid imageId)
         {
-            var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
-            if (image == null)
-                throw new Exception("Image not found");
-
-            var deleteRequest = new DeleteObjectRequest
+            try
             {
-                BucketName = _settings.BucketName,
-                Key = image.Key
-            };
+                var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
+                if (image == null)
+                    throw new Exception("Image not found");
 
-            await _s3Client.DeleteObjectAsync(deleteRequest);
+                var deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = _settings.BucketName,
+                    Key = image.Key
+                };
 
-            image.IsDeleted = true;
-            _dbContext.Images.Update(image);
-            await _dbContext.SaveChangesAsync();
+                await _s3Client.DeleteObjectAsync(deleteRequest);
+
+                image.IsDeleted = true;
+                _dbContext.Images.Update(image);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE, $"S3 storage đang không hoạt động - {e}");
+            }
         }
 
         private bool IsImage(IFormFile file)
