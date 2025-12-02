@@ -262,7 +262,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRecipeValidationService, RecipeValidationService>();
             services.AddScoped<IRecipeImageService, RecipeImageService>();
             services.AddScoped<IRecipeNutritionService, RecipeNutritionService>();
-            services.AddScoped<IRecipeBehaviorService, RecipeBehaviorService>();
             services.AddScoped<IRecipeCommandService, RecipeCommandService>();
             services.AddScoped<IRecipeQueryService, RecipeQueryService>();
 
@@ -271,9 +270,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //userSaveRecipe
             services.AddScoped<IUserSaveRecipeRepository, UserSaveRecipeRepository>();
-
-            //userFavoriteRecipe
-            services.AddScoped<IUserFavoriteRecipeRepository, UserFavoriteRecipeRepository>();
 
             //cookingstep
             services.AddScoped<ICookingStepRepository, CookingStepRepository>();
@@ -350,8 +346,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //report
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IReportService, ReportService>();
-            //userbehavior
-            services.AddScoped<IUserBehaviorRepository, UserBehaviorRepository>();
 
             //recipeingredient
             services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();

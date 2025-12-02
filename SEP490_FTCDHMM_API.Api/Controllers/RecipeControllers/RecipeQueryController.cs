@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.Common;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
-using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -39,17 +38,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _recipeQueryService.GetRecipeDetailsAsync(userId, recipeId);
-            return Ok(result);
-        }
-
-        [HttpGet("favorites")]
-        [Authorize]
-        public async Task<IActionResult> GetFavorites([FromQuery] FavoriteRecipeFilterRequest request)
-        {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest>(request);
-
-            var result = await _recipeQueryService.GetFavoriteListAsync(userId, appRequest);
             return Ok(result);
         }
 

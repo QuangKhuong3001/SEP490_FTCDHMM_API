@@ -42,7 +42,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
 
             var tdeeFit = CalculateTdeeFit(recipe, user.HealthMetrics.FirstOrDefault());
-            //var behaviorFit = this.CalculateBehaviorFit(user);
+            //var behaviorFit = this.CalculateBehaviorFit(recipe, user);
             //var popularity = CalculatePopularityScore(recipe);
 
             var finalScore =
@@ -208,20 +208,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return Math.Clamp(score, 0, 1);
         }
 
-        //public double CalculateBehaviorFit(Guid recipeId, UserBehaviorStats stats)
+        //public double CalculateBehaviorFit(Recipe recipe, AppUser user)
         //{
-        //    if (!stats.Recipes.TryGetValue(recipeId, out var entry))
-        //        return 0;
 
-        //    double score =
-        //        0.10 * Normalize(entry.Views, stats.MaxViews) +
-        //        0.15 * Normalize(entry.SearchClicks, stats.MaxSearchClicks) +
-        //        0.25 * Normalize(entry.Likes, stats.MaxLikes) +
-        //        0.25 * Normalize(entry.Saves, stats.MaxSaves) +
-        //        0.15 * Normalize(entry.Comments, stats.MaxComments) +
-        //        0.10 * Normalize(entry.Ratings, stats.MaxRatings);
 
-        //    return score;
+
         //}
 
         private double CalculatePopularityScore(Recipe recipe)
