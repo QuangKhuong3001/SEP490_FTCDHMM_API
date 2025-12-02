@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public required List<CookingStepResponse> CookingSteps { get; set; }
         public required List<LabelResponse> Labels { get; set; }
         public required List<RecipeIngredientResponse> Ingredients { get; set; }
-        public List<DraftUserRecipeTagged> TaggedUser { get; set; } = new();
+        public List<RecipeUserTaggedResponse> TaggedUser { get; set; } = new();
         public RecipeParentResponse? Parent { get; set; }
 
     }
