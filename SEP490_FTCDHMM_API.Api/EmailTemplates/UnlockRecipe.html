@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thông báo khóa công thức</title>
+    <title>Mở khóa công thức</title>
     <style>
       body {
         font-family: "Segoe UI", Arial, sans-serif;
@@ -22,7 +22,7 @@
         background-color: #ffffff;
       }
       .header {
-        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
         color: white;
         padding: 30px 20px;
         text-align: center;
@@ -49,49 +49,40 @@
         color: #555;
       }
       .recipe-card {
-        background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-        border-left: 4px solid #ff9800;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-left: 4px solid #4caf50;
         border-radius: 8px;
         padding: 20px;
         margin: 25px 0;
+        text-align: center;
       }
       .recipe-name {
         font-size: 18px;
         font-weight: 600;
-        color: #e65100;
+        color: #2e7d32;
         margin-bottom: 10px;
       }
       .recipe-status {
         display: inline-block;
-        background-color: #ff9800;
+        background-color: #4caf50;
         color: white;
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
       }
-      .reason-box {
-        background-color: #fff3e0;
-        border: 1px solid #ffcc80;
+      .success-box {
+        background-color: #e8f5e9;
+        border: 1px solid #a5d6a7;
         border-radius: 8px;
         padding: 20px;
         margin: 25px 0;
+        text-align: center;
       }
-      .reason-title {
-        color: #e65100;
-        font-weight: 600;
-        margin-bottom: 10px;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .reason-content {
-        color: #bf360c;
-        font-style: italic;
-        padding: 15px;
-        background-color: white;
-        border-radius: 6px;
-        border-left: 3px solid #ff9800;
+      .success-box p {
+        color: #2e7d32;
+        margin: 0;
+        font-size: 15px;
       }
       .info-box {
         background-color: #e3f2fd;
@@ -111,6 +102,27 @@
       .info-box li {
         margin: 8px 0;
         color: #1565c0;
+      }
+      .action-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #99b94a 0%, #7a9a3a 100%);
+        color: white;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin: 10px 5px;
+      }
+      .cta-section {
+        text-align: center;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        margin: 25px 0;
+      }
+      .cta-text {
+        color: #555;
+        margin-bottom: 20px;
       }
       .footer {
         text-align: center;
@@ -132,7 +144,7 @@
   <body>
     <div class="container">
       <div class="header">
-        <h2>Công Thức Đã Bị Khóa</h2>
+        <h2>Công Thức Đã Được Mở Khóa!</h2>
       </div>
       <div class="brand-bar"></div>
 
@@ -140,38 +152,43 @@
         <p>Xin chào <strong>{{UserName}}</strong>,</p>
 
         <p>
-          Chúng tôi xin thông báo rằng công thức của bạn đã bị khóa tạm thời bởi
-          đội ngũ kiểm duyệt FitFood Tracker.
+          Tin vui! Công thức của bạn đã được mở khóa và giờ đây đã hiển thị trở
+          lại trên FitFood Tracker cho mọi người.
         </p>
 
         <div class="recipe-card">
           <div class="recipe-name">{{RecipeName}}</div>
-          <span class="recipe-status">Đã bị khóa</span>
+          <span class="recipe-status">Đã mở khóa</span>
         </div>
 
-        <div class="reason-box">
-          <div class="reason-title">Lý do khóa</div>
-          <div class="reason-content">{{Reason}}</div>
+        <div class="success-box">
+          <p>Công thức của bạn đã sẵn sàng để mọi người khám phá!</p>
         </div>
 
         <div class="info-box">
-          <p><strong>Bạn có thể làm gì tiếp theo?</strong></p>
+          <p><strong>Lưu ý để tránh bị khóa lại:</strong></p>
           <ul>
-            <li>Xem lại nội dung công thức của bạn</li>
-            <li>Chỉnh sửa để phù hợp với quy định cộng đồng</li>
-            <li>Liên hệ hỗ trợ nếu bạn cho rằng đây là sai sót</li>
+            <li>Đảm bảo nội dung phù hợp với quy định cộng đồng</li>
+            <li>Sử dụng hình ảnh rõ ràng và phù hợp</li>
+            <li>Cung cấp thông tin dinh dưỡng chính xác</li>
+            <li>Tránh các nội dung vi phạm bản quyền</li>
           </ul>
         </div>
 
+        <div class="cta-section">
+          <p class="cta-text">Xem công thức của bạn trên FitFood Tracker ngay!</p>
+          <a href="{{RecipeUrl}}" class="action-button">Xem Công Thức</a>
+        </div>
+
         <p>
-          Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua
-          email hỗ trợ hoặc tính năng phản hồi trong ứng dụng.
+          Cảm ơn bạn đã là một phần của cộng đồng FitFood Tracker. Tiếp tục chia sẻ
+          những công thức tuyệt vời nhé!
         </p>
       </div>
 
       <div class="footer">
         <p>Trân trọng,</p>
-        <p class="brand">Đội ngũ FitFood</p>
+        <p class="brand">Đội ngũ FitFood Tracker</p>
         <p>Email này được gửi tự động. Vui lòng không trả lời trực tiếp.</p>
       </div>
     </div>

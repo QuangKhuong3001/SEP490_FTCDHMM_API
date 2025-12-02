@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xử lý báo cáo</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      .header {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .brand-bar {
+        background-color: #99b94a;
+        height: 4px;
+      }
+      .content {
+        padding: 30px;
+        background-color: white;
+      }
+      .content p {
+        margin: 15px 0;
+        color: #555;
+      }
+      .report-card {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-left: 4px solid #2196f3;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .report-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1565c0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+      }
+      .report-content {
+        color: #0d47a1;
+        padding: 15px;
+        background-color: white;
+        border-radius: 6px;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 10px 0;
+      }
+      .status-approved {
+        background-color: #c8e6c9;
+        color: #2e7d32;
+      }
+      .status-rejected {
+        background-color: #ffcdd2;
+        color: #c62828;
+      }
+      .action-box {
+        background-color: #fff8e1;
+        border: 1px solid #ffcc80;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .action-box h4 {
+        color: #e65100;
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
+      .action-box p {
+        color: #bf360c;
+        margin: 0;
+      }
+      .info-box {
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .info-row {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .info-row:last-child {
+        border-bottom: none;
+      }
+      .info-label {
+        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .info-value {
+        color: #333;
+        font-weight: 500;
+        margin-top: 3px;
+      }
+      .footer {
+        text-align: center;
+        padding: 25px;
+        background-color: #fafafa;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+        color: #888;
+        font-size: 13px;
+      }
+      .footer .brand {
+        color: #99b94a;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Cập Nhật Báo Cáo Của Bạn</h2>
+      </div>
+      <div class="brand-bar"></div>
+
+      <div class="content">
+        <p>Xin chào <strong>{{UserName}}</strong>,</p>
+
+        <p>
+          Cảm ơn bạn đã gửi báo cáo đến FitFood Tracker. Chúng tôi đã xem xét và xử lý
+          báo cáo của bạn. Dưới đây là kết quả:
+        </p>
+
+        <div class="report-card">
+          <div class="report-title">Nội dung báo cáo</div>
+          <div class="report-content">
+            <strong>Loại:</strong> {{ReportType}}<br />
+            <strong>Đối tượng:</strong> {{ReportTarget}}<br />
+            <strong>Lý do:</strong> {{ReportReason}}
+          </div>
+        </div>
+
+        <div style="text-align: center">
+          <span class="status-badge {{StatusClass}}">{{StatusText}}</span>
+        </div>
+
+        <div class="action-box">
+          <h4>Hành động đã thực hiện</h4>
+          <p>{{ActionTaken}}</p>
+        </div>
+
+        <div class="info-box">
+          <div class="info-row">
+            <div class="info-label">Mã báo cáo</div>
+            <div class="info-value">{{ReportId}}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Ngày gửi</div>
+            <div class="info-value">{{ReportDate}}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Ngày xử lý</div>
+            <div class="info-value">{{ProcessedDate}}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Người xử lý</div>
+            <div class="info-value">{{ModeratorName}}</div>
+          </div>
+        </div>
+
+        <p>
+          Cảm ơn bạn đã giúp chúng tôi duy trì một cộng đồng an toàn và lành
+          mạnh. Mỗi báo cáo của bạn đều rất quan trọng!
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>Trân trọng,</p>
+        <p class="brand">Đội ngũ FitFood Tracker</p>
+        <p>Email này được gửi tự động. Vui lòng không trả lời trực tiếp.</p>
+      </div>
+    </div>
+  </body>
+</html>

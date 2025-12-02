@@ -1,10 +1,224 @@
 ﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Công thức chưa được phê duyệt</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      .header {
+        background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .brand-bar {
+        background-color: #99b94a;
+        height: 4px;
+      }
+      .content {
+        padding: 30px;
+        background-color: white;
+      }
+      .content p {
+        margin: 15px 0;
+        color: #555;
+      }
+      .recipe-card {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        border-left: 4px solid #9c27b0;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .recipe-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #6a1b9a;
+        margin-bottom: 10px;
+      }
+      .recipe-status {
+        display: inline-block;
+        background-color: #9c27b0;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .reason-box {
+        background-color: #fce4ec;
+        border: 1px solid #f48fb1;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .reason-title {
+        color: #c2185b;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .reason-content {
+        color: #880e4f;
+        font-style: italic;
+        padding: 15px;
+        background-color: white;
+        border-radius: 6px;
+        border-left: 3px solid #e91e63;
+      }
+      .tips-box {
+        background-color: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .tips-title {
+        color: #2e7d32;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .tips-box ul {
+        margin: 10px 0;
+        padding-left: 20px;
+      }
+      .tips-box li {
+        margin: 10px 0;
+        color: #388e3c;
+      }
+      .action-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #99b94a 0%, #7a9a3a 100%);
+        color: white;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin: 20px 0;
+      }
+      .cta-section {
+        text-align: center;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        margin: 25px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 25px;
+        background-color: #fafafa;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+        color: #888;
+        font-size: 13px;
+      }
+      .footer .brand {
+        color: #99b94a;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Công Thức Cần Chỉnh Sửa</h2>
+      </div>
+      <div class="brand-bar"></div>
 
-</body>
+      <div class="content">
+        <p>Xin chào <strong>{{UserName}}</strong>,</p>
+
+        <p>
+          Cảm ơn bạn đã chia sẻ công thức với cộng đồng FitFood Tracker! Tuy nhiên, sau
+          khi xem xét, công thức của bạn cần được chỉnh sửa để đáp ứng tiêu
+          chuẩn của chúng tôi.
+        </p>
+
+        <div class="recipe-card">
+          <div class="recipe-name">{{RecipeName}}</div>
+          <span class="recipe-status">Cần chỉnh sửa</span>
+        </div>
+
+        <div class="reason-box">
+          <div class="reason-title">Phản hồi từ kiểm duyệt viên</div>
+          <div class="reason-content">{{Reason}}</div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">Mẹo để công thức được duyệt</div>
+          <ul>
+            <li>
+              <strong>Hình ảnh:</strong> Sử dụng hình ảnh rõ nét, đúng với món
+              ăn
+            </li>
+            <li><strong>Mô tả:</strong> Viết mô tả chi tiết, dễ hiểu</li>
+            <li>
+              <strong>Nguyên liệu:</strong> Liệt kê đầy đủ với định lượng chính
+              xác
+            </li>
+            <li>
+              <strong>Các bước:</strong> Hướng dẫn từng bước rõ ràng, có thể kèm
+              hình ảnh
+            </li>
+            <li>
+              <strong>Dinh dưỡng:</strong> Cung cấp thông tin dinh dưỡng chính
+              xác
+            </li>
+          </ul>
+        </div>
+
+        <div class="cta-section">
+          <p style="margin-bottom: 15px; color: #555">
+            Hãy chỉnh sửa công thức của bạn và gửi lại để được xem xét.
+          </p>
+          <a href="{{EditRecipeUrl}}" class="action-button"
+            >Chỉnh Sửa Công Thức</a
+          >
+        </div>
+
+        <p>
+          Chúng tôi rất mong được xem phiên bản cập nhật của công thức này. Nếu
+          cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi!
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>Trân trọng,</p>
+        <p class="brand">Đội ngũ FitFood Tracker</p>
+        <p>Email này được gửi tự động. Vui lòng không trả lời trực tiếp.</p>
+      </div>
+    </div>
+  </body>
 </html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chào mừng đến với FitFood</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      .header {
+        background: linear-gradient(135deg, #99b94a 0%, #7a9a3a 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .header-icon {
+        font-size: 64px;
+        margin-bottom: 15px;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      .content {
+        padding: 30px;
+        background-color: white;
+      }
+      .content p {
+        margin: 15px 0;
+        color: #555;
+      }
+      .welcome-banner {
+        background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 25px 0;
+        text-align: center;
+      }
+      .welcome-banner h2 {
+        color: #558b2f;
+        margin: 0 0 10px 0;
+        font-size: 22px;
+      }
+      .welcome-banner p {
+        color: #689f38;
+        margin: 0;
+      }
+      .features-grid {
+        margin: 30px 0;
+      }
+      .feature-item {
+        display: block;
+        padding: 20px;
+        margin: 15px 0;
+        background-color: #fafafa;
+        border-radius: 10px;
+        border-left: 4px solid #99b94a;
+      }
+      .feature-icon {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+      .feature-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .feature-desc {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+      }
+      .action-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #99b94a 0%, #7a9a3a 100%);
+        color: white;
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        margin: 10px 0;
+      }
+      .cta-section {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+        border-radius: 12px;
+        margin: 25px 0;
+      }
+      .cta-section h3 {
+        color: #f57c00;
+        margin: 0 0 15px 0;
+        font-size: 18px;
+      }
+      .cta-section p {
+        color: #e65100;
+        margin: 0 0 20px 0;
+      }
+      .tips-box {
+        background-color: #e3f2fd;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 25px 0;
+      }
+      .tips-title {
+        color: #1565c0;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+      .tips-box ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .tips-box li {
+        margin: 10px 0;
+        color: #1976d2;
+      }
+      .footer {
+        text-align: center;
+        padding: 25px;
+        background-color: #fafafa;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+        color: #888;
+        font-size: 13px;
+      }
+      .footer .brand {
+        color: #99b94a;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Chào Mừng Đến Với FitFood Tracker!</h1>
+        <p>Nơi chia sẻ công thức nấu ăn lành mạnh</p>
+      </div>
+
+      <div class="content">
+        <p>Xin chào <strong>{{UserName}}</strong>,</p>
+
+        <div class="welcome-banner">
+          <h2>Tài khoản của bạn đã sẵn sàng!</h2>
+          <p>Chào mừng bạn đến với cộng đồng đầu bếp FitFood Tracker</p>
+        </div>
+
+        <p>
+          Chúng tôi rất vui mừng chào đón bạn đến với FitFood Tracker - nền tảng chia sẻ
+          công thức nấu ăn lành mạnh hàng đầu. Hãy bắt đầu hành trình ẩm thực
+          của bạn ngay hôm nay!
+        </p>
+
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-title">Chia Sẻ Công Thức</div>
+            <p class="feature-desc">
+              Tạo và chia sẻ công thức yêu thích của bạn với cộng đồng
+            </p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">Khám Phá Món Ngon</div>
+            <p class="feature-desc">
+              Tìm kiếm hàng ngàn công thức từ các đầu bếp khác
+            </p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">Sống Khỏe Mỗi Ngày</div>
+            <p class="feature-desc">
+              Theo dõi dinh dưỡng và đạt mục tiêu sức khỏe của bạn
+            </p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">Kết Nối Cộng Đồng</div>
+            <p class="feature-desc">
+              Tương tác, bình luận và học hỏi từ những người yêu ẩm thực
+            </p>
+          </div>
+        </div>
+
+        <div class="cta-section">
+          <h3>Sẵn sàng nấu món đầu tiên?</h3>
+          <p>Khám phá công thức phù hợp với bạn ngay bây giờ!</p>
+          <a href="{{ExploreUrl}}" class="action-button">Bắt Đầu Khám Phá</a>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">Mẹo để bắt đầu</div>
+          <ul>
+            <li>Hoàn thiện hồ sơ cá nhân của bạn</li>
+            <li>Theo dõi các đầu bếp yêu thích</li>
+            <li>Lưu công thức để nấu sau</li>
+            <li>Chia sẻ công thức đầu tiên của bạn!</li>
+          </ul>
+        </div>
+
+        <p>
+          Nếu bạn có bất kỳ câu hỏi nào, đội ngũ hỗ trợ của chúng tôi luôn sẵn
+          sàng giúp đỡ bạn. Chúc bạn có những trải nghiệm tuyệt vời!
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>Trân trọng,</p>
+        <p class="brand">Đội ngũ FitFood Tracker</p>
+        <p>Email này được gửi tự động. Vui lòng không trả lời trực tiếp.</p>
+      </div>
+    </div>
+  </body>
+</html>

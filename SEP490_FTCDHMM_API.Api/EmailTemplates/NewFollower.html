@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Có người theo dõi bạn</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      .header {
+        background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .brand-bar {
+        background-color: #99b94a;
+        height: 4px;
+      }
+      .content {
+        padding: 30px;
+        background-color: white;
+      }
+      .content p {
+        margin: 15px 0;
+        color: #555;
+      }
+      .follower-card {
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        text-align: center;
+      }
+      .follower-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #e91e63;
+        margin: 0 auto 15px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        color: white;
+      }
+      .follower-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #880e4f;
+        margin-bottom: 5px;
+      }
+      .follower-username {
+        color: #ad1457;
+        font-size: 14px;
+      }
+      .stats-row {
+        display: table;
+        width: 100%;
+        margin: 25px 0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .stat-item {
+        display: table-cell;
+        text-align: center;
+        padding: 20px;
+        background-color: #fafafa;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #99b94a;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: #888;
+        text-transform: uppercase;
+        margin-top: 5px;
+      }
+      .action-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #99b94a 0%, #7a9a3a 100%);
+        color: white;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin: 10px 5px;
+      }
+      .action-button.secondary {
+        background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+      }
+      .cta-section {
+        text-align: center;
+        padding: 25px;
+        background-color: #f5f5f5;
+        border-radius: 12px;
+        margin: 25px 0;
+      }
+      .cta-section p {
+        color: #555;
+        margin-bottom: 20px;
+      }
+      .motivation-box {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 25px 0;
+        text-align: center;
+      }
+      .motivation-box p {
+        color: #2e7d32;
+        margin: 0;
+        font-size: 15px;
+      }
+      .footer {
+        text-align: center;
+        padding: 25px;
+        background-color: #fafafa;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+        color: #888;
+        font-size: 13px;
+      }
+      .footer .brand {
+        color: #99b94a;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Có Người Mới Theo Dõi Bạn!</h2>
+      </div>
+      <div class="brand-bar"></div>
+
+      <div class="content">
+        <p>Xin chào <strong>{{UserName}}</strong>,</p>
+
+        <p>
+          Tin vui! Có một thành viên mới trong cộng đồng FitFood Tracker vừa bắt đầu
+          theo dõi bạn để cập nhật những công thức mới nhất của bạn.
+        </p>
+
+        <div class="follower-card">
+          <div class="follower-avatar">{{FollowerInitial}}</div>
+          <div class="follower-name">{{FollowerName}}</div>
+          <div class="follower-username">{{FollowerUsername}}</div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value">{{TotalFollowers}}</div>
+            <div class="stat-label">Người theo dõi</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{TotalRecipes}}</div>
+            <div class="stat-label">Công thức</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{TotalLikes}}</div>
+            <div class="stat-label">Lượt thích</div>
+          </div>
+        </div>
+
+        <div class="cta-section">
+          <p>Xem hồ sơ của người theo dõi mới hoặc tạo công thức mới!</p>
+          <a href="{{FollowerProfileUrl}}" class="action-button secondary"
+            >Xem Hồ Sơ</a
+          >
+          <a href="{{CreateRecipeUrl}}" class="action-button"
+            >Tạo Công Thức</a
+          >
+        </div>
+
+        <div class="motivation-box">
+          <p>
+            Mỗi người theo dõi là một nguồn động lực! Hãy tiếp tục chia sẻ những
+            công thức ngon và lành mạnh nhé!
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Trân trọng,</p>
+        <p class="brand">Đội ngũ FitFood Tracker</p>
+        <p>Email này được gửi tự động. Vui lòng không trả lời trực tiếp.</p>
+      </div>
+    </div>
+  </body>
+</html>
