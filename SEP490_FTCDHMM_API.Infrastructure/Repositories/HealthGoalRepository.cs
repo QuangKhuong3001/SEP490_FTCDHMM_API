@@ -18,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         {
             return await _dbContext.HealthGoals
                 .Include(chg => chg.Targets)
+                    .ThenInclude(t => t.Nutrient)
                 .ToListAsync();
         }
     }

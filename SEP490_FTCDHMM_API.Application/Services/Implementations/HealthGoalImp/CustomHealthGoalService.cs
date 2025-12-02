@@ -153,12 +153,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
 
         public async Task DeleteAsync(Guid userId, Guid id)
         {
-            var goal = await _customHealthGoalRepository.GetByIdAsync(id);
+            var goal = await _customHealthGoalRepository.GetByIdAsync(id,
+                include: q => q.Include(g => g.Targets));
+
             if (goal == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (goal.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
+
+            goal.Targets.Clear();
 
             await _customHealthGoalRepository.DeleteAsync(goal);
         }

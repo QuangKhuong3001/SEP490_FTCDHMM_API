@@ -50,8 +50,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var placeholders = new Dictionary<string, string>
                     {
                         { "Reason", request.Reason },
-                        { "userFirstName", user.FirstName },
-                        { "userLastName", user.LastName },
+                        { "UserName", $"{user.FirstName} {user.LastName}".Trim() },
                         { "RecipeName", recipe.Name },
                     };
 
@@ -82,8 +81,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var placeholders = new Dictionary<string, string>
                     {
                         { "Reason", request.Reason },
-                        { "userFirstName", user.FirstName },
-                        { "userLastName", user.LastName },
+                        { "UserName", $"{user.FirstName} {user.LastName}".Trim() },
                         { "RecipeName", recipe.Name },
                     };
 
@@ -134,8 +132,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             var placeholders = new Dictionary<string, string>
                     {
                         { "Reason", request.Reason },
-                        { "userFirstName", user.FirstName },
-                        { "userLastName", user.LastName },
+                        { "UserName", $"{user.FirstName} {user.LastName}".Trim() },
                         { "RecipeName", recipe.Name },
                     };
 

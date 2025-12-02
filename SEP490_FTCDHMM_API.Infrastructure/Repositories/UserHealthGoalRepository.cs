@@ -26,8 +26,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 )
                 .Include(u => u.CustomHealthGoal)
                     .ThenInclude(ch => ch!.Targets)
+                        .ThenInclude(t => t.Nutrient)
                 .Include(u => u.HealthGoal)
                     .ThenInclude(h => h!.Targets)
+                        .ThenInclude(t => t.Nutrient)
                 .OrderByDescending(u => u.StartedAtUtc)
                 .FirstOrDefaultAsync();
         }
@@ -43,8 +45,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 )
                 .Include(u => u.CustomHealthGoal)
                     .ThenInclude(ch => ch!.Targets)
+                        .ThenInclude(t => t.Nutrient)
                 .Include(u => u.HealthGoal)
                     .ThenInclude(h => h!.Targets)
+                        .ThenInclude(t => t.Nutrient)
                 .OrderByDescending(u => u.StartedAtUtc)
                 .ToListAsync();
         }
