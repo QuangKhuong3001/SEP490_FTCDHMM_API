@@ -39,11 +39,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 if (!goalExist)
                     throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
-                var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
-                if (exist != null)
+                // Expire ALL active goals for this user
+                var now = DateTime.UtcNow;
+                var activeGoals = await _userHealthGoalRepository.GetAllAsync(
+                    c => c.UserId == userId &&
+                    c.StartedAtUtc <= now &&
+                    (c.ExpiredAtUtc == null || c.ExpiredAtUtc > now)
+                );
+
+                foreach (var activeGoal in activeGoals)
                 {
-                    exist.ExpiredAtUtc = DateTime.UtcNow;
-                    await _userHealthGoalRepository.UpdateAsync(exist);
+                    activeGoal.ExpiredAtUtc = DateTime.UtcNow;
+                    await _userHealthGoalRepository.UpdateAsync(activeGoal);
                 }
 
                 var newCustomGoal = new UserHealthGoal
@@ -63,11 +70,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImp
                 if (!customExist)
                     throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
-                var exist = await _userHealthGoalRepository.FirstOrDefaultAsync(c => c.UserId == userId);
-                if (exist != null)
+                // Expire ALL active goals for this user
+                var now = DateTime.UtcNow;
+                var activeGoals = await _userHealthGoalRepository.GetAllAsync(
+                    c => c.UserId == userId &&
+                    c.StartedAtUtc <= now &&
+                    (c.ExpiredAtUtc == null || c.ExpiredAtUtc > now)
+                );
+
+                foreach (var activeGoal in activeGoals)
                 {
-                    exist.ExpiredAtUtc = DateTime.UtcNow;
-                    await _userHealthGoalRepository.UpdateAsync(exist);
+                    activeGoal.ExpiredAtUtc = DateTime.UtcNow;
+                    await _userHealthGoalRepository.UpdateAsync(activeGoal);
                 }
 
                 var newCustomGoal = new UserHealthGoal

@@ -19,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return await _dbContext.CustomHealthGoals
                 .Where(chg => chg.UserId == userId)
                 .Include(chg => chg.Targets)
+                    .ThenInclude(t => t.Nutrient)
                 .ToListAsync();
         }
 
