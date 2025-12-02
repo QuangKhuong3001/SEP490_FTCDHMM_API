@@ -254,7 +254,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             if (targetType == ReportObjectType.Recipe)
             {
-                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && !r.IsDeleted);
+                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status != RecipeStatus.Deleted);
             }
 
             if (targetType == ReportObjectType.User)
