@@ -252,6 +252,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRecipeBehaviorService, RecipeBehaviorService>();
             services.AddScoped<IRecipeCommandService, RecipeCommandService>();
             services.AddScoped<IRecipeQueryService, RecipeQueryService>();
+            services.AddScoped<IRecipeManagementService, RecipeManagementService>();
 
             //userRecipeView
             services.AddScoped<IUserRecipeViewRepository, UserRecipeViewRepository>();
