@@ -21,7 +21,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn giới tính")]
         public required string Gender { get; set; }
