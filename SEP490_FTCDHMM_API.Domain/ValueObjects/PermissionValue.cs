@@ -41,6 +41,12 @@
         public static readonly PermissionValue Report_View = new("Report", "View");
         public static readonly PermissionValue Report_Approve = new("Report", "Approve");
         public static readonly PermissionValue Report_Reject = new("Report", "Reject");
+
+        public static readonly PermissionValue Recipe_Lock = new("Recipe", "Lock");
+        public static readonly PermissionValue Recipe_Delete = new("Recipe", "Delete");
+        public static readonly PermissionValue Recipe_Approve = new("Recipe", "Approve");
+        public static readonly PermissionValue Recipe_ManagementView = new("Recipe", "ManagementView");
+
         public static IEnumerable<PermissionValue> All => new[]
         {
             Moderator_Create,
@@ -68,8 +74,11 @@
             Rating_Update,
             Report_View,
             Report_Approve,
-            Report_Reject
-
+            Report_Reject,
+            Recipe_Approve,
+            Recipe_Delete,
+            Recipe_Lock,
+            Recipe_ManagementView
         };
     }
 }

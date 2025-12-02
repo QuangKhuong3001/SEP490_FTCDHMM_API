@@ -136,7 +136,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                     .Include(r => r.RecipeUserTags)
             );
 
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
@@ -203,12 +203,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateUserExistsAsync(userId);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
 
-            recipe.IsDeleted = true;
+            recipe.Status = RecipeStatus.Deleted;
             await _recipeRepository.UpdateAsync(recipe);
         }
 
@@ -217,7 +217,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateUserExistsAsync(userId);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -238,7 +238,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateUserExistsAsync(userId);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userFavoriteRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -254,7 +254,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateUserExistsAsync(userId);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -275,7 +275,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateUserExistsAsync(userId);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.IsDeleted)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var exist = await _userSaveRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
@@ -299,7 +299,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _validator.ValidateTaggedUsersAsync(userId, request.TaggedUserIds);
 
             var parent = await _recipeRepository.GetByIdAsync(parentId);
-            if (parent == null || parent.IsDeleted)
+            if (parent == null || parent.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức được sao chép không tồn tại");
 
             if (parent.ParentId.HasValue)

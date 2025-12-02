@@ -16,9 +16,9 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public string? LockReason { get; set; }
         public Guid? AvatarId { get; set; }
         public Image? Avatar { get; set; } = null!;
-        public UserHealthGoal? UserHealthGoal { get; set; }
         public Guid RoleId { get; set; }
         public AppRole Role { get; set; } = null!;
+        public ICollection<UserHealthGoal> UserHealthGoals { get; set; } = new List<UserHealthGoal>();
         public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
         public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
         public ICollection<UserRecipeView> ViewedRecipes { get; set; } = new List<UserRecipeView>();

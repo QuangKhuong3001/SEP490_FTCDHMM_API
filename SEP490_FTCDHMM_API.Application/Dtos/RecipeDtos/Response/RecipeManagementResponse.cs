@@ -3,10 +3,10 @@ using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
 {
-    public class RecipeResponse
+    public class RecipeManagementResponse
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; } = string.Empty;
+        public required string Name { get; set; }
         public string? Description { get; set; } = string.Empty;
         public required UserInteractionResponse Author { get; set; }
         public required DifficultyValue Difficulty { get; set; }
@@ -15,5 +15,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public string? ImageUrl { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
+        public string Reason { get; set; } = string.Empty;
     }
 }
