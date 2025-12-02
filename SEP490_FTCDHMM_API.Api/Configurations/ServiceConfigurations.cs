@@ -344,6 +344,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IRecommentdationService, RecommendationService>();
             services.AddScoped<IRecipeScoringSystem, RecipeScoringSystem>();
 
+            //report
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IReportService, ReportService>();
             //userbehavior
             services.AddScoped<IUserBehaviorRepository, UserBehaviorRepository>();
 

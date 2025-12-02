@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130142443_Roport")]
+    partial class Roport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,37 +373,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
-=======
                             PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
-=======
                             PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-=======
                             PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = true
                         },
                         new
@@ -556,37 +541,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
-=======
                             PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
-=======
                             PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-=======
                             PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         },
                         new
@@ -742,37 +709,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
-=======
                             PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
-=======
                             PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-<<<<<<< HEAD
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-=======
                             PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
->>>>>>> origin/FTCDHMM-74
                             IsActive = false
                         });
                 });
@@ -1100,7 +1049,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AuthorId")
+                        .IsUnique();
 
                     b.HasIndex("ImageId");
 
@@ -1293,11 +1243,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-<<<<<<< HEAD
-                            CreatedAtUTC = new DateTime(2025, 12, 2, 15, 33, 57, 958, DateTimeKind.Utc).AddTicks(4200),
-=======
                             CreatedAtUTC = new DateTime(2025, 11, 30, 14, 24, 43, 263, DateTimeKind.Utc).AddTicks(8330),
->>>>>>> origin/FTCDHMM-74
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1319,11 +1265,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Property<Guid>("ImageId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsNew")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("LastUpdatedUtc")
                         .ValueGeneratedOnAdd()
@@ -1602,17 +1543,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("318fc25c-3e11-cdc7-7e54-6b836ccae2b9"),
-                            Description = "Tổng năng lượng của thực phẩm (kcal).",
-                            IsMacroNutrient = false,
-                            Name = "Energy",
-                            UnitId = new Guid("93d2464a-59b3-7951-21fe-5dc36fe13c45"),
-                            VietnameseName = "Năng lượng"
-                        },
-                        new
-                        {
                             Id = new Guid("4e7a667e-4012-d80e-9276-1cd44d4e7fbd"),
-                            Description = "Hỗ trợ xây dựng mô, cơ, enzyme và hormone.",
+                            Description = "Giúp xây dựng cơ bắp và tế bào.",
                             IsMacroNutrient = true,
                             Name = "Protein",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
@@ -1620,71 +1552,62 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cf288aeb-68b0-ef71-e03d-d3ef34fda9ce"),
-                            Description = "Nguồn năng lượng cô đặc, cần cho hấp thu vitamin tan trong dầu.",
+                            Id = new Guid("73cd094d-61aa-61ce-d021-9ffa9b9ebbad"),
+                            Description = "Tổng lượng chất béo trong thực phẩm.",
                             IsMacroNutrient = true,
-                            Name = "Total lipid (fat)",
+                            Name = "Fat",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Tổng chất béo"
                         },
                         new
                         {
                             Id = new Guid("feca7dbc-1254-74f3-c7e0-ff7b786515d0"),
-                            Description = "Nguồn năng lượng chính cho cơ thể.",
+                            Description = "Nguồn năng lượng chính của cơ thể.",
                             IsMacroNutrient = true,
-                            Name = "Carbohydrate, by difference",
+                            Name = "Carbohydrate",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Carbohydrate"
+                            VietnameseName = "Tinh bột"
                         },
                         new
                         {
                             Id = new Guid("e19cd21d-2c38-e38f-7c55-f643fd65daf9"),
-                            Description = "Hỗ trợ tiêu hóa và ổn định đường huyết.",
+                            Description = "Hỗ trợ tiêu hóa và giảm cholesterol.",
                             IsMacroNutrient = false,
-                            Name = "Fiber, total dietary",
+                            Name = "Dietary Fiber",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
                             VietnameseName = "Chất xơ"
                         },
                         new
                         {
                             Id = new Guid("dbe42ec4-51b1-f98d-66fe-6fed6bdcad0a"),
-                            Description = "Toàn bộ lượng đường tự nhiên và thêm vào.",
+                            Description = "Tổng lượng đường tự nhiên và thêm vào.",
                             IsMacroNutrient = false,
-                            Name = "Sugars, total",
+                            Name = "Sugars",
                             UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Tổng đường"
+                            VietnameseName = "Đường"
                         },
                         new
                         {
-                            Id = new Guid("f84f6327-2b00-e712-5d98-e07ccd005d18"),
-                            Description = "Hàm lượng nước trong thực phẩm.",
+                            Id = new Guid("f2e0b30a-40ad-f850-5251-36fd00dc462e"),
+                            Description = "Cholesterol trong thực phẩm.",
                             IsMacroNutrient = false,
-                            Name = "Water",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Nước"
+                            Name = "Cholesterol",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Cholesterol"
                         },
                         new
                         {
-                            Id = new Guid("0138bdbe-6512-9ccc-a332-791054106ef5"),
-                            Description = "Khoáng tổng hợp còn lại sau khi đốt mẫu.",
+                            Id = new Guid("ba6906e3-9e16-e3df-06c5-f3b628919649"),
+                            Description = "Giúp điều hòa nước và áp suất máu.",
                             IsMacroNutrient = false,
-                            Name = "Ash",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Tro"
-                        },
-                        new
-                        {
-                            Id = new Guid("21414437-603f-2de5-60fe-d0278e0872b5"),
-                            Description = "Hàm lượng cồn trong thực phẩm/đồ uống.",
-                            IsMacroNutrient = false,
-                            Name = "Alcohol, ethyl",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Cồn ethanol"
+                            Name = "Sodium",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Natri"
                         },
                         new
                         {
                             Id = new Guid("ed0c64a9-afc7-216a-a83e-8aebc743e462"),
-                            Description = "Quan trọng cho xương, răng và truyền tín hiệu thần kinh.",
+                            Description = "Cần thiết cho xương và răng chắc khỏe.",
                             IsMacroNutrient = false,
                             Name = "Calcium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1693,7 +1616,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("968aface-8106-d49e-09dc-761ca6080887"),
-                            Description = "Thành phần của hemoglobin, vận chuyển oxy.",
+                            Description = "Thành phần của huyết sắc tố (hemoglobin).",
                             IsMacroNutrient = false,
                             Name = "Iron",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1702,7 +1625,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f3c5dea5-8442-1e88-a8bb-d71679c86ede"),
-                            Description = "Tham gia hơn 300 phản ứng enzyme.",
+                            Description = "Quan trọng cho cơ và thần kinh.",
                             IsMacroNutrient = false,
                             Name = "Magnesium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1711,7 +1634,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("88264feb-65c1-6808-c47c-44e3ebe1f725"),
-                            Description = "Hình thành xương và DNA.",
+                            Description = "Giúp hình thành xương và răng.",
                             IsMacroNutrient = false,
                             Name = "Phosphorus",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1720,7 +1643,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("67dc4e3a-958b-9f2b-ba70-d7e6690b8f2d"),
-                            Description = "Điện giải quan trọng cho cơ và tim.",
+                            Description = "Duy trì cân bằng nước và nhịp tim.",
                             IsMacroNutrient = false,
                             Name = "Potassium",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1728,17 +1651,107 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ba6906e3-9e16-e3df-06c5-f3b628919649"),
-                            Description = "Điều hòa nước và huyết áp.",
+                            Id = new Guid("5e08cf55-2b60-6f26-ef65-305553ffb09b"),
+                            Description = "Giúp sáng mắt và tăng sức đề kháng.",
                             IsMacroNutrient = false,
-                            Name = "Sodium",
+                            Name = "Vitamin A",
+                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
+                            VietnameseName = "Vitamin A"
+                        },
+                        new
+                        {
+                            Id = new Guid("4345a4c7-9cd2-6519-5892-9dcc40bb9ecc"),
+                            Description = "Tăng cường miễn dịch, chống oxy hóa.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin C",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Natri"
+                            VietnameseName = "Vitamin C"
+                        },
+                        new
+                        {
+                            Id = new Guid("c8cd2a0b-6458-d98b-0ebf-0243cf575556"),
+                            Description = "Giúp hấp thu canxi, tốt cho xương.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin D",
+                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
+                            VietnameseName = "Vitamin D"
+                        },
+                        new
+                        {
+                            Id = new Guid("40d7e2f9-a5da-064c-fe4d-28febe860039"),
+                            Description = "Chống oxy hóa, bảo vệ tế bào.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin E",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Vitamin E"
+                        },
+                        new
+                        {
+                            Id = new Guid("7df9ddde-bcce-958a-2a38-85778c6cfb7b"),
+                            Description = "Giúp đông máu và duy trì xương khỏe mạnh.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin K",
+                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
+                            VietnameseName = "Vitamin K"
+                        },
+                        new
+                        {
+                            Id = new Guid("422833be-5c43-e625-7a6a-6a74c32794a6"),
+                            Description = "Chuyển hóa năng lượng, hỗ trợ thần kinh.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin B1 (Thiamin)",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Vitamin B1"
+                        },
+                        new
+                        {
+                            Id = new Guid("ac960903-ad9f-dfae-e0b3-35628565a3cb"),
+                            Description = "Tốt cho da, mắt và hệ thần kinh.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin B2 (Riboflavin)",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Vitamin B2"
+                        },
+                        new
+                        {
+                            Id = new Guid("bc5e858f-8aaa-e3f1-c7ae-bf691e5fa88e"),
+                            Description = "Giúp chuyển hóa năng lượng, bảo vệ tim mạch.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin B3 (Niacin)",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Vitamin B3"
+                        },
+                        new
+                        {
+                            Id = new Guid("4e465394-2d14-2a0a-7a00-5db0bc9e4597"),
+                            Description = "Giúp tổng hợp hồng cầu, duy trì trao đổi chất.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin B6",
+                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
+                            VietnameseName = "Vitamin B6"
+                        },
+                        new
+                        {
+                            Id = new Guid("ff39565c-1b2f-7db1-4f47-7b9ca86221f6"),
+                            Description = "Quan trọng cho phụ nữ mang thai và tế bào mới.",
+                            IsMacroNutrient = false,
+                            Name = "Folate (Folic Acid)",
+                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
+                            VietnameseName = "Axit folic"
+                        },
+                        new
+                        {
+                            Id = new Guid("3a9a556f-7285-4572-28aa-67447560ece8"),
+                            Description = "Giúp tạo máu và duy trì hệ thần kinh.",
+                            IsMacroNutrient = false,
+                            Name = "Vitamin B12",
+                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
+                            VietnameseName = "Vitamin B12"
                         },
                         new
                         {
                             Id = new Guid("7dd02ec7-0bde-e9d2-4f7b-99e3184f139e"),
-                            Description = "Quan trọng cho miễn dịch và enzyme.",
+                            Description = "Hỗ trợ miễn dịch, da, tóc và móng.",
                             IsMacroNutrient = false,
                             Name = "Zinc",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1747,7 +1760,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("fa0f09a4-fbbd-3da5-76b0-748a0d87ce21"),
-                            Description = "Tạo máu và enzyme.",
+                            Description = "Tham gia hình thành tế bào máu và enzyme.",
                             IsMacroNutrient = false,
                             Name = "Copper",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1756,7 +1769,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("c52f37b6-b8ba-c587-72d7-d3f5dc8044d6"),
-                            Description = "Tham gia trao đổi xương và enzyme.",
+                            Description = "Cần cho xương và não.",
                             IsMacroNutrient = false,
                             Name = "Manganese",
                             UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
@@ -1765,492 +1778,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("55fb9dc4-6bf0-06b4-e2c5-ca786f557d38"),
-                            Description = "Chống oxy hóa mạnh.",
+                            Description = "Chống oxy hóa, tăng cường miễn dịch.",
                             IsMacroNutrient = false,
                             Name = "Selenium",
                             UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
                             VietnameseName = "Selen"
-                        },
-                        new
-                        {
-                            Id = new Guid("4345a4c7-9cd2-6519-5892-9dcc40bb9ecc"),
-                            Description = "Tăng miễn dịch, chống oxy hóa.",
-                            IsMacroNutrient = false,
-                            Name = "Vitamin C",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin C"
-                        },
-                        new
-                        {
-                            Id = new Guid("422833be-5c43-e625-7a6a-6a74c32794a6"),
-                            IsMacroNutrient = false,
-                            Name = "Thiamin (B1)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B1"
-                        },
-                        new
-                        {
-                            Id = new Guid("ac960903-ad9f-dfae-e0b3-35628565a3cb"),
-                            IsMacroNutrient = false,
-                            Name = "Riboflavin (B2)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B2"
-                        },
-                        new
-                        {
-                            Id = new Guid("bc5e858f-8aaa-e3f1-c7ae-bf691e5fa88e"),
-                            IsMacroNutrient = false,
-                            Name = "Niacin (B3)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B3"
-                        },
-                        new
-                        {
-                            Id = new Guid("6b6110d8-655d-df7c-486e-e85acf7d2540"),
-                            IsMacroNutrient = false,
-                            Name = "Pantothenic acid (B5)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B5"
-                        },
-                        new
-                        {
-                            Id = new Guid("4e465394-2d14-2a0a-7a00-5db0bc9e4597"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin B6",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin B6"
-                        },
-                        new
-                        {
-                            Id = new Guid("be53a666-7e98-040e-4b91-7c2f71a2f546"),
-                            IsMacroNutrient = false,
-                            Name = "Biotin",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Biotin"
-                        },
-                        new
-                        {
-                            Id = new Guid("ff39565c-1b2f-7db1-4f47-7b9ca86221f6"),
-                            IsMacroNutrient = false,
-                            Name = "Folate, total",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Axit folic"
-                        },
-                        new
-                        {
-                            Id = new Guid("3a9a556f-7285-4572-28aa-67447560ece8"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin B12",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin B12"
-                        },
-                        new
-                        {
-                            Id = new Guid("dd3c5de2-7cf9-f476-2b25-6462fde1dad0"),
-                            IsMacroNutrient = false,
-                            Name = "Choline",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Choline"
-                        },
-                        new
-                        {
-                            Id = new Guid("0a259dfb-f18b-7a8f-2fec-33630aac3ea1"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin A, RAE",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin A (RAE)"
-                        },
-                        new
-                        {
-                            Id = new Guid("769ddb05-71ee-eefa-18e3-7a7d3f49c35e"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin A, IU",
-                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
-                            VietnameseName = "Vitamin A (IU)"
-                        },
-                        new
-                        {
-                            Id = new Guid("c8cd2a0b-6458-d98b-0ebf-0243cf575556"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin D (D2 + D3)",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin D"
-                        },
-                        new
-                        {
-                            Id = new Guid("105a2684-c8b2-3f06-51b4-df96bb295f29"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin D IU",
-                            UnitId = new Guid("a06cedbb-6209-6b82-bc1f-ca9873f9e31c"),
-                            VietnameseName = "Vitamin D (IU)"
-                        },
-                        new
-                        {
-                            Id = new Guid("40d7e2f9-a5da-064c-fe4d-28febe860039"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin E (alpha-tocopherol)",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Vitamin E"
-                        },
-                        new
-                        {
-                            Id = new Guid("7df9ddde-bcce-958a-2a38-85778c6cfb7b"),
-                            IsMacroNutrient = false,
-                            Name = "Vitamin K (phylloquinone)",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Vitamin K"
-                        },
-                        new
-                        {
-                            Id = new Guid("ada3daf8-c279-a4b4-d753-0f799a88da35"),
-                            IsMacroNutrient = false,
-                            Name = "Fatty acids, total saturated",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất béo bão hòa"
-                        },
-                        new
-                        {
-                            Id = new Guid("fa81a189-596c-6dff-7d3d-078e8fa086d4"),
-                            IsMacroNutrient = false,
-                            Name = "Fatty acids, total monounsaturated",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất béo không bão hòa đơn"
-                        },
-                        new
-                        {
-                            Id = new Guid("b22e4026-ba11-b2de-3e99-056b11791bc8"),
-                            IsMacroNutrient = false,
-                            Name = "Fatty acids, total polyunsaturated",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất béo không bão hòa đa"
-                        },
-                        new
-                        {
-                            Id = new Guid("f2e0b30a-40ad-f850-5251-36fd00dc462e"),
-                            IsMacroNutrient = false,
-                            Name = "Cholesterol",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Cholesterol"
-                        },
-                        new
-                        {
-                            Id = new Guid("a9145240-ccfe-3639-9726-c5fcc6a19807"),
-                            IsMacroNutrient = false,
-                            Name = "Fatty acids, total trans",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Chất béo trans"
-                        },
-                        new
-                        {
-                            Id = new Guid("86b9cbd0-b193-3c94-1267-d1b2463b224e"),
-                            IsMacroNutrient = false,
-                            Name = "18:1 Oleic acid",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit oleic"
-                        },
-                        new
-                        {
-                            Id = new Guid("0df85a80-795d-fe5a-e1c4-ffaae9210350"),
-                            IsMacroNutrient = false,
-                            Name = "18:2 Linoleic acid",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit linoleic (Omega-6)"
-                        },
-                        new
-                        {
-                            Id = new Guid("e38369bb-2bf7-714c-8982-c4b8037ab867"),
-                            IsMacroNutrient = false,
-                            Name = "18:3 Linolenic acid",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit alpha-linolenic (Omega-3)"
-                        },
-                        new
-                        {
-                            Id = new Guid("3f5f3bde-4d3e-cbcc-9bdf-618270327bf0"),
-                            IsMacroNutrient = false,
-                            Name = "Eicosapentaenoic acid (EPA)",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "EPA"
-                        },
-                        new
-                        {
-                            Id = new Guid("e748a00c-8f55-b10e-fcab-4b800639ab99"),
-                            IsMacroNutrient = false,
-                            Name = "Docosahexaenoic acid (DHA)",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "DHA"
-                        },
-                        new
-                        {
-                            Id = new Guid("2b9bb05a-d554-ed46-ebb1-781b7b67e2b6"),
-                            IsMacroNutrient = false,
-                            Name = "Tryptophan",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Tryptophan"
-                        },
-                        new
-                        {
-                            Id = new Guid("c9e832fd-06ae-d729-aaeb-e197c85bb761"),
-                            IsMacroNutrient = false,
-                            Name = "Threonine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Threonine"
-                        },
-                        new
-                        {
-                            Id = new Guid("f566cf28-767f-5621-6f95-03980a2b638f"),
-                            IsMacroNutrient = false,
-                            Name = "Isoleucine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Isoleucine"
-                        },
-                        new
-                        {
-                            Id = new Guid("5bfdc079-8860-db6b-83cd-fefb53c84b22"),
-                            IsMacroNutrient = false,
-                            Name = "Leucine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Leucine"
-                        },
-                        new
-                        {
-                            Id = new Guid("b9ccf55b-2977-8954-5983-01316c3379b6"),
-                            IsMacroNutrient = false,
-                            Name = "Lysine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Lysine"
-                        },
-                        new
-                        {
-                            Id = new Guid("2526fbcd-fcb9-6660-93ce-a5a34ea61630"),
-                            IsMacroNutrient = false,
-                            Name = "Methionine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Methionine"
-                        },
-                        new
-                        {
-                            Id = new Guid("afacbf3c-902e-cdbc-b28c-d0770f328557"),
-                            IsMacroNutrient = false,
-                            Name = "Cystine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Cystine"
-                        },
-                        new
-                        {
-                            Id = new Guid("08346647-35b8-ea15-1f06-fd61d09d88c4"),
-                            IsMacroNutrient = false,
-                            Name = "Phenylalanine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Phenylalanine"
-                        },
-                        new
-                        {
-                            Id = new Guid("80c1876f-f5be-ed28-5e72-b3735811c5f0"),
-                            IsMacroNutrient = false,
-                            Name = "Tyrosine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Tyrosine"
-                        },
-                        new
-                        {
-                            Id = new Guid("87ddb238-fb89-28a9-d792-949edc7aaf2a"),
-                            IsMacroNutrient = false,
-                            Name = "Valine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Valine"
-                        },
-                        new
-                        {
-                            Id = new Guid("99046a8e-3163-4240-4534-89e0c0218492"),
-                            IsMacroNutrient = false,
-                            Name = "Arginine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Arginine"
-                        },
-                        new
-                        {
-                            Id = new Guid("9eb73af0-abf0-8520-d5eb-ae1abc716b9d"),
-                            IsMacroNutrient = false,
-                            Name = "Histidine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Histidine"
-                        },
-                        new
-                        {
-                            Id = new Guid("c6f2916d-5c73-1ca9-c8e0-754d27c5132b"),
-                            IsMacroNutrient = false,
-                            Name = "Alanine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Alanine"
-                        },
-                        new
-                        {
-                            Id = new Guid("3398fcc6-5ddc-e1b2-2e1a-cd7b81ab6aa9"),
-                            IsMacroNutrient = false,
-                            Name = "Aspartic acid",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit aspartic"
-                        },
-                        new
-                        {
-                            Id = new Guid("3fde1b26-768f-765a-feda-3cec72679fdd"),
-                            IsMacroNutrient = false,
-                            Name = "Glutamic acid",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit glutamic"
-                        },
-                        new
-                        {
-                            Id = new Guid("5062ea22-0adb-2e25-f6e1-b690f3a15f75"),
-                            IsMacroNutrient = false,
-                            Name = "Glycine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Glycine"
-                        },
-                        new
-                        {
-                            Id = new Guid("87db95cc-2e12-66ff-ff88-bb5c6b537518"),
-                            IsMacroNutrient = false,
-                            Name = "Proline",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Proline"
-                        },
-                        new
-                        {
-                            Id = new Guid("26651bb1-7bfe-d7df-dd2d-08f96eea1feb"),
-                            IsMacroNutrient = false,
-                            Name = "Serine",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Axit amin Serine"
-                        },
-                        new
-                        {
-                            Id = new Guid("f33dcae4-dce9-70c9-6feb-843630231ce7"),
-                            IsMacroNutrient = false,
-                            Name = "Sucrose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường saccarose"
-                        },
-                        new
-                        {
-                            Id = new Guid("a8c1352c-f6a4-31ff-9b3d-f002c7af13f4"),
-                            IsMacroNutrient = false,
-                            Name = "Glucose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường glucose"
-                        },
-                        new
-                        {
-                            Id = new Guid("0f2a40ec-7399-2f0b-5987-9b459fff20be"),
-                            IsMacroNutrient = false,
-                            Name = "Fructose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường fructose"
-                        },
-                        new
-                        {
-                            Id = new Guid("8f030538-baf9-c6a0-b958-e573b6cff744"),
-                            IsMacroNutrient = false,
-                            Name = "Lactose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường lactose"
-                        },
-                        new
-                        {
-                            Id = new Guid("31902ac1-9002-2055-5dc7-ba0b7eeaa6e3"),
-                            IsMacroNutrient = false,
-                            Name = "Maltose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường maltose"
-                        },
-                        new
-                        {
-                            Id = new Guid("6c11a4e9-a2f7-da27-8710-2a9c8dd6da3b"),
-                            IsMacroNutrient = false,
-                            Name = "Galactose",
-                            UnitId = new Guid("20a23d6e-c0bf-5383-c8c3-dd19682ccf68"),
-                            VietnameseName = "Đường galactose"
-                        },
-                        new
-                        {
-                            Id = new Guid("075edf8a-e1ec-4275-1f20-4aed6eed19d4"),
-                            IsMacroNutrient = false,
-                            Name = "Carotene, beta",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Beta-carotene"
-                        },
-                        new
-                        {
-                            Id = new Guid("3e0b8215-4bf0-3937-fd01-06fe1f3a3c6b"),
-                            IsMacroNutrient = false,
-                            Name = "Carotene, alpha",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Alpha-carotene"
-                        },
-                        new
-                        {
-                            Id = new Guid("c6ea5065-0e4d-b669-076a-4cf97ee6bdd6"),
-                            IsMacroNutrient = false,
-                            Name = "Lycopene",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Lycopene"
-                        },
-                        new
-                        {
-                            Id = new Guid("7819d15f-492c-a68f-7c22-69890be07852"),
-                            IsMacroNutrient = false,
-                            Name = "Lutein + zeaxanthin",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Lutein + zeaxanthin"
-                        },
-                        new
-                        {
-                            Id = new Guid("d8dd11c7-30c4-4956-0723-b0c095818d78"),
-                            IsMacroNutrient = false,
-                            Name = "Cryptoxanthin, beta",
-                            UnitId = new Guid("c75b9051-0442-cf83-bf9d-c7c30b1413ad"),
-                            VietnameseName = "Beta-Cryptoxanthin"
-                        },
-                        new
-                        {
-                            Id = new Guid("e38ae717-e808-93e3-0305-49d77f0cb2bc"),
-                            IsMacroNutrient = false,
-                            Name = "Caffeine",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Caffeine"
-                        },
-                        new
-                        {
-                            Id = new Guid("25a764cc-7b22-12b3-0245-158fb4f02198"),
-                            IsMacroNutrient = false,
-                            Name = "Theobromine",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Theobromine"
-                        },
-                        new
-                        {
-                            Id = new Guid("3ddb50a7-302d-dbdb-e545-e67ac4054db1"),
-                            IsMacroNutrient = false,
-                            Name = "Beta-sitosterol",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Beta-sitosterol"
-                        },
-                        new
-                        {
-                            Id = new Guid("27c4e3a0-6b2c-edde-9815-7bbc4cae355c"),
-                            IsMacroNutrient = false,
-                            Name = "Campesterol",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Campesterol"
-                        },
-                        new
-                        {
-                            Id = new Guid("21bb1f9d-d428-504a-e7c3-8419a1cedd23"),
-                            IsMacroNutrient = false,
-                            Name = "Stigmasterol",
-                            UnitId = new Guid("813af784-5297-5aea-f247-99ee1ceb39b5"),
-                            VietnameseName = "Stigmasterol"
                         });
                 });
 
@@ -2488,29 +2020,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-<<<<<<< HEAD
-                            Id = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
-                            Name = "Lock",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
-                        },
-                        new
-                        {
-                            Id = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
-                        },
-                        new
-                        {
-                            Id = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
-                            Name = "Approve",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
-                        },
-                        new
-                        {
-                            Id = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-                            Name = "ManagementView",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
-=======
                             Id = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
                             Name = "View",
                             PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
@@ -2526,7 +2035,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                             Id = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
                             Name = "Reject",
                             PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
->>>>>>> origin/FTCDHMM-74
                         });
                 });
 
@@ -2587,13 +2095,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         },
                         new
                         {
-<<<<<<< HEAD
-                            Id = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969"),
-                            Name = "Recipe"
-=======
                             Id = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c"),
                             Name = "Report"
->>>>>>> origin/FTCDHMM-74
                         });
                 });
 
@@ -2668,13 +2171,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid?>("ImageId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("RatingCount")
                         .ValueGeneratedOnAdd()
@@ -2683,15 +2188,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Property<int>("Ration")
                         .HasColumnType("int");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValueSql("'POSTED'");
 
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
@@ -2708,8 +2204,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("ImageId")
                         .IsUnique()
                         .HasFilter("[ImageId] IS NOT NULL");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("Recipes", (string)null);
                 });
@@ -2769,7 +2263,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<Guid>("TaggedUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("RecipeId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("RecipeId", "TaggedUserId");
+
+                    b.HasIndex("RecipeId1");
 
                     b.HasIndex("TaggedUserId");
 
@@ -2899,23 +2398,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ExpiredAtUtc")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<Guid?>("HealthGoalId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("StartedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -2923,16 +2416,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValueSql("'CUSTOM'");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("CustomHealthGoalId");
 
                     b.HasIndex("HealthGoalId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserHealthGoals", (string)null);
                 });
@@ -2993,39 +2484,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserHealthMetrics");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserLabelStat", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("LabelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Favorites")
-                        .HasColumnType("int");
-
-                    b.Property<double>("RatingSum")
-                        .HasColumnType("float");
-
-                    b.Property<int>("Ratings")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Saves")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SearchClicks")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Views")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "LabelId");
-
-                    b.HasIndex("LabelId");
-
-                    b.ToTable("UserLabelStats", (string)null);
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserRecipeView", b =>
@@ -3288,15 +2746,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .WithOne()
+                        .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", "AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Author");
 
@@ -3478,16 +2936,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "ImageId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Author");
 
                     b.Navigation("Image");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeIngredient", b =>
@@ -3531,10 +2982,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.RecipeUserTag", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", "Recipe")
-                        .WithMany("RecipeUserTags")
+                        .WithMany()
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Recipe", null)
+                        .WithMany("RecipeUserTags")
+                        .HasForeignKey("RecipeId1");
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "TaggedUser")
                         .WithMany()
@@ -3634,8 +3089,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
-                        .WithMany("UserHealthGoals")
-                        .HasForeignKey("UserId")
+                        .WithOne("UserHealthGoal")
+                        .HasForeignKey("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", "UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -3653,25 +3108,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserLabelStat", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Label", "Label")
-                        .WithMany()
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Label");
 
                     b.Navigation("User");
                 });
@@ -3733,7 +3169,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.Navigation("SaveRecipes");
 
-                    b.Navigation("UserHealthGoals");
+                    b.Navigation("UserHealthGoal");
 
                     b.Navigation("ViewedRecipes");
                 });
