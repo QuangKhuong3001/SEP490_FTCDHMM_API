@@ -19,5 +19,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
         Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid userId, Guid recipeId, RecipePaginationParams request);
         Task<PagedResult<RecipeResponse>> GetHistoryAsync(Guid userId, RecipePaginationParams request);
         Task<PagedResult<RecipeManagementResponse>> GetPendingListAsync(PaginationParams request);
+        Task<PagedResult<RecipeManagementResponse>> GetUnPostedListAsync(Guid userId, PaginationParams request);
     }
 }

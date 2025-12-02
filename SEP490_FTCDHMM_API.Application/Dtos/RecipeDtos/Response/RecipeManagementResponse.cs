@@ -16,5 +16,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public string Reason { get; set; } = string.Empty;
+        public RecipeStatus Status { get; set; } = RecipeStatus.Pending;
     }
 }

@@ -21,7 +21,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly IUserRepository _userRepository;
         private readonly IUserFavoriteRecipeRepository _userFavoriteRecipeRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
-        private readonly IUserRecipeViewRepository _userRecipeViewRepository;
         private readonly IMapper _mapper;
         private readonly IRecipeBehaviorService _behaviorService;
 
@@ -31,7 +30,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             IUserRepository userRepository,
             IUserFavoriteRecipeRepository userFavoriteRecipeRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
-            IUserRecipeViewRepository userRecipeViewRepository,
             IMapper mapper,
             IRecipeBehaviorService behaviorService)
         {
@@ -39,7 +37,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             _userRepository = userRepository;
             _userFavoriteRecipeRepository = userFavoriteRecipeRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
-            _userRecipeViewRepository = userRecipeViewRepository;
             _mapper = mapper;
             _behaviorService = behaviorService;
         }
@@ -343,6 +340,38 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize,
+                orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),
+                include: include
+            );
+
+            var result = _mapper.Map<IReadOnlyList<RecipeManagementResponse>>(items);
+
+            return new PagedResult<RecipeManagementResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<PagedResult<RecipeManagementResponse>> GetUnPostedListAsync(Guid userId, PaginationParams request)
+        {
+            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
+                q.Include(r => r.Author).ThenInclude(u => u.Avatar)
+                 .Include(r => r.Image)
+                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
+                 .Include(r => r.Labels)
+                 .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
+                 .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+
+            Expression<Func<Recipe, bool>>? filter = i => (i.Status == RecipeStatus.Pending || i.Status == RecipeStatus.Locked)
+                                                            && i.AuthorId == userId;
+
+            var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                filter: filter,
                 pageNumber: request.PageNumber,
                 pageSize: request.PageSize,
                 orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),

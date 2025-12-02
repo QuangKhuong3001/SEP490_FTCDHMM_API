@@ -122,5 +122,15 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
+        [HttpGet("unPosted")]
+        [Authorize]
+        public async Task<IActionResult> GetUnPostedList([FromQuery] PaginationParams request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+
+            var result = await _recipeQueryService.GetUnPostedListAsync(userId, appRequest);
+            return Ok(result);
+        }
     }
 }

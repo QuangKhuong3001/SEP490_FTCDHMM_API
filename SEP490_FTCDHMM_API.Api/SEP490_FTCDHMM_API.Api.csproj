@@ -29,11 +29,26 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="EmailTemplates\DeleteRecipe.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="EmailTemplates\ForgotPassword.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="EmailTemplates\LockAccount.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\LockRecipe.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="EmailTemplates\ModeratorCreated.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\RejectRecipe.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\UnlockAccount.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="EmailTemplates\VerifyAccountEmail.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
