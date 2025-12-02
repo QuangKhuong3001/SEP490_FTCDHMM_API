@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -19,14 +18,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IRecipeRepository _recipeRepository;
         private readonly INotificationRepository _notificationRepository;
-        private readonly IRecipeRepository _recipeRepository;
 
 
         public CommentService(
             ICommentRepository commentRepository,
             IMapper mapper,
             IUserRepository userRepository,
-            IRecipeRepository recipeRepository,
             IRecipeRepository recipeRepository,
             INotificationRepository notificationRepository,
             IRealtimeNotifier notifier)
@@ -35,7 +32,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
             _recipeRepository = recipeRepository;
             _userRepository = userRepository;
-            _recipeRepository = recipeRepository;
             _notificationRepository = notificationRepository;
             _notifier = notifier;
         }
@@ -46,11 +42,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (recipe == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            var comment = _mapper.Map<Comment>(request);
-
-            comment.UserId = userId;
-            comment.RecipeId = recipeId;
-            comment.CreatedAtUtc = DateTime.UtcNow;
             var userExist = await _userRepository.ExistsAsync(u => u.Id == userId);
             if (!userExist)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
@@ -106,12 +97,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     .Include(x => x.Mentions).ThenInclude(x => x.MentionedUser)
             );
 
-            var saved = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
-
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
-            await _notifier.SendCommentAsync(recipeId, response);
 
             if (comment.ParentCommentId.HasValue)
             {

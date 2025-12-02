@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -11,12 +10,10 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     public class NotificationController : ControllerBase
     {
         private readonly INotificationService _notificationService;
-        private readonly IMapper _mapper;
 
-        public NotificationController(INotificationService notificationService, IMapper mapper)
+        public NotificationController(INotificationService notificationService)
         {
             _notificationService = notificationService;
-            _mapper = mapper;
         }
 
         [Authorize]

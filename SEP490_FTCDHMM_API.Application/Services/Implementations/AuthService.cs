@@ -107,7 +107,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
-            await _mailService.SendEmailAsync(dto.Email, htmlBody);
+            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Chào mừng bạn đến với FitFood Tracker");
             await _notificationRepository.AddNotification(null, user.Id, NotificationType.System, "Chào mừng bạn đến với FitFood Tracker", null);
             return (true, Array.Empty<string>());
         }

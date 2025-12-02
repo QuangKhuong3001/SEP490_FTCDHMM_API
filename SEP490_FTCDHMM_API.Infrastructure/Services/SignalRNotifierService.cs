@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.Hubs;
 
@@ -48,11 +47,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
         {
             await _hubContext.Clients.Group($"user-{userId}")
                 .SendAsync(HubEvent.Notification.Value, notification);
-        }
-        public async Task SendNotificationAsync(Guid receiverId, object notification)
-        {
-            await _hubContext.Clients.Group($"user-{receiverId}")
-                .SendAsync(HubEvent.ReceiveNotification.Value, notification);
         }
     }
 }

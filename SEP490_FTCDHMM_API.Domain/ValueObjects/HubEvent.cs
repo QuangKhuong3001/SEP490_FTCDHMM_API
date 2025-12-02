@@ -4,24 +4,25 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 {
     public record HubEvent(string Value)
     {
-        public static readonly HubEvent CommentAdded = new("CommentAdded");
-        public static readonly HubEvent CommentUpdated = new("CommentUpdated");
-        public static readonly HubEvent CommentDeleted = new("CommentDeleted");
-        public static readonly HubEvent RatingUpdated = new("RatingUpdated");
-        public static readonly HubEvent RatingDeleted = new("RatingDeleted");
-        public static readonly HubEvent Notification = new("Notification");
+        public static readonly HubEvent CommentAdded = new("COMMENTADDED");
+        public static readonly HubEvent CommentUpdated = new("COMMENTUPDATED");
+        public static readonly HubEvent CommentDeleted = new("COMMENTDELETED");
+        public static readonly HubEvent RatingUpdated = new("RATINGUPDATED");
+        public static readonly HubEvent RatingDeleted = new("RATINGDELETED");
+        public static readonly HubEvent Notification = new("NOTIFICATION");
 
         public override string ToString() => Value;
 
         public static HubEvent From(string value)
         {
-            return value switch
+            return value.Trim().ToUpperInvariant() switch
             {
-                "CommentAdded" => CommentAdded,
-                "CommentDeleted" => CommentDeleted,
-                "RatingUpdate" => RatingUpdated,
-                "RatingDelete" => RatingDeleted,
-                "Notification" => Notification,
+                "COMMENTADDED" => CommentAdded,
+                "COMMENTDELETED" => CommentDeleted,
+                "RATINGUPDATED" => RatingUpdated,
+                "RATINGDELETED" => RatingDeleted,
+                "NOTIFICATION" => Notification,
+                "COMMENTUPDATED" => CommentUpdated,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION, "Không tồn tại hub event này")
             };
         }
