@@ -70,33 +70,54 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<ReportResponse> GetByIdAsync(Guid id)
+        public async Task<ReportDetailListResponse> GetDetailAsync(Guid targetId, string targetType)
         {
-            var report = await _reportRepository.GetByIdAsync(
-                id,
-                r => r.Reporter
+
+            var type = ReportObjectType.From(targetType);
+            var typeValue = type.Value;
+            var reports = await _reportRepository.GetAllAsync(
+                predicate: r => r.TargetId == targetId && r.TargetType.Value == typeValue,
+                include: q => q.Include(r => r.Reporter)
             );
 
-            if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
+            if (!reports.Any())
+                throw new AppException(AppResponseCode.NOT_FOUND, "Không có report nào cho đối tượng này.");
 
-            var dto = _mapper.Map<ReportResponse>(report);
-            dto.TargetName = await ResolveTargetNameAsync(report);
+            var sample = reports.First();
+            var targetName = await ResolveTargetNameAsync(sample);
 
-            return dto;
+            var detailItems = reports
+                .OrderByDescending(r => r.CreatedAtUtc)
+                .Select(r => new ReportDetailItem
+                {
+                    ReportId = r.Id,
+                    ReporterName = $"{r.Reporter.FirstName} {r.Reporter.LastName}".Trim(),
+                    Description = r.Description,
+                    Status = r.Status.Value,
+                    CreatedAtUtc = r.CreatedAtUtc
+                })
+                .ToList();
+
+            return new ReportDetailListResponse
+            {
+                TargetId = targetId,
+                TargetType = targetType,
+                TargetName = targetName,
+                Reports = detailItems
+            };
         }
+
 
         public async Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request)
         {
             Expression<Func<Report, bool>> filter = r =>
+                r.Status == ReportStatus.Pending &&
                 (string.IsNullOrEmpty(request.Type) ||
-                    r.TargetType.Value == ReportObjectType.From(request.Type).Value)
-                &&
-                (string.IsNullOrEmpty(request.Status) ||
-                    r.Status.Value == ReportStatus.From(request.Status).Value)
-                &&
-                (string.IsNullOrEmpty(request.Keyword) ||
-                    r.Description.Contains(request.Keyword));
+                r.TargetType.Value == ReportObjectType.From(request.Type).Value)
+                    &&
+                        (string.IsNullOrEmpty(request.Keyword) ||
+                        r.Description.Contains(request.Keyword));
+
 
             Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
 
@@ -116,6 +137,70 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 })
                 .OrderByDescending(x => x.Count)
                 .ThenByDescending(x => x.LatestAt)
+                .ToList();
+
+            var resultList = new List<ReportSummaryResponse>();
+
+            foreach (var g in grouped)
+            {
+                var temp = new Report
+                {
+                    TargetId = g.TargetId,
+                    TargetType = ReportObjectType.From(g.TargetType)
+                };
+
+                var targetName = await ResolveTargetNameAsync(temp);
+
+                resultList.Add(new ReportSummaryResponse
+                {
+                    TargetType = g.TargetType,
+                    TargetId = g.TargetId,
+                    TargetName = targetName,
+                    Count = g.Count,
+                    LatestReportAtUtc = g.LatestAt
+                });
+            }
+
+            var totalCount = resultList.Count;
+            var pagedItems = resultList
+                .Skip((request.PaginationParams.PageNumber - 1) * request.PaginationParams.PageSize)
+                .Take(request.PaginationParams.PageSize)
+                .ToList();
+
+            return new PagedResult<ReportSummaryResponse>
+            {
+                Items = pagedItems,
+                TotalCount = totalCount,
+                PageNumber = request.PaginationParams.PageNumber,
+                PageSize = request.PaginationParams.PageSize
+            };
+        }
+        public async Task<PagedResult<ReportSummaryResponse>> GetHistoryAsync(ReportFilterRequest request)
+        {
+            Expression<Func<Report, bool>> filter = r =>
+                (r.Status == ReportStatus.Approved || r.Status == ReportStatus.Rejected) &&
+                (string.IsNullOrEmpty(request.Type) ||
+                    r.TargetType.Value == ReportObjectType.From(request.Type).Value) &&
+                (string.IsNullOrEmpty(request.Keyword) ||
+                    r.Description.Contains(request.Keyword));
+
+            Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
+
+            var reports = await _reportRepository.GetAllAsync(
+                predicate: filter,
+                include: include
+            );
+
+            var grouped = reports
+                .GroupBy(r => new { r.TargetType.Value, r.TargetId })
+                .Select(g => new
+                {
+                    TargetType = g.Key.Value,
+                    TargetId = g.Key.TargetId,
+                    Count = g.Count(),
+                    LatestAt = g.Max(x => x.ReviewedAtUtc) ?? g.Max(x => x.CreatedAtUtc)
+                })
+                .OrderByDescending(x => x.LatestAt)
                 .ToList();
 
             var resultList = new List<ReportSummaryResponse>();
