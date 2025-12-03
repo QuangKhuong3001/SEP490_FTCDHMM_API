@@ -56,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("ForManager/{id:guid}")]
         public async Task<IActionResult> GetDetailsForManagers(Guid id)
         {
-            var result = await _ingredientService.GetDetailsForManagers(id);
+            var result = await _ingredientService.GetDetailsForManager(id);
             return Ok(result);
         }
 

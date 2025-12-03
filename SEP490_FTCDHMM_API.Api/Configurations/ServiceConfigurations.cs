@@ -157,11 +157,6 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                       });
             });
 
-            //            RecurringJob.AddOrUpdate<IngredientPopularityJob>(
-            //    job => job.ExecuteAsync(),
-            //    Cron.Daily(2, 0)
-            //);
-
             //bind settings value
             services.Configure<AwsS3Settings>(configuration.GetSection("AWS"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
@@ -174,6 +169,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //job
             services.AddScoped<IExpireUserDietRestrictionsJob, ExpireUserDietRestrictionsJob>();
+            services.AddScoped<IDeletedImagesJob, DeletedImagesJob>();
 
             // DI External Service
 

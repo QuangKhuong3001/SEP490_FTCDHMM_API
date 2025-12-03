@@ -15,7 +15,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost("compute")]
-        public async Task<IActionResult> Compute([FromQuery] int k = 3)
+        public async Task<IActionResult> Compute([FromQuery] int k = 2)
         {
             var result = await _kMeansAppService.ComputeAsync(k);
             return Ok(result);
