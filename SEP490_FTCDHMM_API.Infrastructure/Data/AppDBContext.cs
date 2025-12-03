@@ -40,6 +40,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

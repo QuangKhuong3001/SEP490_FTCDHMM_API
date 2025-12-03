@@ -24,6 +24,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<UserRecipeView> ViewedRecipes { get; set; } = new List<UserRecipeView>();
         public ICollection<UserSaveRecipe> SaveRecipes { get; set; } = new List<UserSaveRecipe>();
         public ICollection<UserDietRestriction> DietRestrictions { get; set; } = new List<UserDietRestriction>();
+        public ICollection<UserHealthGoal> HealthGoals { get; set; } = new List<UserHealthGoal>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public ICollection<UserHealthMetric> HealthMetrics { get; set; } = new List<UserHealthMetric>();
     }

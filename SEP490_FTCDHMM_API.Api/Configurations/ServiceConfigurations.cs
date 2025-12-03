@@ -329,6 +329,10 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //recipeUserTag
             services.AddScoped<IRecipeUserTagRepository, RecipeUserTagRepository>();
+            //k mean
+            services.AddScoped<IKMeansService, KMeansService>();
+            services.AddScoped<IKMeansAppService, KMeansAppService>();
+            services.AddScoped<IUserVectorBuilder, UserVectorBuilder>();
 
             //draftRecipe
             services.AddScoped<IDraftRecipeUserTagRepository, DraftRecipeUserTagRepository>();
