@@ -292,7 +292,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             };
         }
 
-        public async Task<PagedResult<RecipeManagementResponse>> GetPendingListAsync(PaginationParams request)
+        public async Task<PagedResult<RecipeManagementResponse>> GetPendingManagementListAsync(PaginationParams request)
         {
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author).ThenInclude(u => u.Avatar)
@@ -303,6 +303,36 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                filter: f => f.Status == RecipeStatus.Pending,
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize,
+                orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),
+                include: include
+            );
+
+            var result = _mapper.Map<IReadOnlyList<RecipeManagementResponse>>(items);
+
+            return new PagedResult<RecipeManagementResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<PagedResult<RecipeManagementResponse>> GetPendingListAsync(Guid userId, PaginationParams request)
+        {
+            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
+                q.Include(r => r.Author).ThenInclude(u => u.Avatar)
+                 .Include(r => r.Image)
+                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
+                 .Include(r => r.Labels)
+                 .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
+                 .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+
+            var (items, totalCount) = await _recipeRepository.GetPagedAsync(
+                filter: f => f.Status == RecipeStatus.Pending && f.AuthorId == userId,
                 pageNumber: request.PageNumber,
                 pageSize: request.PageSize,
                 orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),

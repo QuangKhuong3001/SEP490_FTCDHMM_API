@@ -101,14 +101,24 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
-        [HttpGet("pending")]
+        [HttpGet("pendingManagement")]
         [Authorize(Policy = PermissionPolicies.Recipe_ManagementView)]
-        public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
+        public async Task<IActionResult> GetPendingManagementList([FromQuery] PaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
-            var result = await _recipeQueryService.GetPendingListAsync(appRequest);
+            var result = await _recipeQueryService.GetPendingManagementListAsync(appRequest);
             return Ok(result);
         }
 
+        [HttpGet("pending")]
+        [Authorize]
+        public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var result = await _recipeQueryService.GetPendingListAsync(userId, appRequest);
+            return Ok(result);
+        }
     }
 }

@@ -135,6 +135,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
 
+            if (recipe.Status == RecipeStatus.Locked)
+            {
+                recipe.Status = RecipeStatus.Pending;
+            }
+
             recipe.Name = request.Name;
             recipe.Description = description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
