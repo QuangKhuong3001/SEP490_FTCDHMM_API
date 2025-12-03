@@ -2,7 +2,7 @@
 {
     public class NutrientResponse
     {
-        public string Name { get; set; } = string.Empty;
+        public string VietnameseName { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
         public decimal? MinValue { get; set; }
         public decimal? MaxValue { get; set; }

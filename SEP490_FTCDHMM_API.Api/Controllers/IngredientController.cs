@@ -26,6 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _ingredientDetectionService = ingredientDetectionService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] IngredientFilterRequest dto)
         {
@@ -45,6 +46,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetDetails(Guid id)
         {

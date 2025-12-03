@@ -11,5 +11,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos
         public List<IngredientCategoryResponse> CategoryNames { get; set; } = new();
         public DateTime LastUpdatedUtc { get; set; }
         public bool IsNew { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }
