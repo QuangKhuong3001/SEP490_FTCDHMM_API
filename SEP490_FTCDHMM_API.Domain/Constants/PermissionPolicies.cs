@@ -2,48 +2,44 @@
 {
     public static class PermissionPolicies
     {
-        public const string ModeratorManagement_Create = "ModeratorManagement:Create";
-        public const string ModeratorManagement_Update = "ModeratorManagement:Update";
-        public const string ModeratorManagement_Delete = "ModeratorManagement:Delete";
-        public const string ModeratorManagement_View = "ModeratorManagement:View";
+        public const string UserManagement_View = "Quản lí người dùng:Xem";
+        public const string UserManagement_Update = "Quản lí người dùng:Cập nhật";
+        public const string UserManagement_Delete = "Quản lí người dùng:Xóa";
+        public const string UserManagement_Create = "Quản lí người dùng:Tạo";
 
-        public const string CustomerManagement_View = "CustomerManagement:View";
-        public const string CustomerManagement_Update = "CustomerManagement:Update";
-        public const string CustomerManagement_Delete = "CustomerManagement:Delete";
-        public const string CustomerManagement_Create = "CustomerManagement:Create";
+        public const string Ingredient_Create = "Nguyên liệu:Tạo";
+        public const string Ingredient_Update = "Nguyên liệu:Cập nhật";
+        public const string Ingredient_Delete = "Nguyên liệu:Xóa";
+        public const string Ingredient_ManagerView = "Nguyên liệu:Xem với quyền";
 
-        public const string Ingredient_Create = "Ingredient:Create";
-        public const string Ingredient_Update = "Ingredient:Update";
-        public const string Ingredient_Delete = "Ingredient:Delete";
+        public const string Label_Delete = "Nhãn món ăn:Xóa";
+        public const string Label_Create = "Nhãn món ăn:Tạo";
+        public const string Label_Update = "Nhãn món ăn:Cập nhật";
 
-        public const string Label_Delete = "Label:Delete";
-        public const string Label_Create = "Label:Create";
-        public const string Label_Update = "Label:Update";
+        public const string IngredientCategory_Create = "Nhóm nguyên liệu:Tạo";
+        public const string IngredientCategory_Delete = "Nhóm nguyên liệu:Xóa";
 
-        public const string IngredientCategory_Create = "IngredientCategory:Create";
-        public const string IngredientCategory_Delete = "IngredientCategory:Delete";
-
-        public const string HealthGoal_Create = "HealthGoal:Create";
-        public const string HealthGoal_Update = "HealthGoal:Update";
-        public const string HealthGoal_Delete = "HealthGoal:Delete";
+        public const string HealthGoal_Create = "Mục tiêu sức khỏe:Tạo";
+        public const string HealthGoal_Update = "Mục tiêu sức khỏe:Cập nhật";
+        public const string HealthGoal_Delete = "Mục tiêu sức khỏe:Xóa";
 
 
-        public const string Comment_Create = "Comment:Create";
-        public const string Comment_Delete = "Comment:Delete";
-        public const string Comment_Update = "Comment:Update";
+        public const string Comment_Create = "Bình luận:Tạo";
+        public const string Comment_Delete = "Bình luận:Xóa";
+        public const string Comment_Update = "Bình luận:Cập nhật";
 
-        public const string Rating_Create = "Rating:Create";
-        public const string Rating_Delete = "Rating:Delete";
-        public const string Rating_Update = "Rating:Update";
+        public const string Rating_Create = "Đánh giá:Tạo";
+        public const string Rating_Delete = "Đánh giá:Xóa";
+        public const string Rating_Update = "Đánh giá:Cập nhật";
 
-        public const string Recipe_ManagementView = "Recipe:ManagementView";
-        public const string Recipe_Delete = "Recipe:Delete";
-        public const string Recipe_Lock = "Recipe:Lock";
-        public const string Recipe_Approve = "Recipe:Approve";
+        public const string Recipe_ManagementView = "Công thức:Xem với quyền";
+        public const string Recipe_Delete = "Công thức:Xóa";
+        public const string Recipe_Lock = "Công thức:Khóa";
+        public const string Recipe_Approve = "Công thức:Xác nhận";
 
-        public const string Report_View = "Report:View";
-        public const string Report_Approve = "Report:Approve";
-        public const string Report_Reject = "Report:Reject";
+        public const string Report_View = "Báo cáo:Xem";
+        public const string Report_Approve = "Báo cáo:Xác nhận";
+        public const string Report_Reject = "Báo cáo:Từ chối";
     }
 
 }

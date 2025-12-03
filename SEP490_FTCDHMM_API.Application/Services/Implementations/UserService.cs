@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
@@ -13,44 +12,37 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
-using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
         private readonly IRoleRepository _roleRepository;
-        private readonly IOtpRepository _otpRepository;
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IS3ImageService _s3ImageService;
         private readonly IUserFollowRepository _userFollowRepository;
 
         public UserService(IUserRepository userRepository,
-            UserManager<AppUser> userManager,
             IMapper mapper,
             IRoleRepository roleRepository,
-            IOtpRepository otpRepository,
             IMailService mailService,
             IEmailTemplateService emailTemplateService,
             IS3ImageService s3ImageService,
             IUserFollowRepository userFollowRepository)
         {
             _userRepository = userRepository;
-            _userManager = userManager;
             _mapper = mapper;
             _roleRepository = roleRepository;
-            _otpRepository = otpRepository;
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
             _s3ImageService = s3ImageService;
             _userFollowRepository = userFollowRepository;
         }
 
-        public async Task<PagedResult<UserResponse>> GetCustomerList(UserFilterRequest request)
+        public async Task<PagedResult<UserResponse>> GetUserList(UserFilterRequest request)
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
@@ -72,14 +64,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<LockResponse> LockCustomerAccount(Guid userId, LockRequest dto)
+        public async Task<LockResponse> LockUserAccount(Guid userId, LockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            if (user.Role.Name != RoleValue.Customer.Name)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
             user.LockReason = dto.Reason;
@@ -104,14 +93,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<UnlockResponse> UnLockCustomerAccount(Guid userId)
+        public async Task<UnlockResponse> UnLockUserAccount(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            if (user.Role.Name != RoleValue.Customer.Name)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             if (user.LockoutEnd <= DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -128,145 +114,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return new UnlockResponse
             {
                 Email = user.Email!,
-            };
-        }
-
-        public async Task<PagedResult<UserResponse>> GetModeratorList(UserFilterRequest request)
-        {
-            var (modetators, totalCount) = await _userRepository.GetPagedAsync(
-                request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => u.Role.Name == RoleValue.Moderator.Name &&
-                     (string.IsNullOrEmpty(request.Keyword) ||
-                     u.FirstName.Contains(request.Keyword!) ||
-                     u.LastName.Contains(request.Keyword!) ||
-                     u.Email!.Contains(request.Keyword!)),
-                q => q.OrderBy(u => u.CreatedAtUtc));
-
-            var result = _mapper.Map<List<UserResponse>>(modetators);
-
-            return new PagedResult<UserResponse>
-            {
-                Items = result,
-                TotalCount = totalCount,
-                PageNumber = request.PaginationParams.PageNumber,
-                PageSize = request.PaginationParams.PageSize
-            };
-        }
-        public async Task<LockResponse> LockModeratorAccount(Guid userId, LockRequest dto)
-        {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            if (user.Role.Name != RoleValue.Moderator.Name)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
-            user.LockReason = dto.Reason;
-
-            var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
-            var placeholders = new Dictionary<string, string>
-                    {
-                        { "LockoutEnd", localLockoutEnd.ToString() },
-                        { "LockReason", dto.Reason },
-                    };
-
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockAccount, placeholders);
-
-            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo khóa tài khoản");
-
-            await _userRepository.UpdateAsync(user);
-
-            return new LockResponse
-            {
-                Email = user.Email!,
-                LockoutEnd = user.LockoutEnd
-            };
-        }
-        public async Task<UnlockResponse> UnLockModeratorAccount(Guid userId)
-        {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-
-            if (user.Role.Name != RoleValue.Moderator.Name)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            if (user.LockoutEnd <= DateTime.UtcNow)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            user.LockoutEnd = null;
-            user.LockReason = null;
-
-            var placeholders = new Dictionary<string, string> { };
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.UnlockAccount, placeholders);
-            await _mailService.SendEmailAsync(user.Email!, htmlBody, "Thông báo mở khóa tài khoản");
-
-            await _userRepository.UpdateAsync(user);
-
-            return new UnlockResponse
-            {
-                Email = user.Email!,
-            };
-        }
-
-        public async Task<CreateModeratorAccountResponse> CreateModeratorAccount(CreateModeratorAccountRequest dto)
-        {
-            var existing = await _userManager.FindByEmailAsync(dto.Email);
-            if (existing != null)
-                throw new AppException(AppResponseCode.EXISTS);
-
-            var moderatorRole = await _roleRepository.FindByNameAsync(RoleValue.Moderator.Name);
-
-            var user = new AppUser
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                FirstName = ModeratorAccountConstants.FirstName,
-                LastName = ModeratorAccountConstants.LastName,
-                RoleId = moderatorRole!.Id,
-            };
-
-            string password = Generate.GeneratePassword(ModeratorAccountConstants.PasswordLength);
-
-            var createResult = await _userManager.CreateAsync(user, password);
-            if (!createResult.Succeeded)
-                return new CreateModeratorAccountResponse
-                {
-                    Success = false,
-                    Errors = createResult.Errors.Select(e => e.Description)
-                };
-
-            string otpCode = Generate.GenerateNumericOtp(OtpConstants.Length);
-            string hashedCode = HashHelper.ComputeSha256Hash(otpCode);
-
-            var otp = new EmailOtp
-            {
-                SentToId = user.Id,
-                Code = hashedCode,
-                Purpose = OtpPurpose.VerifyAccountEmail,
-                CreatedAtUtc = DateTime.UtcNow,
-                ExpiresAtUtc = DateTime.UtcNow.AddDays(ModeratorAccountConstants.OtpExpireDays)
-            };
-            await _otpRepository.AddAsync(otp);
-
-            var localExpireTime = TimeZoneInfo.ConvertTimeFromUtc(otp.ExpiresAtUtc, TimeZoneInfo.Local);
-            var placeholders = new Dictionary<string, string>
-                    {
-                        { "UserName", dto.Email },
-                        { "OtpCode", otpCode },
-                        { "Password", password },
-                        { "ExpireTime", localExpireTime.ToString("HH:mm dd/MM/yyyy") }
-                    };
-
-            var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.ModeratorCreated, placeholders);
-
-            await _mailService.SendEmailAsync(dto.Email, htmlBody, "Tài khoản quản lý viên FitFood Tracker đã được tạo");
-
-            return new CreateModeratorAccountResponse
-            {
-                Success = true,
             };
         }
         public async Task<ProfileResponse> GetProfileAsync(Guid userId, Guid? currentUserId = null)

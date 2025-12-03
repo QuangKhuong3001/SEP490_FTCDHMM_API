@@ -8,8 +8,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface
         Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request);
         Task DeleteRecipeAsync(Guid userId, Guid recipeId);
 
-        Task AddToFavoriteAsync(Guid userId, Guid recipeId);
-        Task RemoveFromFavoriteAsync(Guid userId, Guid recipeId);
         Task SaveRecipeAsync(Guid userId, Guid recipeId);
         Task UnsaveRecipeAsync(Guid userId, Guid recipeId);
         Task CopyRecipe(Guid userId, Guid parentId, CopyRecipeRequest request);

@@ -22,9 +22,9 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
         public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
         public ICollection<UserRecipeView> ViewedRecipes { get; set; } = new List<UserRecipeView>();
-        public ICollection<UserFavoriteRecipe> FavoriteRecipes { get; set; } = new List<UserFavoriteRecipe>();
         public ICollection<UserSaveRecipe> SaveRecipes { get; set; } = new List<UserSaveRecipe>();
         public ICollection<UserDietRestriction> DietRestrictions { get; set; } = new List<UserDietRestriction>();
+        public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public ICollection<UserHealthMetric> HealthMetrics { get; set; } = new List<UserHealthMetric>();
     }
 }

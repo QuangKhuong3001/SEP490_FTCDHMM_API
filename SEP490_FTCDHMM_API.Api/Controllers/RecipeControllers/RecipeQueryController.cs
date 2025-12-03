@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.Common;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos;
-using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserFavoriteRecipe;
 using SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -39,17 +38,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _recipeQueryService.GetRecipeDetailsAsync(userId, recipeId);
-            return Ok(result);
-        }
-
-        [HttpGet("favorites")]
-        [Authorize]
-        public async Task<IActionResult> GetFavorites([FromQuery] FavoriteRecipeFilterRequest request)
-        {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UserFavoriteRecipe.FavoriteRecipeFilterRequest>(request);
-
-            var result = await _recipeQueryService.GetFavoriteListAsync(userId, appRequest);
             return Ok(result);
         }
 
@@ -113,14 +101,24 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
-        [HttpGet("pending")]
+        [HttpGet("pendingManagement")]
         [Authorize(Policy = PermissionPolicies.Recipe_ManagementView)]
-        public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
+        public async Task<IActionResult> GetPendingManagementList([FromQuery] PaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
-            var result = await _recipeQueryService.GetPendingListAsync(appRequest);
+            var result = await _recipeQueryService.GetPendingManagementListAsync(appRequest);
             return Ok(result);
         }
 
+        [HttpGet("pending")]
+        [Authorize]
+        public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
+            var result = await _recipeQueryService.GetPendingListAsync(userId, appRequest);
+            return Ok(result);
+        }
     }
 }

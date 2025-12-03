@@ -15,12 +15,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly ILabelRepository _labelRepository;
         private readonly IRecipeUserTagRepository _recipeUserTagRepository;
         private readonly IDraftRecipeRepository _draftRecipeRepository;
-        private readonly IUserFavoriteRecipeRepository _userFavoriteRecipeRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
         private readonly IRecipeValidationService _validator;
         private readonly IRecipeImageService _imageService;
         private readonly IRecipeNutritionService _nutritionService;
-        private readonly IRecipeBehaviorService _behaviorService;
         private readonly IRecipeIngredientRepository _recipeIngredientRepository;
 
         public RecipeCommandService(
@@ -28,25 +26,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             ILabelRepository labelRepository,
             IRecipeUserTagRepository recipeUserTagRepository,
             IDraftRecipeRepository draftRecipeRepository,
-            IUserFavoriteRecipeRepository userFavoriteRecipeRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
             IRecipeValidationService validator,
             IRecipeIngredientRepository recipeIngredientRepository,
             IRecipeImageService imageService,
-            IRecipeNutritionService nutritionService,
-            IRecipeBehaviorService behaviorService)
+            IRecipeNutritionService nutritionService)
         {
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _draftRecipeRepository = draftRecipeRepository;
             _recipeIngredientRepository = recipeIngredientRepository;
-            _userFavoriteRecipeRepository = userFavoriteRecipeRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _validator = validator;
             _imageService = imageService;
             _nutritionService = nutritionService;
-            _behaviorService = behaviorService;
         }
 
         public async Task CreateRecipeAsync(Guid userId, CreateRecipeRequest request)
@@ -141,6 +135,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
 
+            if (recipe.Status == RecipeStatus.Locked)
+            {
+                recipe.Status = RecipeStatus.Pending;
+            }
+
             recipe.Name = request.Name;
             recipe.Description = description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
@@ -212,43 +211,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             await _recipeRepository.UpdateAsync(recipe);
         }
 
-        public async Task AddToFavoriteAsync(Guid userId, Guid recipeId)
-        {
-            await _validator.ValidateUserExistsAsync(userId);
-
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.Status != RecipeStatus.Posted)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
-            var exist = await _userFavoriteRecipeRepository.ExistsAsync(f => f.UserId == userId && f.RecipeId == recipeId);
-            if (exist)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            await _userFavoriteRecipeRepository.AddAsync(new UserFavoriteRecipe
-            {
-                RecipeId = recipeId,
-                UserId = userId
-            });
-
-            await _behaviorService.RecordFarvoriteAsync(userId, recipeId);
-        }
-
-        public async Task RemoveFromFavoriteAsync(Guid userId, Guid recipeId)
-        {
-            await _validator.ValidateUserExistsAsync(userId);
-
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null || recipe.Status != RecipeStatus.Posted)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
-            var exist = await _userFavoriteRecipeRepository.GetAllAsync(f => f.UserId == userId && f.RecipeId == recipeId);
-            if (!exist.Any())
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            await _userFavoriteRecipeRepository.DeleteAsync(exist.First());
-            await _behaviorService.RecordUnFavoriteAsync(userId, recipeId);
-        }
-
         public async Task SaveRecipeAsync(Guid userId, Guid recipeId)
         {
             await _validator.ValidateUserExistsAsync(userId);
@@ -266,8 +228,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 RecipeId = recipeId,
                 UserId = userId
             });
-
-            await _behaviorService.RecordSaveAsync(userId, recipeId);
         }
 
         public async Task UnsaveRecipeAsync(Guid userId, Guid recipeId)
@@ -283,7 +243,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             await _userSaveRecipeRepository.DeleteAsync(exist.First());
-            await _behaviorService.RecordUnsaveAsync(userId, recipeId);
         }
 
         public async Task CopyRecipe(Guid userId, Guid parentId, CopyRecipeRequest request)

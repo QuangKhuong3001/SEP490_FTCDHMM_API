@@ -41,6 +41,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                         .ThenInclude(uhg => uhg!.CustomHealthGoal)
                             .ThenInclude(chg => chg!.Targets)
                                 .ThenInclude(t => t.Nutrient)
+                    .Include(u => u.Ratings)
                     .Include(u => u.HealthMetrics));
 
 

@@ -2,11 +2,9 @@
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
-using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -17,20 +15,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     {
         private readonly IRatingRepository _ratingRepository;
         private readonly IRealtimeNotifier _notifier;
-        private readonly IRecipeBehaviorService _recipeBehaviorService;
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
 
         public RatingService(
             IRatingRepository ratingRepository,
             IRealtimeNotifier notifier,
-            IRecipeBehaviorService recipeBehaviorService,
             IRecipeRepository recipeRepository,
             IMapper mapper)
         {
             _ratingRepository = ratingRepository;
             _notifier = notifier;
-            _recipeBehaviorService = recipeBehaviorService;
             _recipeRepository = recipeRepository;
             _mapper = mapper;
         }
@@ -55,7 +50,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 existingRating.Score = request.Score;
                 existingRating.Feedback = request.Feedback;
                 await _ratingRepository.UpdateAsync(existingRating);
-                await _recipeBehaviorService.RecordRatingAsync(userId, recipeId, request.Score);
             }
             else
             {
@@ -68,7 +62,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     CreatedAtUtc = DateTime.UtcNow
                 };
                 await _ratingRepository.AddAsync(rating);
-                await _recipeBehaviorService.RecordUpdateRatingAsync(userId, recipeId, request.Score);
                 existingRating = rating;
             }
 

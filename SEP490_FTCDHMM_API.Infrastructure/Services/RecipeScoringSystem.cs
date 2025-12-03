@@ -42,16 +42,17 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
 
             var tdeeFit = CalculateTdeeFit(recipe, user.HealthMetrics.FirstOrDefault());
-            //var behaviorFit = this.CalculateBehaviorFit(user);
-            //var popularity = CalculatePopularityScore(recipe);
+            var behaviorFit = this.CalculateBehaviorFit(recipe, user);
 
             var finalScore =
-                (_weightsSettings.Nutrient * nutrientFit + _weightsSettings.Tdee * tdeeFit
-                //+0.15 * popularity+ 0.22 * behaviorFit
+                (_weightsSettings.Nutrient * nutrientFit
+                + _weightsSettings.Tdee * tdeeFit
+                + _weightsSettings.Behavior * behaviorFit
                 )
                 /
-                (_weightsSettings.Nutrient + _weightsSettings.Tdee
-                //+ 0.15+ 0.22 
+                (_weightsSettings.Nutrient
+                + _weightsSettings.Tdee
+                + _weightsSettings.Behavior
                 );
 
             return finalScore;
@@ -90,7 +91,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 {
                     score = CalculateAbsoluteNutrientScore(recipeAmount, target);
                 }
-                else // Percentage
+                else
                 {
                     score = CalculatePercentageNutrientScore(recipeAmount, target, recipe.Calories);
                 }
@@ -208,41 +209,52 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return Math.Clamp(score, 0, 1);
         }
 
-        //public double CalculateBehaviorFit(Guid recipeId, UserBehaviorStats stats)
-        //{
-        //    if (!stats.Recipes.TryGetValue(recipeId, out var entry))
-        //        return 0;
-
-        //    double score =
-        //        0.10 * Normalize(entry.Views, stats.MaxViews) +
-        //        0.15 * Normalize(entry.SearchClicks, stats.MaxSearchClicks) +
-        //        0.25 * Normalize(entry.Likes, stats.MaxLikes) +
-        //        0.25 * Normalize(entry.Saves, stats.MaxSaves) +
-        //        0.15 * Normalize(entry.Comments, stats.MaxComments) +
-        //        0.10 * Normalize(entry.Ratings, stats.MaxRatings);
-
-        //    return score;
-        //}
-
-        private double CalculatePopularityScore(Recipe recipe)
+        public double CalculateBehaviorFit(Recipe recipe, AppUser user)
         {
-            return
-                0.4 * Normalize(recipe.ViewCount, 10000) +
-                0.3 * Normalize(recipe.RatingCount, 5000) +
-                0.3 * Normalize(recipe.AvgRating, 5);
-        }
+            if (recipe.Labels == null || recipe.Labels.Count == 0)
+                return 0;
 
-        private double CalculateFreshnessScore(DateTime createdAtUtc)
-        {
-            var days = (DateTime.UtcNow - createdAtUtc).TotalDays;
-            double score = Math.Exp(-(days / 30));
+            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+
+            var recentViews = user.ViewedRecipes
+                .Where(v => v.ViewedAtUtc >= oneWeekAgo)
+                .ToList();
+
+            var recentSaves = user.SaveRecipes
+                .Where(s => s.CreatedAtUtc >= oneWeekAgo)
+                .ToList();
+
+            var recentRatings = user.Ratings
+                .Where(s => s.CreatedAtUtc >= oneWeekAgo)
+                .ToList();
+
+            double viewAffinity = 0;
+            double saveAffinity = 0;
+            double ratingAffinity = 0;
+
+            int labelCount = recipe.Labels.Count;
+
+            double totalViews = recentViews.Count;
+            double totalSaves = recentSaves.Count;
+            double totalRatings = recentRatings.Count;
+
+            foreach (var label in recipe.Labels)
+            {
+                var viewCount = recentViews.Count(v => v.Recipe.Labels.Any(l => l.Id == label.Id));
+                viewAffinity += totalViews == 0 ? 0 : (viewCount / totalViews);
+
+                var saveCount = recentSaves.Count(s => s.Recipe.Labels.Any(l => l.Id == label.Id));
+                saveAffinity += totalSaves == 0 ? 0 : (saveCount / totalSaves);
+
+                var ratingCount = recentRatings.Count(r => r.Recipe.Labels.Any(l => l.Id == label.Id));
+                ratingAffinity += totalRatings == 0 ? 0 : (ratingCount / totalRatings);
+            }
+
+            double score =
+                (viewAffinity + saveAffinity + ratingAffinity)
+                / (labelCount * 3);
+
             return Math.Clamp(score, 0, 1);
-        }
-
-        private double Normalize(double value, double max)
-        {
-            if (max <= 0) return 0;
-            return Math.Clamp(value / max, 0, 1);
         }
 
         private double GetMacroCaloriesPerGram(Guid nutrientId)

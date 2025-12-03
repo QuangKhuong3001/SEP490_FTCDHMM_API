@@ -8,12 +8,25 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Hangfire
     {
         public static void Register(IServiceProvider provider)
         {
-            var job = provider.GetRequiredService<IExpireUserDietRestrictionsJob>();
+            var dietRestrictionsJob = provider.GetRequiredService<IExpireUserDietRestrictionsJob>();
 
             RecurringJob.AddOrUpdate(
                 recurringJobId: "expire-user-diet-restrictions",
-                methodCall: () => job.ExecuteAsync(),
-                cronExpression: "6 13 * * *",
+                methodCall: () => dietRestrictionsJob.ExecuteAsync(),
+                cronExpression: "0 1 * * *",
+                options: new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),
+                    MisfireHandling = MisfireHandlingMode.Strict
+                }
+            );
+
+            var deletedImagesJob = provider.GetRequiredService<IDeletedImagesJob>();
+
+            RecurringJob.AddOrUpdate(
+                recurringJobId: "deleted-images",
+                methodCall: () => deletedImagesJob.ExecuteAsync(),
+                cronExpression: "0 1 * * *",
                 options: new RecurringJobOptions
                 {
                     TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),

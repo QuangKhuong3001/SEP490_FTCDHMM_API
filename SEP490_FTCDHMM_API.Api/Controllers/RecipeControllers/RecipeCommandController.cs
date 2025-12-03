@@ -51,23 +51,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok();
         }
 
-        [HttpPost("{recipeId:guid}/favorite")]
-        public async Task<IActionResult> AddToFavorite(Guid recipeId)
-        {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _recipeCommandService.AddToFavoriteAsync(userId, recipeId);
-            return Ok();
-        }
-
-        [HttpDelete("{recipeId:guid}/favorite")]
-        public async Task<IActionResult> RemoveFromFavorite(Guid recipeId)
-        {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _recipeCommandService.RemoveFromFavoriteAsync(userId, recipeId);
-            return Ok();
-        }
-
-
         [HttpPost("{recipeId:guid}/save")]
         public async Task<IActionResult> Save(Guid recipeId)
         {

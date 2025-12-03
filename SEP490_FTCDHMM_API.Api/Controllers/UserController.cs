@@ -22,71 +22,32 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Policy = PermissionPolicies.CustomerManagement_View)]
-        [HttpGet("getCustomers")]
-        public async Task<IActionResult> GetCustomerList([FromQuery] UserFilterRequest dto)
+        [Authorize(Policy = PermissionPolicies.UserManagement_View)]
+        [HttpGet()]
+        public async Task<IActionResult> GetUserList([FromQuery] UserFilterRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
 
-            var result = await _userService.GetCustomerList(appDto);
+            var result = await _userService.GetUserList(appDto);
             return Ok(result);
         }
 
-        [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
-        [HttpPut("lockCustomer/{userId:guid}")]
-        public async Task<IActionResult> LockCustomer(Guid userId, LockRequest dto)
+        [Authorize(Policy = PermissionPolicies.UserManagement_Update)]
+        [HttpPut("{userId:guid}/lock")]
+        public async Task<IActionResult> LockUser(Guid userId, LockRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
-            var result = await _userService.LockCustomerAccount(userId, appDto);
+            var result = await _userService.LockUserAccount(userId, appDto);
             return Ok(result);
         }
 
-        [Authorize(Policy = PermissionPolicies.CustomerManagement_Update)]
-        [HttpPut("unlockCustomer/{userId:guid}")]
-        public async Task<IActionResult> UnLockCustomer(Guid userId)
-        {
-            var result = await _userService.UnLockCustomerAccount(userId);
-            return Ok(result);
-        }
-
-        [Authorize(Policy = PermissionPolicies.ModeratorManagement_View)]
-        [HttpGet("getModerators")]
-        public async Task<IActionResult> GetModeratorList([FromQuery] UserFilterRequest dto)
-        {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
-
-            var result = await _userService.GetModeratorList(appDto);
-            return Ok(result);
-        }
-
-        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
-        [HttpPut("lockModerator/{userId:guid}")]
-        public async Task<IActionResult> LockModerator(Guid userId, LockRequest dto)
-        {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
-
-            var result = await _userService.LockModeratorAccount(userId, appDto);
-            return Ok(result);
-        }
-
-        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Update)]
-        [HttpPut("unlockModerator/{userId:guid}")]
+        [Authorize(Policy = PermissionPolicies.UserManagement_Update)]
+        [HttpPut("{userId:guid}/unlock")]
         public async Task<IActionResult> UnLockModerator(Guid userId)
         {
-            var result = await _userService.UnLockModeratorAccount(userId);
+            var result = await _userService.UnLockUserAccount(userId);
             return Ok(result);
-        }
-
-        [Authorize(Policy = PermissionPolicies.ModeratorManagement_Create)]
-        [HttpPost("createModerator")]
-        public async Task<IActionResult> CreateModeratorAccount(CreateModeratorAccountRequest dto)
-        {
-            var appDto = _mapper.Map<ApplicationDtos.UserDtos.CreateModeratorAccountRequest>(dto);
-
-            var result = await _userService.CreateModeratorAccount(appDto);
-            if (!result.Success) return BadRequest(new { success = false, result.Errors });
-            return Ok();
         }
 
         [Authorize]

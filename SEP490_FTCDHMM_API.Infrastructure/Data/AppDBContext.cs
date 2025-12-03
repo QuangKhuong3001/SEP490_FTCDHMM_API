@@ -31,9 +31,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Data
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
         public DbSet<RecipeNutritionAggregate> RecipeNutritionAggregates { get; set; }
         public DbSet<UserDietRestriction> UserDietRestrictions { get; set; }
-        public DbSet<UserFavoriteRecipe> UserFavoriteRecipes { get; set; }
         public DbSet<UserFollow> UserFollows { get; set; }
-        public DbSet<UserLabelStat> UserLabelStats { get; set; }
         public DbSet<UserHealthGoal> UserHealthGoals { get; set; }
         public DbSet<UserHealthMetric> UserHealthMetrics { get; set; }
         public DbSet<UserRecipeView> UserRecipeViews { get; set; }
