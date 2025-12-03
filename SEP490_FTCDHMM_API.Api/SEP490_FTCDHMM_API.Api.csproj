@@ -29,13 +29,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="EmailTemplates\ForgotPassword.html">
+		<None Update="EmailTemplates\DELETERECIPE.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\FORGOTPASSWORD.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="EmailTemplates\ModeratorCreated.html">
+		<None Update="EmailTemplates\LOCKACCOUNT.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\LOCKRECIPE.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\MODERATORCREATED.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="EmailTemplates\VerifyAccountEmail.html">
+		<None Update="EmailTemplates\REJECTRECIPE.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\UNLOCKACCOUNT.html">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="EmailTemplates\VERIFYACCOUNTEMAIL.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
