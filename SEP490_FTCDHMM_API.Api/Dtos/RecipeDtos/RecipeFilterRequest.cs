@@ -7,8 +7,10 @@
         public string? SortBy { get; set; }
         public int? Ration { get; set; }
         public decimal? MaxCookTime { get; set; }
-        public List<Guid> LabelIds { get; set; } = new List<Guid>();
-        public List<Guid> IngredientIds { get; set; } = new List<Guid>();
-        public required RecipePaginationParams PaginationParams { get; set; }
+        public List<Guid> IncludeLabelIds { get; set; } = new List<Guid>();
+        public List<Guid> ExcludeLabelIds { get; set; } = new List<Guid>();
+        public List<Guid> IncludeIngredientIds { get; set; } = new List<Guid>();
+        public List<Guid> ExcludeIngredientIds { get; set; } = new List<Guid>();
+        public RecipePaginationParams PaginationParams { get; set; } = new();
     }
 }
