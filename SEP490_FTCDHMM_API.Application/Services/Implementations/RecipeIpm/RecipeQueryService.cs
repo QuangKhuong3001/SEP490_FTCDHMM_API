@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
@@ -9,6 +8,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Specifications;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
@@ -19,77 +19,98 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
         private readonly IRecipeRepository _recipeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
-        private readonly IUserRecipeViewRepository _userRecipeViewRepository;
         private readonly IMapper _mapper;
+        private readonly IIngredientRepository _ingredientRepository;
+        private readonly ILabelRepository _labelRepository;
 
 
         public RecipeQueryService(
             IRecipeRepository recipeRepository,
             IUserRepository userRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
-            IUserRecipeViewRepository userRecipeViewRepository,
+            IIngredientRepository ingredientRepository,
+            ILabelRepository labelRepository,
             IMapper mapper)
         {
             _recipeRepository = recipeRepository;
             _userRepository = userRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
-            _userRecipeViewRepository = userRecipeViewRepository;
             _mapper = mapper;
+            _ingredientRepository = ingredientRepository;
+            _labelRepository = labelRepository;
         }
 
         public async Task<PagedResult<RecipeResponse>> GetAllRecipesAsync(RecipeFilterRequest request)
         {
-            Expression<Func<Recipe, bool>> filter = f =>
-                f.Status == RecipeStatus.Posted
-                && (request.Difficulty == null || f.Difficulty == DifficultyValue.From(request.Difficulty))
-                && (request.Ration == null || f.Ration == request.Ration)
-                && (request.MaxCookTime == null || f.CookTime < request.MaxCookTime)
-                && (!request.LabelIds.Any() || f.Labels.Any(l => request.LabelIds.Contains(l.Id)))
-                && (!request.IngredientIds.Any() || f.RecipeIngredients.Any(ri => request.IngredientIds.Contains(ri.IngredientId)))
-                && (string.IsNullOrEmpty(request.Keyword) || f.Name.Contains(request.Keyword));
+            var inIngredientExist = await _ingredientRepository.IdsExistAsync(request.IncludeIngredientIds);
+            var exIngredientExist = await _ingredientRepository.IdsExistAsync(request.ExcludeIngredientIds);
+            var inLabelExist = await _labelRepository.IdsExistAsync(request.IncludeLabelIds);
+            var exLabelExist = await _labelRepository.IdsExistAsync(request.ExcludeLabelIds);
 
-            Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> orderBy = request.SortBy?.ToLower() switch
+            if (inIngredientExist && exIngredientExist)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu không tồn tại trong hệ thống");
+
+            if (inLabelExist && exLabelExist)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn không tồn tại trong hệ thống");
+
+            var spec = new RecipeBasicFilterSpec
             {
-                "name_asc" => q => q.OrderBy(r => r.Name),
-                "name_desc" => q => q.OrderByDescending(r => r.Name),
-                "time_asc" => q => q.OrderBy(r => r.CookTime),
-                "time_desc" => q => q.OrderByDescending(r => r.CookTime),
-                "latest" => q => q.OrderByDescending(r => r.UpdatedAtUtc),
-                "rate_asc" => q => q.OrderBy(r => r.AvgRating),
-                "rate_desc" => q => q.OrderByDescending(r => r.AvgRating),
-                "view_asc" => q => q.OrderBy(r => r.ViewCount),
-                "view_desc" => q => q.OrderByDescending(r => r.ViewCount),
-                _ => q => q.OrderByDescending(r => r.UpdatedAtUtc)
+                IncludeIngredientIds = request.IncludeIngredientIds,
+                ExcludeIngredientIds = request.ExcludeIngredientIds,
+                IncludeLabelIds = request.IncludeLabelIds,
+                ExcludeLabelIds = request.ExcludeLabelIds,
+                Difficulty = request.Difficulty,
+                Keyword = request.Keyword,
+                Ration = request.Ration,
+                MaxCookTime = request.MaxCookTime
             };
 
-            Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
-                q.Include(r => r.Author).ThenInclude(u => u.Avatar)
-                 .Include(r => r.Image)
-                 .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient)
-                 .Include(r => r.Labels)
-                 .Include(r => r.RecipeUserTags)
-                    .ThenInclude(cs => cs.TaggedUser)
-                 .Include(r => r.CookingSteps)
-                    .ThenInclude(cs => cs.CookingStepImages)
-                        .ThenInclude(cs => cs.Image);
+            var recipes = await _recipeRepository.GetRecipesRawAsync(spec);
 
-            var (items, totalCount) = await _recipeRepository.GetPagedAsync(
-                pageNumber: request.PaginationParams.PageNumber,
-                pageSize: request.PaginationParams.PageSize,
-                filter: filter,
-                orderBy: orderBy,
-                keyword: request.Keyword,
-                searchProperties: new[] { "Name", "Description" },
-                include: include
-            );
+            var ranked = recipes
+                .Select(r => new
+                {
+                    Recipe = r,
+                    Matched = request.IncludeIngredientIds.Any()
+                        ? r.RecipeIngredients.Count(ri =>
+                              request.IncludeIngredientIds.Contains(ri.IngredientId))
+                        : 0,
 
-            var result = _mapper.Map<IReadOnlyList<RecipeResponse>>(items);
+                    NotMatched = request.IncludeIngredientIds.Any()
+                        ? request.IncludeIngredientIds.Count(id =>
+                              !r.RecipeIngredients.Any(ri => ri.IngredientId == id))
+                        : 0
+                })
+                .Where(x => x.Matched > 0)
+                .OrderByDescending(x => x.Matched)
+                .ThenBy(x => x.NotMatched);
+
+            var ordered = request.SortBy?.ToLower() switch
+            {
+                "name_asc" => ranked.ThenBy(x => x.Recipe.Name),
+                "name_desc" => ranked.ThenByDescending(x => x.Recipe.Name),
+                "time_asc" => ranked.ThenBy(x => x.Recipe.CookTime),
+                "time_desc" => ranked.ThenByDescending(x => x.Recipe.CookTime),
+                "latest" => ranked.ThenByDescending(x => x.Recipe.UpdatedAtUtc),
+                "rate_asc" => ranked.ThenBy(x => x.Recipe.AvgRating),
+                "rate_desc" => ranked.ThenByDescending(x => x.Recipe.AvgRating),
+                "view_asc" => ranked.ThenBy(x => x.Recipe.ViewCount),
+                "view_desc" => ranked.ThenByDescending(x => x.Recipe.ViewCount),
+                _ => ranked
+            };
+
+            var paged = ordered
+                .Skip((request.PaginationParams.PageNumber - 1) * request.PaginationParams.PageSize)
+                .Take(request.PaginationParams.PageSize)
+                .Select(x => x.Recipe)
+                .ToList();
+
+            var result = _mapper.Map<List<RecipeResponse>>(paged);
 
             return new PagedResult<RecipeResponse>
             {
                 Items = result,
-                TotalCount = totalCount,
+                TotalCount = ordered.Count(),
                 PageNumber = request.PaginationParams.PageNumber,
                 PageSize = request.PaginationParams.PageSize
             };
