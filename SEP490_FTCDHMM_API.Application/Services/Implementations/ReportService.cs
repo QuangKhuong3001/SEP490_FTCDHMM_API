@@ -72,13 +72,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<ReportDetailListResponse> GetDetailAsync(Guid targetId, string targetType)
         {
-
-            var type = ReportObjectType.From(targetType);
-            var typeValue = type.Value;
             var reports = await _reportRepository.GetAllAsync(
-                predicate: r => r.TargetId == targetId && r.TargetType.Value == typeValue,
+                predicate: r => r.TargetId == targetId && r.TargetType == ReportObjectType.From(targetType),
                 include: q => q.Include(r => r.Reporter)
-            );
+                    );
+
+
 
             if (!reports.Any())
                 throw new AppException(AppResponseCode.NOT_FOUND, "Không có report nào cho đối tượng này.");
