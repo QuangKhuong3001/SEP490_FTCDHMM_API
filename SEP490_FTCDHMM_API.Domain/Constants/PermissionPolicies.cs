@@ -3,7 +3,7 @@
     public static class PermissionPolicies
     {
         public const string ModeratorManagement_Create = "ModeratorManagement:Create";
-        public const string ModeratorManagement_Update = "ModeratorManagement:Update";
+        public const string ModeratorManagemesnt_Update = "ModeratorManagement:Update";
         public const string ModeratorManagement_Delete = "ModeratorManagement:Delete";
         public const string ModeratorManagement_View = "ModeratorManagement:View";
 
@@ -15,6 +15,7 @@
         public const string Ingredient_Create = "Ingredient:Create";
         public const string Ingredient_Update = "Ingredient:Update";
         public const string Ingredient_Delete = "Ingredient:Delete";
+        public const string Ingredient_ManagerView = "Ingredient:ManagerView";
 
         public const string Label_Delete = "Label:Delete";
         public const string Label_Create = "Label:Create";

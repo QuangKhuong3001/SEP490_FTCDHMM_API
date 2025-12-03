@@ -17,6 +17,7 @@
         public static readonly PermissionValue Ingredient_Create = new("Ingredient", "Create");
         public static readonly PermissionValue Ingredient_Update = new("Ingredient", "Update");
         public static readonly PermissionValue Ingredient_Delete = new("Ingredient", "Delete");
+        public static readonly PermissionValue Ingredient_ManagerView = new("Ingredient", "ManagerView");
 
         public static readonly PermissionValue Label_Create = new("Label", "Create");
         public static readonly PermissionValue Label_Update = new("Label", "Update");
@@ -28,7 +29,6 @@
         public static readonly PermissionValue HealthGoal_Create = new("HealthGoal", "Create");
         public static readonly PermissionValue HealthGoal_Update = new("HealthGoal", "Update");
         public static readonly PermissionValue HealthGoal_Delete = new("HealthGoal", "Delete");
-
 
         public static readonly PermissionValue Comment_Create = new("Comment", "Create");
         public static readonly PermissionValue Comment_Delete = new("Comment", "Delete");
@@ -42,8 +42,6 @@
         public static readonly PermissionValue Recipe_Delete = new("Recipe", "Delete");
         public static readonly PermissionValue Recipe_Approve = new("Recipe", "Approve");
         public static readonly PermissionValue Recipe_ManagementView = new("Recipe", "ManagementView");
-
-
 
         public static readonly PermissionValue Report_View = new("Report", "View");
         public static readonly PermissionValue Report_Approve = new("Report", "Approve");
@@ -80,7 +78,8 @@
             Rating_Update,
             Report_View,
             Report_Approve,
-            Report_Reject
+            Report_Reject,
+            Ingredient_ManagerView
         };
     }
 }

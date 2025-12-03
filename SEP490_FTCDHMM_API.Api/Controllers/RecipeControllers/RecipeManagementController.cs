@@ -11,7 +11,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
     public class RecipeManagementController : ControllerBase
     {
         private readonly IMapper _mapper;

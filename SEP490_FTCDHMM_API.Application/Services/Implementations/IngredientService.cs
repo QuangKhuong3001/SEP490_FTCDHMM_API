@@ -94,6 +94,46 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 pageNumber: dto.PaginationParams.PageNumber,
                 pageSize: dto.PaginationParams.PageSize,
                 filter: filter,
+                orderBy: q => q.OrderByKeyword(dto.Keyword,
+                                                        i => i.Name,
+                                                        i => i.Description),
+
+                keyword: dto.Keyword,
+                searchProperties: new[] { "Name", "Description" },
+                include: q => q
+                    .Include(i => i.Categories)
+            );
+
+            var result = _mapper.Map<List<IngredientResponse>>(ingredients);
+
+            return new PagedResult<IngredientResponse>
+            {
+                Items = result,
+                TotalCount = totalCount,
+                PageNumber = dto.PaginationParams.PageNumber,
+                PageSize = dto.PaginationParams.PageSize
+            };
+        }
+
+        public async Task<PagedResult<IngredientResponse>> GetListForManager(IngredientFilterRequest dto)
+        {
+            Expression<Func<Ingredient, bool>>? filter = null;
+
+            if ((dto.CategoryIds != null && dto.CategoryIds.Any()) ||
+                dto.UpdatedFrom.HasValue || dto.UpdatedTo.HasValue)
+            {
+                filter = i =>
+                    ((dto.CategoryIds == null || !dto.CategoryIds.Any()) ||
+                    i.Categories.Any(c => dto.CategoryIds.Contains(c.Id))) &&
+                    (!dto.UpdatedFrom.HasValue || i.LastUpdatedUtc >= dto.UpdatedFrom) &&
+                    (!dto.UpdatedTo.HasValue || i.LastUpdatedUtc <= dto.UpdatedTo);
+            }
+
+
+            var (ingredients, totalCount) = await _ingredientRepository.GetPagedAsync(
+                pageNumber: dto.PaginationParams.PageNumber,
+                pageSize: dto.PaginationParams.PageSize,
+                filter: filter,
                 orderBy: q =>
                 {
                     var ordered = q.OrderByDescending(i => i.IsNew);
@@ -296,6 +336,25 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             });
         }
         public async Task<IngredientDetailsResponse> GetDetails(Guid ingredientId)
+        {
+            var ingredient = await _ingredientRepository.GetByIdAsync(
+                ingredientId,
+                include: q => q
+                    .Include(i => i.Image)
+                    .Include(i => i.IngredientNutrients)
+                        .ThenInclude(n => n.Nutrient)
+                            .ThenInclude(n => n.Unit)
+                    .Include(i => i.Categories)
+            );
+
+            if (ingredient == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var result = _mapper.Map<IngredientDetailsResponse>(ingredient);
+
+            return result;
+        }
+        public async Task<IngredientDetailsResponse> GetDetailsForManager(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
                 ingredientId,

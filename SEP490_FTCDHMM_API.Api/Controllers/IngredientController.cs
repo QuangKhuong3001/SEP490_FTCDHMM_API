@@ -26,7 +26,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _ingredientDetectionService = ingredientDetectionService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] IngredientFilterRequest dto)
         {
@@ -36,11 +35,28 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Policy = PermissionPolicies.Ingredient_ManagerView)]
+        [HttpGet("ForManager")]
+        public async Task<IActionResult> GetListForManager([FromQuery] IngredientFilterRequest dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientFilterRequest>(dto);
+
+            var result = await _ingredientService.GetListForManager(appDto);
+            return Ok(result);
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetDetails(Guid id)
         {
             var result = await _ingredientService.GetDetails(id);
+            return Ok(result);
+        }
+
+        [Authorize(Policy = PermissionPolicies.Ingredient_ManagerView)]
+        [HttpGet("ForManager/{id:guid}")]
+        public async Task<IActionResult> GetDetailsForManagers(Guid id)
+        {
+            var result = await _ingredientService.GetDetailsForManagers(id);
             return Ok(result);
         }
 
