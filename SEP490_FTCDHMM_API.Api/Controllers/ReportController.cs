@@ -40,20 +40,29 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize(Policy = PermissionPolicies.Report_View)]
-        [HttpGet("{id:guid}")]
-
-        public async Task<IActionResult> GetById(Guid id)
+        [HttpGet("details/{targetId:guid}")]
+        public async Task<IActionResult> GetDetailList(Guid targetId, [FromQuery] string targetType)
         {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _service.GetDetailAsync(targetId, targetType);
             return Ok(result);
         }
-        [Authorize(Policy = PermissionPolicies.Report_View)]
-        [HttpGet("summary")]
 
-        public async Task<IActionResult> GetSummary([FromQuery] ReportFilterRequest request)
+
+        [Authorize(Policy = PermissionPolicies.Report_View)]
+        [HttpGet()]
+
+        public async Task<IActionResult> GetList([FromQuery] ReportFilterRequest request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportFilterRequest>(request);
             var result = await _service.GetSummaryAsync(appRequest);
+            return Ok(result);
+        }
+        [Authorize(Policy = PermissionPolicies.Report_View)]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistory([FromQuery] ReportFilterRequest request)
+        {
+            var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportFilterRequest>(request);
+            var result = await _service.GetHistoryAsync(appRequest);
             return Ok(result);
         }
 
