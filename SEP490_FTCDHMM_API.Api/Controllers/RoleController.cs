@@ -41,14 +41,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("active")]
+        [HttpPut("{roleId:guid}/active")]
         public async Task<IActionResult> Active(Guid roleId)
         {
             await _roleService.ActiveRole(roleId);
             return Ok();
         }
 
-        [HttpPut("deactive")]
+        [HttpPut("{roleId:guid}/deactive")]
         public async Task<IActionResult> Deactive(Guid roleId)
         {
             await _roleService.DeactiveRole(roleId);

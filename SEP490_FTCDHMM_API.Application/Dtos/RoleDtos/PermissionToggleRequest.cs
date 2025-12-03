@@ -2,7 +2,7 @@
 {
     public class PermissionToggleRequest
     {
-        public Guid PermissionActionId { get; set; }
+        public Guid? PermissionActionId { get; set; }
         public bool IsActive { get; set; } = false;
     }
 }
