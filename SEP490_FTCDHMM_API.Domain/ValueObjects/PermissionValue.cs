@@ -4,56 +4,49 @@
     {
         public override string ToString() => $"{Domain}:{Action}";
 
-        public static readonly PermissionValue Moderator_Create = new("ModeratorManagement", "Create");
-        public static readonly PermissionValue Moderator_View = new("ModeratorManagement", "View");
-        public static readonly PermissionValue Moderator_Update = new("ModeratorManagement", "Update");
-        public static readonly PermissionValue Moderator_Delete = new("ModeratorManagement", "Delete");
+        public static readonly PermissionValue User_Create = new("Quản lí người dùng", "Tạo");
+        public static readonly PermissionValue User_View = new("Quản lí người dùng", "Xem");
+        public static readonly PermissionValue User_Update = new("Quản lí người dùng", "Cập nhật");
+        public static readonly PermissionValue User_Delete = new("Quản lí người dùng", "Xóa");
 
-        public static readonly PermissionValue Customer_Create = new("CustomerManagement", "Create");
-        public static readonly PermissionValue Customer_View = new("CustomerManagement", "View");
-        public static readonly PermissionValue Customer_Update = new("CustomerManagement", "Update");
-        public static readonly PermissionValue Customer_Delete = new("CustomerManagement", "Delete");
+        public static readonly PermissionValue Ingredient_Create = new("Nguyên liệu", "Tạo");
+        public static readonly PermissionValue Ingredient_Update = new("Nguyên liệu", "Cập nhật");
+        public static readonly PermissionValue Ingredient_Delete = new("Nguyên liệu", "Xóa");
+        public static readonly PermissionValue Ingredient_ManagerView = new("Nguyên liệu", "Xem với quyền");
 
-        public static readonly PermissionValue Ingredient_Create = new("Ingredient", "Create");
-        public static readonly PermissionValue Ingredient_Update = new("Ingredient", "Update");
-        public static readonly PermissionValue Ingredient_Delete = new("Ingredient", "Delete");
-        public static readonly PermissionValue Ingredient_ManagerView = new("Ingredient", "ManagerView");
+        public static readonly PermissionValue Label_Create = new("Nhãn món ăn", "Tạo");
+        public static readonly PermissionValue Label_Update = new("Nhãn món ăn", "Cập nhật");
+        public static readonly PermissionValue Label_Delete = new("Nhãn món ăn", "Xóa");
 
-        public static readonly PermissionValue Label_Create = new("Label", "Create");
-        public static readonly PermissionValue Label_Update = new("Label", "Update");
-        public static readonly PermissionValue Label_Delete = new("Label", "Delete");
+        public static readonly PermissionValue IngredientCategory_Create = new("Nhóm nguyên liệu", "Tạo");
+        public static readonly PermissionValue IngredientCategory_Delete = new("Nhóm nguyên liệu", "Xóa");
 
-        public static readonly PermissionValue IngredientCategory_Create = new("IngredientCategory", "Create");
-        public static readonly PermissionValue IngredientCategory_Delete = new("IngredientCategory", "Delete");
+        public static readonly PermissionValue HealthGoal_Create = new("Mục tiêu sức khỏe", "Tạo");
+        public static readonly PermissionValue HealthGoal_Update = new("Mục tiêu sức khỏe", "Cập nhật");
+        public static readonly PermissionValue HealthGoal_Delete = new("Mục tiêu sức khỏe", "Xóa");
 
-        public static readonly PermissionValue HealthGoal_Create = new("HealthGoal", "Create");
-        public static readonly PermissionValue HealthGoal_Update = new("HealthGoal", "Update");
-        public static readonly PermissionValue HealthGoal_Delete = new("HealthGoal", "Delete");
+        public static readonly PermissionValue Comment_Create = new("Bình luận", "Tạo");
+        public static readonly PermissionValue Comment_Delete = new("Bình luận", "Xóa");
+        public static readonly PermissionValue Comment_Update = new("Bình luận", "Cập nhật");
 
-        public static readonly PermissionValue Comment_Create = new("Comment", "Create");
-        public static readonly PermissionValue Comment_Delete = new("Comment", "Delete");
-        public static readonly PermissionValue Comment_Update = new("Comment", "Update");
+        public static readonly PermissionValue Rating_Create = new("Đánh giá", "Tạo");
+        public static readonly PermissionValue Rating_Delete = new("Đánh giá", "Xóa");
+        public static readonly PermissionValue Rating_Update = new("Đánh giá", "Cập nhật");
 
-        public static readonly PermissionValue Rating_Create = new("Rating", "Create");
-        public static readonly PermissionValue Rating_Delete = new("Rating", "Delete");
-        public static readonly PermissionValue Rating_Update = new("Rating", "Update");
+        public static readonly PermissionValue Recipe_Lock = new("Công thức", "Khóa");
+        public static readonly PermissionValue Recipe_Delete = new("Công thức", "Xóa");
+        public static readonly PermissionValue Recipe_Approve = new("Công thức", "Xác nhận");
+        public static readonly PermissionValue Recipe_ManagementView = new("Công thức", "Xem với quyền");
 
-        public static readonly PermissionValue Recipe_Lock = new("Recipe", "Lock");
-        public static readonly PermissionValue Recipe_Delete = new("Recipe", "Delete");
-        public static readonly PermissionValue Recipe_Approve = new("Recipe", "Approve");
-        public static readonly PermissionValue Recipe_ManagementView = new("Recipe", "ManagementView");
-
-        public static readonly PermissionValue Report_View = new("Report", "View");
-        public static readonly PermissionValue Report_Approve = new("Report", "Approve");
-        public static readonly PermissionValue Report_Reject = new("Report", "Reject");
+        public static readonly PermissionValue Report_View = new("Báo cáo", "Xem");
+        public static readonly PermissionValue Report_Approve = new("Báo cáo", "Xác nhận");
+        public static readonly PermissionValue Report_Reject = new("Báo cáo", "Từ chối");
         public static IEnumerable<PermissionValue> All => new[]
         {
-            Moderator_Create,
-            Moderator_View,
-            Moderator_Update,
-            Moderator_Delete,
-            Customer_Create,
-            Customer_Update,
+            User_Create,
+            User_View,
+            User_Update,
+            User_Delete,
             Ingredient_Create,
             Ingredient_Update,
             Ingredient_Delete,
