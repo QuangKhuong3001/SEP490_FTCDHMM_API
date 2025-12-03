@@ -1,5 +1,6 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -10,12 +11,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public ClusterOutput Compute(List<UserVector> users, int k)
         {
             if (users.Count == 0)
-                throw new ArgumentException("User vector list is empty.");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Danh sách người dùng trống");
 
             if (k <= 0 || k > users.Count)
-                throw new ArgumentException("Invalid cluster number K.");
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Số lượng nhóm phải lớn hơn 0 và ít hơn số người dùng");
 
-            // 1) Chuyển UserVector → double[] và random chọn K tâm cụm ban đầu
             var userVectors = users.Select(ToArray).ToList();
 
             var centroids = userVectors
@@ -27,12 +27,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             bool changed = true;
             var assignments = new Dictionary<Guid, int>();
 
-            // 2) Loop KMeans cho tới khi phân cụm không đổi
             while (changed)
             {
                 changed = false;
 
-                // Gán từng user vào cụm gần nhất
                 for (int idx = 0; idx < users.Count; idx++)
                 {
                     var u = users[idx];
@@ -48,7 +46,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     }
                 }
 
-                // 3) Cập nhật lại tâm cụm
                 for (int c = 0; c < k; c++)
                 {
                     var indices = users
@@ -80,7 +77,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 }
             }
 
-            // 4) Build kết quả
             return new ClusterOutput
             {
                 Assignments = assignments
@@ -96,7 +92,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        // Chuyển UserVector → mảng double[]
         private double[] ToArray(UserVector u)
         {
             return new[]
@@ -111,7 +106,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        // Tìm cụm gần nhất cho vector v
         private int GetNearestCluster(double[] v, List<double[]> centroids)
         {
             double minDistance = double.MaxValue;
@@ -125,7 +119,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 for (int d = 0; d < c.Length; d++)
                 {
                     var diff = v[d] - c[d];
-                    distance += diff * diff; // dùng squared distance, bỏ sqrt
+                    distance += diff * diff;
                 }
 
                 if (distance < minDistance)
