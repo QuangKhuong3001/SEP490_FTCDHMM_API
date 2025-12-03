@@ -65,10 +65,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                 q.Include(r => r.Author).ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
-                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
+                 .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                  .Include(r => r.Labels)
-                 .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
-                 .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+                 .Include(r => r.RecipeUserTags)
+                    .ThenInclude(cs => cs.TaggedUser)
+                 .Include(r => r.CookingSteps)
+                    .ThenInclude(cs => cs.CookingStepImages)
+                        .ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,

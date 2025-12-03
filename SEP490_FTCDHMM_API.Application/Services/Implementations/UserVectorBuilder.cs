@@ -26,16 +26,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: q => q
                     .Include(u => u.HealthGoals!)
                         .ThenInclude(uh => uh.HealthGoal)
-                            .ThenInclude(h => h.Targets)
+                            .ThenInclude(h => h!.Targets)
                                 .ThenInclude(t => t.Nutrient)
-                    .Include(u => u.UserHealthMetrics)
+                    .Include(u => u.HealthMetrics)
             );
 
             var result = new List<UserVector>();
 
             foreach (var u in users)
             {
-                var activatingMetric = u.UserHealthMetrics.OrderByDescending(uh => uh.RecordedAt).FirstOrDefault();
+                var activatingMetric = u.HealthMetrics.OrderByDescending(uh => uh.RecordedAt).FirstOrDefault();
 
                 double tdee = 0;
                 if (activatingMetric != null)
@@ -46,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 double carbPct = 0, proteinPct = 0, fatPct = 0;
 
                 var latestUserHealthGoal = u.HealthGoals
-                    .OrderByDescending(hg => hg.CreatedAtUtc)
+                    .OrderByDescending(hg => hg.StartedAtUtc)
                     .FirstOrDefault();
 
                 var healthGoal = latestUserHealthGoal?.HealthGoal;
@@ -55,10 +55,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 {
                     ExtractMacroEnergyPercent(healthGoal, out carbPct, out proteinPct, out fatPct);
                 }
-
-                var viewScore = u.ViewedRecipes.Count;
-                var favoriteScore = u.FavoriteRecipes.Count;
-                var saveScore = u.SaveRecipes.Count;
 
                 result.Add(new UserVector
                 {

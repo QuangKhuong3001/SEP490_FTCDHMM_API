@@ -220,577 +220,523 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
+                            PermissionActionId = new Guid("f2e7330b-d852-a9e2-cf52-445cdb8a4db6"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"),
+                            PermissionActionId = new Guid("415c998c-7281-d587-8d83-04182ec1d8c9"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("718dad89-4d50-185d-37e3-841f43d1a787"),
+                            PermissionActionId = new Guid("8d8d29e6-f5bb-67c6-da83-9d8c90d983dd"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"),
+                            PermissionActionId = new Guid("08bf779c-d72c-7fb2-da89-8f762f9655d7"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("e5849211-12bb-edfc-75d8-de89ec0ec956"),
+                            PermissionActionId = new Guid("9b30e915-25cd-e11b-7f82-1e4872fcf382"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"),
+                            PermissionActionId = new Guid("fddc030c-67f3-57d0-c4b4-73223bf0395b"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"),
+                            PermissionActionId = new Guid("c0ae0175-fa89-d728-e5d3-91cacc621b35"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
+                            PermissionActionId = new Guid("1f80d74b-47ce-57da-cd73-409be61bcfca"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
+                            PermissionActionId = new Guid("36d3785c-ba45-f596-42e1-ff3503eefe6c"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
+                            PermissionActionId = new Guid("cafa9b9d-117e-a8bb-7257-0c690172ae77"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
+                            PermissionActionId = new Guid("93eb2cca-2057-4dca-e548-9a6feada7f2f"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"),
+                            PermissionActionId = new Guid("59fc98f7-cec7-98ea-5cb8-42569e858a6b"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"),
+                            PermissionActionId = new Guid("726e7a7b-6cfd-7eb5-67b2-d369a3057350"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"),
+                            PermissionActionId = new Guid("aa94461c-6ae5-7f85-317c-b637c3191578"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"),
+                            PermissionActionId = new Guid("d7fcb1a8-2e8b-30af-2d68-61632720cd1d"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
+                            PermissionActionId = new Guid("f67d6419-aaf4-fe2e-77e1-c347ead43ed4"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"),
+                            PermissionActionId = new Guid("9484aac2-6d5d-e8f6-c640-e3835910320c"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"),
+                            PermissionActionId = new Guid("7f606467-5dd3-40ea-251d-46b068bba8ca"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"),
+                            PermissionActionId = new Guid("7b1f6e8d-4ab3-dfab-b15d-aa2914f86f26"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
+                            PermissionActionId = new Guid("af6fb429-d2e7-61f3-ab1d-400ac539aff8"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
+                            PermissionActionId = new Guid("87dd48ca-fdba-5090-060c-ab51927e1574"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
+                            PermissionActionId = new Guid("7197f45f-8780-232a-b5a0-e2cde3ff35b7"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
+                            PermissionActionId = new Guid("fc9c2ea1-13e9-0f88-8ad1-0f479d4f4407"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
+                            PermissionActionId = new Guid("5d12a711-9033-ccab-4b12-c2f929daef24"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
+                            PermissionActionId = new Guid("b7c20f26-bf21-88e4-c21e-a5276782f4fb"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            PermissionActionId = new Guid("41397e25-2514-1a63-4462-62337b78d6d9"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            PermissionActionId = new Guid("56874e49-85f7-3648-c6ba-e00f17bed289"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            PermissionActionId = new Guid("f03ce2a1-72c8-02c7-fe69-8fe4018049a2"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
-                            IsActive = true
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
-                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            PermissionActionId = new Guid("b1f091d5-0d3d-764b-d063-02f60f1521eb"),
                             IsActive = true
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
+                            PermissionActionId = new Guid("f2e7330b-d852-a9e2-cf52-445cdb8a4db6"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"),
+                            PermissionActionId = new Guid("415c998c-7281-d587-8d83-04182ec1d8c9"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("718dad89-4d50-185d-37e3-841f43d1a787"),
+                            PermissionActionId = new Guid("8d8d29e6-f5bb-67c6-da83-9d8c90d983dd"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"),
+                            PermissionActionId = new Guid("08bf779c-d72c-7fb2-da89-8f762f9655d7"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("e5849211-12bb-edfc-75d8-de89ec0ec956"),
+                            PermissionActionId = new Guid("9b30e915-25cd-e11b-7f82-1e4872fcf382"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"),
+                            PermissionActionId = new Guid("fddc030c-67f3-57d0-c4b4-73223bf0395b"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"),
+                            PermissionActionId = new Guid("c0ae0175-fa89-d728-e5d3-91cacc621b35"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
+                            PermissionActionId = new Guid("1f80d74b-47ce-57da-cd73-409be61bcfca"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
+                            PermissionActionId = new Guid("36d3785c-ba45-f596-42e1-ff3503eefe6c"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
+                            PermissionActionId = new Guid("cafa9b9d-117e-a8bb-7257-0c690172ae77"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
+                            PermissionActionId = new Guid("93eb2cca-2057-4dca-e548-9a6feada7f2f"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"),
+                            PermissionActionId = new Guid("59fc98f7-cec7-98ea-5cb8-42569e858a6b"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"),
+                            PermissionActionId = new Guid("726e7a7b-6cfd-7eb5-67b2-d369a3057350"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"),
+                            PermissionActionId = new Guid("aa94461c-6ae5-7f85-317c-b637c3191578"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"),
+                            PermissionActionId = new Guid("d7fcb1a8-2e8b-30af-2d68-61632720cd1d"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
+                            PermissionActionId = new Guid("f67d6419-aaf4-fe2e-77e1-c347ead43ed4"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"),
+                            PermissionActionId = new Guid("9484aac2-6d5d-e8f6-c640-e3835910320c"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"),
+                            PermissionActionId = new Guid("7f606467-5dd3-40ea-251d-46b068bba8ca"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"),
+                            PermissionActionId = new Guid("7b1f6e8d-4ab3-dfab-b15d-aa2914f86f26"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
+                            PermissionActionId = new Guid("af6fb429-d2e7-61f3-ab1d-400ac539aff8"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
+                            PermissionActionId = new Guid("87dd48ca-fdba-5090-060c-ab51927e1574"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
+                            PermissionActionId = new Guid("7197f45f-8780-232a-b5a0-e2cde3ff35b7"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
+                            PermissionActionId = new Guid("fc9c2ea1-13e9-0f88-8ad1-0f479d4f4407"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
+                            PermissionActionId = new Guid("5d12a711-9033-ccab-4b12-c2f929daef24"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
+                            PermissionActionId = new Guid("b7c20f26-bf21-88e4-c21e-a5276782f4fb"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            PermissionActionId = new Guid("41397e25-2514-1a63-4462-62337b78d6d9"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            PermissionActionId = new Guid("56874e49-85f7-3648-c6ba-e00f17bed289"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            PermissionActionId = new Guid("f03ce2a1-72c8-02c7-fe69-8fe4018049a2"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
-                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            PermissionActionId = new Guid("b1f091d5-0d3d-764b-d063-02f60f1521eb"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
+                            PermissionActionId = new Guid("f2e7330b-d852-a9e2-cf52-445cdb8a4db6"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"),
+                            PermissionActionId = new Guid("415c998c-7281-d587-8d83-04182ec1d8c9"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("718dad89-4d50-185d-37e3-841f43d1a787"),
+                            PermissionActionId = new Guid("8d8d29e6-f5bb-67c6-da83-9d8c90d983dd"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"),
+                            PermissionActionId = new Guid("08bf779c-d72c-7fb2-da89-8f762f9655d7"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("e5849211-12bb-edfc-75d8-de89ec0ec956"),
+                            PermissionActionId = new Guid("9b30e915-25cd-e11b-7f82-1e4872fcf382"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"),
+                            PermissionActionId = new Guid("fddc030c-67f3-57d0-c4b4-73223bf0395b"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"),
+                            PermissionActionId = new Guid("c0ae0175-fa89-d728-e5d3-91cacc621b35"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
+                            PermissionActionId = new Guid("1f80d74b-47ce-57da-cd73-409be61bcfca"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
+                            PermissionActionId = new Guid("36d3785c-ba45-f596-42e1-ff3503eefe6c"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
+                            PermissionActionId = new Guid("cafa9b9d-117e-a8bb-7257-0c690172ae77"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
+                            PermissionActionId = new Guid("93eb2cca-2057-4dca-e548-9a6feada7f2f"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"),
+                            PermissionActionId = new Guid("59fc98f7-cec7-98ea-5cb8-42569e858a6b"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"),
+                            PermissionActionId = new Guid("726e7a7b-6cfd-7eb5-67b2-d369a3057350"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"),
+                            PermissionActionId = new Guid("aa94461c-6ae5-7f85-317c-b637c3191578"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"),
+                            PermissionActionId = new Guid("d7fcb1a8-2e8b-30af-2d68-61632720cd1d"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
+                            PermissionActionId = new Guid("f67d6419-aaf4-fe2e-77e1-c347ead43ed4"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"),
+                            PermissionActionId = new Guid("9484aac2-6d5d-e8f6-c640-e3835910320c"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"),
+                            PermissionActionId = new Guid("7f606467-5dd3-40ea-251d-46b068bba8ca"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"),
+                            PermissionActionId = new Guid("7b1f6e8d-4ab3-dfab-b15d-aa2914f86f26"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
+                            PermissionActionId = new Guid("af6fb429-d2e7-61f3-ab1d-400ac539aff8"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
+                            PermissionActionId = new Guid("87dd48ca-fdba-5090-060c-ab51927e1574"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
+                            PermissionActionId = new Guid("7197f45f-8780-232a-b5a0-e2cde3ff35b7"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
+                            PermissionActionId = new Guid("fc9c2ea1-13e9-0f88-8ad1-0f479d4f4407"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
+                            PermissionActionId = new Guid("5d12a711-9033-ccab-4b12-c2f929daef24"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
+                            PermissionActionId = new Guid("b7c20f26-bf21-88e4-c21e-a5276782f4fb"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
+                            PermissionActionId = new Guid("41397e25-2514-1a63-4462-62337b78d6d9"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
+                            PermissionActionId = new Guid("56874e49-85f7-3648-c6ba-e00f17bed289"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
+                            PermissionActionId = new Guid("f03ce2a1-72c8-02c7-fe69-8fe4018049a2"),
                             IsActive = false
                         },
                         new
                         {
                             RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
-                            IsActive = false
-                        },
-                        new
-                        {
-                            RoleId = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
-                            PermissionActionId = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
+                            PermissionActionId = new Guid("b1f091d5-0d3d-764b-d063-02f60f1521eb"),
                             IsActive = false
                         });
                 });
@@ -1311,7 +1257,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 3, 5, 26, 49, 39, DateTimeKind.Utc).AddTicks(4188),
+                            CreatedAtUTC = new DateTime(2025, 12, 3, 19, 56, 32, 742, DateTimeKind.Utc).AddTicks(707),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1982,195 +1928,177 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ced5dfe6-7556-6848-28bc-774ca9373d65"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("58f211a8-1e64-c797-cb94-34ff7945f590")
+                            Id = new Guid("f2e7330b-d852-a9e2-cf52-445cdb8a4db6"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("3137cc33-0a46-b311-6ff2-bf91a8142f47")
                         },
                         new
                         {
-                            Id = new Guid("d6f9fd07-aa46-e05b-eb9a-3dbe142ff302"),
-                            Name = "View",
-                            PermissionDomainId = new Guid("58f211a8-1e64-c797-cb94-34ff7945f590")
+                            Id = new Guid("415c998c-7281-d587-8d83-04182ec1d8c9"),
+                            Name = "Xem",
+                            PermissionDomainId = new Guid("3137cc33-0a46-b311-6ff2-bf91a8142f47")
                         },
                         new
                         {
-                            Id = new Guid("718dad89-4d50-185d-37e3-841f43d1a787"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("58f211a8-1e64-c797-cb94-34ff7945f590")
+                            Id = new Guid("8d8d29e6-f5bb-67c6-da83-9d8c90d983dd"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("3137cc33-0a46-b311-6ff2-bf91a8142f47")
                         },
                         new
                         {
-                            Id = new Guid("bbe1aa5b-b75c-9427-9367-d86ca81437a6"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("58f211a8-1e64-c797-cb94-34ff7945f590")
+                            Id = new Guid("08bf779c-d72c-7fb2-da89-8f762f9655d7"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("3137cc33-0a46-b311-6ff2-bf91a8142f47")
                         },
                         new
                         {
-                            Id = new Guid("e5849211-12bb-edfc-75d8-de89ec0ec956"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b")
+                            Id = new Guid("9b30e915-25cd-e11b-7f82-1e4872fcf382"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("4c689fb8-b1ca-c181-9aea-58a449314d35")
                         },
                         new
                         {
-                            Id = new Guid("e7b07d76-ce8e-5b94-f4e3-12de8c7a8382"),
-                            Name = "View",
-                            PermissionDomainId = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b")
+                            Id = new Guid("fddc030c-67f3-57d0-c4b4-73223bf0395b"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("4c689fb8-b1ca-c181-9aea-58a449314d35")
                         },
                         new
                         {
-                            Id = new Guid("3c1f0712-eab0-cd34-b90d-62d1d886fd98"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b")
+                            Id = new Guid("c0ae0175-fa89-d728-e5d3-91cacc621b35"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("4c689fb8-b1ca-c181-9aea-58a449314d35")
                         },
                         new
                         {
-                            Id = new Guid("5dbcfaf8-7006-f8be-cca0-e22622f58ea9"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b")
+                            Id = new Guid("1f80d74b-47ce-57da-cd73-409be61bcfca"),
+                            Name = "Xem với quyền",
+                            PermissionDomainId = new Guid("4c689fb8-b1ca-c181-9aea-58a449314d35")
                         },
                         new
                         {
-                            Id = new Guid("6d22c125-a619-3aac-7483-3c351375f99a"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
+                            Id = new Guid("36d3785c-ba45-f596-42e1-ff3503eefe6c"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("7218eae3-8905-04d8-d6a4-670fe18b3f5d")
                         },
                         new
                         {
-                            Id = new Guid("394d428f-622a-87d8-fb05-9267ceb6a15c"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
+                            Id = new Guid("cafa9b9d-117e-a8bb-7257-0c690172ae77"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("7218eae3-8905-04d8-d6a4-670fe18b3f5d")
                         },
                         new
                         {
-                            Id = new Guid("f737e8f4-b9d0-8044-ec57-6d51a183a4cc"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb")
+                            Id = new Guid("93eb2cca-2057-4dca-e548-9a6feada7f2f"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("7218eae3-8905-04d8-d6a4-670fe18b3f5d")
                         },
                         new
                         {
-                            Id = new Guid("104dfcfa-1ea8-e98c-86d6-2a54dfc76667"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f")
+                            Id = new Guid("59fc98f7-cec7-98ea-5cb8-42569e858a6b"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("2a4f7344-77d7-f5fb-727a-ce3c3f9a79e4")
                         },
                         new
                         {
-                            Id = new Guid("4946df8e-30a3-6ab7-5f45-bef28f0536bc"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f")
+                            Id = new Guid("726e7a7b-6cfd-7eb5-67b2-d369a3057350"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("2a4f7344-77d7-f5fb-727a-ce3c3f9a79e4")
                         },
                         new
                         {
-                            Id = new Guid("4aaf7650-f5b9-6640-a4da-f851a49e6d16"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f")
+                            Id = new Guid("aa94461c-6ae5-7f85-317c-b637c3191578"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("9200695c-188f-9006-34d4-68681681c7be")
                         },
                         new
                         {
-                            Id = new Guid("b9e09fc1-bafc-f5aa-2396-91ca05ac7839"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f")
+                            Id = new Guid("d7fcb1a8-2e8b-30af-2d68-61632720cd1d"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("9200695c-188f-9006-34d4-68681681c7be")
                         },
                         new
                         {
-                            Id = new Guid("7bd0c333-0cc5-a866-0902-8d606e59e9de"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f")
+                            Id = new Guid("f67d6419-aaf4-fe2e-77e1-c347ead43ed4"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("9200695c-188f-9006-34d4-68681681c7be")
                         },
                         new
                         {
-                            Id = new Guid("5e446033-c846-8d05-e416-f9ceb3e3d829"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("7f3cc217-2b00-adff-c855-c738a34c7183")
+                            Id = new Guid("9484aac2-6d5d-e8f6-c640-e3835910320c"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("f6d91264-54e5-24ab-9773-3cbd65b32a91")
                         },
                         new
                         {
-                            Id = new Guid("bba0d6e7-3d61-14c2-5658-0316d1679c01"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("7f3cc217-2b00-adff-c855-c738a34c7183")
+                            Id = new Guid("7f606467-5dd3-40ea-251d-46b068bba8ca"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("f6d91264-54e5-24ab-9773-3cbd65b32a91")
                         },
                         new
                         {
-                            Id = new Guid("9c8bbbf1-22d6-bfd3-2c0b-6ec22bdc29c6"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("7f3cc217-2b00-adff-c855-c738a34c7183")
+                            Id = new Guid("7b1f6e8d-4ab3-dfab-b15d-aa2914f86f26"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("f6d91264-54e5-24ab-9773-3cbd65b32a91")
                         },
                         new
                         {
-                            Id = new Guid("c425362d-d120-a8cf-4afa-bca231428fc6"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
+                            Id = new Guid("af6fb429-d2e7-61f3-ab1d-400ac539aff8"),
+                            Name = "Tạo",
+                            PermissionDomainId = new Guid("e32d29b4-2541-8830-3dde-355cf77e4a6d")
                         },
                         new
                         {
-                            Id = new Guid("f7bc6e0d-5959-e608-01bd-08331d0a42a3"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
+                            Id = new Guid("87dd48ca-fdba-5090-060c-ab51927e1574"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("e32d29b4-2541-8830-3dde-355cf77e4a6d")
                         },
                         new
                         {
-                            Id = new Guid("5afe8feb-08c8-d9b6-94d2-fb9c21306691"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc")
+                            Id = new Guid("7197f45f-8780-232a-b5a0-e2cde3ff35b7"),
+                            Name = "Cập nhật",
+                            PermissionDomainId = new Guid("e32d29b4-2541-8830-3dde-355cf77e4a6d")
                         },
                         new
                         {
-                            Id = new Guid("5d7a5bfd-19af-f795-4b79-0f893d244916"),
-                            Name = "Create",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
+                            Id = new Guid("fc9c2ea1-13e9-0f88-8ad1-0f479d4f4407"),
+                            Name = "Khóa",
+                            PermissionDomainId = new Guid("b8cfdcb4-4201-9269-b3af-6203c23e4ace")
                         },
                         new
                         {
-                            Id = new Guid("98fb23ef-e726-eab8-0fdc-9fc1d176a3d6"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
+                            Id = new Guid("5d12a711-9033-ccab-4b12-c2f929daef24"),
+                            Name = "Xóa",
+                            PermissionDomainId = new Guid("b8cfdcb4-4201-9269-b3af-6203c23e4ace")
                         },
                         new
                         {
-                            Id = new Guid("fc41156f-a6e3-0cb2-f492-b5c324285a85"),
-                            Name = "Update",
-                            PermissionDomainId = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8")
+                            Id = new Guid("b7c20f26-bf21-88e4-c21e-a5276782f4fb"),
+                            Name = "Xác nhận",
+                            PermissionDomainId = new Guid("b8cfdcb4-4201-9269-b3af-6203c23e4ace")
                         },
                         new
                         {
-                            Id = new Guid("fc15899b-b366-5308-2937-fd0d1ecd842d"),
-                            Name = "Lock",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                            Id = new Guid("41397e25-2514-1a63-4462-62337b78d6d9"),
+                            Name = "Xem với quyền",
+                            PermissionDomainId = new Guid("b8cfdcb4-4201-9269-b3af-6203c23e4ace")
                         },
                         new
                         {
-                            Id = new Guid("be8bd8e4-9f9a-33f0-1237-56009e0036cb"),
-                            Name = "Delete",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                            Id = new Guid("56874e49-85f7-3648-c6ba-e00f17bed289"),
+                            Name = "Xem",
+                            PermissionDomainId = new Guid("c237902e-2228-e29a-be9a-08ad51dc9310")
                         },
                         new
                         {
-                            Id = new Guid("78e6b171-e20d-4669-b5d7-48fac7361bb9"),
-                            Name = "Approve",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
+                            Id = new Guid("f03ce2a1-72c8-02c7-fe69-8fe4018049a2"),
+                            Name = "Xác nhận",
+                            PermissionDomainId = new Guid("c237902e-2228-e29a-be9a-08ad51dc9310")
                         },
                         new
                         {
-                            Id = new Guid("95d02aef-c423-4751-9f9b-f1beb44de539"),
-                            Name = "ManagementView",
-                            PermissionDomainId = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969")
-                        },
-                        new
-                        {
-                            Id = new Guid("11cf4815-8318-cb00-ce7c-92b61942ea34"),
-                            Name = "View",
-                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
-                        },
-                        new
-                        {
-                            Id = new Guid("311308d9-db5f-318c-7d23-bf56668c977f"),
-                            Name = "Approve",
-                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
-                        },
-                        new
-                        {
-                            Id = new Guid("4513ef58-7b84-9d14-33ff-4af1f4de7bb7"),
-                            Name = "Reject",
-                            PermissionDomainId = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c")
+                            Id = new Guid("b1f091d5-0d3d-764b-d063-02f60f1521eb"),
+                            Name = "Từ chối",
+                            PermissionDomainId = new Guid("c237902e-2228-e29a-be9a-08ad51dc9310")
                         });
                 });
 
@@ -2191,53 +2119,48 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("58f211a8-1e64-c797-cb94-34ff7945f590"),
-                            Name = "ModeratorManagement"
+                            Id = new Guid("3137cc33-0a46-b311-6ff2-bf91a8142f47"),
+                            Name = "Quản lí người dùng"
                         },
                         new
                         {
-                            Id = new Guid("9e0c2106-2ec3-4a03-2050-7e1aa77b3a3b"),
-                            Name = "CustomerManagement"
+                            Id = new Guid("4c689fb8-b1ca-c181-9aea-58a449314d35"),
+                            Name = "Nguyên liệu"
                         },
                         new
                         {
-                            Id = new Guid("47831959-8aaa-9a40-d9e4-f0ccd56950eb"),
-                            Name = "Ingredient"
+                            Id = new Guid("7218eae3-8905-04d8-d6a4-670fe18b3f5d"),
+                            Name = "Nhãn món ăn"
                         },
                         new
                         {
-                            Id = new Guid("6adf21b0-46ac-c454-54f4-6c77646e745f"),
-                            Name = "Label"
+                            Id = new Guid("2a4f7344-77d7-f5fb-727a-ce3c3f9a79e4"),
+                            Name = "Nhóm nguyên liệu"
                         },
                         new
                         {
-                            Id = new Guid("f90072cc-a782-723a-e251-e25bc6ca5e6f"),
-                            Name = "IngredientCategory"
+                            Id = new Guid("9200695c-188f-9006-34d4-68681681c7be"),
+                            Name = "Mục tiêu sức khỏe"
                         },
                         new
                         {
-                            Id = new Guid("7f3cc217-2b00-adff-c855-c738a34c7183"),
-                            Name = "HealthGoal"
+                            Id = new Guid("f6d91264-54e5-24ab-9773-3cbd65b32a91"),
+                            Name = "Bình luận"
                         },
                         new
                         {
-                            Id = new Guid("6940e80b-cd51-a8fd-2f00-f79328cf4efc"),
-                            Name = "Comment"
+                            Id = new Guid("e32d29b4-2541-8830-3dde-355cf77e4a6d"),
+                            Name = "Đánh giá"
                         },
                         new
                         {
-                            Id = new Guid("6fc0a9dd-0733-9b1c-6fc2-37ee164109d8"),
-                            Name = "Rating"
+                            Id = new Guid("b8cfdcb4-4201-9269-b3af-6203c23e4ace"),
+                            Name = "Công thức"
                         },
                         new
                         {
-                            Id = new Guid("22ecf6ae-f724-3cef-74b4-942b0e7f2969"),
-                            Name = "Recipe"
-                        },
-                        new
-                        {
-                            Id = new Guid("c84d1b4b-38cf-c6b3-4b1d-657da8f5ac8c"),
-                            Name = "Report"
+                            Id = new Guid("c237902e-2228-e29a-be9a-08ad51dc9310"),
+                            Name = "Báo cáo"
                         });
                 });
 
@@ -2534,6 +2457,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AppUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("CustomHealthGoalId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2558,6 +2484,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("CustomHealthGoalId");
 
@@ -3224,6 +3152,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.UserHealthGoal", b =>
                 {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", null)
+                        .WithMany("HealthGoals")
+                        .HasForeignKey("AppUserId");
+
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.CustomHealthGoal", "CustomHealthGoal")
                         .WithMany()
                         .HasForeignKey("CustomHealthGoalId")
@@ -3308,6 +3240,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Followers");
 
                     b.Navigation("Following");
+
+                    b.Navigation("HealthGoals");
 
                     b.Navigation("HealthMetrics");
 

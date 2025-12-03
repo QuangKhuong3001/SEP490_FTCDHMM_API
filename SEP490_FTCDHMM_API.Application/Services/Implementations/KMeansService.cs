@@ -99,10 +99,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 u.Tdee,
                 u.CarbPct,
                 u.ProteinPct,
-                u.FatPct,
-                u.ViewScore,
-                u.FavoriteScore,
-                u.SaveScore
+                u.FatPct
             };
         }
 
