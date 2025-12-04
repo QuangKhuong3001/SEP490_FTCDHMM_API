@@ -15,7 +15,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(n => n.Message)
                    .HasMaxLength(500)
-                   .IsRequired();
+                   .IsRequired(false);
 
 
             builder.Property(n => n.Type)

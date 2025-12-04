@@ -72,7 +72,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         }
 
         [HttpGet("{recipeId:guid}/rating")]
-        public async Task<IActionResult> GetByRecipe(Guid recipeId, RecipePaginationParams request)
+        public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] RecipePaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
