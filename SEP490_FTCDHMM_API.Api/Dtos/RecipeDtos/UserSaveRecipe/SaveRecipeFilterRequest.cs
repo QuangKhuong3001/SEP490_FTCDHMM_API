@@ -1,6 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
-
-namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe
+﻿namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.UserSaveRecipe
 {
     public class SaveRecipeFilterRequest
     {
