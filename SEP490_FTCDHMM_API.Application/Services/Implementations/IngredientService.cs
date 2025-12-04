@@ -101,6 +101,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 keyword: dto.Keyword,
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
+                    .Include(i => i.Image)
                     .Include(i => i.Categories)
             );
 
@@ -150,6 +151,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 keyword: dto.Keyword,
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
+                    .Include(i => i.Image)
                     .Include(i => i.Categories)
             );
 
@@ -335,6 +337,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 await _ingredientRepository.UpdateAsync(ingredient);
             });
         }
+
         public async Task<IngredientDetailsResponse> GetDetails(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
@@ -354,6 +357,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             return result;
         }
+
         public async Task<IngredientDetailsResponse> GetDetailsForManager(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
