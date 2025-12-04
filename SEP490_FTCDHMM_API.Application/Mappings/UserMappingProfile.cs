@@ -26,6 +26,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                .ForMember(
                     dest => dest.AvatarUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<AppUser, UserInteractionResponse>>());
+
+            CreateMap<AppUser, Dtos.UserDtos.Mention.MentionUserResponse>()
+                .ForMember(
+                    dest => dest.AvatarUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<AppUser, Dtos.UserDtos.Mention.MentionUserResponse>>());
         }
     }
 }

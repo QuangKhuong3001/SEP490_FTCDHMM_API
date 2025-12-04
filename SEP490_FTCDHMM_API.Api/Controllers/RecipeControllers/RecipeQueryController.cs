@@ -84,7 +84,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         [HttpGet("{recipeId:guid}/score")]
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = !string.IsNullOrEmpty(userIdClaim) ? Guid.Parse(userIdClaim) : Guid.Empty;
 
             var avg = await _recipeQueryService.GetRecipeRatingAsync(userId, recipeId);
             return Ok(avg);

@@ -193,7 +193,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 include: include
             );
 
-            var result = _mapper.Map<IReadOnlyList<MyRecipeResponse>>(items);
+            var result = _mapper.Map<List<MyRecipeResponse>>(items);
 
             return new PagedResult<MyRecipeResponse>
             {
@@ -225,7 +225,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                 include: include
             );
 
-            var result = _mapper.Map<IReadOnlyList<MyRecipeResponse>>(items);
+            var result = _mapper.Map<List<MyRecipeResponse>>(items);
 
             return new PagedResult<MyRecipeResponse>
             {

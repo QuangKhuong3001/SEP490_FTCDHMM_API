@@ -26,10 +26,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
             var following = _dbContext.UserFollows
                 .Where(f => f.FollowerId == userId)
+                .Include(f => f.Followee)
+                .ThenInclude(f => f.Avatar)
                 .Select(f => f.Followee);
 
             var followers = _dbContext.UserFollows
                 .Where(f => f.FolloweeId == userId)
+                .Include(f => f.Follower)
+                .ThenInclude(f => f.Avatar)
                 .Select(f => f.Follower);
 
             var query = following.Union(followers)

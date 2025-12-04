@@ -130,7 +130,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                     .Include(r => r.RecipeUserTags)
             );
 
-            if (recipe == null || recipe.Status != RecipeStatus.Deleted)
+            if (recipe == null || recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);

@@ -5,5 +5,6 @@
         public Guid MentionedUserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
     }
 }
