@@ -110,20 +110,74 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 if (parentComment != null)
                 {
-                    await _notificationRepository.AddNotification(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
-                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                    // Notify parent comment author about reply
+                    await CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+
+                    // Notify recipe author about comment
+                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
                 }
                 else
                 {
-                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
                 }
-
             }
             else
             {
-                await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
             }
 
+        }
+
+        /// <summary>
+        /// Helper method to create, save, and send real-time notification via SignalR
+        /// </summary>
+        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid receiverId, NotificationType type, string? message, Guid? targetId)
+        {
+            // Don't send notification if sender and receiver are the same
+            if (senderId == receiverId)
+                return;
+
+            // Create notification entity
+            var notification = new Notification
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Type = type,
+                Message = message,
+                TargetId = targetId,
+                CreatedAtUtc = DateTime.UtcNow,
+                IsRead = false
+            };
+
+            // Save to database
+            var saved = await _notificationRepository.AddAsync(notification);
+
+            // Get sender info for the real-time notification
+            var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
+
+            // Create response object matching frontend expectations
+            var notificationResponse = new
+            {
+                Id = saved.Id,
+                Type = type.Name,
+                Message = message,
+                TargetId = targetId,
+                IsRead = false,
+                CreatedAtUtc = saved.CreatedAtUtc,
+                Senders = sender != null ? new[]
+                {
+                    new
+                    {
+                        Id = sender.Id,
+                        FirstName = sender.FirstName,
+                        LastName = sender.LastName,
+                        AvatarUrl = sender.Avatar?.Key
+                    }
+                } : Array.Empty<object>()
+            };
+
+            // Send real-time notification via SignalR
+            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
 
         public async Task<List<CommentResponse>> GetAllByRecipeAsync(Guid recipeId)

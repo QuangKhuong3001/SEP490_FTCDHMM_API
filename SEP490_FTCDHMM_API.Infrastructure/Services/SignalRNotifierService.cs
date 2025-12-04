@@ -7,46 +7,51 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
     public class SignalRNotifierService : IRealtimeNotifier
     {
-        private readonly IHubContext<CommentHub> _hubContext;
+        private readonly IHubContext<CommentHub> _commentHubContext;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public SignalRNotifierService(IHubContext<CommentHub> hubContext)
+        public SignalRNotifierService(
+            IHubContext<CommentHub> commentHubContext,
+            IHubContext<NotificationHub> notificationHubContext)
         {
-            _hubContext = hubContext;
+            _commentHubContext = commentHubContext;
+            _notificationHubContext = notificationHubContext;
         }
 
         public async Task SendCommentAddedAsync(Guid recipeId, object comment)
         {
-            await _hubContext.Clients.Group($"recipe-{recipeId}")
+            await _commentHubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentAdded.Value, comment);
         }
 
         public async Task SendCommentUpdatedAsync(Guid recipeId, object comment)
         {
-            await _hubContext.Clients.Group($"recipe-{recipeId}")
+            await _commentHubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentUpdated.Value, comment);
         }
 
         public async Task SendCommentDeletedAsync(Guid recipeId, Guid commentId)
         {
-            await _hubContext.Clients.Group($"recipe-{recipeId}")
+            await _commentHubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.CommentDeleted.Value, commentId);
         }
         public async Task SendRatingUpdateAsync(Guid recipeId, object rating)
         {
-            await _hubContext.Clients.Group($"recipe-{recipeId}")
+            await _commentHubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.RatingUpdated.Value, rating);
         }
 
         public async Task SendRatingDeletedAsync(Guid recipeId, Guid ratingId)
         {
-            await _hubContext.Clients.Group($"recipe-{recipeId}")
+            await _commentHubContext.Clients.Group($"recipe-{recipeId}")
                 .SendAsync(HubEvent.RatingDeleted.Value, ratingId);
         }
 
         public async Task SendNotificationAsync(Guid userId, object notification)
         {
-            await _hubContext.Clients.Group($"user-{userId}")
-                .SendAsync(HubEvent.Notification.Value, notification);
+            // Use NotificationHub context and send with event name that frontend expects
+            await _notificationHubContext.Clients.Group($"user-{userId}")
+                .SendAsync("ReceiveNotification", notification);
         }
     }
 }
