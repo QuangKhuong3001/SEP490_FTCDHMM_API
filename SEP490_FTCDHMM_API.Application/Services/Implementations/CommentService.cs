@@ -159,7 +159,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var notificationResponse = new
             {
                 Id = saved.Id,
-                Type = type.Name,
+                Type = new { name = type.Name },
                 Message = message,
                 TargetId = targetId,
                 IsRead = false,

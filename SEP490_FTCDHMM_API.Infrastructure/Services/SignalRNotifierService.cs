@@ -51,7 +51,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
         {
             // Use NotificationHub context and send with event name that frontend expects
             await _notificationHubContext.Clients.Group($"user-{userId}")
-                .SendAsync("ReceiveNotification", notification);
+                .SendAsync("NOTIFICATION", notification);
         }
     }
 }
