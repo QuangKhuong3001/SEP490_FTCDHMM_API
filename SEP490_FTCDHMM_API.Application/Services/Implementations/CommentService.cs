@@ -111,19 +111,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (parentComment != null)
                 {
                     // Notify parent comment author about reply
-                    await CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+                    await CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, recipeId);
 
                     // Notify recipe author about comment
-                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
                 }
                 else
                 {
-                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                    await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
                 }
             }
             else
             {
-                await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+                await CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
             }
 
         }
