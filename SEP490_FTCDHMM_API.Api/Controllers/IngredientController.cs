@@ -104,10 +104,10 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [Authorize]
-        [HttpGet("getForRecipe")]
+        [HttpGet("usda")]
         public async Task<IActionResult> GetForRecipe([FromQuery] string keyword)
         {
-            var result = await _ingredientService.GetTop5Async(keyword);
+            var result = await _ingredientService.GetFromUsdaSourceAsync(keyword);
             return Ok(result);
         }
     }

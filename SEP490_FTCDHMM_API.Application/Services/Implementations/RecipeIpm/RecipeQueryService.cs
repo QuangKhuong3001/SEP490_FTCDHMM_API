@@ -67,6 +67,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
 
             var recipes = await _recipeRepository.GetRecipesRawAsync(spec);
 
+            var hasIncludeIngredient = request.IncludeIngredientIds.Any();
+
             var ranked = recipes
                 .Select(r => new
                 {
@@ -81,7 +83,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeIpm
                               !r.RecipeIngredients.Any(ri => ri.IngredientId == id))
                         : 0
                 })
-                .Where(x => x.Matched > 0)
+                .Where(x => !hasIncludeIngredient || x.Matched > 0)
                 .OrderByDescending(x => x.Matched)
                 .ThenBy(x => x.NotMatched);
 
