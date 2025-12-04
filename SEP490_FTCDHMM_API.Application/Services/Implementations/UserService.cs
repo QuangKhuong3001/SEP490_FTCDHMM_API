@@ -46,8 +46,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => u.Role.Name == RoleValue.Customer.Name &&
-                     (string.IsNullOrEmpty(request.Keyword) ||
+                u => (string.IsNullOrEmpty(request.Keyword) ||
                       u.FirstName.Contains(request.Keyword!) ||
                       u.LastName.Contains(request.Keyword!) ||
                       u.Email!.Contains(request.Keyword!)),
