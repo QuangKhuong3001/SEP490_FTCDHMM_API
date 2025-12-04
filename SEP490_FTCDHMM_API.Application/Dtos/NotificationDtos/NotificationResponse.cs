@@ -11,6 +11,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos
         public Guid? TargetId { get; set; }
         public bool IsRead { get; set; }
         public DateTime CreatedAtUtc { get; set; }
-        public List<UserResponse> Senders { get; set; } = new List<UserResponse>();
+        public List<UserInteractionResponse> Senders { get; set; } = new List<UserInteractionResponse>();
     }
 }

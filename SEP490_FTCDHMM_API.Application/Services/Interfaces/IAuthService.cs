@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<(bool Success, IEnumerable<string> Errors)> Register(RegisterDto dto);
+        Task<(bool Success, IEnumerable<string> Errors)> RegisterAsync(RegisterRequest dto);
         Task<string> Login(LoginRequest dto);
         Task VerifyEmailOtp(OtpVerifyRequest dto);
         Task ResendOtp(ResendOtpRequest dto, OtpPurpose purpose);

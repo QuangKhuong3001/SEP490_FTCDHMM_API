@@ -28,9 +28,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest dto)
         {
-            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.RegisterDto>(dto);
+            var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.RegisterRequest>(dto);
 
-            var (success, errors) = await _authService.Register(appDto);
+            var (success, errors) = await _authService.RegisterAsync(appDto);
             if (!success) return BadRequest(new { success = false, errors });
             return Ok();
         }

@@ -44,12 +44,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     if (response.Type == NotificationType.System)
                     {
-                        response.Senders = new List<UserResponse>();
+                        response.Senders = new List<UserInteractionResponse>();
                     }
                     else
                     {
                         response.Senders = g
-                            .Select(x => _mapper.Map<UserResponse>(x.Sender!))
+                            .Select(x => _mapper.Map<UserInteractionResponse>(x.Sender!))
                             .DistinctBy(u => u.Id)
                             .ToList();
                     }
