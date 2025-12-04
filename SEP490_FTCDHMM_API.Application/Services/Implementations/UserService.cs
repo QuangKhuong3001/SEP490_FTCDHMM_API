@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos.Mention;
@@ -44,16 +45,32 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<UserResponse>> GetUserList(UserFilterRequest request)
         {
-            var (customers, totalCount) = await _userRepository.GetPagedAsync(
-                request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => u.Role.Name == RoleValue.Customer.Name &&
-                     (string.IsNullOrEmpty(request.Keyword) ||
-                      u.FirstName.Contains(request.Keyword!) ||
-                      u.LastName.Contains(request.Keyword!) ||
-                      u.Email!.Contains(request.Keyword!)),
-                q => q.OrderBy(u => u.CreatedAtUtc));
+            // Build filter expression for role if specified
+            Expression<Func<AppUser, bool>>? filter = null;
+            if (!string.IsNullOrEmpty(request.Role))
+            {
+                filter = u => u.Role.Name == request.Role;
+            }
 
-            var result = _mapper.Map<List<UserResponse>>(customers);
+            var (users, totalCount) = await _userRepository.GetPagedAsync(
+                request.PaginationParams.PageNumber,
+                request.PaginationParams.PageSize,
+                filter,
+                q => q.OrderBy(u => u.CreatedAtUtc),
+                request.Keyword,
+                new[] { nameof(AppUser.FirstName), nameof(AppUser.LastName), nameof(AppUser.Email) },
+                q => q.Include(u => u.Role));
+
+            var result = _mapper.Map<List<UserResponse>>(users);
+
+            // Map role names to responses
+            for (int i = 0; i < result.Count; i++)
+            {
+                if (users[i].Role != null)
+                {
+                    result[i].Role = users[i].Role.Name;
+                }
+            }
 
             return new PagedResult<UserResponse>
             {
