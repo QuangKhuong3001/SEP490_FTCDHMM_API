@@ -115,6 +115,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<string> LoginAsync(LoginRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user!, dto.Password);
             if (!isPasswordValid)
@@ -139,6 +141,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task VerifyEmailOtpAsync(OtpVerifyRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var otp = await _otpRepo.GetLatestAsync(user!.Id, OtpPurpose.VerifyAccountEmail);
             if (otp == null)
