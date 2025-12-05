@@ -69,6 +69,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
+            if (user.LockoutEnd > DateTime.UtcNow)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);
             user.LockReason = dto.Reason;
 
@@ -115,24 +118,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = user.Email!,
             };
         }
-        public async Task<ProfileResponse> GetProfileAsync(Guid userId, Guid? currentUserId = null)
+        public async Task<ProfileResponse> GetProfileAsync(string? username, Guid? currentUserId = null)
         {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role, u => u.Avatar!);
+            var user = await _userRepository.FirstOrDefaultAsync(
+                orderByDescendingKeySelector: u => u.UserName,
+                predicate: u => u.UserName == username,
+                include: i => i.Include(u => u.Role)
+                                .Include(u => u.Avatar));
+
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var profile = _mapper.Map<ProfileResponse>(user);
 
-            var followersCount = await _userFollowRepository.CountAsync(f => f.FolloweeId == userId);
+            var followersCount = await _userFollowRepository.CountAsync(f => f.FolloweeId == user.Id);
             profile.FollowersCount = followersCount;
 
-            var followingCount = await _userFollowRepository.CountAsync(f => f.FollowerId == userId);
+            var followingCount = await _userFollowRepository.CountAsync(f => f.FollowerId == user.Id);
             profile.FollowingCount = followingCount;
 
-            if (currentUserId.HasValue && currentUserId.Value != userId)
+            if (currentUserId.HasValue && currentUserId.Value != user.Id)
             {
                 var isFollowing = await _userFollowRepository.ExistsAsync(
-                    f => f.FollowerId == currentUserId.Value && f.FolloweeId == userId
+                    f => f.FollowerId == currentUserId.Value && f.FolloweeId == user.Id
                 );
                 profile.IsFollowing = isFollowing;
             }

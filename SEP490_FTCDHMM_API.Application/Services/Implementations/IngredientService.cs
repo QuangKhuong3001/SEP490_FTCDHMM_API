@@ -102,6 +102,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
                     .Include(i => i.Categories)
+                    .Include(i => i.Image)
             );
 
             var result = _mapper.Map<List<IngredientResponse>>(ingredients);
@@ -151,6 +152,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 searchProperties: new[] { "Name", "Description" },
                 include: q => q
                     .Include(i => i.Categories)
+                    .Include(i => i.Image)
             );
 
             var result = _mapper.Map<List<IngredientResponse>>(ingredients);

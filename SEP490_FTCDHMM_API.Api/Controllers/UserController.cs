@@ -59,22 +59,16 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var profile = await _userService.GetProfileAsync(userId!, userId);
+            var profile = await _userService.GetProfileAsync(null, userId);
             return Ok(profile);
         }
 
-        [Authorize]
-        [HttpGet("profile/{userId}")]
-        public async Task<IActionResult> GetUserProfile(Guid userId)
+        [HttpGet("profile/{username}")]
+        public async Task<IActionResult> GetUserProfile(string username)
         {
-            var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Guid? currentUserId = null;
-            if (currentUserIdClaim != null && Guid.TryParse(currentUserIdClaim, out var parsedId))
-            {
-                currentUserId = parsedId;
-            }
+            var currentUserId = Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : (Guid?)null;
 
-            var profile = await _userService.GetProfileAsync(userId, currentUserId);
+            var profile = await _userService.GetProfileAsync(username, currentUserId);
             return Ok(profile);
         }
 

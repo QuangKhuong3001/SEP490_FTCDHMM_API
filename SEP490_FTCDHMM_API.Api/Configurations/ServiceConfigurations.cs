@@ -24,6 +24,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterface;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
+using SEP490_FTCDHMM_API.Infrastructure.Identity;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence;
 using SEP490_FTCDHMM_API.Infrastructure.Repositories;
@@ -80,6 +81,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
             })
+            .AddErrorDescriber<VietnameseIdentityErrorDescriber>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 

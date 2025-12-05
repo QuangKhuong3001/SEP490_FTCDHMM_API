@@ -30,12 +30,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task DeleteCategory(Guid id)
         {
             var category = await _ingredientCategoryRepository.GetByIdAsync(id, ic => ic.Ingredients);
-            if (category == null)
+            if (category == null || category.isDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (category.Ingredients.Any())
             {
                 category.isDeleted = true;
+                await _ingredientCategoryRepository.UpdateAsync(category);
             }
             else
             {

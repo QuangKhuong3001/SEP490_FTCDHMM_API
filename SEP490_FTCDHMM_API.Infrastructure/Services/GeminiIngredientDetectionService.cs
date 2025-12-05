@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.IngredientDetection;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
@@ -70,16 +71,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             var modelName = "gemini-2.5-pro";
             var apiEndpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{modelName}:generateContent?key={_apiKey}";
-
-            var response = await _client.PostAsync(
+            try
+            {
+                var response = await _client.PostAsync(
                 apiEndpoint,
                 new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
             );
 
-            response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync();
-            return ParseGeminiResponse(json);
+                var json = await response.Content.ReadAsStringAsync();
+                return ParseGeminiResponse(json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Gemini response : " + ex);
+                throw new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE);
+            }
         }
 
         private List<IngredientDetectionResult> ParseGeminiResponse(string json)
@@ -116,8 +124,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Gemini parse error: " + ex.Message);
-                Console.WriteLine("Gemini raw response (để debug): " + json);
+                Console.WriteLine("Gemini response : " + ex);
                 return new List<IngredientDetectionResult>();
             }
         }
