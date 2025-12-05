@@ -28,7 +28,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
 
-            var result = await _userService.GetUserList(appDto);
+            var result = await _userService.GetUserListAsync(appDto);
             return Ok(result);
         }
 
@@ -38,7 +38,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.LockRequest>(dto);
 
-            var result = await _userService.LockUserAccount(userId, appDto);
+            var result = await _userService.LockUserAccountAsync(userId, appDto);
             return Ok(result);
         }
 
@@ -46,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpPut("{userId:guid}/unlock")]
         public async Task<IActionResult> UnLockModerator(Guid userId)
         {
-            var result = await _userService.UnLockUserAccount(userId);
+            var result = await _userService.UnLockUserAccountAsync(userId);
             return Ok(result);
         }
 
@@ -131,7 +131,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var result = await _userService.GetActivityLevel(userId);
+            var result = await _userService.GetActivityLevelAsync(userId);
 
             return Ok(result);
         }
@@ -144,7 +144,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserDtos.ChangeActivityLevelRequest>(request);
 
-            await _userService.ChangeActivityLevel(userId, appRequest);
+            await _userService.ChangeActivityLevelAsync(userId, appRequest);
             return Ok();
         }
 
@@ -154,7 +154,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.UserDtos.ChangeRoleRequest>(request);
 
-            await _userService.ChangeRole(userId, appRequest);
+            await _userService.ChangeRoleAsync(userId, appRequest);
 
             return Ok();
         }

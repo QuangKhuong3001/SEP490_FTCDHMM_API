@@ -7,18 +7,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<PagedResult<UserResponse>> GetUserList(UserFilterRequest pagination);
-        Task<LockResponse> LockUserAccount(Guid userId, LockRequest dto);
-        Task<UnlockResponse> UnLockUserAccount(Guid userId);
+        Task<PagedResult<UserResponse>> GetUserListAsync(UserFilterRequest pagination);
+        Task<LockResponse> LockUserAccountAsync(Guid userId, LockRequest dto);
+        Task<UnlockResponse> UnLockUserAccountAsync(Guid userId);
         Task<ProfileResponse> GetProfileAsync(string? username, Guid? currentUserId = null);
         Task FollowUserAsync(Guid followerId, Guid followeeId);
         Task UnfollowUserAsync(Guid followerId, Guid followeeId);
         Task<IEnumerable<UserInteractionResponse>> GetFollowersAsync(Guid userId);
         Task<IEnumerable<UserInteractionResponse>> GetFollowingAsync(Guid userId);
         Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto);
-        Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request);
-        Task<ActivityLevel> GetActivityLevel(Guid userId);
-        Task ChangeRole(Guid userId, ChangeRoleRequest request);
+        Task ChangeActivityLevelAsync(Guid userId, ChangeActivityLevelRequest request);
+        Task<ActivityLevel> GetActivityLevelAsync(Guid userId);
+        Task ChangeRoleAsync(Guid userId, ChangeRoleRequest request);
         Task<IEnumerable<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword);
     }
 }

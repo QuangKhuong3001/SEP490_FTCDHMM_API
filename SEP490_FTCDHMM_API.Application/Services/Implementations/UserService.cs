@@ -42,7 +42,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userFollowRepository = userFollowRepository;
         }
 
-        public async Task<PagedResult<UserResponse>> GetUserList(UserFilterRequest request)
+        public async Task<PagedResult<UserResponse>> GetUserListAsync(UserFilterRequest request)
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
@@ -63,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<LockResponse> LockUserAccount(Guid userId, LockRequest dto)
+        public async Task<LockResponse> LockUserAccountAsync(Guid userId, LockRequest dto)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
@@ -95,7 +95,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<UnlockResponse> UnLockUserAccount(Guid userId)
+        public async Task<UnlockResponse> UnLockUserAccountAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
             if (user == null)
@@ -241,7 +241,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return _mapper.Map<IEnumerable<UserInteractionResponse>>(followingUsers);
         }
 
-        public async Task<ActivityLevel> GetActivityLevel(Guid userId)
+        public async Task<ActivityLevel> GetActivityLevelAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
@@ -252,7 +252,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return user.ActivityLevel;
         }
 
-        public async Task ChangeActivityLevel(Guid userId, ChangeActivityLevelRequest request)
+        public async Task ChangeActivityLevelAsync(Guid userId, ChangeActivityLevelRequest request)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
@@ -264,7 +264,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task ChangeRole(Guid userId, ChangeRoleRequest request)
+        public async Task ChangeRoleAsync(Guid userId, ChangeRoleRequest request)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)

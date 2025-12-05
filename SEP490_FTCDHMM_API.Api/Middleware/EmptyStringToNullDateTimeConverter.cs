@@ -8,19 +8,27 @@ public class EmptyStringToNullDateTimeConverter : JsonConverter<DateTime?>
         if (reader.TokenType == JsonTokenType.String)
         {
             var str = reader.GetString();
+
             if (string.IsNullOrWhiteSpace(str))
                 return null;
 
-            if (!DateTime.TryParse(str, out var dt))
-                throw new JsonException("Ngày sinh không hợp lệ.");
+            if (DateTime.TryParse(str, out var dt))
+                return dt;
 
-            return dt;
+            return null;
         }
 
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 
-        return reader.GetDateTime();
+        try
+        {
+            return reader.GetDateTime();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
