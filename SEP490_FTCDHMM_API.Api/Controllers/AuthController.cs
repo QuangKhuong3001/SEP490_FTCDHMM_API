@@ -6,7 +6,6 @@ using SEP490_FTCDHMM_API.Api.Attributes;
 using SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Api.Dtos.GoogleAuthDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
-using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers
@@ -41,20 +40,16 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.OtpVerifyRequest>(dto);
 
-            await _authService.VerifyEmailOtp(appDto);
+            await _authService.VerifyEmailOtpAsync(appDto);
             return Ok();
         }
 
         [DisallowAuthenticated]
         [HttpPost("resend-otp")]
-        public async Task<IActionResult> ResendOtp(ResendOtpRequest dto, [FromQuery] string purpose = "VERIFYACCOUNTEMAIL")
+        public async Task<IActionResult> ResendOtp(ResendOtpRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResendOtpRequest>(dto);
-
-            var purposeKey = (purpose ?? string.Empty).Trim().ToUpperInvariant();
-            OtpPurpose parsedPurpose = OtpPurpose.From(purpose!);
-
-            await _authService.ResendOtp(appDto, parsedPurpose);
+            await _authService.ResendVerifyAccountEmailOtpAsync(appDto);
             return Ok();
         }
 
@@ -64,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.LoginRequest>(dto);
 
-            var token = await _authService.Login(appDto);
+            var token = await _authService.LoginAsync(appDto);
             return Ok(new { token });
         }
 
@@ -74,7 +69,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ForgotPasswordRequest>(dto);
 
-            await _authService.ForgotPasswordRequest(appDto);
+            await _authService.ForgotPasswordRequestAsync(appDto);
             return Ok();
         }
 
@@ -84,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.VerifyOtpForPasswordResetRequest>(dto);
 
-            var token = await _authService.VerifyOtpForPasswordReset(appDto);
+            var token = await _authService.VerifyOtpForPasswordResetAsync(appDto);
             return Ok(new { token });
         }
 
@@ -94,7 +89,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.AuthDTOs.ResetPasswordWithTokenDto>(dto);
 
-            var (success, errors) = await _authService.ResetPasswordWithToken(appDto);
+            var (success, errors) = await _authService.ResetPasswordWithTokenAsync(appDto);
             if (!success)
                 return BadRequest(new { success = false, errors });
             return Ok();
@@ -109,7 +104,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var (Success, Errors) = await _authService.ChangePassword(userId!, appDto);
+            var (Success, Errors) = await _authService.ChangePasswordAsync(userId!, appDto);
 
             if (!Success)
                 return BadRequest(new { errors = Errors });

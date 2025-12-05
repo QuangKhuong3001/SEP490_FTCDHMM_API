@@ -5,7 +5,7 @@ using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
 {
-    public class AuthService_LoginTests : AuthServiceTestBase
+    public class LoginAsyncTests : AuthServiceTestBase
     {
         private LoginRequest CreateValidLoginRequest()
         {
@@ -25,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(x => x.FindByEmailAsync(dto.Email))
                 .ReturnsAsync((AppUser)null!);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.Login(dto));
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.LoginAsync(dto));
 
             Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
         }
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(x => x.CheckPasswordAsync(user, dto.Password))
                 .ReturnsAsync(false);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.Login(dto));
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.LoginAsync(dto));
 
             Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
         }
@@ -59,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
             UserManagerMock.Setup(x => x.CheckPasswordAsync(user, dto.Password)).ReturnsAsync(true);
             UserManagerMock.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(true);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.Login(dto));
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.LoginAsync(dto));
 
             Assert.Equal(AppResponseCode.ACCOUNT_LOCKED, ex.ResponseCode);
         }
@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
             UserManagerMock.Setup(x => x.CheckPasswordAsync(user, dto.Password)).ReturnsAsync(true);
             UserManagerMock.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.Login(dto));
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.LoginAsync(dto));
 
             Assert.Equal(AppResponseCode.EMAIL_NOT_CONFIRMED, ex.ResponseCode);
         }
@@ -93,7 +93,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(r => r.GetRoleWithPermissionsAsync(user.RoleId))
                 .ReturnsAsync((AppRole)null!);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.Login(dto));
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.LoginAsync(dto));
 
             Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
         }
@@ -120,7 +120,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(j => j.GenerateToken(user, role))
                 .Returns(expectedToken);
 
-            var result = await Sut.Login(dto);
+            var result = await Sut.LoginAsync(dto);
 
             Assert.Equal(expectedToken, result);
             JwtServiceMock.Verify(j => j.GenerateToken(user, role), Times.Once);
