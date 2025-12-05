@@ -1,4 +1,5 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
+﻿using System.ComponentModel.DataAnnotations;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
 
@@ -6,7 +7,11 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {
     public class CreateRecipeRequest
     {
+        [Required(ErrorMessage = "Tên công thức không được để trống")]
+        [StringLength(200, MinimumLength = 1, ErrorMessage = "Tên công thức phải từ 1-200 ký tự")]
         public required string Name { get; set; }
+
+        [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
         public string? Description { get; set; } = string.Empty;
         public required string Difficulty { get; set; }
         public int CookTime { get; set; }

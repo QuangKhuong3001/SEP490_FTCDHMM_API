@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.LabelDtos
     public class CreateLabelRequest
     {
         [Required(ErrorMessage = "Tên nhãn không được để trống")]
-        [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên nhãn phải từ 1 đến 255 ký tự")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "Tên nhãn phải từ 1 đến 100 ký tự")]
         public required string Name { get; set; }
 
         [Required(ErrorMessage = "Mã màu không được để trống")]

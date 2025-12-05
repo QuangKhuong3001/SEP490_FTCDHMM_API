@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
     public class CreateIngredientRequest
     {
         [Required(ErrorMessage = "Tên nguyên liệu không được để trống")]
-        [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên nguyên liệu phải từ 1 đến 255 ký tự")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "Tên nguyên liệu phải từ 1 đến 100 ký tự")]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự")]

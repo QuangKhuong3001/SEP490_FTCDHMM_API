@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
     public class CreateRecipeRequest
     {
         [Required(ErrorMessage = "Tên công thức không được để trống")]
-        [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên công thức phải từ 1-255 ký tự")]
+        [StringLength(200, MinimumLength = 1, ErrorMessage = "Tên công thức phải từ 1-200 ký tự")]
         public required string Name { get; set; }
 
         [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
