@@ -5,6 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.UserDtos
     public class UserFilterRequest
     {
         public string? Keyword { get; set; }
+        public Guid? RoleId { get; set; }
         public PaginationParams PaginationParams { get; set; } = new PaginationParams();
     }
 }

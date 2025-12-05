@@ -46,11 +46,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => (string.IsNullOrEmpty(request.Keyword) ||
+                u => string.IsNullOrEmpty(request.Keyword) ||
                       u.FirstName.Contains(request.Keyword!) ||
                       u.LastName.Contains(request.Keyword!) ||
-                      u.Email!.Contains(request.Keyword!)),
-                q => q.OrderBy(u => u.CreatedAtUtc));
+                      u.Email!.Contains(request.Keyword!)
+                      && (!request.RoleId.HasValue || u.RoleId == request.RoleId.Value),
+                q => q.OrderBy(u => u.CreatedAtUtc),
+                include: i => i.Include(u => u.Role)
+                );
 
             var result = _mapper.Map<List<UserResponse>>(customers);
 
