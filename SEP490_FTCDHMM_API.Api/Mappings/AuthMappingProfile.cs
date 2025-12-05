@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public AuthMappingProfile()
         {
             //register
-            CreateMap<APIDtos.AuthDTOs.RegisterRequest, ApplicationDtos.AuthDTOs.RegisterDto>();
+            CreateMap<APIDtos.AuthDTOs.RegisterRequest, ApplicationDtos.AuthDTOs.RegisterRequest>();
 
             //verifyEmail
             CreateMap<APIDtos.AuthDTOs.OtpVerifyRequest, ApplicationDtos.AuthDTOs.OtpVerifyRequest>();

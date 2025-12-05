@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEP490_FTCDHMM_API.Infrastr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEP490_FTCDHMM_API.Shared", "SEP490_FTCDHMM_API.Shared\SEP490_FTCDHMM_API.Shared.csproj", "{A18B0C37-E2DA-4A98-BF52-5E766BE118E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEP490_FTCDHMM_API.Tests", "SEP490_FTCDHMM_API.Tests\SEP490_FTCDHMM_API.Tests.csproj", "{59D8B262-8CA4-448D-A271-5E90DF5A25CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A18B0C37-E2DA-4A98-BF52-5E766BE118E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A18B0C37-E2DA-4A98-BF52-5E766BE118E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A18B0C37-E2DA-4A98-BF52-5E766BE118E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59D8B262-8CA4-448D-A271-5E90DF5A25CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D8B262-8CA4-448D-A271-5E90DF5A25CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D8B262-8CA4-448D-A271-5E90DF5A25CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D8B262-8CA4-448D-A271-5E90DF5A25CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

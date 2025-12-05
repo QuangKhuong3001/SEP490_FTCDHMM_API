@@ -12,7 +12,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task CreateIngredient(CreateIngredientRequest dto);
         Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto);
         Task DeleteIngredient(Guid ingredientId);
-        Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword);
+        Task<IEnumerable<IngredientNameResponse>> GetFromUsdaSourceAsync(string keyword);
 
     }
 }

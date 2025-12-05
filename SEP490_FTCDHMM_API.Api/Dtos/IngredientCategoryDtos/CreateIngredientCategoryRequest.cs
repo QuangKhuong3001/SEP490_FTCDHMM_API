@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientCategoryDtos
     {
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "Missing name")]
+        [Required(ErrorMessage = "Thiếu tên ")]
         public required string Name { get; set; }
     }
 }

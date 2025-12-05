@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             var filePath = Path.Combine(_env.ContentRootPath, "EmailTemplates", $"{templateName}.html");
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"Template '{templateName}' not found at {filePath}");
+                throw new FileNotFoundException($"Không tìm thấy mẫu email phù hợp");
 
             var content = await File.ReadAllTextAsync(filePath);
 

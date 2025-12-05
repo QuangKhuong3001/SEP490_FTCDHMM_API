@@ -381,7 +381,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<IEnumerable<IngredientNameResponse>> GetTop5Async(string keyword)
+        public async Task<IEnumerable<IngredientNameResponse>> GetFromUsdaSourceAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLength)
                 return Enumerable.Empty<IngredientNameResponse>();

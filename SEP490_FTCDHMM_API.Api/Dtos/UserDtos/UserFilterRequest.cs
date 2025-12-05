@@ -1,4 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.Common;
+﻿using SEP490_FTCDHMM_API.Api.Dtos.Common;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
 {

@@ -34,7 +34,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 .Select(rp => $"{rp.PermissionAction.PermissionDomain.Name}:{rp.PermissionAction.Name}")
                 .ToList();
 
-            claims.Add(new Claim("Permissions", JsonSerializer.Serialize(permissions)));
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permissions", permission));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
