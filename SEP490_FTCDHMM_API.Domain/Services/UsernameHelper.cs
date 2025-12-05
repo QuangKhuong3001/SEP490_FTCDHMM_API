@@ -1,4 +1,6 @@
-﻿namespace SEP490_FTCDHMM_API.Domain.Services
+﻿using SEP490_FTCDHMM_API.Shared.Utils;
+
+namespace SEP490_FTCDHMM_API.Domain.Services
 {
     public static class UsernameHelper
     {
@@ -17,8 +19,6 @@
 
         public static string IncrementUserName(string userName)
         {
-            if (string.IsNullOrWhiteSpace(userName))
-                return "1";
             int index = userName.Length - 1;
             while (index >= 0 && char.IsDigit(userName[index]))
             {
@@ -26,9 +26,9 @@
             }
             string prefix = userName.Substring(0, index + 1);
             string numberPart = userName.Substring(index + 1);
-            if (string.IsNullOrEmpty(numberPart))
+            if (numberPart.Length < 6)
             {
-                return prefix + "1";
+                return prefix + Generate.GenerateRandomNumberic(6);
             }
             else
             {
@@ -39,7 +39,7 @@
                 }
                 else
                 {
-                    return userName + "1";
+                    return userName + Generate.GenerateRandomNumberic(6);
                 }
             }
         }

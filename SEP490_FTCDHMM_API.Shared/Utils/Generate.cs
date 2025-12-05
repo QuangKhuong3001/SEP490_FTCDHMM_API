@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
             return result.ToString();
         }
 
-        public static string GenerateNumericOtp(int length)
+        public static string GenerateRandomNumberic(int length)
         {
             if (length < 6)
                 throw new AppException(AppResponseCode.INVALID_ACTION);

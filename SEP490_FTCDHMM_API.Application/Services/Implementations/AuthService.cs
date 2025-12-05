@@ -84,7 +84,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!createResult.Succeeded)
                 return (false, createResult.Errors.Select(e => e.Description));
 
-            string otpCode = Generate.GenerateNumericOtp(OtpConstants.Length);
+            string otpCode = Generate.GenerateRandomNumberic(OtpConstants.Length);
             string hashedCode = HashHelper.ComputeSha256Hash(otpCode);
 
             var otp = new EmailOtp
@@ -198,7 +198,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             int otpLength = OtpConstants.Length;
             int otpExpireMinutes = OtpConstants.ExpireMinutes;
 
-            string code = Generate.GenerateNumericOtp(otpLength);
+            string code = Generate.GenerateRandomNumberic(otpLength);
             var hashedCode = HashHelper.ComputeSha256Hash(code);
 
             var otp = new EmailOtp
@@ -234,7 +234,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             int otpLength = OtpConstants.Length;
             int otpExpireMinutes = OtpConstants.ExpireMinutes;
 
-            string code = Generate.GenerateNumericOtp(otpLength);
+            string code = Generate.GenerateRandomNumberic(otpLength);
             var hashedCode = HashHelper.ComputeSha256Hash(code);
 
             var otp = new EmailOtp
