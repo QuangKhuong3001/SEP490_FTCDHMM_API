@@ -109,8 +109,8 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserAccountStatusMiddleware>();
 
-app.UseMiddleware<UserLockoutMiddleware>();
 
 app.MapHub<RecipeHub>("/hubs/recipe");
 app.MapHub<CommentHub>("/hubs/comments");

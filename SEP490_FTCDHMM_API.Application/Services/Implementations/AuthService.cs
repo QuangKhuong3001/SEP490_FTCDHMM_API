@@ -115,17 +115,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<string> LoginAsync(LoginRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user!, dto.Password);
             if (!isPasswordValid)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (await _userManager.IsLockedOutAsync(user))
+            if (await _userManager.IsLockedOutAsync(user!))
                 throw new AppException(AppResponseCode.ACCOUNT_LOCKED);
 
-            if (!user.EmailConfirmed)
+            if (!user!.EmailConfirmed)
                 throw new AppException(AppResponseCode.EMAIL_NOT_CONFIRMED);
 
             var role = await _roleRepository.GetRoleWithPermissionsAsync(user.RoleId);
@@ -138,14 +136,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return token;
         }
 
-
         public async Task VerifyEmailOtpAsync(OtpVerifyRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var otp = await _otpRepo.GetLatestAsync(user.Id, OtpPurpose.VerifyAccountEmail);
+            var otp = await _otpRepo.GetLatestAsync(user!.Id, OtpPurpose.VerifyAccountEmail);
             if (otp == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
@@ -181,10 +176,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task ResendVerifyAccountEmailOtpAsync(ResendOtpRequest dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.EmailConfirmed)
+            if (user!.EmailConfirmed)
             {
                 throw new AppException(AppResponseCode.INVALID_ACTION);
             }

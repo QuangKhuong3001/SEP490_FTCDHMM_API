@@ -246,7 +246,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
             }
 
             return user.ActivityLevel;
@@ -257,7 +257,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
             }
 
             user.ActivityLevel = ActivityLevel.From(request.ActivityLevel);
@@ -269,12 +269,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new AppException(AppResponseCode.NOT_FOUND, "Người dùng không tồn tại");
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng không tồn tại");
             }
             var role = await _roleRepository.GetByIdAsync(request.RoleId);
             if (role == null || !role.IsActive)
             {
-                throw new AppException(AppResponseCode.NOT_FOUND, "Vai trò không tồn tại");
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Vai trò không tồn tại");
             }
             user.RoleId = request.RoleId;
             await _userRepository.UpdateAsync(user);
