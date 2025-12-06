@@ -42,7 +42,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                     (u.FirstName + " " + u.LastName).ToLower().Contains(keyword));
             }
 
-            return await query.ToListAsync();
+            return await query.Take(5).ToListAsync();
         }
 
     }

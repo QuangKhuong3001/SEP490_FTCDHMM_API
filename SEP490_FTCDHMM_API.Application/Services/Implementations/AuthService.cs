@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.AuthDTOs;
 using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
@@ -54,7 +55,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<(bool Success, IEnumerable<string> Errors)> RegisterAsync(RegisterRequest dto)
         {
             var age = AgeCalculator.Calculate(dto.DateOfBirth);
-            if (age <= AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
+            if (age < AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
                 throw new AppException(AppResponseCode.INVALID_ACTION, $"Tuổi phải nằm trong khoảng {AuthConstants.MIN_REGISTER_AGE} đến {AuthConstants.MAX_REGISTER_AGE} tuổi");
 
             var existing = await _userManager.FindByEmailAsync(dto.Email);
@@ -64,11 +65,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);
 
             var userName = UsernameHelper.ExtractUserName(dto.Email);
-
-            while (await _userRepository.ExistsAsync(u => u.UserName == userName))
-            {
-                userName = UsernameHelper.IncrementUserName(userName);
-            }
 
             var user = new AppUser
             {
@@ -80,9 +76,35 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Gender = Gender.From(dto.Gender),
                 DateOfBirth = dto.DateOfBirth
             };
-            var createResult = await _userManager.CreateAsync(user, dto.Password);
-            if (!createResult.Succeeded)
-                return (false, createResult.Errors.Select(e => e.Description));
+
+            var createResult = default(IdentityResult);
+
+            while (true)
+            {
+                try
+                {
+                    user.UserName = UsernameHelper.IncrementUserName(userName);
+                    createResult = await _userManager.CreateAsync(user, dto.Password);
+
+                    if (createResult.Succeeded)
+                        break;
+
+                    if (createResult.Errors.Any(e => e.Code == "DuplicateUserName"))
+                    {
+                        continue;
+                    }
+
+                    return (false, createResult.Errors.Select(e => e.Description));
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException?.Message.Contains("IX_AspNetUsers_UserName") == true)
+                    {
+                        continue;
+                    }
+                    throw;
+                }
+            }
 
             string otpCode = Generate.GenerateRandomNumberic(OtpConstants.Length);
             string hashedCode = HashHelper.ComputeSha256Hash(otpCode);

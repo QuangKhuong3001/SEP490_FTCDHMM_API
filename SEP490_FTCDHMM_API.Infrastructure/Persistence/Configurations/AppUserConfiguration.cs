@@ -13,6 +13,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.HasKey(u => u.Id);
 
+            builder.HasIndex(u => u.UserName).IsUnique();
+
             builder.Property(r => r.Id)
                .ValueGeneratedOnAdd();
 

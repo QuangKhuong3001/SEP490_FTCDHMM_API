@@ -46,10 +46,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var (customers, totalCount) = await _userRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => string.IsNullOrEmpty(request.Keyword) ||
+                u => (string.IsNullOrEmpty(request.Keyword) ||
                       u.FirstName.Contains(request.Keyword!) ||
                       u.LastName.Contains(request.Keyword!) ||
-                      u.Email!.Contains(request.Keyword!)
+                      u.Email!.Contains(request.Keyword!))
                       && (!request.RoleId.HasValue || u.RoleId == request.RoleId.Value),
                 q => q.OrderBy(u => u.CreatedAtUtc),
                 include: i => i.Include(u => u.Role)
@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            if (user.LockoutEnd > DateTime.UtcNow)
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             user.LockoutEnd = DateTime.UtcNow.AddDays(dto.Day);

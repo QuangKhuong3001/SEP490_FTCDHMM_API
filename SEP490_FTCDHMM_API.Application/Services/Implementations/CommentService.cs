@@ -40,15 +40,25 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null)
-                throw new AppException(AppResponseCode.NOT_FOUND);
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             var userExist = await _userRepository.ExistsAsync(u => u.Id == userId);
-            if (!userExist)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-            var recipeExist = await _recipeRepository.ExistsAsync(r => r.Id == recipeId);
-            if (!recipeExist)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+            Comment? parentComment = null;
+            var parentCommentId = request.ParentCommentId;
+
+            if (parentCommentId.HasValue)
+            {
+                parentComment = await _commentRepository.GetByIdAsync(
+                    parentCommentId.Value,
+                    c => c.Include(x => x.ParentComment)
+                );
+
+                if (parentComment != null && parentComment.ParentCommentId.HasValue)
+                {
+                    parentComment = parentComment.ParentComment;
+                }
+            }
 
             var comment = new Comment
             {
@@ -56,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 RecipeId = recipeId,
                 CreatedAtUtc = DateTime.UtcNow,
                 Content = request.Content,
-                ParentCommentId = request.ParentCommentId
+                ParentComment = parentComment
             };
 
             if (request.MentionedUserIds.Any())
@@ -67,26 +77,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION,
                             "Người dùng được nhắc tới không tồn tại.");
 
+                    if (mentionedId == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION,
+                            "Người dùng không được nhắc tới bản thân.");
+
                     comment.Mentions.Add(new CommentMention
                     {
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
                 }
-            }
-
-            if (comment.ParentCommentId.HasValue)
-            {
-                var parentComment = await _commentRepository.GetByIdAsync(
-                    comment.ParentCommentId.Value,
-                    c => c.Include(x => x.ParentComment)
-                );
-
-                if (parentComment != null && parentComment.ParentCommentId.HasValue)
-                {
-                    comment.ParentCommentId = parentComment.ParentCommentId;
-                }
-
             }
 
             await _commentRepository.AddAsync(comment);
@@ -100,30 +100,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
+            await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
 
-            if (comment.ParentCommentId.HasValue)
+            if (parentComment != null)
             {
-                var parentComment = await _commentRepository.GetByIdAsync(
-                    comment.ParentCommentId.Value,
-                    c => c.Include(x => x.ParentComment)
-                );
-
-                if (parentComment != null)
-                {
-                    await _notificationRepository.AddNotification(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
-                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
-                }
-                else
-                {
-                    await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
-                }
-
+                await _notificationRepository.AddNotification(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
             }
-            else
-            {
-                await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
-            }
-
         }
 
         public async Task<List<CommentResponse>> GetAllByRecipeAsync(Guid recipeId)
@@ -154,7 +136,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 include: i => i.Include(c => c.Recipe)
                                 .Include(c => c.Replies));
             if (comment == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (mode == DeleteMode.Self && comment.UserId != userId)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -193,14 +175,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateAsync(Guid userId, Guid recipeId, Guid commentId, UpdateCommentRequest request)
         {
-            var comment = await _commentRepository.GetByIdAsync(commentId);
+            var comment = await _commentRepository.GetByIdAsync(commentId,
+                include: i => i.Include(c => c.Mentions));
             if (comment == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Bình luận không tồn tại");
+
+            if (comment.RecipeId != recipeId)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             if (comment.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
             comment.Content = request.Content;
+
+            comment.Mentions.Clear();
+
             if (request.MentionedUserIds.Any())
             {
                 foreach (var mentionedId in request.MentionedUserIds.Distinct())
@@ -208,6 +197,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     if (!await _userRepository.ExistsAsync(u => u.Id == mentionedId))
                         throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION,
                             "Người dùng được nhắc tới không tồn tại.");
+
+                    if (mentionedId == userId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION,
+                            "Người dùng không được nhắc tới bản thân.");
 
                     comment.Mentions.Add(new CommentMention
                     {
