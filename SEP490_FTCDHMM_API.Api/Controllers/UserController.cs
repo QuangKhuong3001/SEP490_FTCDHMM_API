@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.UserManagement_View)]
         [HttpGet()]
-        public async Task<IActionResult> GetUserList([FromQuery] UserFilterRequest dto)
+        public async Task<IActionResult> GetUserListForManagement([FromQuery] UserFilterRequest dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.UserDtos.UserFilterRequest>(dto);
 
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         [Authorize(Policy = PermissionPolicies.UserManagement_Update)]
         [HttpPut("{userId:guid}/unlock")]
-        public async Task<IActionResult> UnLockModerator(Guid userId)
+        public async Task<IActionResult> UnLockUser(Guid userId)
         {
             var result = await _userService.UnLockUserAccountAsync(userId);
             return Ok(result);

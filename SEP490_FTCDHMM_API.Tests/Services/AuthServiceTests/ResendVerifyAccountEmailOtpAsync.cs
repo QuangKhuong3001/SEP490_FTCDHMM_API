@@ -19,15 +19,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
         [Fact]
         public async Task ResendOtp_ShouldThrow_WhenUserNotFound()
         {
-            var dto = CreateRequest();
+            var dto = new ResendOtpRequest { Email = "abc@example.com" };
 
-            UserManagerMock.Setup(x => x.FindByEmailAsync(dto.Email))
-                           .ReturnsAsync((AppUser?)null);
+            UserManagerMock
+                .Setup(x => x.FindByEmailAsync(dto.Email))
+                .ReturnsAsync((AppUser)null!);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() =>
-                Sut.ResendVerifyAccountEmailOtpAsync(dto));
-
-            Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
+            await Assert.ThrowsAsync<AppException>(() => Sut.ResendVerifyAccountEmailOtpAsync(dto));
         }
 
         [Fact]

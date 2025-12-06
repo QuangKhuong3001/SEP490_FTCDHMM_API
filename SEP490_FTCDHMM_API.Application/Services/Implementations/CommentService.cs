@@ -180,7 +180,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             foreach (var reply in repliesCopy)
             {
-                var fullReply = await _commentRepository.GetByIdAsync(reply.Id, c => c.Replies);
+                var fullReply = await _commentRepository.GetByIdAsync(reply.Id,
+                    include: c => c.Include(u => u.Replies));
                 if (fullReply != null)
                 {
                     await DeleteRepliesRecursive(fullReply);

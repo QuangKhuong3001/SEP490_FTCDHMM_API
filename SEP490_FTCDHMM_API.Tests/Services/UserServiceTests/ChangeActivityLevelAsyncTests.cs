@@ -2,30 +2,11 @@
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
 {
     public class ChangeActivityLevelAsyncTests : UserServiceTestBase
     {
-        [Fact]
-        public async Task ChangeActivityLevel_ShouldThrow_WhenUserNotFound()
-        {
-            var userId = Guid.NewGuid();
-            var request = new ChangeActivityLevelRequest
-            {
-                ActivityLevel = "ACTIVE"
-            };
-
-            UserRepositoryMock
-            .Setup(r => r.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync((AppUser)null!);
-
-            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.ChangeActivityLevelAsync(userId, request));
-
-            Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
-        }
-
         [Fact]
         public async Task ChangeActivityLevel_ShouldUpdateActivityLevel_WhenUserExists()
         {

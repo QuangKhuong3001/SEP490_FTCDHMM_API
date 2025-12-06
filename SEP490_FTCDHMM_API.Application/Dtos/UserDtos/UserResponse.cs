@@ -13,5 +13,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.UserDtos
         public string? LockReason { get; set; }
         public DateTimeOffset? LockoutEnd { get; set; }
         public string UserName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
     }
 }

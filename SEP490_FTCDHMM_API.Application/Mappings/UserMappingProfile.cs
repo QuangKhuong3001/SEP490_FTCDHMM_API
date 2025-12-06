@@ -12,7 +12,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
             CreateMap<AppUser, UserResponse>().
                 ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.LockoutEnd.HasValue && src.LockoutEnd.Value > DateTime.UtcNow
-                    ? UserStatus.Locked : (src.EmailConfirmed ? UserStatus.Verified : UserStatus.Unverified)));
+                    ? UserStatus.Locked : (src.EmailConfirmed ? UserStatus.Verified : UserStatus.Unverified)))
+                .ForMember(
+                    dest => dest.Role,
+                    opt => opt.MapFrom(src => src.Role.Name)
+                );
 
             CreateMap<AppUser, ProfileResponse>()
                 .ForMember(dest => dest.Gender,
