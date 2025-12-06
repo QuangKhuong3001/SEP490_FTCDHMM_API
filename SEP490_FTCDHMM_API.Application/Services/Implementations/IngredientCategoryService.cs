@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientCategoryDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -29,7 +30,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task DeleteCategory(Guid id)
         {
-            var category = await _ingredientCategoryRepository.GetByIdAsync(id, ic => ic.Ingredients);
+            var category = await _ingredientCategoryRepository.GetByIdAsync(id,
+                include: i => i.Include(u => u.Ingredients));
+
             if (category == null || category.isDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 

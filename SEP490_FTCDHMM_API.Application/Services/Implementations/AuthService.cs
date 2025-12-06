@@ -181,6 +181,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
 
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
             if (user!.EmailConfirmed)
             {
                 throw new AppException(AppResponseCode.INVALID_ACTION);

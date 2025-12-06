@@ -68,7 +68,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<LockResponse> LockUserAccountAsync(Guid userId, LockRequest dto)
         {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId,
+                include: u => u.Include(u => u.Role));
+
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -100,7 +102,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<UnlockResponse> UnLockUserAccountAsync(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
+            var user = await _userRepository.GetByIdAsync(userId,
+                include: u => u.Include(u => u.Role));
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
@@ -161,11 +164,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (age < AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
                 throw new AppException(AppResponseCode.INVALID_ACTION, $"Tuổi phải nằm trong khoảng {AuthConstants.MIN_REGISTER_AGE} đến {AuthConstants.MAX_REGISTER_AGE} tuổi");
 
-            var user = await _userRepository.GetByIdAsync(userId, u => u.Role);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+            var user = await _userRepository.GetByIdAsync(userId,
+                include: u => u.Include(u => u.Role));
 
-            user.FirstName = dto.FirstName;
+            user!.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
             user.Gender = Gender.From(dto.Gender);
             user.DateOfBirth = dto.DateOfBirth;
@@ -191,6 +193,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             if (followerId == followeeId)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var followee = await _userRepository.GetByIdAsync(followeeId);
+            if (followee == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
             var exist = await _userFollowRepository.ExistsAsync(u => u.FollowerId == followerId && u.FolloweeId == followeeId);
 
@@ -228,7 +234,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 u => u.FolloweeId == userId,
                 include: i => i.Include(u => u.Follower).ThenInclude(u => u.Avatar));
 
-            var followerUsers = followers.Select(f => f.Follower).ToList();
+            var followerUsers = followers
+                .Select(f => f.Follower)
+                .OrderBy(f => f.FirstName)
+                .ThenBy(f => f.LastName)
+                .ToList();
 
             return _mapper.Map<IEnumerable<UserInteractionResponse>>(followerUsers);
         }
@@ -239,7 +249,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 u => u.FollowerId == userId,
                 include: i => i.Include(u => u.Followee).ThenInclude(u => u.Avatar));
 
-            var followingUsers = followings.Select(f => f.Followee).ToList();
+            var followingUsers = followings
+                .Select(f => f.Followee)
+                .OrderBy(f => f.FirstName)
+                .ThenBy(f => f.LastName)
+                .ToList();
 
             return _mapper.Map<IEnumerable<UserInteractionResponse>>(followingUsers);
         }
@@ -274,10 +288,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng không tồn tại");
             }
+
             var role = await _roleRepository.GetByIdAsync(request.RoleId);
             if (role == null || !role.IsActive)
             {
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Vai trò không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Vai trò không tồn tại");
             }
             user.RoleId = request.RoleId;
             await _userRepository.UpdateAsync(user);

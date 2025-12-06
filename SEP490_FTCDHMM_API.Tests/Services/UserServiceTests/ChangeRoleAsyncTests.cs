@@ -52,7 +52,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             var ex = await Assert.ThrowsAsync<AppException>(() =>
                 Sut.ChangeRoleAsync(userId, dto));
 
-            Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
+            Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             var ex = await Assert.ThrowsAsync<AppException>(() =>
                 Sut.ChangeRoleAsync(userId, dto));
 
-            Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
+            Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
         }
 
         [Fact]

@@ -15,17 +15,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes)
-        {
-            IQueryable<T> query = _dbContext.Set<T>();
-
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-
-            return await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
-        }
         public async Task<T?> GetByIdAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             IQueryable<T> query = _dbContext.Set<T>();

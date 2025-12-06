@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -61,7 +62,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task DeleteLabel(Guid labelId)
         {
-            var label = await _labelRepository.GetByIdAsync(labelId, l => l.Recipes);
+            var label = await _labelRepository.GetByIdAsync(labelId,
+                include: l => l.Include(u => u.Recipes));
             if (label == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 

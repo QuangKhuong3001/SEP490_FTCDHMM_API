@@ -4,7 +4,6 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
 {
     public interface IRepository<T> where T : class
     {
-        Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes);
         Task<T?> GetByIdAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null);
         Task<IList<T>> GetAllAsync(
             Expression<Func<T, bool>>? predicate = null,

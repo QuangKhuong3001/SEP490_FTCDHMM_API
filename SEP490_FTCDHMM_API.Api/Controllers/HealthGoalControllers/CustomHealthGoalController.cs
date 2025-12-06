@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.CustomHealthGoalDtos;
-using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
 namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers

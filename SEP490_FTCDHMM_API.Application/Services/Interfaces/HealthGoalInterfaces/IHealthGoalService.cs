@@ -1,0 +1,16 @@
+﻿using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
+
+namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces
+{
+    public interface IHealthGoalService
+    {
+        Task CreateAsync(CreateHealthGoalRequest request);
+        Task UpdateAsync(Guid id, UpdateHealthGoalRequest request);
+        Task<IEnumerable<HealthGoalResponse>> GetAllAsync();
+        Task<HealthGoalResponse> GetByIdAsync(Guid id);
+        Task DeleteAsync(Guid id);
+        Task<IEnumerable<UserHealthGoalResponse>> GetListGoalAsync(Guid userId);
+
+    }
+}

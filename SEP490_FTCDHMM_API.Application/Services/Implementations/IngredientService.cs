@@ -246,8 +246,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
             {
-                var ingredient = await _ingredientRepository.GetByIdAsync(
-                ingredientId, i => i.IngredientNutrients, i => i.Categories);
+                var ingredient = await _ingredientRepository.GetByIdAsync(ingredientId,
+                    include: i => i.Include(u => u.IngredientNutrients)
+                                    .Include(u => u.Categories));
 
                 if (ingredient == null)
                     throw new AppException(AppResponseCode.NOT_FOUND);
