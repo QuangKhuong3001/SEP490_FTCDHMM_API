@@ -164,6 +164,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateProfileAsync(Guid userId, UpdateProfileRequest dto)
         {
+            // Validate DateOfBirth is provided and valid
+            if (dto.DateOfBirth == default || dto.DateOfBirth == DateTime.MinValue)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Vui lòng chọn ngày sinh.");
+
             var age = AgeCalculator.Calculate(dto.DateOfBirth);
             if (age < AuthConstants.MIN_REGISTER_AGE || age > AuthConstants.MAX_REGISTER_AGE)
                 throw new AppException(AppResponseCode.INVALID_ACTION, $"Tuổi phải nằm trong khoảng {AuthConstants.MIN_REGISTER_AGE} đến {AuthConstants.MAX_REGISTER_AGE} tuổi");
