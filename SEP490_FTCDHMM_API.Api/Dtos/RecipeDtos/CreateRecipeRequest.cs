@@ -24,6 +24,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         [Range(1, int.MaxValue, ErrorMessage = "Khẩu phần ăn tối thiểu là 1")]
         public required int Ration { get; set; }
 
+        [MinLength(1, ErrorMessage = "Vui lòng chọn ít nhất một nhãn")]
         [Required(ErrorMessage = "Vui lòng chọn ít nhất một nhãn")]
         public required List<Guid> LabelIds { get; set; }
 
