@@ -237,7 +237,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             bool isUsedInRecipe = ingredient.RecipeIngredients.Any();
 
             if (isUsedInRecipe)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION, $"Không thể xóa nguyên liệu '{ingredient.Name}' vì nó đang được sử dụng trong một hoặc nhiều công thức.");
 
             await _ingredientRepository.DeleteAsync(ingredient);
         }
