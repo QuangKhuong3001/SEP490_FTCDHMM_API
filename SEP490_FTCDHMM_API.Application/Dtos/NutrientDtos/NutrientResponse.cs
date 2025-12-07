@@ -4,8 +4,6 @@
     {
         public string VietnameseName { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
-        public decimal? MinValue { get; set; }
-        public decimal? MaxValue { get; set; }
-        public decimal MedianValue { get; set; }
+        public decimal Value { get; set; }
     }
 }

@@ -6,9 +6,6 @@
         public Ingredient Ingredient { get; set; } = null!;
         public Guid NutrientId { get; set; }
         public Nutrient Nutrient { get; set; } = null!;
-
-        public decimal? MinValue { get; set; }
-        public decimal? MaxValue { get; set; }
-        public decimal MedianValue { get; set; }
+        public decimal Value { get; set; }
     }
 }

@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.CommentDtos
     public class CreateCommentRequest
     {
         [Required(ErrorMessage = "Bình luận không được để trống")]
-        [StringLength(2048, MinimumLength = 1, ErrorMessage = "Nội dung không được để trống và không vượt quá 2048 ký tự")]
+        [StringLength(1024, MinimumLength = 1, ErrorMessage = "Nội dung không được để trống và không vượt quá 1024 ký tự")]
         public string Content { get; set; } = string.Empty;
 
         public Guid? ParentCommentId { get; set; }

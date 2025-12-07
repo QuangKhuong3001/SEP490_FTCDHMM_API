@@ -4,17 +4,11 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.NutrientDtos
 {
     public class NutrientRequest
     {
-        [Required(ErrorMessage = "Missing NutrientId")]
+        [Required(ErrorMessage = "Nutrient không được để trống")]
         public Guid NutrientId { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Min must be greater than 0")]
-        public decimal? Min { get; set; }
-
-        [Range(0, double.MaxValue, ErrorMessage = "Max must be greater than 0")]
-        public decimal? Max { get; set; }
-
         [Required(ErrorMessage = "Missing Median.")]
-        [Range(0, double.MaxValue, ErrorMessage = "Median must be greater than 0")]
+        [Range(0, 9999999.999, ErrorMessage = "Giá trị phải từ 0 đến 9999999.999")]
         public decimal Median { get; set; }
     }
 }

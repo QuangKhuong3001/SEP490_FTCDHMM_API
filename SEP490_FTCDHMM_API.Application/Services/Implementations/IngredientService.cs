@@ -5,7 +5,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.Nutrient;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.USDA;
-using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -67,12 +66,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var missingRequired = requiredNutrientIds.Except(nutrientIds).ToList();
             if (missingRequired.Any())
                 throw new AppException(AppResponseCode.MISSING_REQUIRED_NUTRIENTS);
-        }
-
-        private static void ValidateValueInput(NutrientRequest n)
-        {
-            if ((n.Min > n.Max) || (n.Min > n.Median) || (n.Median > n.Max))
-                throw new AppException(AppResponseCode.INVALID_ACTION);
         }
 
         public async Task<PagedResult<IngredientResponse>> GetList(IngredientFilterRequest dto)
@@ -174,11 +167,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (!await _ingredientCategoryRepository.IdsExistAsync(dto.IngredientCategoryIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            foreach (var n in dto.Nutrients)
-            {
-                IngredientService.ValidateValueInput(n);
-            }
-
             var nutrientIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
             if (!await _nutrientRepository.IdsExistAsync(nutrientIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -207,9 +195,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 {
                     IngredientId = ingredient.Id,
                     NutrientId = n.NutrientId,
-                    MinValue = n.Min,
-                    MaxValue = n.Max,
-                    MedianValue = n.Median
+                    Value = n.Value
                 })
                 .ToList();
 
@@ -217,7 +203,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 dto.Nutrients.Select(n => new NutrientValueInput
                 {
                     NutrientId = n.NutrientId,
-                    Median = n.Median
+                    Median = n.Value
                 })
             );
 
@@ -237,7 +223,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             bool isUsedInRecipe = ingredient.RecipeIngredients.Any();
 
             if (isUsedInRecipe)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION,
+                    $"Không thể xóa nguyên liệu '{ingredient.Name}' vì nó đang được sử dụng trong một hoặc nhiều công thức.");
 
             await _ingredientRepository.DeleteAsync(ingredient);
         }
@@ -258,11 +245,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     throw new AppException(AppResponseCode.NOT_FOUND);
 
                 await HasMacroNutrients(nutrientIds);
-
-                foreach (var n in dto.Nutrients)
-                {
-                    IngredientService.ValidateValueInput(n);
-                }
 
                 ingredient.LastUpdatedUtc = DateTime.UtcNow;
 
@@ -310,9 +292,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     var existingEntity = existing.FirstOrDefault(x => x.NutrientId == nutrientDto.NutrientId);
                     if (existingEntity != null)
                     {
-                        existingEntity.MinValue = nutrientDto.Min;
-                        existingEntity.MaxValue = nutrientDto.Max;
-                        existingEntity.MedianValue = nutrientDto.Median;
+                        existingEntity.Value = nutrientDto.Value;
                     }
                     else
                     {
@@ -320,9 +300,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         {
                             IngredientId = ingredient.Id,
                             NutrientId = nutrientDto.NutrientId,
-                            MinValue = nutrientDto.Min,
-                            MaxValue = nutrientDto.Max,
-                            MedianValue = nutrientDto.Median
+                            Value = nutrientDto.Value
                         });
                     }
                 }
@@ -331,7 +309,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     dto.Nutrients.Select(n => new NutrientValueInput
                     {
                         NutrientId = n.NutrientId,
-                        Median = n.Median
+                        Median = n.Value
                     })
                 );
 
@@ -495,9 +473,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     Ingredient = ingredient,
                     NutrientId = sys.Id,
                     Nutrient = sys,
-                    MedianValue = usda.Amount ?? 0m,
-                    MinValue = usda.Amount,
-                    MaxValue = usda.Amount
+                    Value = usda.Amount ?? 0m,
                 });
             }
 

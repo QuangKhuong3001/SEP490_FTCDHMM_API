@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos.CookingStep
     public class CookingStepRequest
     {
         [Required(ErrorMessage = "Vui lòng nhập bước hướng dẫn")]
-        [StringLength(1000, MinimumLength = 1, ErrorMessage = "Hướng dẫn bước phải từ 1-1000 ký tự")]
+        [StringLength(2000, MinimumLength = 1, ErrorMessage = "Hướng dẫn bước phải từ 1-2000 ký tự")]
         public required string Instruction { get; set; }
 
         public List<CookingStepImageRequest> Images { get; set; } = new();

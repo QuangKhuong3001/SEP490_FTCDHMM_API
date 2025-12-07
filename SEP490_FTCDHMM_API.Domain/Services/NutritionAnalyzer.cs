@@ -17,7 +17,7 @@ namespace SEP490_FTCDHMM_API.Domain.Services
                 foreach (var inut in ri.Ingredient.IngredientNutrients)
                 {
                     var nutrientName = inut.Nutrient.Name;
-                    var addValue = inut.MedianValue * qtyFactor;
+                    var addValue = inut.Value * qtyFactor;
 
                     if (addValue == 0) continue;
 

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
 namespace SEP490_FTCDHMM_API.Api.Authorization
 {
@@ -9,11 +8,11 @@ namespace SEP490_FTCDHMM_API.Api.Authorization
             AuthorizationHandlerContext context,
             ModulePermissionRequirement requirement)
         {
-            var permissionsClaim = context.User.FindFirst("Permissions")?.Value;
+            var permissionClaims = context.User.FindAll("Permissions");
 
-            if (!string.IsNullOrEmpty(permissionsClaim))
+            if (permissionClaims != null && permissionClaims.Any())
             {
-                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsClaim);
+                var permissions = permissionClaims.Select(c => c.Value).ToList();
 
                 if (permissions != null &&
                     permissions.Contains(requirement.ToString()))

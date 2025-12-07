@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
         public IFormFile? Avatar { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh.")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [StringLength(256, ErrorMessage = "Địa chỉ không được vượt quá 256 ký tự.")]
         public string? Address { get; set; }
