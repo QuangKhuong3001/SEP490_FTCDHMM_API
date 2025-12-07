@@ -69,6 +69,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return await _context.Recipes
                 .Where(r => r.Status == RecipeStatus.Posted &&
                             r.CreatedAtUtc >= oneYearAgo)
+                .Include(r => r.Author)
+                    .ThenInclude(a => a.Avatar)
+                .Include(r => r.Image)
                 .Include(r => r.RecipeIngredients)
                     .ThenInclude(r => r.Ingredient)
                 .Include(r => r.NutritionAggregates)

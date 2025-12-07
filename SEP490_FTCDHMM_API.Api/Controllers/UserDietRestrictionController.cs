@@ -24,7 +24,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost("ingredient")]
-        public async Task<IActionResult> CreateIngredientRestriction(CreateIngredientRestrictionRequest request)
+        public async Task<IActionResult> CreateIngredientRestriction([FromBody] CreateIngredientRestrictionRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -38,7 +38,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost("ingredient-category")]
-        public async Task<IActionResult> CreateIngredientCategoryRestriction(CreateIngredientCategoryRestrictionRequest request)
+        public async Task<IActionResult> CreateIngredientCategoryRestriction([FromBody] CreateIngredientCategoryRestrictionRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
