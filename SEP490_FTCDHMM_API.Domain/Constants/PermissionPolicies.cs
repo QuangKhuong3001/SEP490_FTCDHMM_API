@@ -40,6 +40,12 @@
         public const string Report_View = "Báo cáo:Xem";
         public const string Report_Approve = "Báo cáo:Xác nhận";
         public const string Report_Reject = "Báo cáo:Từ chối";
+
+        public const string Role_Create = "Vai trò:Tạo";
+        public const string Role_View = "Vai trò:Xem";
+        public const string Role_Delete = "Vai trò:Xóa";
+        public const string Role_Update = "Vai trò:Cập nhật";
+
     }
 
 }

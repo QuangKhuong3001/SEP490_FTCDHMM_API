@@ -124,12 +124,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Email = user.Email!,
             };
         }
-        public async Task<ProfileResponse> GetProfileAsync(string? username, Guid? currentUserId = null)
+
+        public async Task<ProfileResponse> GetMyProfileAsync(Guid userId)
         {
             var user = await _userRepository.FirstOrDefaultAsync(
                 orderByDescendingKeySelector: u => u.UserName,
-                predicate: u => u.UserName == username,
+                predicate: u => u.Id == userId,
                 include: i => i.Include(u => u.Role)
+                                .Include(u => u.Followers)
+                                .Include(u => u.Following)
                                 .Include(u => u.Avatar));
 
             if (user == null)
@@ -137,10 +140,34 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var profile = _mapper.Map<ProfileResponse>(user);
 
-            var followersCount = await _userFollowRepository.CountAsync(f => f.FolloweeId == user.Id);
+            var followersCount = user.Followers.Count(f => f.FolloweeId == user.Id);
             profile.FollowersCount = followersCount;
 
-            var followingCount = await _userFollowRepository.CountAsync(f => f.FollowerId == user.Id);
+            var followingCount = user.Following.Count(f => f.FollowerId == user.Id);
+            profile.FollowingCount = followingCount;
+
+            return profile;
+
+        }
+        public async Task<ProfileResponse> GetProfileAsync(string? username, Guid? currentUserId = null)
+        {
+            var user = await _userRepository.FirstOrDefaultAsync(
+                orderByDescendingKeySelector: u => u.UserName,
+                predicate: u => u.UserName == username,
+                include: i => i.Include(u => u.Role)
+                                .Include(u => u.Followers)
+                                .Include(u => u.Following)
+                                .Include(u => u.Avatar));
+
+            if (user == null)
+                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+            var profile = _mapper.Map<ProfileResponse>(user);
+
+            var followersCount = user.Followers.Count(f => f.FolloweeId == user.Id);
+            profile.FollowersCount = followersCount;
+
+            var followingCount = user.Following.Count(f => f.FollowerId == user.Id);
             profile.FollowingCount = followingCount;
 
             if (currentUserId.HasValue && currentUserId.Value != user.Id)
@@ -294,6 +321,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 throw new AppException(AppResponseCode.NOT_FOUND, "Vai trò không tồn tại");
             }
+
+            if (role.Name == RoleConstants.Admin)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
+
             user.RoleId = request.RoleId;
             await _userRepository.UpdateAsync(user);
         }

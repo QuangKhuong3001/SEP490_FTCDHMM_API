@@ -59,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var profile = await _userService.GetProfileAsync(null, userId);
+            var profile = await _userService.GetMyProfileAsync(userId);
             return Ok(profile);
         }
 
@@ -148,7 +148,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = RoleConstants.Admin)]
+        [Authorize(Policy = PermissionPolicies.Role_Update)]
         [HttpPost("{userId:guid}/roles")]
         public async Task<IActionResult> AssignRole(Guid userId, ChangeRoleRequest request)
         {

@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task<PagedResult<UserResponse>> GetUserListAsync(UserFilterRequest pagination);
         Task<LockResponse> LockUserAccountAsync(Guid userId, LockRequest dto);
         Task<UnlockResponse> UnLockUserAccountAsync(Guid userId);
+        Task<ProfileResponse> GetMyProfileAsync(Guid userId);
         Task<ProfileResponse> GetProfileAsync(string? username, Guid? currentUserId = null);
         Task FollowUserAsync(Guid followerId, Guid followeeId);
         Task UnfollowUserAsync(Guid followerId, Guid followeeId);

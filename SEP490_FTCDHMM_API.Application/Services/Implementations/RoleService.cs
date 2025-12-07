@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RoleDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
@@ -120,6 +121,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (role.IsActive == false)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
+            if (role.Name == RoleConstants.Admin)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
+
             var existingUserInRole = await _userRepository.ExistsAsync(x => x.RoleId == roleId);
             if (existingUserInRole)
             {
@@ -132,6 +136,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateRolePermissions(Guid roleId, RolePermissionSettingRequest dto)
         {
+            var role = await _roleRepository.GetByIdAsync(roleId);
+
+            if (role == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            if (role.Name == RoleConstants.Admin)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
+
             var rolePermissions = await _rolePermissionRepository
                 .GetAllAsync(rp => rp.RoleId == roleId);
 

@@ -1,10 +1,14 @@
 ﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
+using SEP490_FTCDHMM_API.Infrastructure.Data;
 using SEP490_FTCDHMM_API.Infrastructure.Hangfire;
 using SEP490_FTCDHMM_API.Infrastructure.Hubs;
 using SEP490_FTCDHMM_API.Infrastructure.Persistence.SeedData;
 using SEP490_FTCDHMM_API.Infrastructure.Security;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -83,10 +87,15 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var config = services.GetRequiredService<IConfiguration>();
 
+    var dbContext = services.GetRequiredService<AppDbContext>();
+
+    dbContext.Database.Migrate();
+
+    var config = services.GetRequiredService<IConfiguration>();
     await DataSeeder.SeedAdminAsync(services, config);
 }
+
 
 app.UseSwagger();
 app.UseSwaggerUI();

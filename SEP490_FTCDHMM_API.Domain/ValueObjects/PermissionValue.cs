@@ -41,6 +41,13 @@
         public static readonly PermissionValue Report_View = new("Báo cáo", "Xem");
         public static readonly PermissionValue Report_Approve = new("Báo cáo", "Xác nhận");
         public static readonly PermissionValue Report_Reject = new("Báo cáo", "Từ chối");
+
+        public static readonly PermissionValue Role_Create = new("Vai trò", "Tạo");
+        public static readonly PermissionValue Role_Delete = new("Vai trò", "Xóa");
+        public static readonly PermissionValue Role_Update = new("Vai trò", "Cập nhật");
+        public static readonly PermissionValue Role_View = new("Vai trò", "Xem");
+
+
         public static IEnumerable<PermissionValue> All => new[]
         {
             User_Create,
@@ -72,7 +79,11 @@
             Report_View,
             Report_Approve,
             Report_Reject,
-            Ingredient_ManagerView
+            Ingredient_ManagerView,
+            Role_Create,
+            Role_Delete,
+            Role_Update,
+            Role_View
         };
     }
 }

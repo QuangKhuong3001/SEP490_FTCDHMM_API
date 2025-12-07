@@ -11,7 +11,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = RoleConstants.Admin)]
     public class RoleController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -23,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _roleService = roleService;
         }
 
+        [Authorize(Policy = PermissionPolicies.Role_Create)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateRole dto)
         {
@@ -33,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = PermissionPolicies.Role_View)]
         public async Task<IActionResult> Get([FromQuery] PaginationParams dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
@@ -42,6 +43,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("{roleId:guid}/active")]
+        [Authorize(Policy = PermissionPolicies.Role_Update)]
         public async Task<IActionResult> Active(Guid roleId)
         {
             await _roleService.ActiveRole(roleId);
@@ -49,6 +51,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("{roleId:guid}/deactive")]
+        [Authorize(Policy = PermissionPolicies.Role_Update)]
         public async Task<IActionResult> Deactive(Guid roleId)
         {
             await _roleService.DeactiveRole(roleId);
@@ -56,6 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPut("{roleId:guid}/permissions")]
+        [Authorize(Policy = PermissionPolicies.Role_Update)]
         public async Task<IActionResult> UpdateRolePermissions(Guid roleId, RolePermissionSettingDto dto)
         {
             var appDto = _mapper.Map<ApplicationDtos.RoleDtos.RolePermissionSettingRequest>(dto);
@@ -65,6 +69,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpGet("{roleId:guid}/permissions")]
+        [Authorize(Policy = PermissionPolicies.Role_View)]
         public async Task<IActionResult> GetRolePermissions(Guid roleId)
         {
             var result = await _roleService.GetRolePermissions(roleId);
