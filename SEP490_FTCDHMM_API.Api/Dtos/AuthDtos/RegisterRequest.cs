@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
 {
@@ -21,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
+        [ModelBinder(BinderType = typeof(SafeNullableDateTimeBinder))]
         public DateTime? DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn giới tính")]
