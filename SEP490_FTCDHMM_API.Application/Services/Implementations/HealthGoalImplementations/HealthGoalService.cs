@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
@@ -43,14 +44,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             var totalPct = 0m;
             foreach (var nutrient in request.Targets)
             {
-                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue) || nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                if (nutrient.MaxValue <= nutrient.MinValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-
-                if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+                IsValidInput(nutrient);
                 totalPct += nutrient.MaxEnergyPct ?? 0;
             }
 
@@ -101,14 +95,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             var totalPct = 0m;
             foreach (var nutrient in request.Targets)
             {
-                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue) || nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
-
-                if (nutrient.MaxValue <= nutrient.MinValue)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
-
-                if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
-                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+                IsValidInput(nutrient);
                 totalPct += nutrient.MaxEnergyPct ?? 0;
             }
 
@@ -173,9 +160,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
         public async Task DeleteAsync(Guid id)
         {
-            var goal = await _healthGoalRepository.GetByIdAsync(id);
+            var goal = await _healthGoalRepository.GetByIdAsync(id,
+                include: q => q.Include(g => g.Targets));
+
             if (goal == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
+
+            goal.Targets.Clear();
 
             await _healthGoalRepository.DeleteAsync(goal);
         }
@@ -194,6 +185,28 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             result.AddRange(defaults);
 
             return result.ToList();
+        }
+
+        private bool IsValidInput(NutrientTargetRequest nutrient)
+        {
+            if (nutrient.TargetType == NutrientTargetType.Absolute.Value)
+            {
+                if (!(nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue))
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
+
+                if (nutrient.MaxValue <= nutrient.MinValue)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+            }
+            else if (nutrient.TargetType == NutrientTargetType.EnergyPercent.Value)
+            {
+                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue))
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
+
+                if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
+            }
+
+            return false;
         }
     }
 }
