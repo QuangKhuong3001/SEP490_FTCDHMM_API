@@ -30,13 +30,15 @@ builder.Services.AddSignalR(options =>
     options.HandshakeTimeout = TimeSpan.FromSeconds(10);
 });
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new SafeNullableGuidConverter());
-        options.JsonSerializerOptions.Converters.Add(new EmptyStringToNullDateTimeConverter());
-        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
-    });
+builder.Services.AddControllers(options =>
+{
+    options.ModelBinderProviders.Insert(0, new SafeNullableDateTimeBinderProvider());
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new SafeNullableGuidConverter());
+});
+
 
 builder.Services.AddAuthorization();
 

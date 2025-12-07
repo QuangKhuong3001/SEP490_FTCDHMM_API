@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
 {
@@ -18,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.UserDtos
         public IFormFile? Avatar { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh.")]
+        [ModelBinder(BinderType = typeof(SafeNullableDateTimeBinder))]
         public DateTime? DateOfBirth { get; set; }
 
         [StringLength(256, ErrorMessage = "Địa chỉ không được vượt quá 256 ký tự.")]
