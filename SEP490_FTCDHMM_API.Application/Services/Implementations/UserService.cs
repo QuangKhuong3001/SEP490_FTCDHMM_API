@@ -298,11 +298,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task<IEnumerable<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword)
+        public async Task<List<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword)
         {
             var users = await _userRepository.GetTaggableUsersAsync(userId, keyword);
 
-            var result = _mapper.Map<IEnumerable<MentionUserResponse>>(users);
+            var result = _mapper.Map<List<MentionUserResponse>>(users);
             return result;
         }
     }

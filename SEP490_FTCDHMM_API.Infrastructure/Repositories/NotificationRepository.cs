@@ -17,6 +17,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
         public async Task AddNotification(Guid? senderId, Guid receiverId, NotificationType type, string? message, Guid? targetId)
         {
+            if (senderId.HasValue && senderId.Value == receiverId)
+                return;
+
             var notification = new Notification
             {
                 SenderId = senderId,
@@ -37,6 +40,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
             foreach (var receiverId in receiverIds)
             {
+                if (senderId.HasValue && senderId.Value == receiverId)
+                    continue;
+
                 var notification = new Notification
                 {
                     SenderId = senderId,
@@ -49,8 +55,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 notifications.Add(notification);
             }
 
-            await _dbContext.Notifications.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
+            if (notifications.Any())
+            {
+                await _dbContext.Notifications.AddRangeAsync(notifications);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task AddNotificationToAll(Guid? senderId, NotificationType type, string? message, Guid? targetId)

@@ -19,7 +19,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
             CreateMap<CommentMention, MentionedUserResponse>()
                     .ForMember(dest => dest.MentionedUserId, opt => opt.MapFrom(src => src.MentionedUserId))
                     .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.MentionedUser.FirstName))
-                    .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.MentionedUser.LastName));
+                    .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.MentionedUser.LastName))
+                    .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom<UniversalImageUrlResolver<CommentMention, MentionedUserResponse>>());
         }
     }
 }

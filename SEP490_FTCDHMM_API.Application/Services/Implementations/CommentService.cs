@@ -100,11 +100,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
-            await _notificationRepository.AddNotification(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
 
             if (parentComment != null)
             {
-                await _notificationRepository.AddNotification(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
             }
         }
 
@@ -215,6 +215,48 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var response = _mapper.Map<CommentResponse>(updated);
             await _notifier.SendCommentUpdatedAsync(recipeId, response);
+        }
+
+        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid receiverId, NotificationType type, string? message, Guid targetId)
+        {
+            if (senderId == receiverId)
+                return;
+
+            var notification = new Notification
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Type = type,
+                Message = message,
+                TargetId = targetId,
+                CreatedAtUtc = DateTime.UtcNow,
+            };
+
+            var saved = await _notificationRepository.AddAsync(notification);
+
+            var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
+
+            var notificationResponse = new
+            {
+                Id = saved.Id,
+                Type = new { name = type.Name },
+                Message = message,
+                TargetId = targetId,
+                IsRead = false,
+                CreatedAtUtc = saved.CreatedAtUtc,
+                Senders = sender != null ? new[]
+                {
+                    new
+                    {
+                        Id = sender.Id,
+                        FirstName = sender.FirstName,
+                        LastName = sender.LastName,
+                        AvatarUrl = sender.Avatar?.Key
+                    }
+                } : Array.Empty<object>()
+            };
+
+            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
     }
 }

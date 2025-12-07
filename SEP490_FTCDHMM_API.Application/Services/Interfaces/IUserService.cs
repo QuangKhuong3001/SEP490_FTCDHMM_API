@@ -19,6 +19,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
         Task ChangeActivityLevelAsync(Guid userId, ChangeActivityLevelRequest request);
         Task<ActivityLevel> GetActivityLevelAsync(Guid userId);
         Task ChangeRoleAsync(Guid userId, ChangeRoleRequest request);
-        Task<IEnumerable<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword);
+        Task<List<MentionUserResponse>> GetMentionableUsersAsync(Guid userId, string? keyword);
     }
 }

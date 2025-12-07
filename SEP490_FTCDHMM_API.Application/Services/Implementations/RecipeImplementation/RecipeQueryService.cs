@@ -118,7 +118,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
         }
 
-        public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid userId, Guid recipeId)
+        public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId)
         {
             IQueryable<Recipe> include(IQueryable<Recipe> q) =>
                 q.Include(r => r.Author).ThenInclude(u => u.Avatar)
@@ -132,16 +132,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await ValidateAccessRecipeAsync(userId, recipe);
 
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
-            await _recipeRepository.UpdateAsync(recipe!);
-
-            var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
-
             var result = _mapper.Map<RecipeDetailsResponse>(recipe);
-            result.IsSaved = isSaved;
+
+            if (userId.HasValue)
+            {
+                var user = await _userRepository.GetByIdAsync(userId.Value);
+                if (user == null)
+                    throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+
+                await _recipeRepository.UpdateAsync(recipe!);
+
+                var isSaved = await _userSaveRecipeRepository.ExistsAsync(s => s.UserId == userId && s.RecipeId == recipeId);
+
+                result.IsSaved = isSaved;
+            }
 
             return result;
         }
@@ -195,7 +199,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 include: include
             );
 
-            var result = _mapper.Map<IReadOnlyList<MyRecipeResponse>>(items);
+            var result = _mapper.Map<List<MyRecipeResponse>>(items);
 
             return new PagedResult<MyRecipeResponse>
             {
@@ -227,7 +231,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 include: include
             );
 
-            var result = _mapper.Map<IReadOnlyList<MyRecipeResponse>>(items);
+            var result = _mapper.Map<List<MyRecipeResponse>>(items);
 
             return new PagedResult<MyRecipeResponse>
             {
@@ -238,7 +242,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
         }
 
-        public async Task<RecipeRatingResponse> GetRecipeRatingAsync(Guid userId, Guid recipeId)
+        public async Task<RecipeRatingResponse> GetRecipeRatingAsync(Guid? userId, Guid recipeId)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
 
@@ -248,7 +252,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             return result;
         }
 
-        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid userId, Guid recipeId, RecipePaginationParams request)
+        public async Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid? userId, Guid recipeId, RecipePaginationParams request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(
                 id: recipeId,
@@ -377,7 +381,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
         }
 
-        private Task ValidateAccessRecipeAsync(Guid userId, Recipe? recipe)
+        private Task ValidateAccessRecipeAsync(Guid? userId, Recipe? recipe)
         {
             if (recipe == null || recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
