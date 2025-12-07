@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
             var followers = _dbContext.UserFollows
                 .Where(f => f.FolloweeId == userId)
-                .Include(f => f.Followee)
+                .Include(f => f.Follower)
                     .ThenInclude(f => f.Avatar)
                 .Select(f => f.Follower);
 
