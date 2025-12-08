@@ -380,7 +380,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
-                filter: f => f.Status == RecipeStatus.Pending && f.AuthorId == userId,
+                filter: f => (f.Status == RecipeStatus.Pending || f.Status == RecipeStatus.Locked) && f.AuthorId == userId,
                 pageNumber: request.PageNumber,
                 pageSize: request.PageSize,
                 orderBy: o => o.OrderByDescending(r => r.UpdatedAtUtc),

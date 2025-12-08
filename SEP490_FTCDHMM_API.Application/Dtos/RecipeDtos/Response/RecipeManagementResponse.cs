@@ -13,6 +13,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public decimal CookTime { get; set; }
         public required int Ration { get; set; }
         public string? ImageUrl { get; set; }
+        public required RecipeStatus Status { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public string Reason { get; set; } = string.Empty;
