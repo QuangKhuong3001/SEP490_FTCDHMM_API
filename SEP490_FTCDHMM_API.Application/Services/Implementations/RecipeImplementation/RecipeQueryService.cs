@@ -42,16 +42,33 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<PagedResult<RecipeResponse>> GetAllRecipesAsync(RecipeFilterRequest request)
         {
-            var inIngredientExist = await _ingredientRepository.IdsExistAsync(request.IncludeIngredientIds);
-            var exIngredientExist = await _ingredientRepository.IdsExistAsync(request.ExcludeIngredientIds);
-            var inLabelExist = await _labelRepository.IdsExistAsync(request.IncludeLabelIds);
-            var exLabelExist = await _labelRepository.IdsExistAsync(request.ExcludeLabelIds);
+            if (request.IncludeIngredientIds.Any())
+            {
+                var inIngredientExist = await _ingredientRepository.IdsExistAsync(request.IncludeIngredientIds);
+                if (!inIngredientExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu trong danh sách bao gồm không tồn tại trong hệ thống");
+            }
 
-            if (inIngredientExist && exIngredientExist)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu không tồn tại trong hệ thống");
+            if (request.ExcludeIngredientIds.Any())
+            {
+                var exIngredientExist = await _ingredientRepository.IdsExistAsync(request.ExcludeIngredientIds);
+                if (!exIngredientExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu trong danh sách loại trừ không tồn tại trong hệ thống");
+            }
 
-            if (inLabelExist && exLabelExist)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn không tồn tại trong hệ thống");
+            if (request.IncludeLabelIds.Any())
+            {
+                var inLabelExist = await _labelRepository.IdsExistAsync(request.IncludeLabelIds);
+                if (!inLabelExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn trong danh sách bao gồm không tồn tại trong hệ thống");
+            }
+
+            if (request.ExcludeLabelIds.Any())
+            {
+                var exLabelExist = await _labelRepository.IdsExistAsync(request.ExcludeLabelIds);
+                if (!exLabelExist)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn trong danh sách loại trừ không tồn tại trong hệ thống");
+            }
 
             var spec = new RecipeBasicFilterSpec
             {
