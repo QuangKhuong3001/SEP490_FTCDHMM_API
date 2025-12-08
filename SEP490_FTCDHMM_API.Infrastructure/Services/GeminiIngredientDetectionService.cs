@@ -69,7 +69,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 }
             };
 
-            var modelName = "gemini-2.5-pro";
+            var modelName = "gemini-2.5-flash";
             var apiEndpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{modelName}:generateContent?key={_apiKey}";
             try
             {
@@ -81,7 +81,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                return ParseGeminiResponse(json);
+                return ParseGeminiResponse(json, ingredients);
             }
             catch (Exception ex)
             {
@@ -90,7 +90,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
         }
 
-        private List<IngredientDetectionResult> ParseGeminiResponse(string json)
+        private List<IngredientDetectionResult> ParseGeminiResponse(string json, IEnumerable<Domain.Entities.Ingredient> ingredients)
         {
             try
             {
@@ -119,6 +119,21 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                 var parsed = JsonSerializer.Deserialize<List<IngredientDetectionResult>>(rawJsonText,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (parsed != null)
+                {
+                    // Match detected ingredients with database ingredients to get real IDs
+                    for (int i = 0; i < parsed.Count; i++)
+                    {
+                        if (string.IsNullOrEmpty(parsed[i].Id))
+                        {
+                            var matchedIngredient = ingredients.FirstOrDefault(
+                                ing => ing.Name.Equals(parsed[i].Ingredient, StringComparison.OrdinalIgnoreCase)
+                            );
+                            parsed[i].Id = matchedIngredient?.Id.ToString() ?? Guid.NewGuid().ToString();
+                        }
+                    }
+                }
 
                 return parsed ?? new List<IngredientDetectionResult>();
             }
