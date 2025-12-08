@@ -74,6 +74,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (user == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
+            if (user.Role.Name == RoleConstants.Admin)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
             if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 

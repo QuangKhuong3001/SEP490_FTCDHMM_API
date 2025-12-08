@@ -71,6 +71,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                             r.CreatedAtUtc >= oneYearAgo)
                 .Include(r => r.RecipeIngredients)
                     .ThenInclude(r => r.Ingredient)
+                .Include(r => r.Author)
+                    .ThenInclude(a => a.Avatar)
+                .Include(r => r.Image)
                 .Include(r => r.NutritionAggregates)
                     .ThenInclude(na => na.Nutrient)
                 .ToListAsync();
