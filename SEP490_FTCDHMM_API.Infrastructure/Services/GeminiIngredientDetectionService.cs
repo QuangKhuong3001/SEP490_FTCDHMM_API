@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.IngredientDetection;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services
@@ -69,7 +70,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 }
             };
 
-            var modelName = "gemini-2.5-pro";
+            var modelName = "gemini-2.5-flash";
             var apiEndpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{modelName}:generateContent?key={_apiKey}";
             try
             {
@@ -81,7 +82,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                return ParseGeminiResponse(json);
+                return ParseGeminiResponse(json, ingredients);
             }
             catch (Exception ex)
             {
@@ -90,7 +91,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
         }
 
-        private List<IngredientDetectionResult> ParseGeminiResponse(string json)
+        private List<IngredientDetectionResult> ParseGeminiResponse(string json, IList<Ingredient> ingredients)
         {
             try
             {
@@ -119,6 +120,20 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                 var parsed = JsonSerializer.Deserialize<List<IngredientDetectionResult>>(rawJsonText,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (parsed != null)
+                {
+                    for (int i = 0; i < parsed.Count; i++)
+                    {
+                        if (string.IsNullOrEmpty(parsed[i].Id))
+                        {
+                            var matchedIngredient = ingredients.FirstOrDefault(
+                                ing => ing.Name.Equals(parsed[i].Ingredient, StringComparison.OrdinalIgnoreCase)
+                            );
+                            parsed[i].Id = matchedIngredient?.Id.ToString() ?? Guid.NewGuid().ToString();
+                        }
+                    }
+                }
 
                 return parsed ?? new List<IngredientDetectionResult>();
             }

@@ -123,9 +123,9 @@ app.UseAuthorization();
 app.UseMiddleware<UserAccountStatusMiddleware>();
 
 
-app.MapHub<RecipeHub>("/hubs/recipe");
-app.MapHub<CommentHub>("/hubs/comments");
-app.MapHub<NotificationHub>("/hubs/notification");
+app.MapHub<RecipeHub>("/hubs/recipe").RequireCors(MyAllowSpecificOrigins);
+app.MapHub<CommentHub>("/hubs/comments").RequireCors(MyAllowSpecificOrigins);
+app.MapHub<NotificationHub>("/hubs/notification").RequireCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 
