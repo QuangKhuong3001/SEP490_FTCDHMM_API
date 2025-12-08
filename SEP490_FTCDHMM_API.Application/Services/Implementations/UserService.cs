@@ -83,6 +83,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var localLockoutEnd = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(dto.Day), TimeZoneInfo.Local);
             var placeholders = new Dictionary<string, string>
                     {
+                        { "UserName", $"{user.FirstName} {user.LastName}".Trim() },
                         { "LockoutEnd", localLockoutEnd.ToString() },
                         { "LockReason", dto.Reason },
                     };

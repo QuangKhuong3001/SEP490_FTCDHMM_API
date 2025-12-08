@@ -94,7 +94,11 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
 
             CreateMap<Recipe, RecipeParentResponse>();
 
-            CreateMap<Recipe, RecipeManagementResponse>();
+            CreateMap<Recipe, RecipeManagementResponse>()
+                .ForMember(
+                    dest => dest.ImageUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<Recipe, RecipeManagementResponse>>()
+                );
 
         }
     }
