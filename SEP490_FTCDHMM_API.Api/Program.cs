@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("http://localhost:3000", "https://sep-490-ftcdhmm-ui.vercel.app")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
+                .SetIsOriginAllowed(origin => true)
                 .AllowCredentials();
         });
 });
@@ -123,9 +124,9 @@ app.UseAuthorization();
 app.UseMiddleware<UserAccountStatusMiddleware>();
 
 
-app.MapHub<RecipeHub>("/hubs/recipe");
-app.MapHub<CommentHub>("/hubs/comments");
-app.MapHub<NotificationHub>("/hubs/notification");
+app.MapHub<RecipeHub>("/hubs/recipe").RequireCors(MyAllowSpecificOrigins);
+app.MapHub<CommentHub>("/hubs/comments").RequireCors(MyAllowSpecificOrigins);
+app.MapHub<NotificationHub>("/hubs/notification").RequireCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 
