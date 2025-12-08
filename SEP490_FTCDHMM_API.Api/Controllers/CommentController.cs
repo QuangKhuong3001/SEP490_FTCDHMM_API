@@ -28,7 +28,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("{recipeId:guid}")]
         public async Task<IActionResult> GetAll(Guid recipeId)
         {
-            var result = await _commentService.GetAllByRecipeAsync(recipeId);
+            var result = await _commentService.GetAllCommentByRecipeAsync(recipeId);
             return Ok(result);
         }
 
@@ -38,7 +38,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.CreateCommentRequest>(request);
 
-            await _commentService.CreateAsync(userId, recipeId, appRequest);
+            await _commentService.CreateCommentAsync(userId, recipeId, appRequest);
             return Ok();
         }
 
@@ -48,7 +48,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.CommentDtos.UpdateCommentRequest>(request);
 
-            await _commentService.UpdateAsync(userId, recipeId, commentId, appRequest);
+            await _commentService.UpdateCommentAsync(userId, recipeId, commentId, appRequest);
             return Ok();
         }
 
@@ -57,7 +57,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> DeleteOwn(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _commentService.DeleteAsync(userId, commentId, DeleteMode.Self);
+            await _commentService.DeleteCommentAsync(userId, commentId, DeleteMode.Self);
             return Ok();
         }
 
@@ -65,7 +65,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> DeleteByRecipeAuthor(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _commentService.DeleteAsync(userId, commentId, DeleteMode.RecipeAuthor);
+            await _commentService.DeleteCommentAsync(userId, commentId, DeleteMode.RecipeAuthor);
             return Ok();
         }
 
@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> DeleteWithPermission(Guid commentId)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _commentService.DeleteAsync(userId, commentId, DeleteMode.Permission);
+            await _commentService.DeleteCommentAsync(userId, commentId, DeleteMode.Permission);
             return Ok();
         }
 

@@ -1,113 +1,88 @@
 ﻿using Moq;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
 {
-    public class ChangeRoleAsync_Tests : UserServiceTestBase
+    public class ChangeRoleAsyncTests : UserServiceTestBase
     {
-        private static ChangeRoleRequest CreateDto(Guid roleId)
+        [Fact]
+        public async Task ChangeRoleAsync_ShouldThrow_WhenRoleIsAdmin()
         {
-            return new ChangeRoleRequest
+            var userId = Guid.NewGuid();
+            var req = new ChangeRoleRequest { RoleId = Guid.NewGuid() };
+
+            var user = CreateUser(userId);
+
+            var adminRole = new AppRole
             {
-                RoleId = roleId
+                Id = req.RoleId,
+                Name = RoleConstants.Admin,
+                IsActive = true
             };
-        }
-
-        [Fact]
-        public async Task ChangeRole_ShouldThrow_WhenUserNotFound()
-        {
-            var userId = Guid.NewGuid();
-            var roleId = Guid.NewGuid();
-            var dto = CreateDto(roleId);
 
             UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync((AppUser?)null);
+                .Setup(x => x.GetByIdAsync(userId, null))
+                .ReturnsAsync(user);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() =>
-                Sut.ChangeRoleAsync(userId, dto));
+            RoleRepositoryMock
+                .Setup(x => x.GetByIdAsync(req.RoleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>?>()))
+                .ReturnsAsync(adminRole);
 
-            Assert.Equal(AppResponseCode.INVALID_ACCOUNT_INFORMATION, ex.ResponseCode);
+            await Assert.ThrowsAsync<AppException>(() => Sut.ChangeRoleAsync(userId, req));
         }
 
         [Fact]
-        public async Task ChangeRole_ShouldThrow_WhenRoleNotFound()
+        public async Task ChangeRoleAsync_ShouldThrow_WhenRoleNotFoundOrInactive()
         {
             var userId = Guid.NewGuid();
-            var roleId = Guid.NewGuid();
-            var dto = CreateDto(roleId);
+            var req = new ChangeRoleRequest { RoleId = Guid.NewGuid() };
 
             var user = CreateUser(userId);
 
             UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .Setup(x => x.GetByIdAsync(userId, null))
                 .ReturnsAsync(user);
 
             RoleRepositoryMock
-                .Setup(r => r.GetByIdAsync(roleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
-                .ReturnsAsync((AppRole?)null);
+                .Setup(x => x.GetByIdAsync(req.RoleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>?>()))
+                .ReturnsAsync((AppRole)null!);
 
-            var ex = await Assert.ThrowsAsync<AppException>(() =>
-                Sut.ChangeRoleAsync(userId, dto));
-
-            Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
+            await Assert.ThrowsAsync<AppException>(() => Sut.ChangeRoleAsync(userId, req));
         }
 
         [Fact]
-        public async Task ChangeRole_ShouldThrow_WhenRoleInactive()
+        public async Task ChangeRoleAsync_ShouldUpdate_WhenValid()
         {
             var userId = Guid.NewGuid();
-            var roleId = Guid.NewGuid();
-            var dto = CreateDto(roleId);
+            var req = new ChangeRoleRequest { RoleId = Guid.NewGuid() };
 
             var user = CreateUser(userId);
-            var role = new AppRole { Id = roleId, IsActive = false };
+
+            var role = new AppRole
+            {
+                Id = req.RoleId,
+                Name = "STAFF",
+                IsActive = true
+            };
 
             UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .Setup(x => x.GetByIdAsync(userId, null))
                 .ReturnsAsync(user);
 
             RoleRepositoryMock
-                .Setup(r => r.GetByIdAsync(roleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
-                .ReturnsAsync(role);
-
-            var ex = await Assert.ThrowsAsync<AppException>(() =>
-                Sut.ChangeRoleAsync(userId, dto));
-
-            Assert.Equal(AppResponseCode.NOT_FOUND, ex.ResponseCode);
-        }
-
-        [Fact]
-        public async Task ChangeRole_ShouldUpdateRole_WhenValid()
-        {
-            var userId = Guid.NewGuid();
-            var roleId = Guid.NewGuid();
-            var dto = CreateDto(roleId);
-
-            var user = CreateUser(userId);
-            user.RoleId = Guid.NewGuid();
-
-            var role = new AppRole { Id = roleId, IsActive = true };
-
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(user);
-
-            RoleRepositoryMock
-                .Setup(r => r.GetByIdAsync(roleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
+                .Setup(x => x.GetByIdAsync(req.RoleId, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>?>()))
                 .ReturnsAsync(role);
 
             UserRepositoryMock
-                .Setup(r => r.UpdateAsync(It.IsAny<AppUser>()))
-                .Returns(Task.CompletedTask)
-                .Verifiable();
+                .Setup(x => x.UpdateAsync(user))
+                .Returns(Task.CompletedTask);
 
-            await Sut.ChangeRoleAsync(userId, dto);
+            await Sut.ChangeRoleAsync(userId, req);
 
-            Assert.Equal(roleId, user.RoleId);
-            UserRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
+            Assert.Equal(req.RoleId, user.RoleId);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.IngredientCategoryDtos.IngredientCategoryFilterRequest>(request);
 
-            var result = await _ingredientCategoryService.GetAllCategories(appRequest);
+            var result = await _ingredientCategoryService.GetAllIngredientCategoriesFilterAsync(appRequest);
             return Ok(result);
         }
 
@@ -35,7 +35,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.IngredientCategoryDtos.IngredientCategorySearchDropboxRequest>(request);
 
-            var result = await _ingredientCategoryService.GetAllCategories(appRequest);
+            var result = await _ingredientCategoryService.GetIngredientCategoriesAsync(appRequest);
             return Ok(result);
         }
 
@@ -45,7 +45,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.IngredientCategoryDtos.CreateIngredientCategoryRequest>(request);
 
-            await _ingredientCategoryService.CreateCategory(appRequest);
+            await _ingredientCategoryService.CreateIngredientCategoryAsync(appRequest);
             return Ok();
         }
 
@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _ingredientCategoryService.DeleteCategory(id);
+            await _ingredientCategoryService.DeleteIngredientCategoryAsync(id);
             return Ok();
         }
     }

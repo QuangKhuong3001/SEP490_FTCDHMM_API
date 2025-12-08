@@ -5,7 +5,7 @@ using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
 {
-    public class DeleteAsyncTests : CommentServiceTestBase
+    public class DeleteCommentAsyncTests : CommentServiceTestBase
     {
         [Fact]
         public async Task DeleteAsync_ShouldThrow_WhenCommentNotFound()
@@ -15,7 +15,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 .ReturnsAsync((Comment?)null);
 
             await Assert.ThrowsAsync<AppException>(() =>
-                Sut.DeleteAsync(Guid.NewGuid(), Guid.NewGuid(), DeleteMode.Self));
+                Sut.DeleteCommentAsync(Guid.NewGuid(), Guid.NewGuid(), DeleteMode.Self));
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 .ReturnsAsync(comment);
 
             await Assert.ThrowsAsync<AppException>(() =>
-                Sut.DeleteAsync(Guid.NewGuid(), comment.Id, DeleteMode.Self));
+                Sut.DeleteCommentAsync(Guid.NewGuid(), comment.Id, DeleteMode.Self));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 r.GetByIdAsync(comment.Id, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
-            await Sut.DeleteAsync(userId, comment.Id, DeleteMode.Self);
+            await Sut.DeleteCommentAsync(userId, comment.Id, DeleteMode.Self);
 
             CommentRepositoryMock.Verify(r => r.DeleteAsync(comment), Times.Once);
             NotifierMock.Verify(n => n.SendCommentDeletedAsync(comment.RecipeId, comment.Id), Times.Once);

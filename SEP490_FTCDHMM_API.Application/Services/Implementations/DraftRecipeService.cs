@@ -74,10 +74,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nhãn dán bị trùng.");
             }
 
-            var userExist = await _userRepository.ExistsAsync(u => u.Id == userId);
-            if (!userExist)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
             var draft = new DraftRecipe

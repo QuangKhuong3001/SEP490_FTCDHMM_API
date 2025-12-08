@@ -178,7 +178,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
 
-            if (categories.Any(c => c.isDeleted))
+            if (categories.Any(c => c.IsDeleted))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var ingredient = new Ingredient
@@ -251,7 +251,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
 
-                if (categories.Any(c => c.isDeleted))
+                if (categories.Any(c => c.IsDeleted))
                     throw new AppException(AppResponseCode.INVALID_ACTION);
 
                 ingredient.Categories.Clear();

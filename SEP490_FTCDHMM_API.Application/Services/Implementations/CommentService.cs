@@ -36,13 +36,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _notifier = notifier;
         }
 
-        public async Task CreateAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
+        public async Task CreateCommentAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
         {
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
-            if (recipe == null)
+            if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
-
-            var userExist = await _userRepository.ExistsAsync(u => u.Id == userId);
 
             Comment? parentComment = null;
             var parentCommentId = request.ParentCommentId;
@@ -54,8 +52,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     c => c.Include(x => x.ParentComment)
                 );
 
+                if (parentComment == null)
+                    throw new AppException(AppResponseCode.NOT_FOUND);
+
                 if (parentComment != null && parentComment.ParentCommentId.HasValue)
                 {
+                    if (parentComment.RecipeId != recipeId)
+                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bình luận cha không thuộc công thức này.");
+
                     parentComment = parentComment.ParentComment;
                 }
             }
@@ -69,7 +73,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 ParentComment = parentComment
             };
 
-            if (request.MentionedUserIds.Any())
+            if (request.MentionedUserIds != null && request.MentionedUserIds.Any())
             {
                 foreach (var mentionedId in request.MentionedUserIds.Distinct())
                 {
@@ -108,7 +112,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task<List<CommentResponse>> GetAllByRecipeAsync(Guid recipeId)
+        public async Task<List<CommentResponse>> GetAllCommentByRecipeAsync(Guid recipeId)
         {
             var exist = await _recipeRepository.ExistsAsync(r => r.Id == recipeId);
 
@@ -130,7 +134,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return _mapper.Map<List<CommentResponse>>(comments);
         }
 
-        public async Task DeleteAsync(Guid userId, Guid commentId, DeleteMode mode)
+        public async Task DeleteCommentAsync(Guid userId, Guid commentId, DeleteMode mode)
         {
             var comment = await _commentRepository.GetByIdAsync(commentId,
                 include: i => i.Include(c => c.Recipe)
@@ -173,12 +177,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task UpdateAsync(Guid userId, Guid recipeId, Guid commentId, UpdateCommentRequest request)
+        public async Task UpdateCommentAsync(Guid userId, Guid recipeId, Guid commentId, UpdateCommentRequest request)
         {
             var comment = await _commentRepository.GetByIdAsync(commentId,
                 include: i => i.Include(c => c.Mentions));
             if (comment == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Bình luận không tồn tại");
+
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+
+            if (recipe == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            if (recipe.Status != RecipeStatus.Posted)
+                throw new AppException(AppResponseCode.NOT_FOUND);
 
             if (comment.RecipeId != recipeId)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -190,7 +202,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             comment.Mentions.Clear();
 
-            if (request.MentionedUserIds.Any())
+            if (request.MentionedUserIds != null && request.MentionedUserIds.Any())
             {
                 foreach (var mentionedId in request.MentionedUserIds.Distinct())
                 {
