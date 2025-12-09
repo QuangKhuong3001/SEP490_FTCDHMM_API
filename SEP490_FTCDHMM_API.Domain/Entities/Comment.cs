@@ -10,6 +10,7 @@
         public Guid UserId { get; set; }
         public AppUser User { get; set; } = null!;
         public string Content { get; set; } = string.Empty;
+        public bool IsEdited { get; set; } = false;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public Guid? ParentCommentId { get; set; }
         public Comment? ParentComment { get; set; }

@@ -6,6 +6,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -58,7 +59,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var notification = await _notificationRepository.GetByIdAsync(notificationId);
 
-            if (notification != null && !notification.IsRead)
+            if (notification == null)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Không tìm thấy thông báo.");
+
+            if (notification.ReceiverId != userId)
+            {
+                throw new AppException(AppResponseCode.FORBIDDEN, "Bạn không có quyền thực hiện hành động này.");
+            }
+
+            if (!notification.IsRead)
             {
                 notification.IsRead = true;
                 await _notificationRepository.UpdateAsync(notification);

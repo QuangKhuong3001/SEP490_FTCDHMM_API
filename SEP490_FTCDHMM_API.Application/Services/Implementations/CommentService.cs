@@ -90,7 +90,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
-                    await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+
+                    if (recipe.AuthorId != mentionedId && (parentComment == null || parentComment.UserId != mentionedId))
+                    {
+                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                    }
                 }
             }
 
@@ -107,7 +111,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _notifier.SendCommentAddedAsync(recipeId, response);
             await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
 
-            if (parentComment != null)
+            if (parentComment != null && parentComment.UserId != recipe.AuthorId)
             {
                 await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, recipeId);
             }
@@ -200,6 +204,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
             comment.Content = request.Content;
+            comment.IsEdited = true;
 
             var oldMentionIds = comment.Mentions.Select(m => m.MentionedUserId).ToList();
 
