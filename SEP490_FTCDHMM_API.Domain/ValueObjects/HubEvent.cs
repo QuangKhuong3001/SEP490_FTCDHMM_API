@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
         public static readonly HubEvent RatingUpdated = new("RATINGUPDATED");
         public static readonly HubEvent RatingDeleted = new("RATINGDELETED");
         public static readonly HubEvent Notification = new("NOTIFICATION");
+        public static readonly HubEvent ReadNotification = new("READNOTIFICATION");
 
         public override string ToString() => Value;
 
@@ -23,6 +24,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "RATINGDELETED" => RatingDeleted,
                 "NOTIFICATION" => Notification,
                 "COMMENTUPDATED" => CommentUpdated,
+                "READNOTIFICATION" => ReadNotification,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION, "Không tồn tại hub event này")
             };
         }

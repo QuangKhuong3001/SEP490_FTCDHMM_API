@@ -8,5 +8,6 @@
         Task SendRatingUpdateAsync(Guid recipeId, object rating);
         Task SendRatingDeletedAsync(Guid recipeId, Guid ratingId);
         Task SendNotificationAsync(Guid userId, object notification);
+        Task MarkAsReadAsync(Guid userId, Guid notificationId);
     }
 }
