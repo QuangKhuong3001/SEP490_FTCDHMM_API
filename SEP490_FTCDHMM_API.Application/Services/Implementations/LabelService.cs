@@ -6,6 +6,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -20,23 +21,30 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task CreatLabel(CreateLabelRequest dto)
+        public async Task CreatLabelAsync(CreateLabelRequest dto)
         {
-            if (await _labelRepository.ExistsAsync(l => l.Name == dto.Name))
+            var lowerName = dto.Name.ToLowerInvariant().CleanDuplicateSpace();
+            var normalizeName = dto.Name.NormalizeVi();
+
+            if (await _labelRepository.ExistsAsync(l => l.LowerName == lowerName))
                 throw new AppException(AppResponseCode.EXISTS);
 
             await _labelRepository.AddAsync(new Label
             {
-                Name = dto.Name,
+                Name = dto.Name.CleanDuplicateSpace(),
+                LowerName = lowerName,
+                NormalizedName = normalizeName,
                 ColorCode = dto.ColorCode
             });
         }
-        public async Task<PagedResult<LabelResponse>> GetAllLabels(LabelFilterRequest request)
+        public async Task<PagedResult<LabelResponse>> GetPagedLabelsAsync(LabelFilterRequest request)
         {
+            var normalizeKeyword = request.Keyword?.NormalizeVi();
+
             var (labels, totalCount) = await _labelRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
                 l => l.IsDeleted == false &&
-                    (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)),
+                    (string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!)),
                 q => q.OrderBy(u => u.Name));
 
             var result = _mapper.Map<List<LabelResponse>>(labels);
@@ -49,18 +57,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
-        public async Task<IEnumerable<LabelResponse>> GetAllLabels(LabelSearchDropboxRequest request)
+        public async Task<IEnumerable<LabelResponse>> GetLabelsAsync(LabelSearchDropboxRequest request)
         {
+            var normalizeKeyword = request.Keyword?.NormalizeVi();
+
             var labels = await _labelRepository.GetAllAsync(
                 l => !l.IsDeleted &&
-                    (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
+                    (string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!)));
             labels = labels.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<IEnumerable<LabelResponse>>(labels);
             return result;
         }
 
-        public async Task DeleteLabel(Guid labelId)
+        public async Task DeleteLabelAsync(Guid labelId)
         {
             var label = await _labelRepository.GetByIdAsync(labelId,
                 include: l => l.Include(u => u.Recipes));
@@ -78,11 +88,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task UpdateColorCode(Guid labelId, UpdateColorCodeRequest request)
+        public async Task UpdateColorCodeAsync(Guid labelId, UpdateColorCodeRequest request)
         {
             var label = await _labelRepository.GetByIdAsync(labelId);
 
-            if (label == null)
+            if (label == null || label.IsDeleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             label.ColorCode = request.ColorCode;

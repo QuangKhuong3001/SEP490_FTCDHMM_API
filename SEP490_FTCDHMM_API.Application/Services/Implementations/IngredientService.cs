@@ -71,18 +71,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<IngredientResponse>> GetIngredientsAsync(IngredientFilterRequest dto)
         {
+            if (dto.CategoryIds != null && dto.CategoryIds.Any())
+            {
+                var exists = await _ingredientCategoryRepository.IdsExistAsync(dto.CategoryIds);
+                if (!exists)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Nhóm nguyên liệu không tồn tại");
+            }
+
             dto.Keyword = dto.Keyword?.NormalizeVi();
 
             Expression<Func<Ingredient, bool>>? filter = null;
 
-            if ((dto.CategoryIds != null && dto.CategoryIds.Any()) ||
-                dto.UpdatedFrom.HasValue || dto.UpdatedTo.HasValue)
+            if (dto.CategoryIds != null && dto.CategoryIds.Any())
             {
                 filter = i =>
-                    ((dto.CategoryIds == null || !dto.CategoryIds.Any()) ||
-                    i.Categories.Any(c => dto.CategoryIds.Contains(c.Id))) &&
-                    (!dto.UpdatedFrom.HasValue || i.LastUpdatedUtc >= dto.UpdatedFrom) &&
-                    (!dto.UpdatedTo.HasValue || i.LastUpdatedUtc <= dto.UpdatedTo);
+                    (dto.CategoryIds == null || dto.CategoryIds.Count == 0
+                    || i.Categories.Any(c => dto.CategoryIds.Contains(c.Id)));
             }
 
             var (ingredients, totalCount) = await _ingredientRepository.GetPagedAsync(
@@ -113,20 +117,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<IngredientResponse>> GetIngredientsForManagerAsync(IngredientFilterRequest dto)
         {
+            if (dto.CategoryIds != null && dto.CategoryIds.Any())
+            {
+                var exists = await _ingredientCategoryRepository.IdsExistAsync(dto.CategoryIds);
+                if (!exists)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Nhóm nguyên liệu không tồn tại");
+            }
+
             dto.Keyword = dto.Keyword?.NormalizeVi();
 
             Expression<Func<Ingredient, bool>>? filter = null;
 
-            if ((dto.CategoryIds != null && dto.CategoryIds.Any()) ||
-                dto.UpdatedFrom.HasValue || dto.UpdatedTo.HasValue)
+            if (dto.CategoryIds != null && dto.CategoryIds.Any())
             {
                 filter = i =>
-                    ((dto.CategoryIds == null || !dto.CategoryIds.Any()) ||
-                    i.Categories.Any(c => dto.CategoryIds.Contains(c.Id))) &&
-                    (!dto.UpdatedFrom.HasValue || i.LastUpdatedUtc >= dto.UpdatedFrom) &&
-                    (!dto.UpdatedTo.HasValue || i.LastUpdatedUtc <= dto.UpdatedTo);
+                    (dto.CategoryIds == null || dto.CategoryIds.Count == 0
+                    || i.Categories.Any(c => dto.CategoryIds.Contains(c.Id)));
             }
-
 
             var (ingredients, totalCount) = await _ingredientRepository.GetPagedAsync(
                 pageNumber: dto.PaginationParams.PageNumber,
@@ -195,7 +202,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Name = dto.Name.CleanDuplicateSpace(),
                 NormalizedName = dto.Name.NormalizeVi(),
                 LowerName = lowerName,
-                Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description.CleanDuplicateSpace(),
+                Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description,
                 Image = uploadedImage,
                 LastUpdatedUtc = DateTime.UtcNow,
                 Categories = categories.ToList()
@@ -278,7 +285,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     ingredient.Categories.Add(category);
                 }
 
-                ingredient.Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description.CleanDuplicateSpace();
+                ingredient.Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description;
 
                 if (dto.Image != null && dto.Image.Length > 0)
                 {

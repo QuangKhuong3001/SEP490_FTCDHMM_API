@@ -5,15 +5,15 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     public class Recipe
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public required Guid AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
         public AppUser Author { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DifficultyValue Difficulty { get; set; } = DifficultyValue.Medium;
         public int CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
-        public required int Ration { get; set; }
+        public int Ration { get; set; }
         public Guid? ImageId { get; set; }
         public Image? Image { get; set; }
         public decimal Calories { get; set; }
