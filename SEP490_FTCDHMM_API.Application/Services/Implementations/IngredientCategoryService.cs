@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredients = await _ingredientCategoryRepository.GetAllAsync(
                             l => !l.IsDeleted &&
                                 (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
-            ingredients = ingredients.OrderBy(l => l.Name).Take(5).ToList();
+            ingredients = ingredients.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<IEnumerable<IngredientCategoryResponse>>(ingredients);
             return result;
