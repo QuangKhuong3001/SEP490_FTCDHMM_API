@@ -17,14 +17,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("required")]
         public async Task<IActionResult> GetRequiredNutrient()
         {
-            var result = await _nutrientService.GetRequiredNutrientList();
+            var result = await _nutrientService.GetRequiredNutrientsAsync();
             return Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllNutrient()
         {
-            var result = await _nutrientService.GetAllNutrient();
+            var result = await _nutrientService.GetNutrientsAsync();
             return Ok(result);
         }
     }

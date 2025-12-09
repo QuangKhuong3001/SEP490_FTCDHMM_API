@@ -113,7 +113,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task<List<CommentResponse>> GetAllCommentByRecipeAsync(Guid recipeId)
+        public async Task<List<CommentResponse>> GetCommentsByRecipeAsync(Guid recipeId)
         {
             var exist = await _recipeRepository.ExistsAsync(r => r.Id == recipeId);
 
@@ -252,18 +252,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
-            var saved = await _notificationRepository.AddAsync(notification);
+            await _notificationRepository.AddAsync(notification);
 
             var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
 
             var notificationResponse = new
             {
-                Id = saved.Id,
+                Id = notification.Id,
                 Type = new { name = type.Name },
                 Message = message,
                 TargetId = targetId,
                 IsRead = false,
-                CreatedAtUtc = saved.CreatedAtUtc,
+                CreatedAtUtc = notification.CreatedAtUtc,
                 Senders = sender != null ? new[]
                 {
                     new

@@ -37,21 +37,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             };
         }
 
-        private AppUser CreateUser(Guid id)
-        {
-            return new AppUser
-            {
-                Id = id,
-                FirstName = "User",
-                LastName = "Test",
-                UserName = "user.test",
-                Email = "user@test.com",
-                Gender = Gender.Male,
-                DateOfBirth = DateTime.UtcNow.AddYears(-20),
-                ActivityLevel = ActivityLevel.From("SEDENTARY")
-            };
-        }
-
         [Fact]
         public async Task UpdateAsync_ShouldThrow_WhenCommentNotFound()
         {
@@ -61,13 +46,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             var request = new UpdateCommentRequest();
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
-                .ReturnsAsync((Comment)null!);
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .ReturnsAsync((Comment?)null);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
-            CommentRepositoryMock.Verify(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()), Times.Once);
-            RecipeRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()), Times.Never);
+            CommentRepositoryMock.Verify(r => r.GetByIdAsync(commentId,
+                It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()), Times.Once);
+            RecipeRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>(), null), Times.Never);
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(It.IsAny<Guid>(), It.IsAny<object>()), Times.Never);
         }
@@ -82,14 +70,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             var request = new UpdateCommentRequest();
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(recipeId, null))
-                .ReturnsAsync((Recipe)null!);
+                .ReturnsAsync((Recipe?)null);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             RecipeRepositoryMock.Verify(r => r.GetByIdAsync(recipeId, null), Times.Once);
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
@@ -109,14 +99,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             var recipe = CreateRecipe(recipeId, authorId, posted: false);
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             RecipeRepositoryMock.Verify(r => r.GetByIdAsync(recipeId, null), Times.Once);
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
@@ -138,14 +130,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             var request = new UpdateCommentRequest();
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(It.IsAny<Guid>(), It.IsAny<object>()), Times.Never);
@@ -166,14 +160,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             var request = new UpdateCommentRequest();
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(It.IsAny<Guid>(), It.IsAny<object>()), Times.Never);
@@ -198,7 +194,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             };
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
@@ -209,7 +206,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
                 .ReturnsAsync(false);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(It.IsAny<Guid>(), It.IsAny<object>()), Times.Never);
@@ -233,7 +231,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             };
 
             CommentRepositoryMock
-                .Setup(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .Setup(r => r.GetByIdAsync(commentId,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
 
             RecipeRepositoryMock
@@ -244,7 +243,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
                 .ReturnsAsync(true);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateCommentAsync(userId, recipeId, commentId, request));
 
             CommentRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Comment>()), Times.Never);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(It.IsAny<Guid>(), It.IsAny<object>()), Times.Never);
@@ -278,7 +278,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             };
 
             CommentRepositoryMock
-                .SetupSequence(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .SetupSequence(r => r.GetByIdAsync(commentId,
+                        It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment)
                 .ReturnsAsync(updatedComment);
 
@@ -304,9 +305,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
 
             await Sut.UpdateCommentAsync(userId, recipeId, commentId, request);
 
-            CommentRepositoryMock.Verify(r => r.GetByIdAsync(commentId, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()), Times.Exactly(2));
+            CommentRepositoryMock.Verify(r => r.GetByIdAsync(commentId,
+                It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()), Times.Exactly(2));
             RecipeRepositoryMock.Verify(r => r.GetByIdAsync(recipeId, null), Times.Once);
-            UserRepositoryMock.Verify(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()), Times.AtLeastOnce);
+            UserRepositoryMock.Verify(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()),
+                Times.AtLeastOnce);
             CommentRepositoryMock.Verify(r => r.UpdateAsync(comment), Times.Once);
             MapperMock.Verify(m => m.Map<CommentResponse>(updatedComment), Times.Once);
             NotifierMock.Verify(n => n.SendCommentUpdatedAsync(recipeId, It.IsAny<object>()), Times.Once);

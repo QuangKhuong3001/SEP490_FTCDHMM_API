@@ -13,7 +13,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             RecipeRepositoryMock.Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Recipe, bool>>>()))
                 .ReturnsAsync(false);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.GetAllCommentByRecipeAsync(Guid.NewGuid()));
+            await Assert.ThrowsAsync<AppException>(() => Sut.GetCommentsByRecipeAsync(Guid.NewGuid()));
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             MapperMock.Setup(m => m.Map<List<CommentResponse>>(It.IsAny<object>()))
                 .Returns(new List<CommentResponse> { new CommentResponse() });
 
-            var result = await Sut.GetAllCommentByRecipeAsync(Guid.NewGuid());
+            var result = await Sut.GetCommentsByRecipeAsync(Guid.NewGuid());
             Assert.Single(result);
         }
     }

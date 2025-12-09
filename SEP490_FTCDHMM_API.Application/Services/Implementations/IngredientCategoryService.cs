@@ -51,7 +51,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
         }
 
-        public async Task<PagedResult<IngredientCategoryResponse>> GetAllIngredientCategoriesFilterAsync(IngredientCategoryFilterRequest request)
+        public async Task<PagedResult<IngredientCategoryResponse>> GetIngredientCategoriesFilterAsync(IngredientCategoryFilterRequest request)
         {
             var (categories, totalCount) = await _ingredientCategoryRepository.GetPagedAsync(
                             request.PaginationParams.PageNumber, request.PaginationParams.PageSize,

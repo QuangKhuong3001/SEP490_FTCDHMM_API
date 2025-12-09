@@ -40,7 +40,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
                 PaginationParams = new PaginationParams { PageNumber = 1, PageSize = 10 }
             };
 
-            var result = await Sut.GetAllIngredientCategoriesFilterAsync(req);
+            var result = await Sut.GetIngredientCategoriesFilterAsync(req);
 
             Assert.Equal(1, result.TotalCount);
             Assert.Single(result.Items);
