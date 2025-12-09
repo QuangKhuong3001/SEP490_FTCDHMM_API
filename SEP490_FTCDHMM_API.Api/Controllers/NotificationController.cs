@@ -29,7 +29,9 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpPost("{notificationId:guid}/mark-read")]
         public async Task<IActionResult> MarkAsRead(Guid notificationId)
         {
-            await _notificationService.MarkAsReadAsync(notificationId);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _notificationService.MarkAsReadAsync(userId, notificationId);
             return Ok();
         }
 
