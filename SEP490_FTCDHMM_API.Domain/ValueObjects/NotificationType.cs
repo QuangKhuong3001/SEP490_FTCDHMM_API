@@ -6,6 +6,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
     {
         public static readonly NotificationType System = new("SYSTEM");
         public static readonly NotificationType Comment = new("COMMENT");
+        public static readonly NotificationType Mention = new("MENTION");
         public static readonly NotificationType Like = new("LIKE");
         public static readonly NotificationType Follow = new("FOLLOW");
         public static readonly NotificationType Reply = new("REPLY");
@@ -21,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "COMMENT" => Comment,
                 "LIKE" => Like,
                 "FOLLOW" => Follow,
+                "MENTION" => Mention,
                 "REPLY" => Reply,
                 "Achievement" => Achievement,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)

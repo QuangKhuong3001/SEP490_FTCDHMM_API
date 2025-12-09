@@ -90,6 +90,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
+                    await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
                 }
             }
 
@@ -104,11 +105,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
-            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
 
             if (parentComment != null)
             {
-                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, recipeId);
             }
         }
 
@@ -200,6 +201,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             comment.Content = request.Content;
 
+            var oldMentionIds = comment.Mentions.Select(m => m.MentionedUserId).ToList();
+
             comment.Mentions.Clear();
 
             if (request.MentionedUserIds != null && request.MentionedUserIds.Any())
@@ -219,6 +222,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
+
+                    if (!oldMentionIds.Contains(mentionedId))
+                    {
+                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                    }
                 }
             }
 
