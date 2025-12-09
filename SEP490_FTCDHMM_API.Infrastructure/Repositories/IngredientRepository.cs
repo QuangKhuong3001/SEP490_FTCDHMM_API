@@ -18,8 +18,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         {
             return await _dbContext.Ingredients
                 .AsNoTracking()
-                .Where(i => EF.Functions.Like(i.Name.ToLower(), $"%{keyword}%"))
-                .OrderByDescending(i => i.Name.ToLower().StartsWith(keyword))
+                .Where(i => EF.Functions.Like(i.LowerName, $"%{keyword}%"))
+                .OrderByDescending(i => i.LowerName.StartsWith(keyword))
                 .ThenBy(i => i.Name.Length)
                 .Take(5)
                 .ToListAsync(ct);

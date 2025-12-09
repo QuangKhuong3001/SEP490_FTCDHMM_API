@@ -9,6 +9,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
+using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -68,8 +69,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.MISSING_REQUIRED_NUTRIENTS);
         }
 
-        public async Task<PagedResult<IngredientResponse>> GetList(IngredientFilterRequest dto)
+        public async Task<PagedResult<IngredientResponse>> GetIngredientsAsync(IngredientFilterRequest dto)
         {
+            dto.Keyword = dto.Keyword?.NormalizeVi();
+
             Expression<Func<Ingredient, bool>>? filter = null;
 
             if ((dto.CategoryIds != null && dto.CategoryIds.Any()) ||
@@ -82,7 +85,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     (!dto.UpdatedTo.HasValue || i.LastUpdatedUtc <= dto.UpdatedTo);
             }
 
-
             var (ingredients, totalCount) = await _ingredientRepository.GetPagedAsync(
                 pageNumber: dto.PaginationParams.PageNumber,
                 pageSize: dto.PaginationParams.PageSize,
@@ -92,7 +94,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                                                         i => i.Description),
 
                 keyword: dto.Keyword,
-                searchProperties: new[] { "Name", "Description" },
+                searchProperties: new[] { "NormalizedName", "Description" },
                 include: q => q
                     .Include(i => i.Categories)
                     .Include(i => i.Image)
@@ -109,8 +111,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<PagedResult<IngredientResponse>> GetListForManager(IngredientFilterRequest dto)
+        public async Task<PagedResult<IngredientResponse>> GetIngredientsForManagerAsync(IngredientFilterRequest dto)
         {
+            dto.Keyword = dto.Keyword?.NormalizeVi();
+
             Expression<Func<Ingredient, bool>>? filter = null;
 
             if ((dto.CategoryIds != null && dto.CategoryIds.Any()) ||
@@ -142,7 +146,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     return ordered;
                 },
                 keyword: dto.Keyword,
-                searchProperties: new[] { "Name", "Description" },
+                searchProperties: new[] { "NormalizedName", "Description" },
                 include: q => q
                     .Include(i => i.Categories)
                     .Include(i => i.Image)
@@ -159,10 +163,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task CreateIngredient(CreateIngredientRequest dto)
+        public async Task CreateIngredientAsync(CreateIngredientRequest dto)
         {
-            if (await _ingredientRepository.ExistsAsync(i => i.Name == dto.Name))
+            var lowerName = dto.Name.CleanDuplicateSpace().ToLowerInvariant();
+
+            if (await _ingredientRepository.ExistsAsync(
+                    i => i.LowerName == lowerName))
+            {
                 throw new AppException(AppResponseCode.EXISTS);
+            }
 
             if (!await _ingredientCategoryRepository.IdsExistAsync(dto.IngredientCategoryIds))
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -183,8 +192,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var ingredient = new Ingredient
             {
-                Name = dto.Name.Trim(),
-                Description = dto.Description?.Trim(),
+                Name = dto.Name.CleanDuplicateSpace(),
+                NormalizedName = dto.Name.NormalizeVi(),
+                LowerName = lowerName,
+                Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description.CleanDuplicateSpace(),
                 Image = uploadedImage,
                 LastUpdatedUtc = DateTime.UtcNow,
                 Categories = categories.ToList()
@@ -210,7 +221,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _ingredientRepository.AddAsync(ingredient);
         }
 
-        public async Task DeleteIngredient(Guid ingredientId)
+        public async Task DeleteIngredientAsync(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
                 ingredientId,
@@ -226,10 +237,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION,
                     $"Không thể xóa nguyên liệu '{ingredient.Name}' vì nó đang được sử dụng trong một hoặc nhiều công thức.");
 
+            if (ingredient.Image != null)
+            {
+                await _s3ImageService.DeleteImageAsync(ingredient.ImageId);
+            }
             await _ingredientRepository.DeleteAsync(ingredient);
         }
 
-        public async Task UpdateIngredient(Guid ingredientId, UpdateIngredientRequest dto)
+        public async Task UpdateIngredientAsync(Guid ingredientId, UpdateIngredientRequest dto)
         {
             await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
             {
@@ -248,6 +263,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 ingredient.LastUpdatedUtc = DateTime.UtcNow;
 
+                if (!await _ingredientCategoryRepository.IdsExistAsync(dto.IngredientCategoryIds))
+                    throw new AppException(AppResponseCode.NOT_FOUND);
+
                 var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
 
@@ -260,8 +278,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     ingredient.Categories.Add(category);
                 }
 
-                if (!string.IsNullOrEmpty(dto.Description))
-                    ingredient.Description = dto.Description.Trim();
+                ingredient.Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description.CleanDuplicateSpace();
 
                 if (dto.Image != null && dto.Image.Length > 0)
                 {
@@ -316,7 +333,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 await _ingredientRepository.UpdateAsync(ingredient);
             });
         }
-        public async Task<IngredientDetailsResponse> GetDetails(Guid ingredientId)
+        public async Task<IngredientDetailsResponse> GetIngredientDetailsAsync(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
                 ingredientId,
@@ -335,7 +352,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             return result;
         }
-        public async Task<IngredientDetailsResponse> GetDetailsForManager(Guid ingredientId)
+        public async Task<IngredientDetailsResponse> GetIngredientDetailsForManagerAsync(Guid ingredientId)
         {
             var ingredient = await _ingredientRepository.GetByIdAsync(
                 ingredientId,
@@ -360,10 +377,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<IngredientNameResponse>> GetFromUsdaSourceAsync(string keyword)
         {
-            if (string.IsNullOrWhiteSpace(keyword) || keyword.Trim().Length < MinLength)
-                return Enumerable.Empty<IngredientNameResponse>();
+            keyword = keyword.CleanDuplicateSpace().ToLowerInvariant();
 
-            keyword = keyword.Trim();
+            if (string.IsNullOrWhiteSpace(keyword) || keyword.Length < MinLength)
+                return Enumerable.Empty<IngredientNameResponse>();
 
             var dbItems = await _ingredientRepository.GetTop5Async(keyword);
             if (dbItems.Count > 0)
@@ -382,9 +399,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var vietName = await _translateService.TranslateToVietnameseAsync(translated);
 
-            if (await _ingredientRepository.ExistsAsync(u => u.Name == vietName))
+            var lower = vietName.CleanDuplicateSpace().ToLowerInvariant();
+            if (await _ingredientRepository.ExistsAsync(u => u.LowerName == lower))
             {
-                var dbItems = await _ingredientRepository.GetTop5Async(vietName);
+                var dbItems = await _ingredientRepository.GetTop5Async(lower);
                 return _mapper.Map<IngredientNameResponse>(dbItems.First());
             }
 
@@ -417,6 +435,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Id = Guid.NewGuid(),
                 Name = vietName,
+                NormalizedName = vietName.NormalizeVi(),
+                LowerName = vietName.CleanDuplicateSpace().ToLowerInvariant(),
                 Description = descriptionViet,
                 LastUpdatedUtc = DateTime.UtcNow,
                 Calories = ExtractCalories(detail),

@@ -23,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
         }
 
         [HttpPost("{goalId:guid}")]
-        public async Task<IActionResult> SetGoal([FromBody] Guid goalId, UserHealthGoalRequest request)
+        public async Task<IActionResult> SetGoal(Guid goalId, [FromBody] UserHealthGoalRequest request)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
