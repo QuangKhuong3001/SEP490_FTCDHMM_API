@@ -30,6 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateReportRequest request)
         {
+
             var userId = GetUserId();
 
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportRequest>(request);

@@ -278,30 +278,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _reportRepository.UpdateAsync(report);
         }
 
-        private async Task<bool> TargetExistsAsync(ReportObjectType targetType, Guid targetId)
+        private async Task TargetExistsAsync(ReportObjectType targetType, Guid targetId)
         {
-            if (targetType == ReportObjectType.Recipe)
+            bool exists = targetType switch
             {
-                return await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status == RecipeStatus.Posted);
-            }
+                var t when t == ReportObjectType.Recipe =>
+                    await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status == RecipeStatus.Posted),
 
-            if (targetType == ReportObjectType.User)
-            {
-                return await _userRepository.ExistsAsync(u => u.Id == targetId);
-            }
+                var t when t == ReportObjectType.User =>
+                    await _userRepository.ExistsAsync(u => u.Id == targetId),
 
-            if (targetType == ReportObjectType.Comment)
-            {
-                return await _commentRepository.ExistsAsync(c => c.Id == targetId);
-            }
+                var t when t == ReportObjectType.Comment =>
+                    await _commentRepository.ExistsAsync(c => c.Id == targetId),
 
-            if (targetType == ReportObjectType.Rating)
-            {
-                return await _ratingRepository.ExistsAsync(r => r.Id == targetId);
-            }
+                var t when t == ReportObjectType.Rating =>
+                    await _ratingRepository.ExistsAsync(r => r.Id == targetId),
 
-            return false;
+                _ => throw new AppException(AppResponseCode.INVALID_ACTION, "Loại đối tượng report không hợp lệ.")
+            };
+
+            if (!exists)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Đối tượng bị report không tồn tại.");
         }
+
 
         private async Task<string> ResolveTargetNameAsync(Report report)
         {

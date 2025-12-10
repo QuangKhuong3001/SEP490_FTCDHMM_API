@@ -55,11 +55,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (parentComment == null)
                     throw new AppException(AppResponseCode.NOT_FOUND);
 
+                if (parentComment.RecipeId != recipeId)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Bình luận cha không thuộc công thức này.");
+
                 if (parentComment != null && parentComment.ParentCommentId.HasValue)
                 {
-                    if (parentComment.RecipeId != recipeId)
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Bình luận cha không thuộc công thức này.");
-
                     parentComment = parentComment.ParentComment;
                 }
             }
