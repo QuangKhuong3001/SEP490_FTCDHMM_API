@@ -4,9 +4,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IUserHealthMetricService
     {
-        Task CreateAsync(Guid userId, CreateUserHealthMetricRequest request);
-        Task UpdateAsync(Guid userId, Guid metricId, UpdateUserHealthMetricRequest request);
-        Task DeleteAsync(Guid userId, Guid metricId);
-        Task<IEnumerable<UserHealthMetricResponse>> GetHistoryByUserIdAsync(Guid userId);
+        Task CreateHealthMetricAsync(Guid userId, CreateUserHealthMetricRequest request);
+        Task UpdateHealthMetricAsync(Guid userId, Guid metricId, UpdateUserHealthMetricRequest request);
+        Task DeleteHealthMetricAsync(Guid userId, Guid metricId);
+        Task<IEnumerable<UserHealthMetricResponse>> GetHealthMetricHistoryByUserIdAsync(Guid userId);
     }
 }

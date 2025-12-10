@@ -30,22 +30,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreateIngredientCategoryRestrictionAsync(Guid userId, CreateIngredientCategoryRestrictionRequest request)
         {
-            if (request.ExpiredAtUtc != null && request.ExpiredAtUtc < DateTime.UtcNow)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
-            var exist = await _ingredientCategoryRepository.ExistsAsync(i => i.Id == request.IngredientCategoryId);
-            if (!exist)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
             var type = RestrictionType.From(request.Type);
-
-            var duplicates = await _userDietRestrictionRepository.ExistsAsync(
-                u => u.IngredientCategoryId == request.IngredientCategoryId &&
-                (u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow) &&
-                u.UserId == userId);
-
-            if (duplicates)
-                throw new AppException(AppResponseCode.DUPLICATE);
 
             if (type == RestrictionType.TemporaryAvoid && !request.ExpiredAtUtc.HasValue)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -54,6 +39,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 request.ExpiredAtUtc = null;
             }
+
+            if (request.ExpiredAtUtc != null && request.ExpiredAtUtc < DateTime.UtcNow)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
+
+            var exist = await _ingredientCategoryRepository.ExistsAsync(i => i.Id == request.IngredientCategoryId);
+            if (!exist)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var duplicates = await _userDietRestrictionRepository.ExistsAsync(
+                u => u.IngredientCategoryId == request.IngredientCategoryId &&
+                (u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow) &&
+                u.UserId == userId);
+
+            if (duplicates)
+                throw new AppException(AppResponseCode.DUPLICATE);
 
             await _userDietRestrictionRepository.AddAsync(new UserDietRestriction
             {

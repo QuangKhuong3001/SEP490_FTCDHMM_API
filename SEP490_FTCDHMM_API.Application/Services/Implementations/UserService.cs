@@ -12,6 +12,7 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -44,18 +45,28 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<UserResponse>> GetUserListAsync(UserFilterRequest request)
         {
-            var (customers, totalCount) = await _userRepository.GetPagedAsync(
-                request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                u => (string.IsNullOrEmpty(request.Keyword) ||
-                      u.FirstName.Contains(request.Keyword!) ||
-                      u.LastName.Contains(request.Keyword!) ||
-                      u.Email!.Contains(request.Keyword!))
-                      && (!request.RoleId.HasValue || u.RoleId == request.RoleId.Value),
+            var normalizedKeyword = request.Keyword.NormalizeVi() ?? string.Empty;
+
+            var (users, totalCount) = await _userRepository.GetPagedAsync(
+                request.PaginationParams.PageNumber,
+                request.PaginationParams.PageSize,
+                u => !request.RoleId.HasValue || u.RoleId == request.RoleId.Value,
                 q => q.OrderBy(u => u.CreatedAtUtc),
                 include: i => i.Include(u => u.Role)
-                );
+            );
 
-            var result = _mapper.Map<List<UserResponse>>(customers);
+            if (!string.IsNullOrWhiteSpace(normalizedKeyword))
+            {
+                users = users
+                    .Where(u =>
+                        (u.FirstName?.NormalizeVi()?.Contains(normalizedKeyword) ?? false) ||
+                        (u.LastName?.NormalizeVi()?.Contains(normalizedKeyword) ?? false) ||
+                        (u.Email?.NormalizeVi()?.Contains(normalizedKeyword) ?? false)
+                    )
+                    .ToList();
+            }
+
+            var result = _mapper.Map<List<UserResponse>>(users);
 
             return new PagedResult<UserResponse>
             {

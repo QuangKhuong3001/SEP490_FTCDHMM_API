@@ -5,8 +5,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
 {
     public class AppUser : IdentityUser<Guid>
     {
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public DateTime DateOfBirth { get; set; }
         public Gender Gender { get; set; } = Gender.Male;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

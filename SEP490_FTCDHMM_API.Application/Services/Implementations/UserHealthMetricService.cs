@@ -21,16 +21,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task CreateAsync(Guid userId, CreateUserHealthMetricRequest request)
+        public async Task CreateHealthMetricAsync(Guid userId, CreateUserHealthMetricRequest request)
         {
             var user = await _userRepository.GetByIdAsync(userId);
 
-            if (user == null)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
             var bmi = request.WeightKg / (request.HeightCm / 100m * request.HeightCm / 100m);
 
-            var age = AgeCalculator.Calculate(user.DateOfBirth);
+            var age = AgeCalculator.Calculate(user!.DateOfBirth);
 
             var bmr = BmrCalculator.Calculate(
                 weightKg: request.WeightKg,
@@ -63,21 +60,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userHealthMetricRepository.AddAsync(metric);
         }
 
-        public async Task UpdateAsync(Guid userId, Guid metricId, UpdateUserHealthMetricRequest request)
+        public async Task UpdateHealthMetricAsync(Guid userId, Guid metricId, UpdateUserHealthMetricRequest request)
         {
             var metric = await _userHealthMetricRepository.GetByIdAsync(metricId);
 
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null || metric == null)
+            if (metric == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var user = await _userRepository.GetByIdAsync(userId);
 
             if (metric.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
-            var bmi = request.WeightKg / (decimal)Math.Pow((double)(request.HeightCm / 100), 2);
+            var bmi = request.WeightKg / (request.HeightCm / 100m * request.HeightCm / 100m);
 
-            var age = AgeCalculator.Calculate(user.DateOfBirth);
+            var age = AgeCalculator.Calculate(user!.DateOfBirth);
 
             var bmr = BmrCalculator.Calculate(
                 weightKg: request.WeightKg,
@@ -102,10 +99,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             metric.RecordedAt = DateTime.UtcNow;
             metric.ActivityLevel = user.ActivityLevel;
 
-
             await _userHealthMetricRepository.UpdateAsync(metric);
         }
-        public async Task DeleteAsync(Guid userId, Guid metricId)
+
+        public async Task DeleteHealthMetricAsync(Guid userId, Guid metricId)
         {
             var metric = await _userHealthMetricRepository.GetByIdAsync(metricId);
 
@@ -118,7 +115,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _userHealthMetricRepository.DeleteAsync(metric);
         }
 
-        public async Task<IEnumerable<UserHealthMetricResponse>> GetHistoryByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<UserHealthMetricResponse>> GetHealthMetricHistoryByUserIdAsync(Guid userId)
         {
             var metrics = await _userHealthMetricRepository.GetAllAsync(h => h.UserId == userId);
 

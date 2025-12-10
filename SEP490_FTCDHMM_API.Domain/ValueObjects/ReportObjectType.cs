@@ -13,9 +13,6 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
 
         public static ReportObjectType From(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Loại đối tượng report không được để trống.");
-
             return value.Trim().ToUpperInvariant() switch
             {
                 "RECIPE" => Recipe,

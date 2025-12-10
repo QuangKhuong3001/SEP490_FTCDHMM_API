@@ -75,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var existingUserInRole = await _userRepository.ExistsAsync(x => x.RoleId == roleId);
             if (existingUserInRole)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Hiện đang có người dùng sử dụng vai trò này");
 
             await _roleRepository.DeleteAsync(role);
         }
@@ -168,10 +168,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissionsAsync(Guid roleId)
         {
+            var role = await _roleRepository.GetByIdAsync(roleId,
+                include: i => i.Include(r => r.RolePermissions));
+
+            if (role == null)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
+            var rolePermissions = role.RolePermissions;
+
             var domains = await _permissionDomainRepository.GetAllAsync(
                 include: i => i.Include(rd => rd.Actions));
-
-            var rolePermissions = await _rolePermissionRepository.GetAllAsync(rp => rp.RoleId == roleId);
 
             var result = domains.Select(d => new PermissionDomainRequest
             {

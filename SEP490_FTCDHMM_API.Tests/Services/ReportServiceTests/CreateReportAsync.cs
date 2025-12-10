@@ -10,24 +10,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
     public class CreateReportAsyncTests : ReportServiceTestBase
     {
         [Fact]
-        public async Task CreateReportAsync_ShouldThrow_WhenReporterNotFound()
-        {
-            var reporterId = Guid.NewGuid();
-            var request = new ReportRequest
-            {
-                TargetId = Guid.NewGuid(),
-                TargetType = "USER",
-                Description = "abc"
-            };
-
-            UserRepoMock
-                .Setup(r => r.GetByIdAsync(reporterId, null))
-                .ReturnsAsync((AppUser)null!);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.CreateReportAsync(reporterId, request));
-        }
-
-        [Fact]
         public async Task CreateReportAsync_ShouldUpdateExistingReport_WhenPendingExists()
         {
             var reporterId = Guid.NewGuid();

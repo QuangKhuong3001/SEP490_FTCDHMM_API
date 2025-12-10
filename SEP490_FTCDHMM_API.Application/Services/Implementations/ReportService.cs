@@ -38,8 +38,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task CreateReportAsync(Guid reporterId, ReportRequest request)
         {
             var reporter = await _userRepository.GetByIdAsync(reporterId);
-            if (reporter == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Tài khoản không tồn tại.");
 
             var targetType = ReportObjectType.From(request.TargetType);
 
@@ -262,8 +260,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (report == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Báo cáo không tồn tại.");
 
-            if (report.Status == ReportStatus.Approved)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã được duyệt trước đó.");
+            if (report.Status != ReportStatus.Pending)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã được xử lí trước đó.");
 
             report.Status = ReportStatus.Approved;
             report.ReviewedBy = userId;
@@ -283,8 +281,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (report == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Báo cáo không tồn tại.");
 
-            if (report.Status == ReportStatus.Rejected)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã bị từ chối trước đó.");
+            if (report.Status != ReportStatus.Pending)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã được xử lí trước đó.");
 
             report.Status = ReportStatus.Rejected;
             report.ReviewedBy = userId;

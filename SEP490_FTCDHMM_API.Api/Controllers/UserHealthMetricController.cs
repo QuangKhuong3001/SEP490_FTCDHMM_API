@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserHealthMetricDtos.CreateUserHealthMetricRequest>(request);
 
-            await _userHealthMetricService.CreateAsync(userId, appRequest);
+            await _userHealthMetricService.CreateHealthMetricAsync(userId, appRequest);
             return Ok();
         }
 
@@ -46,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserHealthMetricDtos.UpdateUserHealthMetricRequest>(request);
 
-            await _userHealthMetricService.UpdateAsync(userId, metricId, appRequest);
+            await _userHealthMetricService.UpdateHealthMetricAsync(userId, metricId, appRequest);
             return Ok();
         }
 
@@ -58,7 +58,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthMetricService.DeleteAsync(userId, metricId);
+            await _userHealthMetricService.DeleteHealthMetricAsync(userId, metricId);
             return Ok();
         }
 
@@ -70,7 +70,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var result = await _userHealthMetricService.GetHistoryByUserIdAsync(userId);
+            var result = await _userHealthMetricService.GetHealthMetricHistoryByUserIdAsync(userId);
             return Ok(result);
         }
 
