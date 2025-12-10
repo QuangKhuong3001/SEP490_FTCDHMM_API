@@ -6,6 +6,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -22,15 +23,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreateIngredientCategoryAsync(CreateIngredientCategoryRequest request)
         {
-            var normalizedName = request.Name.Trim().ToLower();
+            var upperName = request.Name.Trim().ToUpperInvariant();
+            var normalizedName = request.Name.NormalizeVi();
 
             var exists = await _ingredientCategoryRepository.ExistsAsync(
-                c => c.Name.ToLower().Trim() == normalizedName);
+                c => c.UpperName == upperName);
 
             if (exists)
                 throw new AppException(AppResponseCode.EXISTS);
 
-            await _ingredientCategoryRepository.AddAsync(new IngredientCategory { Name = request.Name });
+            await _ingredientCategoryRepository.AddAsync(
+                new IngredientCategory
+                {
+                    Name = request.Name,
+                    UpperName = upperName,
+                    NormalizedName = normalizedName
+                });
         }
         public async Task DeleteIngredientCategoryAsync(Guid id)
         {
@@ -53,10 +61,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<IngredientCategoryResponse>> GetIngredientCategoriesFilterAsync(IngredientCategoryFilterRequest request)
         {
+            var normalizedKeyword = request.Keyword.NormalizeVi() ?? string.Empty;
+
             var (categories, totalCount) = await _ingredientCategoryRepository.GetPagedAsync(
                             request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
                             l => l.IsDeleted == false &&
-                                (string.IsNullOrEmpty(request.Keyword) || l.Name.ToLowerInvariant().Contains(request.Keyword.Trim().ToLowerInvariant()!)),
+                                (string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizedKeyword)),
                             q => q.OrderBy(u => u.Name));
 
             var result = _mapper.Map<List<IngredientCategoryResponse>>(categories);
@@ -71,9 +81,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task<IEnumerable<IngredientCategoryResponse>> GetIngredientCategoriesAsync(IngredientCategorySearchDropboxRequest request)
         {
+            var normalizedKeyword = request.Keyword.NormalizeVi() ?? string.Empty;
+
             var ingredients = await _ingredientCategoryRepository.GetAllAsync(
                             l => !l.IsDeleted &&
-                                (string.IsNullOrEmpty(request.Keyword) || l.Name.Contains(request.Keyword!)));
+                                 l.NormalizedName.Contains(normalizedKeyword));
+
             ingredients = ingredients.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<IEnumerable<IngredientCategoryResponse>>(ingredients);
