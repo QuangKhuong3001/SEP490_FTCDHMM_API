@@ -8,6 +8,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -30,9 +31,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task AddOrUpdate(Guid userId, Guid recipeId, RatingRequest request)
+        public async Task AddOrUpdateRatingAsync(Guid userId, Guid recipeId, RatingRequest request)
         {
-            if (request.Score < 4 && request.Feedback.IsNullOrEmpty())
+            if (request.Score <= 3 && (request.Feedback == null || request.Feedback.CleanDuplicateSpace().IsNullOrEmpty()))
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Nhận xét là bắt buộc khi đánh giá từ 3 sao đổ xuống");
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
@@ -49,6 +50,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 existingRating.Score = request.Score;
                 existingRating.Feedback = request.Feedback;
+                existingRating.CreatedAtUtc = DateTime.UtcNow;
                 await _ratingRepository.UpdateAsync(existingRating);
             }
             else
@@ -65,20 +67,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 existingRating = rating;
             }
 
-            var allRatings = await _ratingRepository.GetAllAsync(r => r.RecipeId == recipeId);
-
-            var avg = allRatings.Average(r => r.Score);
-
-            recipe.AvgRating = avg;
-            recipe.RatingCount = allRatings.Count;
-
-            await _recipeRepository.UpdateAsync(recipe);
+            await this.CalculateRating(recipeId);
 
             var ratingResponse = _mapper.Map<RatingDetailsResponse>(existingRating);
             await _notifier.SendRatingUpdateAsync(recipeId, ratingResponse);
         }
 
-        public async Task Delete(Guid userId, Guid ratingId)
+        public async Task DeleteRatingAsync(Guid userId, Guid ratingId)
         {
             var rating = await _ratingRepository.GetByIdAsync(ratingId);
             if (rating == null)
@@ -88,6 +83,36 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.FORBIDDEN, "Không có quyền xóa đánh giá này");
 
             await _ratingRepository.DeleteAsync(rating);
+
+            await this.CalculateRating(rating.RecipeId);
+            await _notifier.SendRatingDeletedAsync(rating.RecipeId, ratingId);
+        }
+
+        public async Task DeleteRatingByManagerAsync(Guid ratingId)
+        {
+            var rating = await _ratingRepository.GetByIdAsync(ratingId);
+            if (rating == null)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Đánh giá không tồn tại");
+
+            await _ratingRepository.DeleteAsync(rating);
+
+            await this.CalculateRating(rating.RecipeId);
+            await _notifier.SendRatingDeletedAsync(rating.RecipeId, ratingId);
+        }
+
+        private async Task CalculateRating(Guid recipeId)
+        {
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+
+            if (recipe == null)
+                return;
+
+            var allRatings = await _ratingRepository.GetAllAsync(r => r.RecipeId == recipe.Id);
+            var avg = allRatings.Any() ? allRatings.Average(r => r.Score) : 0;
+            recipe.AvgRating = avg;
+            recipe.RatingCount = allRatings.Count;
+
+            await _recipeRepository.UpdateAsync(recipe);
         }
     }
 }

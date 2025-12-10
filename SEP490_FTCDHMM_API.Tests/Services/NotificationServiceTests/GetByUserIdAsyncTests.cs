@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.NotificationServiceTests
                 .Setup(m => m.Map<NotificationResponse>(n1))
                 .Returns(mapped);
 
-            var result = await Sut.GetByUserIdAsync(userId);
+            var result = await Sut.GetNotificationsByUserIdAsync(userId);
 
             Assert.Single(result);
 
@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.NotificationServiceTests
                 .Setup(m => m.Map<NotificationResponse>(n))
                 .Returns(mapped);
 
-            var result = await Sut.GetByUserIdAsync(userId);
+            var result = await Sut.GetNotificationsByUserIdAsync(userId);
 
             Assert.Empty(result.First().Senders);
 

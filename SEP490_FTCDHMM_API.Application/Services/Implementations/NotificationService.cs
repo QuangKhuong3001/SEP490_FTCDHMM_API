@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _notifier = notifier;
         }
 
-        public async Task<IEnumerable<NotificationResponse>> GetByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<NotificationResponse>> GetNotificationsByUserIdAsync(Guid userId)
         {
             var notifications = await _notificationRepository.GetAllAsync(
                 n => n.ReceiverId == userId,

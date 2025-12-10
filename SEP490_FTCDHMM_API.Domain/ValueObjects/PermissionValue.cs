@@ -29,9 +29,7 @@
         public static readonly PermissionValue Comment_Delete = new("Bình luận", "Xóa");
         public static readonly PermissionValue Comment_Update = new("Bình luận", "Cập nhật");
 
-        public static readonly PermissionValue Rating_Create = new("Đánh giá", "Tạo");
         public static readonly PermissionValue Rating_Delete = new("Đánh giá", "Xóa");
-        public static readonly PermissionValue Rating_Update = new("Đánh giá", "Cập nhật");
 
         public static readonly PermissionValue Recipe_Lock = new("Công thức", "Khóa");
         public static readonly PermissionValue Recipe_Delete = new("Công thức", "Xóa");
@@ -68,14 +66,11 @@
             Comment_Create,
             Comment_Delete,
             Comment_Update,
-            Rating_Create,
             Rating_Delete,
-            Rating_Update,
             Recipe_Approve,
             Recipe_Delete,
             Recipe_Lock,
             Recipe_ManagementView,
-            Rating_Update,
             Report_View,
             Report_Approve,
             Report_Reject,

@@ -28,9 +28,7 @@
         public const string Comment_Delete = "Bình luận:Xóa";
         public const string Comment_Update = "Bình luận:Cập nhật";
 
-        public const string Rating_Create = "Đánh giá:Tạo";
         public const string Rating_Delete = "Đánh giá:Xóa";
-        public const string Rating_Update = "Đánh giá:Cập nhật";
 
         public const string Recipe_ManagementView = "Công thức:Xem với quyền";
         public const string Recipe_Delete = "Công thức:Xóa";
