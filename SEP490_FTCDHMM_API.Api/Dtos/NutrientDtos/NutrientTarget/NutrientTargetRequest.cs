@@ -21,7 +21,8 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.NutrientDtos.NutrientTarget
         public decimal? MaxEnergyPct { get; set; }
 
         [Required(ErrorMessage = "Trọng số là bắt buộc .")]
-        public decimal Weight { get; set; } = 1m;
+        [Range(1, 5, ErrorMessage = "Trọng số phải nằm trong khoảng từ 1 đến 5")]
+        public int Weight { get; set; } = 1;
     }
 
 }

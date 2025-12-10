@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CustomHealthGoalServiceTests
         protected readonly Mock<ICustomHealthGoalRepository> CustomHealthGoalRepositoryMock = new();
         protected readonly Mock<INutrientRepository> NutrientRepositoryMock = new();
         protected readonly Mock<IMapper> MapperMock;
+        protected readonly Mock<IHealthGoalTargetRepository> HealthGoalTargetRepositoryMock = new();
         protected readonly CustomHealthGoalService Sut;
 
         protected CustomHealthGoalServiceTestBase()
@@ -19,6 +20,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CustomHealthGoalServiceTests
             Sut = new CustomHealthGoalService(
                 CustomHealthGoalRepositoryMock.Object,
                 MapperMock.Object,
+                HealthGoalTargetRepositoryMock.Object,
                 NutrientRepositoryMock.Object
             );
         }

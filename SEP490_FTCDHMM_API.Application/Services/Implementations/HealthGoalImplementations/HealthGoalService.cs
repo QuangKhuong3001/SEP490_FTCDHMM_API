@@ -8,6 +8,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImplementations
 {
@@ -17,19 +18,30 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
         private readonly INutrientRepository _nutrientRepository;
         private readonly IMapper _mapper;
         private readonly ICustomHealthGoalRepository _customHealthGoalRepository;
+        private readonly IHealthGoalTargetRepository _healthGoalTargetRepository;
 
         public HealthGoalService(IHealthGoalRepository healthGoalRepository,
             INutrientRepository nutrientRepository,
-            IMapper mapper, ICustomHealthGoalRepository customHealthGoalRepository)
+            IHealthGoalTargetRepository healthGoalTargetRepository,
+            IMapper mapper,
+            ICustomHealthGoalRepository customHealthGoalRepository)
         {
             _healthGoalRepository = healthGoalRepository;
             _nutrientRepository = nutrientRepository;
             _mapper = mapper;
+            _healthGoalTargetRepository = healthGoalTargetRepository;
             _customHealthGoalRepository = customHealthGoalRepository;
         }
 
-        public async Task CreateAsync(CreateHealthGoalRequest request)
+        public async Task CreateHealthGoalAsync(CreateHealthGoalRequest request)
         {
+            var upperName = request.Name.ToUpperInvariant().CleanDuplicateSpace();
+
+            var exist = await _healthGoalRepository.ExistsAsync(g => g.UpperName == upperName);
+
+            if (exist)
+                throw new AppException(AppResponseCode.EXISTS);
+
             var duplicateIds = request.Targets
                 .GroupBy(t => t.NutrientId)
                 .Where(g => g.Count() > 1)
@@ -44,8 +56,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             var totalPct = 0m;
             foreach (var nutrient in request.Targets)
             {
-                IsValidInput(nutrient);
-                totalPct += nutrient.MaxEnergyPct ?? 0;
+                await ValidateInput(nutrient);
+                if (NutrientTargetType.From(nutrient.TargetType) == NutrientTargetType.EnergyPercent)
+                {
+                    totalPct += nutrient.MaxEnergyPct ?? 0;
+                }
             }
 
             if (totalPct > 100)
@@ -55,14 +70,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
             var nutrientIds = request.Targets.Select(n => n.NutrientId).ToList();
 
-            var exist = await _nutrientRepository.IdsExistAsync(nutrientIds);
+            var nutrientsExist = await _nutrientRepository.IdsExistAsync(nutrientIds);
 
-            if (!exist)
+            if (!nutrientsExist)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Dinh dưỡng không tồn tại trong hệ thống");
 
             var goal = new HealthGoal
             {
                 Name = request.Name,
+                UpperName = upperName,
                 Description = request.Description,
                 Targets = request.Targets.Select(t => new HealthGoalTarget
                 {
@@ -79,7 +95,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             await _healthGoalRepository.AddAsync(goal);
         }
 
-        public async Task UpdateAsync(Guid id, UpdateHealthGoalRequest request)
+        public async Task UpdateHealthGoalAsync(Guid id, UpdateHealthGoalRequest request)
         {
             var duplicateIds = request.Targets
                 .GroupBy(t => t.NutrientId)
@@ -95,8 +111,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             var totalPct = 0m;
             foreach (var nutrient in request.Targets)
             {
-                IsValidInput(nutrient);
-                totalPct += nutrient.MaxEnergyPct ?? 0;
+                await ValidateInput(nutrient);
+                if (NutrientTargetType.From(nutrient.TargetType) == NutrientTargetType.EnergyPercent)
+                {
+                    totalPct += nutrient.MaxEnergyPct ?? 0;
+                }
             }
 
             if (totalPct > 100)
@@ -111,14 +130,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
             var nutrientIds = request.Targets.Select(n => n.NutrientId).ToList();
 
-            var exist = await _nutrientRepository.IdsExistAsync(nutrientIds);
+            var nutrientsExist = await _nutrientRepository.IdsExistAsync(nutrientIds);
 
-            if (!exist)
+            if (!nutrientsExist)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Dinh dưỡng không tồn tại");
 
-            healthGoal.Targets.Clear();
-
             healthGoal.Description = request.Description;
+            await _healthGoalTargetRepository.DeleteRangeAsync(healthGoal.Targets);
             healthGoal.Targets = request.Targets.Select(t => new HealthGoalTarget
             {
                 NutrientId = t.NutrientId,
@@ -133,7 +151,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             await _healthGoalRepository.UpdateAsync(healthGoal);
         }
 
-        public async Task<IEnumerable<HealthGoalResponse>> GetAllAsync()
+        public async Task<IEnumerable<HealthGoalResponse>> GetHealthGoalsAsync()
         {
             var goals = await _healthGoalRepository.GetAllAsync(
                 include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient)
@@ -145,7 +163,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             return result;
         }
 
-        public async Task<HealthGoalResponse> GetByIdAsync(Guid id)
+        public async Task<HealthGoalResponse> GetHealthGoalByIdAsync(Guid id)
         {
             var goal = await _healthGoalRepository.GetByIdAsync(id,
                 include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient));
@@ -158,7 +176,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteHealthGoalAsync(Guid id)
         {
             var goal = await _healthGoalRepository.GetByIdAsync(id,
                 include: q => q.Include(g => g.Targets));
@@ -166,8 +184,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (goal == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
-            goal.Targets.Clear();
-
+            await _healthGoalTargetRepository.DeleteRangeAsync(goal.Targets);
             await _healthGoalRepository.DeleteAsync(goal);
         }
 
@@ -187,14 +204,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             return result.ToList();
         }
 
-        private bool IsValidInput(NutrientTargetRequest nutrient)
+        private Task ValidateInput(NutrientTargetRequest nutrient)
         {
             if (nutrient.TargetType == NutrientTargetType.Absolute.Value)
             {
                 if (!(nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue))
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
-                if (nutrient.MaxValue <= nutrient.MinValue)
+                if (nutrient.MaxValue < nutrient.MinValue)
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
             }
             else if (nutrient.TargetType == NutrientTargetType.EnergyPercent.Value)
@@ -202,11 +219,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
                 if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue))
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
-                if (nutrient.MaxEnergyPct <= nutrient.MinEnergyPct)
+                if (nutrient.MaxEnergyPct < nutrient.MinEnergyPct)
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
             }
 
-            return false;
+            return Task.CompletedTask;
         }
     }
 }

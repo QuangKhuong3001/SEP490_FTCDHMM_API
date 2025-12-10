@@ -16,11 +16,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
         private readonly ICustomHealthGoalRepository _customHealthGoalRepository;
         private readonly IMapper _mapper;
         private readonly INutrientRepository _nutrientRepository;
+        private readonly IHealthGoalTargetRepository _healthGoalTargetRepository;
 
-        public CustomHealthGoalService(ICustomHealthGoalRepository customHealthGoalRepository, IMapper mapper, INutrientRepository nutrientRepository)
+        public CustomHealthGoalService(
+            ICustomHealthGoalRepository customHealthGoalRepository,
+            IMapper mapper,
+            IHealthGoalTargetRepository healthGoalTargetRepository,
+            INutrientRepository nutrientRepository)
         {
             _customHealthGoalRepository = customHealthGoalRepository;
             _mapper = mapper;
+            _healthGoalTargetRepository = healthGoalTargetRepository;
             _nutrientRepository = nutrientRepository;
         }
 
@@ -42,7 +48,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             foreach (var nutrient in request.Targets)
             {
                 await this.ValidateInput(nutrient);
-                totalPct += nutrient.MaxEnergyPct ?? 0;
+                if (NutrientTargetType.From(nutrient.TargetType) == NutrientTargetType.EnergyPercent)
+                {
+                    totalPct += nutrient.MaxEnergyPct ?? 0;
+                }
             }
 
             if (totalPct > 100)
@@ -77,7 +86,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             await _customHealthGoalRepository.AddAsync(goal);
         }
 
-        public async Task UpdateCustomHealthGoalAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request)
+        public async Task UpdateCustomHealthGoalAsync(Guid userId, Guid customHealthGoalId, UpdateCustomHealthGoalRequest request)
         {
             var duplicateIds = request.Targets
                 .GroupBy(t => t.NutrientId)
@@ -94,7 +103,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             foreach (var nutrient in request.Targets)
             {
                 await this.ValidateInput(nutrient);
-                totalPct += nutrient.MaxEnergyPct ?? 0;
+                if (NutrientTargetType.From(nutrient.TargetType) == NutrientTargetType.EnergyPercent)
+                {
+                    totalPct += nutrient.MaxEnergyPct ?? 0;
+                }
             }
 
             if (totalPct > 100)
@@ -109,7 +121,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (!exist)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Dinh dưỡng không tồn tại");
 
-            var healthGoal = await _customHealthGoalRepository.GetByIdAsync(id,
+            var healthGoal = await _customHealthGoalRepository.GetByIdAsync(customHealthGoalId,
                 include: i => i.Include(h => h.Targets));
 
             if (healthGoal == null)
@@ -118,7 +130,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (healthGoal.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
-            healthGoal.Targets.Clear();
+            await _healthGoalTargetRepository.DeleteRangeAsync(healthGoal.Targets);
 
             healthGoal.Name = request.Name;
             healthGoal.Description = request.Description;
@@ -136,9 +148,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             await _customHealthGoalRepository.UpdateAsync(healthGoal);
         }
 
-        public async Task<HealthGoalResponse> GetCustomHealthGoalByIdAsync(Guid userId, Guid id)
+        public async Task<HealthGoalResponse> GetCustomHealthGoalByIdAsync(Guid userId, Guid customHealthGoalId)
         {
-            var goal = await _customHealthGoalRepository.GetByIdAsync(id,
+            var goal = await _customHealthGoalRepository.GetByIdAsync(customHealthGoalId,
                 include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient));
 
             if (goal == null)
@@ -151,9 +163,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             return result;
         }
 
-        public async Task DeleteCustomHealthGoalAsync(Guid userId, Guid id)
+        public async Task DeleteCustomHealthGoalAsync(Guid userId, Guid customHealthGoalId)
         {
-            var goal = await _customHealthGoalRepository.GetByIdAsync(id,
+            var goal = await _customHealthGoalRepository.GetByIdAsync(customHealthGoalId,
                 include: q => q.Include(g => g.Targets));
 
             if (goal == null)
@@ -162,6 +174,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (goal.UserId != userId)
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
+
+            await _healthGoalTargetRepository.DeleteRangeAsync(goal.Targets);
             await _customHealthGoalRepository.DeleteAsync(goal);
         }
 

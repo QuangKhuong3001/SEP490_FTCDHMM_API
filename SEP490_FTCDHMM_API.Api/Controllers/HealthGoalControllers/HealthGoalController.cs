@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.HealthGoalDtos.CreateHealthGoalRequest>(request);
 
-            await _healthGoalService.CreateAsync(appRequest);
+            await _healthGoalService.CreateHealthGoalAsync(appRequest);
             return Ok();
         }
 
@@ -39,14 +39,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.HealthGoalDtos.UpdateHealthGoalRequest>(request);
 
-            await _healthGoalService.UpdateAsync(id, appRequest);
+            await _healthGoalService.UpdateHealthGoalAsync(id, appRequest);
             return Ok();
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _healthGoalService.GetByIdAsync(id);
+            var result = await _healthGoalService.GetHealthGoalByIdAsync(id);
 
             return Ok(result);
         }
@@ -54,7 +54,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _healthGoalService.GetAllAsync();
+            var result = await _healthGoalService.GetHealthGoalsAsync();
 
             return Ok(result);
         }
@@ -63,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _healthGoalService.DeleteAsync(id);
+            await _healthGoalService.DeleteHealthGoalAsync(id);
             return Ok();
         }
 

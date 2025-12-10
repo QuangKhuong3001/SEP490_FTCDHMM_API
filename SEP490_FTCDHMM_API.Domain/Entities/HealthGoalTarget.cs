@@ -23,6 +23,6 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public decimal? MinEnergyPct { get; set; }
         public decimal? MaxEnergyPct { get; set; }
 
-        public decimal Weight { get; set; } = 1m;
+        public int Weight { get; set; } = 1;
     }
 }

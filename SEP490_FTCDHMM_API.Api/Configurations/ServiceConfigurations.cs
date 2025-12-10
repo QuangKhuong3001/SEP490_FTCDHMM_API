@@ -360,6 +360,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             //recipe management
             services.AddScoped<IRecipeManagementService, RecipeManagementService>();
+
+            services.AddScoped<IHealthGoalTargetRepository, HealthGoalTargetRepository>();
         }
     }
 }

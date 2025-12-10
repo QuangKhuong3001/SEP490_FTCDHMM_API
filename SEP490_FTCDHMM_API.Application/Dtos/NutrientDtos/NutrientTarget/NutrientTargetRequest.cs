@@ -8,7 +8,7 @@
         public decimal? MaxValue { get; set; }
         public decimal? MinEnergyPct { get; set; }
         public decimal? MaxEnergyPct { get; set; }
-        public decimal Weight { get; set; } = 1m;
+        public int Weight { get; set; } = 1;
     }
 
 }
