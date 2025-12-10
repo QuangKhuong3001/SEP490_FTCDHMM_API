@@ -6,15 +6,15 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
 {
     public class CopyRecipeRequest
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
-        public required string Difficulty { get; set; }
+        public string Difficulty { get; set; } = string.Empty;
         public int CookTime { get; set; }
         public FileUploadModel? Image { get; set; }
-        public required int Ration { get; set; }
-        public required List<Guid> LabelIds { get; set; }
+        public int Ration { get; set; }
+        public List<Guid> LabelIds { get; set; } = new();
         public List<RecipeIngredientRequest> Ingredients { get; set; } = new();
-        public required List<CookingStepRequest> CookingSteps { get; set; }
+        public List<CookingStepRequest> CookingSteps { get; set; } = new();
         public List<Guid> TaggedUserIds { get; set; } = new();
     }
 }

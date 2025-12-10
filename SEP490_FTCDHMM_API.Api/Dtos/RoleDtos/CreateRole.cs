@@ -6,6 +6,6 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RoleDtos
     {
         [Required(ErrorMessage = "Nhập tên")]
         [StringLength(100, ErrorMessage = "Tên phải ít hơn 100 ký tự")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

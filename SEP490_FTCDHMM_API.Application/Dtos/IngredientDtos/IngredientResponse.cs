@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos
     public class IngredientResponse
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal Calories { get; set; }
         public List<IngredientCategoryResponse> CategoryNames { get; set; } = new();

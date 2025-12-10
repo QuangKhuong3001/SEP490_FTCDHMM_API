@@ -20,7 +20,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<IEnumerable<IngredientDetectionResult>> DetectIngredientsAsync(IngredientDetectionUploadRequest request)
         {
-            var result = await _geminiDetectionService.DetectIngredientsAsync(request.Image);
+            var result = await _geminiDetectionService.DetectIngredientsAsync(request.Image!);
 
             if (!result.Any())
             {

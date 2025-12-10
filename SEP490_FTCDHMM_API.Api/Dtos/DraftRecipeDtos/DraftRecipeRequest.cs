@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.DraftRecipeDtos
     {
         [Required(ErrorMessage = "Tên không được để trống.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Tên phải từ 3 đến 100 ký tự")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         public string Difficulty { get; set; } = "Easy";
         public int CookTime { get; set; }

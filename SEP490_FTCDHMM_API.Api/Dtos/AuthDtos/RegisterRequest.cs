@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.AuthDTOs
         public DateTime? DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn giới tính")]
-        public required string Gender { get; set; }
+        public string Gender { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
         [Compare("Password", ErrorMessage = "Xác nhận mật khẩu không khớp")]

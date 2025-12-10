@@ -5,14 +5,14 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
     public class EmailOtp
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public required string Code { get; set; }
-        public required OtpPurpose Purpose { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public OtpPurpose Purpose { get; set; } = OtpPurpose.VerifyAccountEmail;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public DateTime ExpiresAtUtc { get; set; }
         public int Attempts { get; set; } = 0;
         public bool IsDisabled { get; set; } = false;
 
-        public required Guid SentToId { get; set; }
+        public Guid SentToId { get; set; }
         public AppUser SentTo { get; set; } = default!;
     }
 }

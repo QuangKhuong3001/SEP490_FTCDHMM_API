@@ -2,6 +2,6 @@
 {
     public class UpdateColorCodeRequest
     {
-        public required string ColorCode { get; set; }
+        public string ColorCode { get; set; } = string.Empty;
     }
 }

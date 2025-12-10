@@ -3,6 +3,6 @@
     public class UserHealthGoalRequest
     {
         public DateTime? ExpiredAtUtc { get; set; }
-        public required string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
     }
 }

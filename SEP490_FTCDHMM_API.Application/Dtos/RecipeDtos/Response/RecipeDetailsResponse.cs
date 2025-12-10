@@ -10,20 +10,20 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
     public class RecipeDetailsResponse
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
-        public required UserInteractionResponse Author { get; set; }
+        public UserInteractionResponse Author { get; set; } = new();
         public DateTime CreatedAtUtc { get; set; }
-        public required DifficultyValue Difficulty { get; set; }
+        public DifficultyValue Difficulty { get; set; } = DifficultyValue.Medium;
         public decimal CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
-        public required int Ration { get; set; }
+        public int Ration { get; set; }
         public string? ImageUrl { get; set; }
         public bool IsFavorited { get; set; }
         public bool IsSaved { get; set; }
-        public required List<CookingStepResponse> CookingSteps { get; set; }
-        public required List<LabelResponse> Labels { get; set; }
-        public required List<RecipeIngredientResponse> Ingredients { get; set; }
+        public List<CookingStepResponse> CookingSteps { get; set; } = new();
+        public List<LabelResponse> Labels { get; set; } = new();
+        public List<RecipeIngredientResponse> Ingredients { get; set; } = new();
         public List<RecipeUserTaggedResponse> TaggedUser { get; set; } = new();
         public RecipeParentResponse? Parent { get; set; }
 

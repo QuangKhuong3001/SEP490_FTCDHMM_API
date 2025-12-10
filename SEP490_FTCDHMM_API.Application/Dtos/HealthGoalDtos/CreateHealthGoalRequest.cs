@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos
     {
         [Required(ErrorMessage = "Tên mục tiêu không được để trống")]
         [StringLength(255, MinimumLength = 1, ErrorMessage = "Tên mục tiêu phải từ 1 đến 255 ký tự")]
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự")]
         public string? Description { get; set; }

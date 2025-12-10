@@ -13,12 +13,12 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn phân loại nguyên liệu")]
-        public required List<Guid> IngredientCategoryIds { get; set; }
+        public List<Guid> IngredientCategoryIds { get; set; } = new();
 
         [Required(ErrorMessage = "Vui lòng tải lên hình ảnh")]
-        public required IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
 
         [Required(ErrorMessage = "Vui lòng thêm thành phần dinh dưỡng")]
-        public required List<NutrientRequest> Nutrients { get; set; }
+        public List<NutrientRequest> Nutrients { get; set; } = new();
     }
 }

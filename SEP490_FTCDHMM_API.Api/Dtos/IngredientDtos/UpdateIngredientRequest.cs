@@ -14,6 +14,6 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
         public List<NutrientRequest>? Nutrients { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn phân loại nguyên liệu")]
-        public required List<Guid> IngredientCategoryIds { get; set; }
+        public List<Guid> IngredientCategoryIds { get; set; } = new();
     }
 }

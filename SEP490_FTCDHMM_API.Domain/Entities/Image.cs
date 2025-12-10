@@ -3,7 +3,7 @@
     public class Image
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public required string Key { get; set; }
+        public string Key { get; set; } = string.Empty;
         public string? ContentType { get; set; }
         public DateTime CreatedAtUTC { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;

@@ -2,8 +2,8 @@
 {
     public class CreateLabelRequest
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public required string ColorCode { get; set; }
+        public string ColorCode { get; set; } = string.Empty;
     }
 }

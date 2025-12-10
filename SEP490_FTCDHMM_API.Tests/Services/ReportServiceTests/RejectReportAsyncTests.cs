@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
         {
             var id = Guid.NewGuid();
 
-            ReportRepoMock.Setup(r => r.GetByIdAsync(id, null)).ReturnsAsync((Report)null);
+            ReportRepoMock.Setup(r => r.GetByIdAsync(id, null)).ReturnsAsync((Report)null!);
 
             await Assert.ThrowsAsync<AppException>(() =>
                 Sut.RejectReportAsync(id, Guid.NewGuid(), "x"));

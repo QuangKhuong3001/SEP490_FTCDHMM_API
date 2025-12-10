@@ -3,10 +3,10 @@
     public class Label
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string LowerName { get; set; } = string.Empty;
         public string NormalizedName { get; set; } = string.Empty;
-        public required string ColorCode { get; set; }
+        public string ColorCode { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
         public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
 

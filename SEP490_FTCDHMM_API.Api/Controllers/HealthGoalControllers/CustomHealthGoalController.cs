@@ -32,7 +32,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
 
             var appRequest = _mapper.Map<ApplicationDtos.CustomHealthGoalDtos.CreateCustomHealthGoalRequest>(req);
 
-            await _customHealthGoalService.CreateAsync(userId, appRequest);
+            await _customHealthGoalService.CreateCustomHealthGoalAsync(userId, appRequest);
             return Ok();
         }
 
@@ -44,7 +44,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var result = await _customHealthGoalService.GetByIdAsync(userId, id);
+            var result = await _customHealthGoalService.GetCustomHealthGoalByIdAsync(userId, id);
 
             return Ok(result);
         }
@@ -59,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
 
             var appRequest = _mapper.Map<ApplicationDtos.CustomHealthGoalDtos.UpdateCustomHealthGoalRequest>(request);
 
-            await _customHealthGoalService.UpdateAsync(userId, id, appRequest);
+            await _customHealthGoalService.UpdateCustomHealthGoalAsync(userId, id, appRequest);
 
             return Ok();
         }
@@ -72,7 +72,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _customHealthGoalService.DeleteAsync(userId, id);
+            await _customHealthGoalService.DeleteCustomHealthGoalAsync(userId, id);
             return Ok();
         }
     }

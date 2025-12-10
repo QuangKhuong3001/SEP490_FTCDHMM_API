@@ -3,7 +3,7 @@
     public class PermissionDomain
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public ICollection<PermissionAction> Actions { get; set; } = new List<PermissionAction>();
     }
 }

@@ -3,6 +3,6 @@
     public class FavoriteRecipeFilterRequest
     {
         public string? Keyword { get; set; }
-        public required RecipePaginationParams PaginationParams { get; set; }
+        public RecipePaginationParams PaginationParams { get; set; } = new();
     }
 }

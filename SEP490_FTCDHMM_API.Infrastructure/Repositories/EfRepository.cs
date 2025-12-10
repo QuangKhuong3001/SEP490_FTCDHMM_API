@@ -54,12 +54,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
         public async Task UpdateAsync(T entity)
         {
-            var entry = _dbContext.Entry(entity);
-
-            if (entry.State == EntityState.Detached)
-            {
-                entry.State = EntityState.Modified;
-            }
+            _dbContext.Set<T>().Update(entity);
             await _dbContext.SaveChangesAsync();
         }
 

@@ -5,9 +5,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterface
 {
     public interface ICustomHealthGoalService
     {
-        Task CreateAsync(Guid userId, CreateCustomHealthGoalRequest request);
-        Task<HealthGoalResponse> GetByIdAsync(Guid userId, Guid id);
-        Task UpdateAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request);
-        Task DeleteAsync(Guid userId, Guid id);
+        Task CreateCustomHealthGoalAsync(Guid userId, CreateCustomHealthGoalRequest request);
+        Task<HealthGoalResponse> GetCustomHealthGoalByIdAsync(Guid userId, Guid id);
+        Task UpdateCustomHealthGoalAsync(Guid userId, Guid id, UpdateCustomHealthGoalRequest request);
+        Task DeleteCustomHealthGoalAsync(Guid userId, Guid id);
     }
 }

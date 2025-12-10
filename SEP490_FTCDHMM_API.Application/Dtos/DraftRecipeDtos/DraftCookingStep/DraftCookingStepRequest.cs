@@ -6,6 +6,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep
     {
         public string? Instruction { get; set; }
         public List<DraftCookingStepImageRequest> Images { get; set; } = new();
-        public required int StepOrder { get; set; }
+        public int StepOrder { get; set; }
     }
 }

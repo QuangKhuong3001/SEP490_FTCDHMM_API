@@ -3,7 +3,7 @@
     public class CreateIngredientCategoryRestrictionRequest
     {
         public Guid IngredientCategoryId { get; set; }
-        public required string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
         public string? Notes { get; set; }
         public DateTime? ExpiredAtUtc { get; set; }
     }

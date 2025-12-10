@@ -189,7 +189,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await HasMacroNutrients(nutrientIds);
 
-            var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image, StorageFolder.INGREDIENTS, null);
+            var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image!, StorageFolder.INGREDIENTS, null);
 
             var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));

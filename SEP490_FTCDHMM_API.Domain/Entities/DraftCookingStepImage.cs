@@ -9,6 +9,6 @@
 
         public Guid ImageId { get; set; }
         public Image Image { get; set; } = null!;
-        public required int ImageOrder { get; set; }
+        public int ImageOrder { get; set; }
     }
 }

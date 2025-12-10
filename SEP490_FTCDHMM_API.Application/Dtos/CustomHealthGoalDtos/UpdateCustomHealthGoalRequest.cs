@@ -4,7 +4,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.CustomHealthGoalDtos
 {
     public class UpdateCustomHealthGoalRequest
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public List<NutrientTargetRequest> Targets { get; set; } = new();
     }
