@@ -4,7 +4,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface INotificationService
     {
-        Task<IEnumerable<NotificationResponse>> GetByUserIdAsync(Guid userId);
+        Task<IEnumerable<NotificationResponse>> GetNotificationsByUserIdAsync(Guid userId);
         Task MarkAsReadAsync(Guid userId, Guid notificationId);
     }
 }

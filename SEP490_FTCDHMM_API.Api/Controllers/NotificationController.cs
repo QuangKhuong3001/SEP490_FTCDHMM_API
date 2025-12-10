@@ -21,7 +21,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> GetMyNotifications()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _notificationService.GetByUserIdAsync(userId);
+            var result = await _notificationService.GetNotificationsByUserIdAsync(userId);
             return Ok(result);
         }
 
