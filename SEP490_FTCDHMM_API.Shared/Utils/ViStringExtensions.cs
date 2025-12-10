@@ -11,7 +11,7 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
         {
             if (string.IsNullOrWhiteSpace(text)) return string.Empty;
 
-            text = text.Trim().ToLowerInvariant().CleanDuplicateSpace();
+            text = text.ToLowerInvariant().CleanDuplicateSpace();
 
             var normalized = text.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();

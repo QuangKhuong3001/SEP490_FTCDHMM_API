@@ -7,6 +7,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -35,16 +36,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task CreateRole(CreateRoleRequest dto)
+        public async Task CreateRoleAsync(CreateRoleRequest dto)
         {
-            var existing = await _roleRepository.ExistsAsync(r => r.Name == dto.Name);
+            var existing = await _roleRepository.ExistsAsync(r => r.NormalizedName == dto.Name.ToUpperInvariant().CleanDuplicateSpace());
 
             if (existing)
                 throw new AppException(AppResponseCode.EXISTS);
 
             var role = new AppRole
             {
-                NormalizedName = dto.Name.ToUpperInvariant(),
+                NormalizedName = dto.Name.ToUpperInvariant().CleanDuplicateSpace(),
                 IsActive = true,
                 Name = dto.Name
             };
@@ -63,11 +64,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _rolePermissionRepository.AddRangeAsync(rolePermissions);
         }
 
-        public async Task DeleteRole(Guid roleId)
+        public async Task DeleteRoleAsync(Guid roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
+
+            if (role.Name == RoleConstants.Admin)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
 
             var existingUserInRole = await _userRepository.ExistsAsync(x => x.RoleId == roleId);
             if (existingUserInRole)
@@ -76,7 +80,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _roleRepository.DeleteAsync(role);
         }
 
-        public async Task<PagedResult<RoleResponse>> GetAllRoles(PaginationParams pagination)
+        public async Task<PagedResult<RoleResponse>> GetRolesAsync(PaginationParams pagination)
         {
             var (roles, totalCount) = await _roleRepository.GetPagedAsync(
                 pagination.PageNumber, pagination.PageSize);
@@ -91,15 +95,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task<RoleNameResponse> GetActivateRoles()
+        public async Task<List<RoleNameResponse>> GetActivateRolesAsync()
         {
             var roles = await _roleRepository.GetAllAsync(r => r.IsActive);
 
-            var result = _mapper.Map<RoleNameResponse>(roles);
+            var result = _mapper.Map<List<RoleNameResponse>>(roles);
             return result;
         }
 
-        public async Task ActiveRole(Guid roleId)
+        public async Task ActiveRoleAsync(Guid roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
@@ -112,7 +116,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _roleRepository.UpdateAsync(role);
 
         }
-        public async Task DeactiveRole(Guid roleId)
+        public async Task DeactiveRoleAsync(Guid roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId);
             if (role == null)
@@ -127,16 +131,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var existingUserInRole = await _userRepository.ExistsAsync(x => x.RoleId == roleId);
             if (existingUserInRole)
             {
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Vai trò này đang được gắn cho một hoặc nhiều người dùng");
             }
 
             role.IsActive = false;
             await _roleRepository.UpdateAsync(role);
         }
 
-        public async Task UpdateRolePermissions(Guid roleId, RolePermissionSettingRequest dto)
+        public async Task UpdateRolePermissionsAsync(Guid roleId, RolePermissionSettingRequest dto)
         {
-            var role = await _roleRepository.GetByIdAsync(roleId);
+            var role = await _roleRepository.GetByIdAsync(roleId,
+                include: i => i.Include(r => r.RolePermissions));
 
             if (role == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -144,28 +149,27 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (role.Name == RoleConstants.Admin)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
 
-            var rolePermissions = await _rolePermissionRepository
-                .GetAllAsync(rp => rp.RoleId == roleId);
-
-            if (rolePermissions == null || !rolePermissions.Any())
-                throw new AppException(AppResponseCode.NOT_FOUND);
+            var rolePermissions = role.RolePermissions;
 
             foreach (var permission in dto.Permissions)
             {
                 var rp = rolePermissions.FirstOrDefault(
                     x => x.PermissionActionId == permission.PermissionActionId);
-                if (rp != null)
-                {
-                    rp.IsActive = permission.IsActive;
-                    await _rolePermissionRepository.UpdateAsync(rp);
-                }
+
+                if (rp == null)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Quyền này không tồn tại");
+
+                rp.IsActive = permission.IsActive;
             }
+
+            await _roleRepository.UpdateAsync(role);
+
         }
 
-        public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissions(Guid roleId)
+        public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissionsAsync(Guid roleId)
         {
             var domains = await _permissionDomainRepository.GetAllAsync(
-                include: d => d.Include(r => r.Actions));
+                include: i => i.Include(rd => rd.Actions));
 
             var rolePermissions = await _rolePermissionRepository.GetAllAsync(rp => rp.RoleId == roleId);
 

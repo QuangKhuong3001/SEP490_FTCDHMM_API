@@ -5,14 +5,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IRoleService
     {
-        Task CreateRole(CreateRoleRequest dto);
-        Task DeleteRole(Guid roleId);
-        Task<PagedResult<RoleResponse>> GetAllRoles(PaginationParams pagination);
-        Task<RoleNameResponse> GetActivateRoles();
-        Task ActiveRole(Guid roleId);
-        Task DeactiveRole(Guid roleId);
-        Task UpdateRolePermissions(Guid roleId, RolePermissionSettingRequest dto);
-        Task<IEnumerable<PermissionDomainRequest>> GetRolePermissions(Guid roleId);
+        Task CreateRoleAsync(CreateRoleRequest dto);
+        Task DeleteRoleAsync(Guid roleId);
+        Task<PagedResult<RoleResponse>> GetRolesAsync(PaginationParams pagination);
+        Task<List<RoleNameResponse>> GetActivateRolesAsync();
+        Task ActiveRoleAsync(Guid roleId);
+        Task DeactiveRoleAsync(Guid roleId);
+        Task UpdateRolePermissionsAsync(Guid roleId, RolePermissionSettingRequest dto);
+        Task<IEnumerable<PermissionDomainRequest>> GetRolePermissionsAsync(Guid roleId);
 
     }
 }

@@ -28,7 +28,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.RoleDtos.CreateRoleRequest>(dto);
 
-            await _roleService.CreateRole(appDto);
+            await _roleService.CreateRoleAsync(appDto);
             return Ok();
         }
 
@@ -38,7 +38,17 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
 
-            var result = await _roleService.GetAllRoles(appDto);
+            var result = await _roleService.GetRolesAsync(appDto);
+            return Ok(result);
+        }
+
+        [HttpGet("activating")]
+        [Authorize(Policy = PermissionPolicies.Role_View)]
+        public async Task<IActionResult> GetActiveRoles([FromQuery] PaginationParams dto)
+        {
+            var appDto = _mapper.Map<ApplicationDtos.Common.PaginationParams>(dto);
+
+            var result = await _roleService.GetActivateRolesAsync();
             return Ok(result);
         }
 
@@ -46,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize(Policy = PermissionPolicies.Role_Update)]
         public async Task<IActionResult> Active(Guid roleId)
         {
-            await _roleService.ActiveRole(roleId);
+            await _roleService.ActiveRoleAsync(roleId);
             return Ok();
         }
 
@@ -54,7 +64,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize(Policy = PermissionPolicies.Role_Update)]
         public async Task<IActionResult> Deactive(Guid roleId)
         {
-            await _roleService.DeactiveRole(roleId);
+            await _roleService.DeactiveRoleAsync(roleId);
             return Ok();
         }
 
@@ -64,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.RoleDtos.RolePermissionSettingRequest>(dto);
 
-            await _roleService.UpdateRolePermissions(roleId, appDto);
+            await _roleService.UpdateRolePermissionsAsync(roleId, appDto);
             return Ok();
         }
 
@@ -72,7 +82,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize(Policy = PermissionPolicies.Role_View)]
         public async Task<IActionResult> GetRolePermissions(Guid roleId)
         {
-            var result = await _roleService.GetRolePermissions(roleId);
+            var result = await _roleService.GetRolePermissionsAsync(roleId);
             return Ok(result);
         }
 

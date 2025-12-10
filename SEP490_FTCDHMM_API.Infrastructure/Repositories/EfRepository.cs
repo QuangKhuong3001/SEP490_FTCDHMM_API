@@ -40,11 +40,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task SaveChangeAsync()
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-
         public async Task<T> AddAsync(T entity)
         {
             await _dbContext.Set<T>().AddAsync(entity);
@@ -79,7 +74,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             _dbContext.Set<T>().RemoveRange(entities);
             await _dbContext.SaveChangesAsync();
         }
-
         public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
         {
             return predicate == null
@@ -113,33 +107,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             var count = await _dbContext.Set<T>().CountAsync(lambda);
             return count == ids.Count;
         }
-
-        public async Task<bool> IdsExistAsync(IEnumerable<Guid> ids)
-        {
-            if (ids == null || !ids.Any())
-                return false;
-
-            var idList = ids.Distinct().ToList();
-
-            var param = Expression.Parameter(typeof(T), "e");
-            var property = Expression.PropertyOrField(param, "Id");
-
-            var containsMethod = typeof(List<Guid>)
-                .GetMethod(nameof(List<Guid>.Contains), new[] { typeof(Guid) });
-
-            var containsCall = Expression.Call(
-                Expression.Constant(idList),
-                containsMethod!,
-                property
-            );
-
-            var lambda = Expression.Lambda<Func<T, bool>>(containsCall, param);
-
-            var count = await _dbContext.Set<T>().CountAsync(lambda);
-
-            return count == idList.Count;
-        }
-
 
         public async Task<(IReadOnlyList<T> Items, int TotalCount)> GetPagedAsync(
             int pageNumber,

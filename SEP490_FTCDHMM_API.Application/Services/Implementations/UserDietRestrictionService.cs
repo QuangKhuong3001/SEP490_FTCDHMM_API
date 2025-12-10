@@ -6,6 +6,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -27,23 +28,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _ingredientRepository = ingredientRepository;
         }
 
-        public async Task CreateIngredientCategoryRestriction(Guid userId, CreateIngredientCategoryRestrictionRequest request)
+        public async Task CreateIngredientCategoryRestrictionAsync(Guid userId, CreateIngredientCategoryRestrictionRequest request)
         {
-            if (request.ExpiredAtUtc < DateTime.UtcNow)
+            if (request.ExpiredAtUtc != null && request.ExpiredAtUtc < DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var exist = await _ingredientCategoryRepository.ExistsAsync(i => i.Id == request.IngredientCategoryId);
             if (!exist)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            var type = RestrictionType.From(request.Type);
+
             var duplicates = await _userDietRestrictionRepository.ExistsAsync(
                 u => u.IngredientCategoryId == request.IngredientCategoryId &&
+                (u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow) &&
                 u.UserId == userId);
 
             if (duplicates)
                 throw new AppException(AppResponseCode.DUPLICATE);
-
-            var type = RestrictionType.From(request.Type);
 
             if (type == RestrictionType.TemporaryAvoid && !request.ExpiredAtUtc.HasValue)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -63,23 +65,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             });
         }
 
-        public async Task CreateIngredientRestriction(Guid userId, CreateIngredientRestrictionRequest request)
+        public async Task CreateIngredientRestrictionAsync(Guid userId, CreateIngredientRestrictionRequest request)
         {
-            if (request.ExpiredAtUtc < DateTime.UtcNow)
+            if (request.ExpiredAtUtc != null && request.ExpiredAtUtc < DateTime.UtcNow)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var exist = await _ingredientRepository.ExistsAsync(i => i.Id == request.IngredientId);
             if (!exist)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            var type = RestrictionType.From(request.Type);
+
             var duplicates = await _userDietRestrictionRepository.ExistsAsync(
                 u => u.IngredientId == request.IngredientId &&
+                (u.ExpiredAtUtc == null || u.ExpiredAtUtc > DateTime.UtcNow) &&
                 u.UserId == userId);
 
             if (duplicates)
                 throw new AppException(AppResponseCode.DUPLICATE);
-
-            var type = RestrictionType.From(request.Type);
 
             if (type == RestrictionType.TemporaryAvoid && !request.ExpiredAtUtc.HasValue)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
@@ -99,7 +102,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             });
         }
 
-        public async Task DeleteRestriction(Guid userId, Guid restrictionId)
+        public async Task DeleteRestrictionAsync(Guid userId, Guid restrictionId)
         {
             var restriction = await _userDietRestrictionRepository.GetByIdAsync(restrictionId);
             if (restriction == null)
@@ -122,11 +125,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (!string.IsNullOrWhiteSpace(request.Keyword))
             {
-                string keyword = request.Keyword.Trim().ToLower();
+                string keyword = request.Keyword.NormalizeVi();
                 restrictions = restrictions
                     .Where(d =>
-                        (d.Ingredient != null && d.Ingredient.Name.ToLower().Contains(keyword)) ||
-                        (d.IngredientCategory != null && d.IngredientCategory.Name.ToLower().Contains(keyword)))
+                        (d.Ingredient != null && d.Ingredient.Name.NormalizeVi().Contains(keyword)) ||
+                        (d.IngredientCategory != null && d.IngredientCategory.Name.NormalizeVi().Contains(keyword)))
                     .ToList();
             }
 
@@ -136,9 +139,43 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 restrictions = restrictions.Where(d => d.Type == type).ToList();
             }
 
-            restrictions = restrictions
-                .OrderBy(d => d.Ingredient != null ? d.Ingredient.Name : d.IngredientCategory!.Name)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(request.SortBy))
+            {
+                restrictions = request.SortBy.ToLower() switch
+                {
+                    "name_asc" => restrictions
+                        .OrderBy(d => d.Ingredient != null ? d.Ingredient.Name : d.IngredientCategory?.Name ?? string.Empty)
+                        .ToList(),
+
+                    "name_desc" => restrictions
+                        .OrderByDescending(d => d.Ingredient != null ? d.Ingredient.Name : d.IngredientCategory?.Name ?? string.Empty)
+                        .ToList(),
+
+                    "type_asc" => restrictions
+                        .OrderBy(d => d.Type.Value)
+                        .ToList(),
+
+                    "type_desc" => restrictions
+                        .OrderByDescending(d => d.Type.Value)
+                        .ToList(),
+
+                    "expired_asc" => restrictions
+                        .OrderBy(d => d.ExpiredAtUtc == null ? DateTime.MaxValue : d.ExpiredAtUtc)
+                        .ToList(),
+
+                    "expired_desc" => restrictions
+                        .OrderByDescending(d => d.ExpiredAtUtc == null ? DateTime.MaxValue : d.ExpiredAtUtc)
+                        .ToList(),
+
+                    _ => restrictions
+                };
+            }
+            else
+            {
+                restrictions = restrictions
+                    .OrderBy(d => d.Ingredient != null ? d.Ingredient.Name : d.IngredientCategory?.Name ?? string.Empty)
+                    .ToList();
+            }
 
             var result = _mapper.Map<IEnumerable<UserDietRestrictionResponse>>(restrictions);
 

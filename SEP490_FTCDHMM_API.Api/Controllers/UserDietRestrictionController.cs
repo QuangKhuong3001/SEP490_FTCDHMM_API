@@ -33,7 +33,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserDietRestriction.CreateIngredientRestrictionRequest>(request);
 
-            await _userDietRestrictionService.CreateIngredientRestriction(userId, appRequest);
+            await _userDietRestrictionService.CreateIngredientRestrictionAsync(userId, appRequest);
             return Ok();
         }
 
@@ -47,7 +47,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.UserDietRestriction.CreateIngredientCategoryRestrictionRequest>(request);
 
-            await _userDietRestrictionService.CreateIngredientCategoryRestriction(userId, appRequest);
+            await _userDietRestrictionService.CreateIngredientCategoryRestrictionAsync(userId, appRequest);
             return Ok();
         }
 
@@ -73,7 +73,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userDietRestrictionService.DeleteRestriction(userId, restrictionId);
+            await _userDietRestrictionService.DeleteRestrictionAsync(userId, restrictionId);
             return Ok();
         }
     }
