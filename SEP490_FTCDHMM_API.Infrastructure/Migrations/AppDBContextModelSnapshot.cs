@@ -946,6 +946,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("ParentCommentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1332,7 +1335,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 7, 16, 58, 40, 840, DateTimeKind.Utc).AddTicks(912),
+                            CreatedAtUTC = new DateTime(2025, 12, 9, 17, 20, 17, 522, DateTimeKind.Utc).AddTicks(4071),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1365,11 +1368,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<string>("LowerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1387,14 +1398,14 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1407,68 +1418,68 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("3741c8e7-ce2b-c477-4e45-169cec441664"),
-                            Name = "Rau củ quả",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Rau củ quả"
                         },
                         new
                         {
                             Id = new Guid("36e6cb97-3dc3-c518-e22c-4d2804e5a65d"),
-                            Name = "Hải sản",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Hải sản"
                         },
                         new
                         {
                             Id = new Guid("e7f53468-c971-6d4d-7e56-1e50702495fd"),
-                            Name = "Thịt",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Thịt"
                         },
                         new
                         {
                             Id = new Guid("5b8fd31b-bca6-bd0f-4bd4-1008a83f4385"),
-                            Name = "Trứng",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Trứng"
                         },
                         new
                         {
                             Id = new Guid("7814e36f-6b23-5d6b-f0b7-bc34f75fa315"),
-                            Name = "Ngũ cốc",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Ngũ cốc"
                         },
                         new
                         {
                             Id = new Guid("0b391ac2-8440-b318-afc4-045c61aee15c"),
-                            Name = "Gia vị",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Gia vị"
                         },
                         new
                         {
                             Id = new Guid("db5072d7-9bc0-6d4a-8d33-3b18239c40f6"),
-                            Name = "Dầu mỡ",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Dầu mỡ"
                         },
                         new
                         {
                             Id = new Guid("0ef727db-5be6-f820-ec21-5d1d34876db5"),
-                            Name = "Đồ uống",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Đồ uống"
                         },
                         new
                         {
                             Id = new Guid("bcfbe809-1ee1-771d-e271-0f959bfd67f6"),
-                            Name = "Đồ ngọt",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Đồ ngọt"
                         },
                         new
                         {
                             Id = new Guid("2510563b-4a1a-36f8-3eee-0081aeb1b15c"),
-                            Name = "Đồ hộp / chế biến sẵn",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Đồ hộp / chế biến sẵn"
                         },
                         new
                         {
                             Id = new Guid("447e8fa6-250f-0c6c-190e-d7ec87e91745"),
-                            Name = "Nguyên liệu khác",
-                            isDeleted = false
+                            IsDeleted = false,
+                            Name = "Nguyên liệu khác"
                         });
                 });
 
@@ -1510,10 +1521,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LowerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1527,70 +1546,90 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                             Id = new Guid("edae6e4e-e3a4-ccd4-a2d4-81edf652d3f4"),
                             ColorCode = "#4CAF50",
                             IsDeleted = false,
-                            Name = "Lành mạnh"
+                            LowerName = "",
+                            Name = "Lành mạnh",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("133554ee-b8bf-0518-a055-4097baea7b64"),
                             ColorCode = "#2196F3",
                             IsDeleted = false,
-                            Name = "Giàu đạm"
+                            LowerName = "",
+                            Name = "Giàu đạm",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("d5caeabc-0ca2-b778-f234-d5c084dd23cb"),
                             ColorCode = "#9C27B0",
                             IsDeleted = false,
-                            Name = "Ít tinh bột"
+                            LowerName = "",
+                            Name = "Ít tinh bột",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("16a7239f-04ef-4ae8-3c3d-f7c91f625ade"),
                             ColorCode = "#8BC34A",
                             IsDeleted = false,
-                            Name = "Thuần chay"
+                            LowerName = "",
+                            Name = "Thuần chay",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("8443f632-4d26-96c3-6c99-cdb180c761f3"),
                             ColorCode = "#CDDC39",
                             IsDeleted = false,
-                            Name = "Chay"
+                            LowerName = "",
+                            Name = "Chay",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("19f3c506-46ad-f9be-3a10-63dc2ed6a57e"),
                             ColorCode = "#FF9800",
                             IsDeleted = false,
-                            Name = "Không gluten"
+                            LowerName = "",
+                            Name = "Không gluten",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("b6cb3448-5f59-44b8-e69e-5a2e408ccd97"),
                             ColorCode = "#FFC107",
                             IsDeleted = false,
-                            Name = "Món nhanh"
+                            LowerName = "",
+                            Name = "Món nhanh",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("c8f90ed8-cc93-7d51-8477-534ff99d0fd0"),
                             ColorCode = "#00BCD4",
                             IsDeleted = false,
-                            Name = "Ít béo"
+                            LowerName = "",
+                            Name = "Ít béo",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("d238ef58-09be-5176-f430-16cdbfc0032a"),
                             ColorCode = "#795548",
                             IsDeleted = false,
-                            Name = "Keto"
+                            LowerName = "",
+                            Name = "Keto",
+                            NormalizedName = ""
                         },
                         new
                         {
                             Id = new Guid("f4a0ea3a-98b1-3443-4739-f63803a841c8"),
                             ColorCode = "#FF5722",
                             IsDeleted = false,
-                            Name = "Phù hợp cho người tiểu đường"
+                            LowerName = "",
+                            Name = "Phù hợp cho người tiểu đường",
+                            NormalizedName = ""
                         });
                 });
 

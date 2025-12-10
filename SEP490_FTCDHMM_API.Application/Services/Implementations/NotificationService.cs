@@ -5,8 +5,8 @@ using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
-using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -46,13 +46,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     {
                         response.Senders = new List<UserInteractionResponse>();
                     }
-                    else
-                    {
-                        response.Senders = g
-                            .Select(x => _mapper.Map<UserInteractionResponse>(x.Sender!))
-                            .DistinctBy(u => u.Id)
-                            .ToList();
-                    }
 
                     return response;
                 })
@@ -62,30 +55,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return grouped;
         }
 
-
-
-        public async Task CreateAsync(CreateNotificationRequest request)
-        {
-            var entity = _mapper.Map<Notification>(request);
-            entity.CreatedAtUtc = DateTime.UtcNow;
-            entity.IsRead = false;
-
-            var saved = await _notificationRepository.AddAsync(entity);
-            var result = _mapper.Map<NotificationResponse>(saved);
-
-
-            await _notifier.SendNotificationAsync(request.ReceiverId, result);
-
-
-        }
-
-        public async Task MarkAsReadAsync(Guid notificationId)
+        public async Task MarkAsReadAsync(Guid userId, Guid notificationId)
         {
             var notification = await _notificationRepository.GetByIdAsync(notificationId);
-            if (notification != null && !notification.IsRead)
+
+            if (notification == null)
+                throw new AppException(AppResponseCode.NOT_FOUND, "Không tìm thấy thông báo.");
+
+            if (notification.ReceiverId != userId)
+            {
+                throw new AppException(AppResponseCode.FORBIDDEN, "Bạn không có quyền thực hiện hành động này.");
+            }
+
+            if (!notification.IsRead)
             {
                 notification.IsRead = true;
                 await _notificationRepository.UpdateAsync(notification);
+                await _notifier.SendMarkNotificationAsReadAsync(userId, notificationId);
             }
         }
     }

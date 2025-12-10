@@ -28,7 +28,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("{recipeId:guid}")]
         public async Task<IActionResult> GetAll(Guid recipeId)
         {
-            var result = await _commentService.GetAllCommentByRecipeAsync(recipeId);
+            var result = await _commentService.GetCommentsByRecipeAsync(recipeId);
             return Ok(result);
         }
 

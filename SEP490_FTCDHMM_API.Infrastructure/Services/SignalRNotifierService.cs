@@ -48,7 +48,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
         public async Task SendNotificationAsync(Guid userId, object notification)
         {
             await _notificationHubContext.Clients.Group($"user-{userId}")
-                 .SendAsync("NOTIFICATION", notification);
+                 .SendAsync(HubEvent.Notification.Value, notification);
+        }
+
+        public async Task SendMarkNotificationAsReadAsync(Guid userId, Guid notificationId)
+        {
+            await _notificationHubContext.Clients.Group($"user-{userId}")
+                 .SendAsync(HubEvent.ReadNotification.Value, notificationId);
         }
     }
 }

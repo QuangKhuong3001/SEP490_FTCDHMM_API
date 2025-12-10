@@ -90,6 +90,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
+
+                    if (recipe.AuthorId != mentionedId && (parentComment == null || parentComment.UserId != mentionedId))
+                    {
+                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                    }
                 }
             }
 
@@ -104,15 +109,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
-            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, comment.Id);
+            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
 
-            if (parentComment != null)
+            if (parentComment != null && parentComment.UserId != recipe.AuthorId)
             {
-                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, comment.Id);
+                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, recipeId);
             }
         }
 
-        public async Task<List<CommentResponse>> GetAllCommentByRecipeAsync(Guid recipeId)
+        public async Task<List<CommentResponse>> GetCommentsByRecipeAsync(Guid recipeId)
         {
             var exist = await _recipeRepository.ExistsAsync(r => r.Id == recipeId);
 
@@ -199,6 +204,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
             comment.Content = request.Content;
+            comment.IsEdited = true;
+
+            var oldMentionIds = comment.Mentions.Select(m => m.MentionedUserId).ToList();
 
             comment.Mentions.Clear();
 
@@ -219,6 +227,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         CommentId = comment.Id,
                         MentionedUserId = mentionedId
                     });
+
+                    if (!oldMentionIds.Contains(mentionedId))
+                    {
+                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                    }
                 }
             }
 
@@ -244,18 +257,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
-            var saved = await _notificationRepository.AddAsync(notification);
+            await _notificationRepository.AddAsync(notification);
 
             var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
 
             var notificationResponse = new
             {
-                Id = saved.Id,
+                Id = notification.Id,
                 Type = new { name = type.Name },
                 Message = message,
                 TargetId = targetId,
                 IsRead = false,
-                CreatedAtUtc = saved.CreatedAtUtc,
+                CreatedAtUtc = notification.CreatedAtUtc,
                 Senders = sender != null ? new[]
                 {
                     new

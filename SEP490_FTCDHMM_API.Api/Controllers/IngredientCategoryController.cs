@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.IngredientCategoryDtos.IngredientCategoryFilterRequest>(request);
 
-            var result = await _ingredientCategoryService.GetAllIngredientCategoriesFilterAsync(appRequest);
+            var result = await _ingredientCategoryService.GetIngredientCategoriesFilterAsync(appRequest);
             return Ok(result);
         }
 

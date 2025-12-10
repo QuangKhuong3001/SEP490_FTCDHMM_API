@@ -26,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.LabelFilterRequest>(request);
 
-            var result = await _labelService.GetAllLabels(appRequest);
+            var result = await _labelService.GetPagedLabelsAsync(appRequest);
             return Ok(result);
         }
 
@@ -35,7 +35,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.LabelSearchDropboxRequest>(request);
 
-            var result = await _labelService.GetAllLabels(appRequest);
+            var result = await _labelService.GetLabelsAsync(appRequest);
             return Ok(result);
         }
 
@@ -45,7 +45,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.CreateLabelRequest>(request);
 
-            await _labelService.CreatLabel(appRequest);
+            await _labelService.CreatLabelAsync(appRequest);
             return Ok();
         }
 
@@ -53,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _labelService.DeleteLabel(id);
+            await _labelService.DeleteLabelAsync(id);
             return Ok();
         }
 
@@ -63,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.UpdateColorCodeRequest>(request);
 
-            await _labelService.UpdateColorCode(id, appRequest);
+            await _labelService.UpdateColorCodeAsync(id, appRequest);
             return Ok();
         }
     }

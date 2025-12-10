@@ -17,7 +17,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _nutrientRepository = nutrientRepository;
         }
 
-        public async Task<IEnumerable<NutrientNameResponse>> GetAllNutrient()
+        public async Task<IEnumerable<NutrientNameResponse>> GetNutrientsAsync()
         {
             var nutrients = await _nutrientRepository.GetAllAsync(include: i => i.Include(n => n.Unit));
             var result = _mapper.Map<IEnumerable<NutrientNameResponse>>(nutrients);
@@ -25,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return result;
         }
 
-        public async Task<IEnumerable<NutrientNameResponse>> GetRequiredNutrientList()
+        public async Task<IEnumerable<NutrientNameResponse>> GetRequiredNutrientsAsync()
         {
             var requireds = await _nutrientRepository.GetAllAsync(r => r.IsMacroNutrient, include: i => i.Include(r => r.Unit));
             var result = _mapper.Map<IEnumerable<NutrientNameResponse>>(requireds);

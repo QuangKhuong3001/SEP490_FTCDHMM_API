@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public required string Name { get; set; }
-        public required string VietnameseName { get; set; }
+        public string VietnameseName { get; set; } = string.Empty;
 
         public string? Description { get; set; }
         public bool IsMacroNutrient { get; set; } = false;

@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
     {
         Task CreateIngredientCategoryAsync(CreateIngredientCategoryRequest request);
         Task DeleteIngredientCategoryAsync(Guid id);
-        Task<PagedResult<IngredientCategoryResponse>> GetAllIngredientCategoriesFilterAsync(IngredientCategoryFilterRequest request);
+        Task<PagedResult<IngredientCategoryResponse>> GetIngredientCategoriesFilterAsync(IngredientCategoryFilterRequest request);
         Task<IEnumerable<IngredientCategoryResponse>> GetIngredientCategoriesAsync(IngredientCategorySearchDropboxRequest request);
     }
 }

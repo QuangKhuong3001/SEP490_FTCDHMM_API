@@ -4,6 +4,8 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public required string Name { get; set; }
+        public string LowerName { get; set; } = string.Empty;
+        public string NormalizedName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime LastUpdatedUtc { get; set; } = DateTime.UtcNow;
         public decimal Calories { get; set; }

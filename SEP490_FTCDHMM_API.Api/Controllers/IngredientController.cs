@@ -30,7 +30,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientFilterRequest>(dto);
 
-            var result = await _ingredientService.GetList(appDto);
+            var result = await _ingredientService.GetIngredientsAsync(appDto);
             return Ok(result);
         }
 
@@ -40,14 +40,14 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.IngredientFilterRequest>(dto);
 
-            var result = await _ingredientService.GetListForManager(appDto);
+            var result = await _ingredientService.GetIngredientsForManagerAsync(appDto);
             return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetDetails(Guid id)
         {
-            var result = await _ingredientService.GetDetails(id);
+            var result = await _ingredientService.GetIngredientDetailsAsync(id);
             return Ok(result);
         }
 
@@ -55,7 +55,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("ForManager/{id:guid}")]
         public async Task<IActionResult> GetDetailsForManagers(Guid id)
         {
-            var result = await _ingredientService.GetDetailsForManager(id);
+            var result = await _ingredientService.GetIngredientDetailsForManagerAsync(id);
             return Ok(result);
         }
 
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         {
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.CreateIngredientRequest>(dto);
 
-            await _ingredientService.CreateIngredient(appDto);
+            await _ingredientService.CreateIngredientAsync(appDto);
             return Ok();
         }
 
@@ -78,7 +78,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appDto = _mapper.Map<ApplicationDtos.IngredientDtos.UpdateIngredientRequest>(dto);
 
-            await _ingredientService.UpdateIngredient(id, appDto);
+            await _ingredientService.UpdateIngredientAsync(id, appDto);
             return Ok();
         }
 
@@ -86,8 +86,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [Authorize(Policy = PermissionPolicies.Ingredient_Delete)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _ingredientService.DeleteIngredient(id);
-            return Ok(new { message = "Ingredient deleted successfully." });
+            await _ingredientService.DeleteIngredientAsync(id);
+            return Ok();
         }
 
         [HttpPost("detect-gemini")]
