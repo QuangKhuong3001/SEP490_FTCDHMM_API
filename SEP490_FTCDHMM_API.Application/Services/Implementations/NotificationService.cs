@@ -46,6 +46,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     {
                         response.Senders = new List<UserInteractionResponse>();
                     }
+                    else
+                    {
+                        response.Senders = g
+                            .Where(n => n.Sender != null)
+                            .Select(n => _mapper.Map<UserInteractionResponse>(n.Sender))
+                            .DistinctBy(s => s.Id)
+                            .ToList();
+                    }
 
                     return response;
                 })

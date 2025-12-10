@@ -10,11 +10,10 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
         public CommentMappingProfile()
         {
             CreateMap<Comment, CommentResponse>()
-                    .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-                    .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-                    .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom<UniversalImageUrlResolver<Comment, CommentResponse>>())
                     .ForMember(dest => dest.Replies, opt => opt.MapFrom(src => src.Replies))
-                    .ForMember(dest => dest.Mentions, opt => opt.MapFrom(src => src.Mentions));
+                    .ForMember(dest => dest.Mentions, opt => opt.MapFrom(src => src.Mentions))
+                    .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User));
+
 
             CreateMap<CommentMention, MentionedUserResponse>()
                     .ForMember(dest => dest.MentionedUserId, opt => opt.MapFrom(src => src.MentionedUserId))
