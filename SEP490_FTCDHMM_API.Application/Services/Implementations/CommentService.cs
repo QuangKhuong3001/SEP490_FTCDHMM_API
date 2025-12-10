@@ -102,8 +102,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var saved = await _commentRepository.GetByIdAsync(
                 comment.Id,
                 c => c
-                    .Include(x => x.User).ThenInclude(x => x.Avatar)
-                    .Include(x => x.Mentions).ThenInclude(x => x.MentionedUser)
+                    .Include(x => x.User)
+                        .ThenInclude(x => x.Avatar)
+                    .Include(x => x.Mentions)
+                        .ThenInclude(x => x.MentionedUser)
             );
 
             var response = _mapper.Map<CommentResponse>(saved);
@@ -236,7 +238,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }
 
             await _commentRepository.UpdateAsync(comment);
-            var updated = await _commentRepository.GetByIdAsync(comment.Id, c => c.Include(x => x.User).ThenInclude(x => x.Avatar));
+            var updated = await _commentRepository.GetByIdAsync(comment.Id,
+                c => c.Include(x => x.User)
+                .ThenInclude(x => x.Avatar));
 
             var response = _mapper.Map<CommentResponse>(updated);
             await _notifier.SendCommentUpdatedAsync(recipeId, response);

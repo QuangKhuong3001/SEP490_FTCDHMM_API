@@ -9,5 +9,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating
         public string Feedback { get; set; } = string.Empty;
         public UserInteractionResponse UserInteractionResponse { get; set; } = null!;
         public DateTime CreatedAtUtc { get; set; }
+        public bool IsOwner { get; set; }
     }
 }

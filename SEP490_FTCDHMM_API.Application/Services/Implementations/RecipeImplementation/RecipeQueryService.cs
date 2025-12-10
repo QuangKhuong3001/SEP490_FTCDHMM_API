@@ -292,6 +292,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var result = _mapper.Map<IEnumerable<RatingDetailsResponse>>(pagedRatings);
 
+            foreach (var rating in result)
+            {
+                if (rating.UserInteractionResponse.Id == userId)
+                {
+                    rating.IsOwner = true;
+                }
+            }
+
             return new PagedResult<RatingDetailsResponse>
             {
                 Items = result,

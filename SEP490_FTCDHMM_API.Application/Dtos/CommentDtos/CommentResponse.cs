@@ -1,4 +1,5 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos.CommentMention;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.CommentDtos
 {
@@ -6,13 +7,9 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.CommentDtos
     {
         public Guid Id { get; set; }
         public string Content { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string? AvatarUrl { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public Guid? ParentCommentId { get; set; }
-        public Guid UserId { get; set; }
-
+        public UserInteractionResponse User { get; set; } = new UserInteractionResponse();
         public List<CommentResponse> Replies { get; set; } = new();
         public List<MentionedUserResponse> Mentions { get; set; } = new();
     }
