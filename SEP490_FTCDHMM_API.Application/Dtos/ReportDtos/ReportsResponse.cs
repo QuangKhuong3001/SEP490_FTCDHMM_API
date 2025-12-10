@@ -1,6 +1,6 @@
 ﻿namespace SEP490_FTCDHMM_API.Application.Dtos.ReportDtos
 {
-    public class ReportSummaryResponse
+    public class ReportsResponse
     {
         public string TargetType { get; set; } = "";
         public Guid TargetId { get; set; }

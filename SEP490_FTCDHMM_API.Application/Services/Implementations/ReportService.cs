@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.ReportDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -18,38 +18,54 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IRecipeRepository _recipeRepository;
         private readonly ICommentRepository _commentRepository;
         private readonly IRatingRepository _ratingRepository;
-        private readonly IMapper _mapper;
 
         public ReportService(
             IReportRepository reportRepository,
             IUserRepository userRepository,
             IRecipeRepository recipeRepository,
             ICommentRepository commentRepository,
-            IRatingRepository ratingRepository,
-            IMapper mapper)
+            IRatingRepository ratingRepository)
         {
             _reportRepository = reportRepository;
             _userRepository = userRepository;
             _recipeRepository = recipeRepository;
             _commentRepository = commentRepository;
             _ratingRepository = ratingRepository;
-            _mapper = mapper;
         }
 
 
 
-        public async Task CreateAsync(Guid reporterId, ReportRequest request)
+        public async Task CreateReportAsync(Guid reporterId, ReportRequest request)
         {
             var reporter = await _userRepository.GetByIdAsync(reporterId);
             if (reporter == null)
                 throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Tài khoản không tồn tại.");
 
-            if (reporterId == request.TargetId && request.TargetType.Trim().ToUpperInvariant() == "USER")
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể report chính mình.");
+            var targetType = ReportObjectType.From(request.TargetType);
+
+            var existingReport = await _reportRepository.FirstOrDefaultAsync(r =>
+                r.ReporterId == reporterId &&
+                r.TargetId == request.TargetId &&
+                r.TargetType == targetType &&
+                r.Status == ReportStatus.Pending);
+
+            if (existingReport != null)
+            {
+                if (request.Description == null || request.Description.Trim().IsNullOrEmpty())
+                    return;
+
+                if (request.Description == existingReport.Description)
+                    return;
+
+                existingReport.Description = request.Description;
+                await _reportRepository.UpdateAsync(existingReport);
+                return;
+            }
+
+            if (reporterId == request.TargetId && (request.TargetType.ToUpperInvariant() == ReportObjectType.User.Value))
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể báo cáo chính mình.");
 
             await this.TargetExistsAsync(ReportObjectType.From(request.TargetType), request.TargetId);
-
-            var targetType = ReportObjectType.From(request.TargetType);
 
             var description = request.Description?.Trim() ?? string.Empty;
 
@@ -70,17 +86,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<ReportDetailListResponse> GetDetailAsync(Guid targetId, string targetType)
+        public async Task<ReportDetailListResponse> GetReportDetailsAsync(Guid targetId, string targetType)
         {
             var reports = await _reportRepository.GetAllAsync(
                 predicate: r => r.TargetId == targetId && r.TargetType == ReportObjectType.From(targetType),
                 include: q => q.Include(r => r.Reporter)
                     );
 
-
-
             if (!reports.Any())
-                throw new AppException(AppResponseCode.NOT_FOUND, "Không có report nào cho đối tượng này.");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Không có báo cáo nào cho đối tượng này.");
 
             var sample = reports.First();
             var targetName = await ResolveTargetNameAsync(sample);
@@ -107,12 +121,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
 
 
-        public async Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request)
+        public async Task<PagedResult<ReportsResponse>> GetReportsAsync(ReportFilterRequest request)
         {
+            var targetType = ReportObjectType.From(request.Type ?? "");
+
             Expression<Func<Report, bool>> filter = r =>
                 r.Status == ReportStatus.Pending &&
                 (string.IsNullOrEmpty(request.Type) ||
-                r.TargetType.Value == ReportObjectType.From(request.Type).Value)
+                r.TargetType == targetType)
                     &&
                         (string.IsNullOrEmpty(request.Keyword) ||
                         r.Description.Contains(request.Keyword));
@@ -138,7 +154,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .ThenByDescending(x => x.LatestAt)
                 .ToList();
 
-            var resultList = new List<ReportSummaryResponse>();
+            var resultList = new List<ReportsResponse>();
 
             foreach (var g in grouped)
             {
@@ -150,7 +166,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 var targetName = await ResolveTargetNameAsync(temp);
 
-                resultList.Add(new ReportSummaryResponse
+                resultList.Add(new ReportsResponse
                 {
                     TargetType = g.TargetType,
                     TargetId = g.TargetId,
@@ -166,7 +182,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .Take(request.PaginationParams.PageSize)
                 .ToList();
 
-            return new PagedResult<ReportSummaryResponse>
+            return new PagedResult<ReportsResponse>
             {
                 Items = pagedItems,
                 TotalCount = totalCount,
@@ -174,7 +190,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 PageSize = request.PaginationParams.PageSize
             };
         }
-        public async Task<PagedResult<ReportSummaryResponse>> GetHistoryAsync(ReportFilterRequest request)
+        public async Task<PagedResult<ReportsResponse>> GetReportHistoriesAsync(ReportFilterRequest request)
         {
             Expression<Func<Report, bool>> filter = r =>
                 (r.Status == ReportStatus.Approved || r.Status == ReportStatus.Rejected) &&
@@ -202,7 +218,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .OrderByDescending(x => x.LatestAt)
                 .ToList();
 
-            var resultList = new List<ReportSummaryResponse>();
+            var resultList = new List<ReportsResponse>();
 
             foreach (var g in grouped)
             {
@@ -214,7 +230,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 var targetName = await ResolveTargetNameAsync(temp);
 
-                resultList.Add(new ReportSummaryResponse
+                resultList.Add(new ReportsResponse
                 {
                     TargetType = g.TargetType,
                     TargetId = g.TargetId,
@@ -230,7 +246,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .Take(request.PaginationParams.PageSize)
                 .ToList();
 
-            return new PagedResult<ReportSummaryResponse>
+            return new PagedResult<ReportsResponse>
             {
                 Items = pagedItems,
                 TotalCount = totalCount,
@@ -239,25 +255,25 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
         }
 
-        public async Task ApproveAsync(Guid reportId, Guid adminId)
+        public async Task ApproveReportAsync(Guid reportId, Guid userId)
         {
             var report = await _reportRepository.GetByIdAsync(reportId);
 
             if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Báo cáo không tồn tại.");
 
             if (report.Status == ReportStatus.Approved)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã được duyệt trước đó.");
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã được duyệt trước đó.");
 
             report.Status = ReportStatus.Approved;
-            report.ReviewedBy = adminId;
+            report.ReviewedBy = userId;
             report.ReviewedAtUtc = DateTime.UtcNow;
 
             await _reportRepository.UpdateAsync(report);
         }
 
 
-        public async Task RejectAsync(Guid reportId, Guid adminId, string reason)
+        public async Task RejectReportAsync(Guid reportId, Guid userId, string reason)
         {
             if (string.IsNullOrWhiteSpace(reason))
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Lý do từ chối không được để trống.");
@@ -265,13 +281,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var report = await _reportRepository.GetByIdAsync(reportId);
 
             if (report == null)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Report không tồn tại.");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Báo cáo không tồn tại.");
 
             if (report.Status == ReportStatus.Rejected)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Report đã bị từ chối trước đó.");
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Báo cáo đã bị từ chối trước đó.");
 
             report.Status = ReportStatus.Rejected;
-            report.ReviewedBy = adminId;
+            report.ReviewedBy = userId;
             report.ReviewedAtUtc = DateTime.UtcNow;
             report.RejectReason = reason;
 
@@ -280,65 +296,72 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         private async Task TargetExistsAsync(ReportObjectType targetType, Guid targetId)
         {
-            bool exists = targetType switch
+            var exists = false;
+            if (targetType == ReportObjectType.Recipe)
             {
-                var t when t == ReportObjectType.Recipe =>
-                    await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status == RecipeStatus.Posted),
-
-                var t when t == ReportObjectType.User =>
-                    await _userRepository.ExistsAsync(u => u.Id == targetId),
-
-                var t when t == ReportObjectType.Comment =>
-                    await _commentRepository.ExistsAsync(c => c.Id == targetId),
-
-                var t when t == ReportObjectType.Rating =>
-                    await _ratingRepository.ExistsAsync(r => r.Id == targetId),
-
-                _ => throw new AppException(AppResponseCode.INVALID_ACTION, "Loại đối tượng report không hợp lệ.")
-            };
+                exists = await _recipeRepository.ExistsAsync(r => r.Id == targetId && r.Status == RecipeStatus.Posted);
+            }
+            else if (targetType == ReportObjectType.User)
+            {
+                exists = await _userRepository.ExistsAsync(u => u.Id == targetId);
+            }
+            else if (targetType == ReportObjectType.Comment)
+            {
+                exists = await _commentRepository.ExistsAsync(c => c.Id == targetId);
+            }
+            else if (targetType == ReportObjectType.Rating)
+            {
+                exists = await _ratingRepository.ExistsAsync(r => r.Id == targetId);
+            }
+            else
+            {
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Loại đối tượng báo cáo không hợp lệ.");
+            }
 
             if (!exists)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Đối tượng bị report không tồn tại.");
+            {
+                throw new AppException(AppResponseCode.NOT_FOUND, "Đối tượng báo cáo không tồn tại.");
+            }
         }
-
 
         private async Task<string> ResolveTargetNameAsync(Report report)
         {
             if (report.TargetType == ReportObjectType.Recipe)
             {
                 var recipe = await _recipeRepository.GetByIdAsync(report.TargetId);
-                return recipe?.Name?.Trim() ?? "Unknown Recipe";
+                if (recipe == null)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại.");
+
+                return recipe.Name;
             }
 
             if (report.TargetType == ReportObjectType.User)
             {
                 var user = await _userRepository.GetByIdAsync(report.TargetId);
                 if (user == null)
-                    return "Unknown User";
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Người dùng không tồn tại.");
 
                 var first = user.FirstName?.Trim() ?? "";
                 var last = user.LastName?.Trim() ?? "";
-                var full = $"{first} {last}".Trim();
+                var fullName = $"{first} {last}".Trim();
 
-                return string.IsNullOrWhiteSpace(full) ? "Unknown User" : full;
+                return fullName;
             }
 
             if (report.TargetType == ReportObjectType.Comment)
             {
                 var comment = await _commentRepository.GetByIdAsync(report.TargetId);
-                var content = comment?.Content?.Trim();
+                if (comment == null)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Bình luận không tồn tại.");
 
-                if (string.IsNullOrWhiteSpace(content))
-                    return "(no content)";
-
-                return content;
+                return comment.Content;
             }
 
             if (report.TargetType == ReportObjectType.Rating)
             {
                 var rating = await _ratingRepository.GetByIdAsync(report.TargetId);
                 if (rating == null)
-                    return "Unknown Rating";
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Đánh giá không tồn tại.");
 
                 var feedback = rating.Feedback?.Trim();
 
@@ -347,10 +370,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 return $"{rating.Score} stars — {feedback}";
             }
-
-            return "Unknown";
+            return string.Empty;
         }
-
-
     }
 }

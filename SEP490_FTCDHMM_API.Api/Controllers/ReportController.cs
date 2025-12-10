@@ -21,21 +21,17 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _service = service;
             _mapper = mapper;
         }
-        private Guid GetUserId()
-        {
-            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        }
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateReportRequest request)
         {
 
-            var userId = GetUserId();
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportRequest>(request);
 
-            await _service.CreateAsync(userId, appRequest);
+            await _service.CreateReportAsync(userId, appRequest);
 
             return Ok();
         }
@@ -44,18 +40,18 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         [HttpGet("details/{targetId:guid}")]
         public async Task<IActionResult> GetDetailList(Guid targetId, [FromQuery] string targetType)
         {
-            var result = await _service.GetDetailAsync(targetId, targetType);
+            var result = await _service.GetReportDetailsAsync(targetId, targetType);
             return Ok(result);
         }
 
 
         [Authorize(Policy = PermissionPolicies.Report_View)]
-        [HttpGet()]
+        [HttpGet]
 
         public async Task<IActionResult> GetList([FromQuery] ReportFilterRequest request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportFilterRequest>(request);
-            var result = await _service.GetSummaryAsync(appRequest);
+            var result = await _service.GetReportsAsync(appRequest);
             return Ok(result);
         }
         [Authorize(Policy = PermissionPolicies.Report_View)]
@@ -63,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         public async Task<IActionResult> GetHistory([FromQuery] ReportFilterRequest request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.ReportFilterRequest>(request);
-            var result = await _service.GetHistoryAsync(appRequest);
+            var result = await _service.GetReportHistoriesAsync(appRequest);
             return Ok(result);
         }
 
@@ -72,8 +68,8 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         public async Task<IActionResult> Approve(Guid id)
         {
-            var adminId = GetUserId();
-            await _service.ApproveAsync(id, adminId);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _service.ApproveReportAsync(id, userId);
 
             return Ok();
         }
@@ -82,11 +78,11 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
         public async Task<IActionResult> Reject(Guid id, [FromBody] RejectReportRequest request)
         {
-            var adminId = GetUserId();
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var appRequest = _mapper.Map<ApplicationDtos.ReportDtos.RejectReportRequest>(request);
 
-            await _service.RejectAsync(id, adminId, appRequest.Reason);
+            await _service.RejectReportAsync(id, userId, appRequest.Reason);
 
             return Ok();
         }

@@ -5,12 +5,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
 {
     public interface IReportService
     {
-        Task CreateAsync(Guid reporterId, ReportRequest request);
-        Task<ReportDetailListResponse> GetDetailAsync(Guid targetId, string targetType);
-        Task<PagedResult<ReportSummaryResponse>> GetSummaryAsync(ReportFilterRequest request);
-        Task<PagedResult<ReportSummaryResponse>> GetHistoryAsync(ReportFilterRequest request);
-        Task ApproveAsync(Guid reportId, Guid adminId);
-        Task RejectAsync(Guid reportId, Guid adminId, string reason);
+        Task CreateReportAsync(Guid reporterId, ReportRequest request);
+        Task<ReportDetailListResponse> GetReportDetailsAsync(Guid targetId, string targetType);
+        Task<PagedResult<ReportsResponse>> GetReportsAsync(ReportFilterRequest request);
+        Task<PagedResult<ReportsResponse>> GetReportHistoriesAsync(ReportFilterRequest request);
+        Task ApproveReportAsync(Guid reportId, Guid userId);
+        Task RejectReportAsync(Guid reportId, Guid userId, string reason);
     }
 
 }
