@@ -11,7 +11,8 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
             CreateMap<CreateNotificationRequest, Notification>();
 
             CreateMap<Notification, NotificationResponse>()
-                .ForMember(dest => dest.Senders, opt => opt.Ignore());
+                .ForMember(dest => dest.Senders, opt =>
+                    opt.MapFrom(src => src.Sender));
         }
     }
 }
