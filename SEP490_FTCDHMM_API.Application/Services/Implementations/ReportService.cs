@@ -121,12 +121,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<ReportsResponse>> GetReportsAsync(ReportFilterRequest request)
         {
-            var targetType = ReportObjectType.From(request.Type ?? "");
-
             Expression<Func<Report, bool>> filter = r =>
                 r.Status == ReportStatus.Pending &&
                 (string.IsNullOrEmpty(request.Type) ||
-                r.TargetType == targetType)
+                r.TargetType == ReportObjectType.From(request.Type))
                     &&
                         (string.IsNullOrEmpty(request.Keyword) ||
                         r.Description.Contains(request.Keyword));
@@ -163,12 +161,42 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 };
 
                 var targetName = await ResolveTargetNameAsync(temp);
+                string? targetUserName = null;
+                Guid? recipeId = null;
+
+                // Resolve RecipeId for Comment and Rating targets
+                if (temp.TargetType == ReportObjectType.Comment)
+                {
+                    var comment = await _commentRepository.GetByIdAsync(g.TargetId);
+                    if (comment != null)
+                    {
+                        recipeId = comment.RecipeId;
+                    }
+                }
+                else if (temp.TargetType == ReportObjectType.Rating)
+                {
+                    var rating = await _ratingRepository.GetByIdAsync(g.TargetId);
+                    if (rating != null)
+                    {
+                        recipeId = rating.RecipeId;
+                    }
+                }
+                else if (temp.TargetType == ReportObjectType.User)
+                {
+                    var user = await _userRepository.GetByIdAsync(g.TargetId);
+                    if (user != null)
+                    {
+                        targetUserName = user.UserName;
+                    }
+                }
 
                 resultList.Add(new ReportsResponse
                 {
                     TargetType = g.TargetType,
                     TargetId = g.TargetId,
                     TargetName = targetName,
+                    TargetUserName = targetUserName,
+                    RecipeId = recipeId,
                     Count = g.Count,
                     LatestReportAtUtc = g.LatestAt
                 });
@@ -227,12 +255,42 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 };
 
                 var targetName = await ResolveTargetNameAsync(temp);
+                string? targetUserName = null;
+                Guid? recipeId = null;
+
+                // Resolve RecipeId for Comment and Rating targets
+                if (temp.TargetType == ReportObjectType.Comment)
+                {
+                    var comment = await _commentRepository.GetByIdAsync(g.TargetId);
+                    if (comment != null)
+                    {
+                        recipeId = comment.RecipeId;
+                    }
+                }
+                else if (temp.TargetType == ReportObjectType.Rating)
+                {
+                    var rating = await _ratingRepository.GetByIdAsync(g.TargetId);
+                    if (rating != null)
+                    {
+                        recipeId = rating.RecipeId;
+                    }
+                }
+                else if (temp.TargetType == ReportObjectType.User)
+                {
+                    var user = await _userRepository.GetByIdAsync(g.TargetId);
+                    if (user != null)
+                    {
+                        targetUserName = user.UserName;
+                    }
+                }
 
                 resultList.Add(new ReportsResponse
                 {
                     TargetType = g.TargetType,
                     TargetId = g.TargetId,
                     TargetName = targetName,
+                    TargetUserName = targetUserName,
+                    RecipeId = recipeId,
                     Count = g.Count,
                     LatestReportAtUtc = g.LatestAt
                 });
@@ -350,7 +408,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 var comment = await _commentRepository.GetByIdAsync(report.TargetId);
                 if (comment == null)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Bình luận không tồn tại.");
+                    return "[Bình luận không tồn tại]";
 
                 return comment.Content;
             }
@@ -359,7 +417,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 var rating = await _ratingRepository.GetByIdAsync(report.TargetId);
                 if (rating == null)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Đánh giá không tồn tại.");
+                    return "[Đánh giá không tồn tại]";
 
                 var feedback = rating.Feedback?.Trim();
 
