@@ -37,6 +37,7 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddControllers(options =>
 {
     options.ModelBinderProviders.Insert(0, new SafeNullableDateTimeBinderProvider());
+    options.ModelBinderProviders.Insert(0, new SEP490_FTCDHMM_API.Api.ModelBinders.DecimalModelBinderProvider());
 })
 .AddJsonOptions(options =>
 {
@@ -90,7 +91,7 @@ using (var scope = app.Services.CreateScope())
 
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    dbContext.Database.Migrate();
+    // dbContext.Database.Migrate();
 
     var config = services.GetRequiredService<IConfiguration>();
     await DataSeeder.SeedAdminAsync(services, config);

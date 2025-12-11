@@ -10,7 +10,11 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public string? Description { get; set; } = string.Empty;
         public string Difficulty { get; set; } = string.Empty;
         public int CookTime { get; set; }
+
         public FileUploadModel? Image { get; set; }
+
+        public string? ExistingImageUrl { get; set; }
+
         public int Ration { get; set; }
         public List<Guid> LabelIds { get; set; } = new();
         public List<RecipeIngredientRequest> Ingredients { get; set; } = new();

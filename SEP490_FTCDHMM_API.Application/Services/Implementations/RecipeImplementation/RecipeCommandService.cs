@@ -304,7 +304,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            if (request.Image != null)
+            {
+                await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            }
+            else if (!string.IsNullOrWhiteSpace(request.ExistingImageUrl))
+            {
+                await _imageService.SetRecipeImageFromUrlAsync(recipe, request.ExistingImageUrl, userId);
+            }
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
             recipe.CookingSteps = steps;

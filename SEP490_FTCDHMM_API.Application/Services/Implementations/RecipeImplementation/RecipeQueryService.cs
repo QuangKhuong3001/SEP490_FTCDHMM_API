@@ -143,7 +143,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                  .Include(r => r.Labels)
                  .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image)
-                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient);
+                 .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
+                 .Include(r => r.Parent);
 
             var recipe = await _recipeRepository.GetByIdAsync(recipeId, include);
 
@@ -206,7 +207,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                   .Include(r => r.Labels)
                   .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
                   .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
-                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image)
+                  .Include(r => r.Parent);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,
@@ -238,7 +240,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                   .Include(r => r.Labels)
                   .Include(r => r.RecipeIngredients).ThenInclude(ri => ri.Ingredient)
                   .Include(r => r.RecipeUserTags).ThenInclude(cs => cs.TaggedUser)
-                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image);
+                  .Include(r => r.CookingSteps).ThenInclude(cs => cs.CookingStepImages).ThenInclude(cs => cs.Image)
+                  .Include(r => r.Parent);
 
             var (items, totalCount) = await _recipeRepository.GetPagedAsync(
                 pageNumber: paginationParams.PageNumber,

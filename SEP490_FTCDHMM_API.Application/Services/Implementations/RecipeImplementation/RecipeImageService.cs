@@ -14,13 +14,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
     {
         private readonly IS3ImageService _imageService;
         private readonly ICookingStepRepository _cookingStepRepository;
+        private readonly IImageRepository _imageRepository;
 
         public RecipeImageService(
             IS3ImageService imageService,
-            ICookingStepRepository cookingStepRepository)
+            ICookingStepRepository cookingStepRepository,
+            IImageRepository imageRepository)
         {
             _imageService = imageService;
             _cookingStepRepository = cookingStepRepository;
+            _imageRepository = imageRepository;
         }
 
         public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file, Guid userId)
@@ -35,6 +38,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             );
 
             recipe.Image = uploaded;
+        }
+
+        public async Task SetRecipeImageFromUrlAsync(Recipe recipe, string? existingImageUrl, Guid userId)
+        {
+            if (string.IsNullOrWhiteSpace(existingImageUrl))
+                return;
+
+            var mirrored = await _imageService.MirrorExternalImageAsync(
+                StorageFolder.RECIPES,
+                existingImageUrl,
+                userId
+            );
+
+            recipe.Image = mirrored;
         }
 
         public async Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file, Guid userId)
@@ -77,18 +94,37 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
                     foreach (var img in imageRequests)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(
-                            img.Image,
-                            StorageFolder.COOKING_STEPS,
-                            userId
-                        );
+                        Guid imageId;
+
+                        if (img.ExistingImageId.HasValue)
+                        {
+                            var existingImage = await _imageRepository.GetByIdAsync(img.ExistingImageId.Value);
+                            if (existingImage == null)
+                            {
+                                continue;
+                            }
+                            imageId = existingImage.Id;
+                        }
+                        else if (img.Image != null)
+                        {
+                            var uploaded = await _imageService.UploadImageAsync(
+                                img.Image,
+                                StorageFolder.COOKING_STEPS,
+                                userId
+                            );
+                            imageId = uploaded.Id;
+                        }
+                        else
+                        {
+                            continue;
+                        }
 
                         newStep.CookingStepImages.Add(new CookingStepImage
                         {
                             Id = Guid.NewGuid(),
                             CookingStepId = newStep.Id,
                             ImageOrder = img.ImageOrder,
-                            ImageId = uploaded.Id
+                            ImageId = imageId
                         });
                     }
                 }
