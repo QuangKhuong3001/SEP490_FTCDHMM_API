@@ -41,11 +41,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var targetType = ReportObjectType.From(request.TargetType);
 
-            var existingReport = await _reportRepository.FirstOrDefaultAsync(r =>
+            var existingReport = await _reportRepository.FirstOrDefaultAsync(
+                orderByDescendingKeySelector: r => r.CreatedAtUtc,
+                predicate: r =>
                 r.ReporterId == reporterId &&
                 r.TargetId == request.TargetId &&
                 r.TargetType == targetType &&
                 r.Status == ReportStatus.Pending);
+
 
             if (existingReport != null)
             {
