@@ -10,7 +10,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
     {
         Task<PagedResult<RecipeResponse>> GetRecipesAsync(RecipeFilterRequest request);
         Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId);
-        Task<RecipeDetailsResponse> GetRecipeDetailsByPermissionAsync(Guid recipeId);
         Task<PagedResult<RecipeResponse>> GetSavedRecipesAsync(Guid userId, SaveRecipeFilterRequest request);
         Task<PagedResult<MyRecipeResponse>> GetRecipesByUserIdAsync(Guid userId, RecipePaginationParams paginationParams);
         Task<PagedResult<MyRecipeResponse>> GetRecipesByUserNameAsync(string userName, RecipePaginationParams paginationParams);

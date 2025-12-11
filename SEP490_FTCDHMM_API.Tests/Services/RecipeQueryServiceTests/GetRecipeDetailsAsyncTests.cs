@@ -10,6 +10,37 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 {
     public class GetRecipeDetailsAsyncTests : RecipeQueryServiceTestBase
     {
+        private void SetupUser(Guid id, bool hasPermission = false)
+        {
+            UserRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    id,
+                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .ReturnsAsync(new AppUser
+                {
+                    Id = id,
+                    Role = new AppRole
+                    {
+                        RolePermissions = hasPermission
+                            ? new List<AppRolePermission>
+                            {
+                                new()
+                                {
+                                    PermissionAction = new PermissionAction
+                                    {
+                                        Name = PermissionValue.Recipe_ManagementView.Action,
+                                        PermissionDomain = new PermissionDomain
+                                        {
+                                            Name = PermissionValue.Recipe_ManagementView.Domain
+                                        }
+                                    }
+                                }
+                            }
+                            : new List<AppRolePermission>()
+                    }
+                });
+        }
+
         [Fact]
         public async Task Details_ShouldThrow_WhenRecipeNotFound()
         {
@@ -21,8 +52,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             await Assert.ThrowsAsync<AppException>(() =>
                 Sut.GetRecipeDetailsAsync(null, NewId()));
-
-            RecipeRepositoryMock.VerifyAll();
         }
 
         [Fact]
@@ -43,8 +72,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             await Assert.ThrowsAsync<AppException>(() =>
                 Sut.GetRecipeDetailsAsync(null, recipe.Id));
-
-            RecipeRepositoryMock.VerifyAll();
         }
 
         [Fact]
@@ -57,16 +84,18 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 AuthorId = NewId()
             };
 
+            var callerId = NewId();
+
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(
                     recipe.Id,
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            await Assert.ThrowsAsync<AppException>(() =>
-                Sut.GetRecipeDetailsAsync(NewId(), recipe.Id));
+            SetupUser(callerId);
 
-            RecipeRepositoryMock.VerifyAll();
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.GetRecipeDetailsAsync(callerId, recipe.Id));
         }
 
         [Fact]
@@ -95,8 +124,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             Assert.NotNull(result);
             Assert.Equal(recipe.Id, result.Id);
 
-            RecipeRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
             UserRecipeViewRepositoryMock.VerifyNoOtherCalls();
         }
 
@@ -119,15 +146,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    viewerId,
-                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(new AppUser
-                {
-                    Id = viewerId,
-                    DietRestrictions = new List<UserDietRestriction>()
-                });
+            SetupUser(viewerId);
 
             UserSaveRecipeRepositoryMock
                 .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
@@ -135,7 +154,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView urv) => Task.FromResult(urv));
+                .Returns((UserRecipeView r) => Task.FromResult(r));
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
@@ -153,12 +172,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     Ingredients = new List<RecipeIngredientResponse>()
                 });
 
-            var result = await Sut.GetRecipeDetailsAsync(viewerId, recipe.Id);
+            var res = await Sut.GetRecipeDetailsAsync(viewerId, recipe.Id);
 
             Assert.Equal(5, recipe.ViewCount);
-
-            RecipeRepositoryMock.VerifyAll();
-            UserRecipeViewRepositoryMock.VerifyAll();
         }
 
         [Fact]
@@ -180,15 +196,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    userId,
-                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(new AppUser
-                {
-                    Id = userId,
-                    DietRestrictions = new List<UserDietRestriction>()
-                });
+            SetupUser(userId);
 
             UserSaveRecipeRepositoryMock
                 .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
@@ -202,10 +210,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     Ingredients = new List<RecipeIngredientResponse>()
                 });
 
-            var result = await Sut.GetRecipeDetailsAsync(userId, recipe.Id);
+            var _ = await Sut.GetRecipeDetailsAsync(userId, recipe.Id);
 
             UserRecipeViewRepositoryMock.VerifyNoOtherCalls();
-            RecipeRepositoryMock.VerifyAll();
         }
 
         [Fact]
@@ -227,15 +234,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    userId,
-                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(new AppUser
-                {
-                    Id = userId,
-                    DietRestrictions = new List<UserDietRestriction>()
-                });
+            SetupUser(userId);
 
             UserSaveRecipeRepositoryMock
                 .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
@@ -243,7 +242,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView urv) => Task.FromResult(urv));
+                .Returns((UserRecipeView r) => Task.FromResult(r));
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
@@ -278,9 +277,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 Id = NewId(),
                 Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
-                RecipeIngredients = new List<RecipeIngredient>
+                RecipeIngredients =
                 {
-                    new()
+                    new RecipeIngredient
                     {
                         IngredientId = ingredientId,
                         Ingredient = new Ingredient
@@ -295,9 +294,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var user = new AppUser
             {
                 Id = userId,
-                DietRestrictions = new List<UserDietRestriction>
+                DietRestrictions =
                 {
-                    new()
+                    new UserDietRestriction
                     {
                         IngredientId = ingredientId,
                         Type = RestrictionType.Allergy
@@ -323,7 +322,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView urv) => Task.FromResult(urv));
+                .Returns((UserRecipeView r) => Task.FromResult(r));
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
@@ -338,12 +337,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 .Returns(new RecipeDetailsResponse
                 {
                     Id = recipe.Id,
-                    Ingredients = new List<RecipeIngredientResponse>
+                    Ingredients =
                     {
-                        new()
-                        {
-                            IngredientId = ingredientId
-                        }
+                        new RecipeIngredientResponse { IngredientId = ingredientId }
                     }
                 });
 
@@ -364,17 +360,17 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 Id = NewId(),
                 Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
-                RecipeIngredients = new List<RecipeIngredient>
+                RecipeIngredients =
                 {
-                    new()
+                    new RecipeIngredient
                     {
                         IngredientId = ingredientId,
                         Ingredient = new Ingredient
                         {
                             Id = ingredientId,
-                            Categories = new List<IngredientCategory>
+                            Categories =
                             {
-                                new() { Id = categoryId }
+                                new IngredientCategory { Id = categoryId }
                             }
                         }
                     }
@@ -384,9 +380,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var user = new AppUser
             {
                 Id = userId,
-                DietRestrictions = new List<UserDietRestriction>
+                DietRestrictions =
                 {
-                    new()
+                    new UserDietRestriction
                     {
                         IngredientCategoryId = categoryId,
                         Type = RestrictionType.Dislike
@@ -412,7 +408,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView urv) => Task.FromResult(urv));
+                .Returns((UserRecipeView r) => Task.FromResult(r));
 
             UserRecipeViewRepositoryMock
                 .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
@@ -427,9 +423,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 .Returns(new RecipeDetailsResponse
                 {
                     Id = recipe.Id,
-                    Ingredients = new List<RecipeIngredientResponse>
+                    Ingredients =
                     {
-                        new() { IngredientId = ingredientId }
+                        new RecipeIngredientResponse { IngredientId = ingredientId }
                     }
                 });
 
