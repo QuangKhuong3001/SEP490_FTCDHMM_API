@@ -7,6 +7,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/notifications")]
     [ApiController]
+    [Authorize]
     public class NotificationController : ControllerBase
     {
         private readonly INotificationService _notificationService;
@@ -16,7 +17,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _notificationService = notificationService;
         }
 
-        [Authorize]
         [HttpGet("myNotifications")]
         public async Task<IActionResult> GetMyNotifications()
         {
@@ -25,7 +25,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost("{notificationId:guid}/mark-read")]
         public async Task<IActionResult> MarkAsRead(Guid notificationId)
         {

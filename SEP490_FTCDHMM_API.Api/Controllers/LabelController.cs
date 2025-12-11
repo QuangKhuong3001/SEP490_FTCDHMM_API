@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LabelController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -21,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             _labelService = labelService;
         }
 
+        [AllowAnonymous]
         [HttpGet("getListFilter")]
         public async Task<IActionResult> GetList([FromQuery] LabelFilterRequest request)
         {
@@ -31,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetList([FromQuery] LabelSearchDropboxRequest request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.LabelDtos.LabelSearchDropboxRequest>(request);

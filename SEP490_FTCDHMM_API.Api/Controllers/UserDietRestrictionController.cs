@@ -11,7 +11,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-
     public class UserDietRestrictionController : ControllerBase
     {
         private readonly IUserDietRestrictionService _userDietRestrictionService;

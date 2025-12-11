@@ -11,6 +11,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [ApiController]
     [Route("api/report")]
+    [Authorize]
     public class ReportController : ControllerBase
     {
         private readonly IReportService _service;
@@ -23,7 +24,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateReportRequest request)
         {
 

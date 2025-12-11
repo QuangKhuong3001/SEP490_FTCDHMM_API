@@ -13,6 +13,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
 {
     [ApiController]
     [Route("api/recipe")]
+    [Authorize]
     public class RecipeQueryController : ControllerBase
     {
         private readonly IRecipeQueryService _recipeQueryService;
@@ -24,6 +25,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] RecipeFilterRequest request)
         {
@@ -33,6 +35,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{recipeId}")]
         public async Task<IActionResult> GetDetails(Guid recipeId)
         {
@@ -48,7 +51,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         }
 
         [HttpGet("saved")]
-        [Authorize]
         public async Task<IActionResult> GetSaved([FromQuery] SaveRecipeFilterRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -59,7 +61,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         }
 
         [HttpGet("history")]
-        [Authorize]
         public async Task<IActionResult> GetHistory([FromQuery] RecipePaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -69,6 +70,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("user/{userName}")]
         public async Task<IActionResult> GetRecipesByUserId(string userName, [FromQuery] RecipePaginationParams request)
         {
@@ -77,6 +79,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{recipeId:guid}/rating")]
         public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] RecipePaginationParams request)
         {
@@ -93,6 +96,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("{recipeId:guid}/score")]
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
@@ -107,7 +111,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(avg);
         }
 
-        [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> GetMyRecipeList([FromQuery] RecipePaginationParams request)
         {
@@ -128,7 +131,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         }
 
         [HttpGet("pendings")]
-        [Authorize]
         public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

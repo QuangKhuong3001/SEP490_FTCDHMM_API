@@ -11,6 +11,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RoleController : ControllerBase
     {
         private readonly IMapper _mapper;

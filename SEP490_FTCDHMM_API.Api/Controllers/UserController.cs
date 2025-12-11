@@ -11,6 +11,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -50,7 +51,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
@@ -63,6 +63,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(profile);
         }
 
+        [AllowAnonymous]
         [HttpGet("profile/{username}")]
         public async Task<IActionResult> GetUserProfile(string username)
         {
@@ -72,7 +73,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(profile);
         }
 
-        [Authorize]
         [HttpPut("profile")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest dto)
@@ -89,7 +89,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             await _userService.UpdateProfileAsync(userId!, appDto);
             return Ok();
         }
-        [Authorize]
+
         [HttpPost("follow/{followeeId}")]
         public async Task<IActionResult> FollowUser(Guid followeeId)
         {
@@ -98,7 +98,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpDelete("unfollow/{followeeId}")]
         public async Task<IActionResult> UnfollowUser(Guid followeeId)
         {
@@ -107,7 +106,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("followers")]
         public async Task<IActionResult> GetFollowers()
         {
@@ -116,7 +114,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpGet("following")]
         public async Task<IActionResult> GetFollowing()
         {
@@ -125,7 +122,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpGet("activity-level")]
         public async Task<IActionResult> GetActivityLevel()
         {
@@ -136,7 +132,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPut("activity-level")]
         public async Task<IActionResult> ChangeActivityLevel(ChangeActivityLevelRequest request)
         {
@@ -159,7 +154,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("taggable-users")]
         public async Task<IActionResult> GetTaggableUsers([FromQuery] string? keyword)
         {
