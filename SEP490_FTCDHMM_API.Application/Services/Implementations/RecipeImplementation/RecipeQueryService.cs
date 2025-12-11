@@ -409,7 +409,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                                .Include(v => v.Recipe.Author).ThenInclude(a => a.Avatar)
             );
 
-            var result = _mapper.Map<IEnumerable<RecipeResponse>>(items);
+            var recipes = items.Select(v => v.Recipe).ToList();
+
+            var result = _mapper.Map<IEnumerable<RecipeResponse>>(recipes);
 
             return new PagedResult<RecipeResponse>
             {
@@ -492,6 +494,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     include: i => i.Include(u => u.Role)
                                         .ThenInclude(r => r.RolePermissions)
                                             .ThenInclude(rp => rp.PermissionAction)
+                                                .ThenInclude(pa => pa.PermissionDomain)
                     );
 
                 var isAuthor = recipe.AuthorId == userId.Value;
