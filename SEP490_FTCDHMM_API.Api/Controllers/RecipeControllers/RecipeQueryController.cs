@@ -47,14 +47,6 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             return Ok(result);
         }
 
-        [Authorize(Policy = PermissionPolicies.Recipe_ManagementView)]
-        [HttpGet("pending/{recipeId}")]
-        public async Task<IActionResult> GetDetailsByPermission(Guid recipeId)
-        {
-            var result = await _recipeQueryService.GetRecipeDetailsByPermissionAsync(recipeId);
-            return Ok(result);
-        }
-
         [HttpGet("saved")]
         [Authorize]
         public async Task<IActionResult> GetSaved([FromQuery] SaveRecipeFilterRequest request)

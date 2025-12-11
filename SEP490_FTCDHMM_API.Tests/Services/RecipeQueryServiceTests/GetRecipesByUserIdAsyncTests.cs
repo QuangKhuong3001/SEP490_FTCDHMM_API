@@ -4,65 +4,31 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 {
     public class GetRecipesByUserIdAsyncTests : RecipeQueryServiceTestBase
     {
         [Fact]
-        public async Task GetByUserId_ShouldThrow_WhenUserNotFound()
-        {
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
-                .ReturnsAsync((AppUser)null!);
-
-            var req = new RecipePaginationParams();
-
-            await Assert.ThrowsAsync<AppException>(() =>
-                Sut.GetRecipesByUserIdAsync(NewId(), req));
-
-            UserRepositoryMock.VerifyAll();
-        }
-
-        [Fact]
         public async Task GetByUserId_ShouldReturnPagedResult()
         {
             var userId = NewId();
-
-            var user = new AppUser { Id = userId };
-
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, null))
-                .ReturnsAsync(user);
 
             var r1 = new Recipe
             {
                 Id = NewId(),
                 Status = RecipeStatus.Posted,
-                AuthorId = userId,
-                Name = "A",
-                Image = new Image { Id = NewId() },
-                RecipeIngredients = new List<RecipeIngredient>(),
-                Labels = new List<Label>(),
-                RecipeUserTags = new List<RecipeUserTag>(),
-                CookingSteps = new List<CookingStep>()
+                AuthorId = userId
             };
 
             var r2 = new Recipe
             {
                 Id = NewId(),
                 Status = RecipeStatus.Posted,
-                AuthorId = userId,
-                Name = "B",
-                Image = new Image { Id = NewId() },
-                RecipeIngredients = new List<RecipeIngredient>(),
-                Labels = new List<Label>(),
-                RecipeUserTags = new List<RecipeUserTag>(),
-                CookingSteps = new List<CookingStep>()
+                AuthorId = userId
             };
 
-            var list = new List<Recipe> { r1, r2 };
+            var recipes = new List<Recipe> { r1, r2 };
 
             RecipeRepositoryMock
                 .Setup(r => r.GetPagedAsync(
@@ -74,16 +40,13 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<string[]?>(),
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>?>()
                 ))
-                .ReturnsAsync((list, list.Count));
+                .ReturnsAsync((recipes, recipes.Count));
 
             MapperMock
-                .Setup(m => m.Map<List<MyRecipeResponse>>(list))
-                .Returns(list.Select(x => new MyRecipeResponse { Id = x.Id }).ToList());
+                .Setup(m => m.Map<List<MyRecipeResponse>>(recipes))
+                .Returns(recipes.Select(r => new MyRecipeResponse { Id = r.Id }).ToList());
 
-            var req = new RecipePaginationParams
-            {
-                PageNumber = 1,
-            };
+            var req = new RecipePaginationParams { PageNumber = 1 };
 
             var result = await Sut.GetRecipesByUserIdAsync(userId, req);
 
@@ -93,7 +56,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             Assert.Contains(result.Items, x => x.Id == r2.Id);
 
             RecipeRepositoryMock.VerifyAll();
-            UserRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
         }
 
@@ -102,22 +64,12 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
         {
             var userId = NewId();
 
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, null))
-                .ReturnsAsync(new AppUser { Id = userId });
-
             var all = Enumerable.Range(1, 12)
                 .Select(i => new Recipe
                 {
                     Id = Guid.NewGuid(),
                     Status = RecipeStatus.Posted,
-                    AuthorId = userId,
-                    Name = "R" + i,
-                    Image = new Image { Id = Guid.NewGuid() },
-                    RecipeIngredients = new List<RecipeIngredient>(),
-                    Labels = new List<Label>(),
-                    RecipeUserTags = new List<RecipeUserTag>(),
-                    CookingSteps = new List<CookingStep>()
+                    AuthorId = userId
                 })
                 .ToList();
 
@@ -137,20 +89,16 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             MapperMock
                 .Setup(m => m.Map<List<MyRecipeResponse>>(pageItems))
-                .Returns(pageItems.Select(r => new MyRecipeResponse { Id = r.Id }).ToList());
+                .Returns(pageItems.Select(x => new MyRecipeResponse { Id = x.Id }).ToList());
 
-            var req = new RecipePaginationParams
-            {
-                PageNumber = 2,
-            };
+            var req = new RecipePaginationParams { PageNumber = 2 };
 
-            var result = await Sut.GetRecipesByUserIdAsync(userId, req);
+            var res = await Sut.GetRecipesByUserIdAsync(userId, req);
 
-            Assert.Equal(12, result.TotalCount);
-            Assert.Equal(5, result.Items.Count());
+            Assert.Equal(12, res.TotalCount);
+            Assert.Equal(5, res.Items.Count());
 
             RecipeRepositoryMock.VerifyAll();
-            UserRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
         }
 
@@ -158,10 +106,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
         public async Task GetByUserId_ShouldReturnEmpty_WhenNoRecipes()
         {
             var userId = NewId();
-
-            UserRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId, null))
-                .ReturnsAsync(new AppUser { Id = userId });
 
             RecipeRepositoryMock
                 .Setup(r => r.GetPagedAsync(
@@ -179,10 +123,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 .Setup(m => m.Map<List<MyRecipeResponse>>(It.IsAny<List<Recipe>>()))
                 .Returns(new List<MyRecipeResponse>());
 
-            var req = new RecipePaginationParams
-            {
-                PageNumber = 1,
-            };
+            var req = new RecipePaginationParams { PageNumber = 1 };
 
             var result = await Sut.GetRecipesByUserIdAsync(userId, req);
 
@@ -190,7 +131,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             Assert.Equal(0, result.TotalCount);
 
             RecipeRepositoryMock.VerifyAll();
-            UserRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
         }
     }

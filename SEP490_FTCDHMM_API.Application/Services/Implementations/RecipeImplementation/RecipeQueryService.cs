@@ -164,28 +164,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
         }
 
-        public async Task<RecipeDetailsResponse> GetRecipeDetailsByPermissionAsync(Guid recipeId)
-        {
-            IQueryable<Recipe> IncludeRecipeDetails(IQueryable<Recipe> q) =>
-                q.Include(r => r.Author).ThenInclude(u => u.Avatar)
-                 .Include(r => r.Image)
-                 .Include(r => r.Labels)
-                 .Include(r => r.RecipeUserTags).ThenInclude(t => t.TaggedUser)
-                 .Include(r => r.CookingSteps)
-                     .ThenInclude(cs => cs.CookingStepImages)
-                         .ThenInclude(i => i.Image)
-                 .Include(r => r.RecipeIngredients)
-                     .ThenInclude(ri => ri.Ingredient)
-                         .ThenInclude(i => i.Categories);
-
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId, IncludeRecipeDetails);
-
-            if (recipe == null || recipe.Status == RecipeStatus.Deleted)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
-            return _mapper.Map<RecipeDetailsResponse>(recipe);
-        }
-
         public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId)
         {
             IQueryable<Recipe> IncludeRecipeDetails(IQueryable<Recipe> q) =>
@@ -285,10 +263,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<PagedResult<RecipeResponse>> GetSavedRecipesAsync(Guid userId, SaveRecipeFilterRequest request)
         {
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-
             var (items, totalCount) = await _userSaveRecipeRepository.GetPagedAsync(
                 pageNumber: request.PaginationParams.PageNumber,
                 pageSize: request.PaginationParams.PageSize,
@@ -315,10 +289,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<PagedResult<MyRecipeResponse>> GetRecipesByUserIdAsync(Guid userId, RecipePaginationParams paginationParams)
         {
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new AppException(AppResponseCode.NOT_FOUND);
-
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                  q.Include(r => r.Image)
                   .Include(r => r.Labels)
@@ -349,7 +319,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         {
             var user = await _userRepository.GetByUserNameAsync(userName);
             if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, "Người dùng không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Người dùng không tồn tại");
 
             Func<IQueryable<Recipe>, IQueryable<Recipe>> include = q =>
                  q.Include(r => r.Image)
@@ -508,7 +478,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
         }
 
-        private Task ValidateAccessRecipeAsync(Guid? userId, Recipe? recipe)
+        private async Task ValidateAccessRecipeAsync(Guid? userId, Recipe? recipe)
         {
             if (recipe == null || recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -518,12 +488,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 if (!userId.HasValue)
                     throw new AppException(AppResponseCode.NOT_FOUND);
 
-                if (recipe.AuthorId != userId.Value)
+                var user = await _userRepository.GetByIdAsync(userId.Value,
+                    include: i => i.Include(u => u.Role)
+                                        .ThenInclude(r => r.RolePermissions)
+                                            .ThenInclude(rp => rp.PermissionAction)
+                    );
+
+                var isAuthor = recipe.AuthorId == userId.Value;
+
+                var havePermission = user!.Role.RolePermissions
+                    .Select(rp => rp.PermissionAction)
+                    .Any(pa =>
+                        pa.PermissionDomain.Name == PermissionValue.Recipe_ManagementView.Domain &&
+                        pa.Name == PermissionValue.Recipe_ManagementView.Action);
+
+                if (!(isAuthor || havePermission))
                     throw new AppException(AppResponseCode.NOT_FOUND);
             }
-
-            return Task.CompletedTask;
         }
-
     }
 }
