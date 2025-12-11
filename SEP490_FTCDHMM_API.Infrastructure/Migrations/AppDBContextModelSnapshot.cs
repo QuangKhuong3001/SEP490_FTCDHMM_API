@@ -1303,7 +1303,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 10, 21, 43, 37, 509, DateTimeKind.Utc).AddTicks(6548),
+                            CreatedAtUTC = new DateTime(2025, 12, 11, 18, 41, 1, 578, DateTimeKind.Utc).AddTicks(795),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -2364,6 +2364,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");

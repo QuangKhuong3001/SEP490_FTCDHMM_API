@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.CopyRecipeRequest>(request);
 
-            await _recipeCommandService.CopyRecipe(userId, parentId, appRequest);
+            await _recipeCommandService.CopyRecipeAsync(userId, parentId, appRequest);
             return Ok();
         }
     }

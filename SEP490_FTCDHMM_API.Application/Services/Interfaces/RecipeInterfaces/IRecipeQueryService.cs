@@ -8,15 +8,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
 {
     public interface IRecipeQueryService
     {
-        Task<PagedResult<RecipeResponse>> GetAllRecipesAsync(RecipeFilterRequest request);
+        Task<PagedResult<RecipeResponse>> GetRecipesAsync(RecipeFilterRequest request);
         Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId);
-        Task<PagedResult<RecipeResponse>> GetSavedListAsync(Guid userId, SaveRecipeFilterRequest request);
-        Task<PagedResult<MyRecipeResponse>> GetRecipeByUserIdAsync(Guid userId, RecipePaginationParams paginationParams);
-        Task<PagedResult<MyRecipeResponse>> GetRecipeByUserNameAsync(string userName, RecipePaginationParams paginationParams);
-        Task<RecipeRatingResponse> GetRecipeRatingAsync(Guid? userId, Guid recipeId);
-        Task<PagedResult<RatingDetailsResponse>> GetRatingDetailsAsync(Guid? userId, Guid recipeId, RecipePaginationParams request);
-        Task<PagedResult<RecipeResponse>> GetHistoryAsync(Guid userId, RecipePaginationParams request);
-        Task<PagedResult<RecipeManagementResponse>> GetPendingManagementListAsync(PaginationParams request);
-        Task<PagedResult<RecipeManagementResponse>> GetPendingListAsync(Guid userId, PaginationParams request);
+        Task<RecipeDetailsResponse> GetRecipeDetailsByPermissionAsync(Guid recipeId);
+        Task<PagedResult<RecipeResponse>> GetSavedRecipesAsync(Guid userId, SaveRecipeFilterRequest request);
+        Task<PagedResult<MyRecipeResponse>> GetRecipesByUserIdAsync(Guid userId, RecipePaginationParams paginationParams);
+        Task<PagedResult<MyRecipeResponse>> GetRecipesByUserNameAsync(string userName, RecipePaginationParams paginationParams);
+        Task<RecipeRatingResponse> GetRecipeRatingsAsync(Guid? userId, Guid recipeId);
+        Task<PagedResult<RatingDetailsResponse>> GetRecipeRatingDetailsAsync(Guid? userId, Guid recipeId, RecipePaginationParams request);
+        Task<PagedResult<RecipeResponse>> GetRecipeHistoriesAsync(Guid userId, RecipePaginationParams request);
+        Task<PagedResult<RecipeManagementResponse>> GetRecipePendingsAsync(PaginationParams request);
+        Task<PagedResult<RecipeManagementResponse>> GetRecipePendingsByUserIdAsync(Guid userId, PaginationParams request);
     }
 }

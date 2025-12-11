@@ -1,9 +1,12 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient
+﻿using SEP490_FTCDHMM_API.Domain.ValueObjects;
+
+namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient
 {
     public class RecipeIngredientResponse
     {
         public Guid IngredientId { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal QuantityGram { get; set; }
+        public RestrictionType? RestrictionType { get; set; }
     }
 }

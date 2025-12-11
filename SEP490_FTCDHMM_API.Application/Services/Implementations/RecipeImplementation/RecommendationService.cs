@@ -5,7 +5,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
-using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
 {
@@ -28,7 +27,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _recipeScoringSystem = recipeScoringSystem;
         }
 
-        public async Task<PagedResult<RecipeRankResponse>> RecommendAsync(Guid userId, PaginationParams request)
+        public async Task<PagedResult<RecipeRankResponse>> RecommendRecipesAsync(Guid userId, PaginationParams request)
         {
             var user = await _userRepository.GetByIdAsync(
                 id: userId,
@@ -42,39 +41,47 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                             .ThenInclude(chg => chg!.Targets)
                                 .ThenInclude(t => t.Nutrient)
                     .Include(u => u.Ratings)
+                    .Include(u => u.DietRestrictions)
                     .Include(u => u.HealthMetrics));
-
-
-            if (user == null)
-            {
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
-            }
 
             var recipes = await _recipeRepository.GetActiveRecentRecipesAsync();
 
-            var ranked = new List<RecipeRankResponse>();
-
-            foreach (var r in recipes)
+            if (!recipes.Any())
             {
-                var final = _recipeScoringSystem.CalculateFinalScore(user, r);
-
-                var result = _mapper.Map<RecipeRankResponse>(r);
-                result.Score = final;
-                ranked.Add(result);
+                return new PagedResult<RecipeRankResponse>
+                {
+                    Items = new List<RecipeRankResponse>(),
+                    TotalCount = 0,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
             }
 
-            var sorted = ranked.OrderByDescending(x => x.Score);
+            var scored = recipes
+                .Select(r => (Recipe: r, Score: _recipeScoringSystem.CalculateFinalScore(user!, r)))
+                .ToList();
 
-            var totalCount = sorted.Count();
+            var ordered = scored
+                .OrderByDescending(x => x.Score)
+                .ThenByDescending(x => x.Recipe.UpdatedAtUtc)
+                .ToList();
 
-            var pagedItems = sorted
+            var totalCount = ordered.Count;
+
+            var pagedTuples = ordered
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToList();
 
+            var pagedRecipes = pagedTuples.Select(x => x.Recipe).ToList();
+            var mapped = _mapper.Map<List<RecipeRankResponse>>(pagedRecipes);
+
+            for (var i = 0; i < mapped.Count; i++)
+                mapped[i].Score = pagedTuples[i].Score;
+
             return new PagedResult<RecipeRankResponse>
             {
-                Items = pagedItems,
+                Items = mapped,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize

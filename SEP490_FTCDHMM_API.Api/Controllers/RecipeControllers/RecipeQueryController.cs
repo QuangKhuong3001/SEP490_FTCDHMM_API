@@ -29,15 +29,29 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         {
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipeFilterRequest>(request);
 
-            var result = await _recipeQueryService.GetAllRecipesAsync(appRequest);
+            var result = await _recipeQueryService.GetRecipesAsync(appRequest);
             return Ok(result);
         }
 
         [HttpGet("{recipeId}")]
         public async Task<IActionResult> GetDetails(Guid recipeId)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            Guid? userId = null;
+
+            if (Guid.TryParse(userIdClaim, out var parsed))
+                userId = parsed;
+
             var result = await _recipeQueryService.GetRecipeDetailsAsync(userId, recipeId);
+            return Ok(result);
+        }
+
+        [Authorize(Policy = PermissionPolicies.Recipe_ManagementView)]
+        [HttpGet("pending/{recipeId}")]
+        public async Task<IActionResult> GetDetailsByPermission(Guid recipeId)
+        {
+            var result = await _recipeQueryService.GetRecipeDetailsByPermissionAsync(recipeId);
             return Ok(result);
         }
 
@@ -48,7 +62,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.UserSaveRecipe.SaveRecipeFilterRequest>(request);
 
-            var result = await _recipeQueryService.GetSavedListAsync(userId, appRequest);
+            var result = await _recipeQueryService.GetSavedRecipesAsync(userId, appRequest);
             return Ok(result);
         }
 
@@ -59,7 +73,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
-            var result = await _recipeQueryService.GetHistoryAsync(userId, appRequest);
+            var result = await _recipeQueryService.GetRecipeHistoriesAsync(userId, appRequest);
             return Ok(result);
         }
 
@@ -67,57 +81,68 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         public async Task<IActionResult> GetRecipesByUserId(string userName, [FromQuery] RecipePaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
-            var result = await _recipeQueryService.GetRecipeByUserNameAsync(userName, appRequest);
+            var result = await _recipeQueryService.GetRecipesByUserNameAsync(userName, appRequest);
             return Ok(result);
         }
 
         [HttpGet("{recipeId:guid}/rating")]
         public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] RecipePaginationParams request)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            Guid? userId = null;
+
+            if (Guid.TryParse(userIdClaim, out var parsed))
+                userId = parsed;
+
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
 
-            var result = await _recipeQueryService.GetRatingDetailsAsync(userId, recipeId, appRequest);
+            var result = await _recipeQueryService.GetRecipeRatingDetailsAsync(userId, recipeId, appRequest);
             return Ok(result);
         }
 
         [HttpGet("{recipeId:guid}/score")]
         public async Task<IActionResult> GetAverageScore(Guid recipeId)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var avg = await _recipeQueryService.GetRecipeRatingAsync(userId, recipeId);
+            Guid? userId = null;
+
+            if (Guid.TryParse(userIdClaim, out var parsed))
+                userId = parsed;
+
+            var avg = await _recipeQueryService.GetRecipeRatingsAsync(userId, recipeId);
             return Ok(avg);
         }
 
         [Authorize]
-        [HttpGet("myRecipe")]
+        [HttpGet("my")]
         public async Task<IActionResult> GetMyRecipeList([FromQuery] RecipePaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipePaginationParams>(request);
-            var result = await _recipeQueryService.GetRecipeByUserIdAsync(userId, appRequest);
+            var result = await _recipeQueryService.GetRecipesByUserIdAsync(userId, appRequest);
             return Ok(result);
         }
 
-        [HttpGet("pendingManagement")]
+        [HttpGet("pendingsManagement")]
         [Authorize(Policy = PermissionPolicies.Recipe_ManagementView)]
         public async Task<IActionResult> GetPendingManagementList([FromQuery] PaginationParams request)
         {
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
-            var result = await _recipeQueryService.GetPendingManagementListAsync(appRequest);
+            var result = await _recipeQueryService.GetRecipePendingsAsync(appRequest);
             return Ok(result);
         }
 
-        [HttpGet("pending")]
+        [HttpGet("pendings")]
         [Authorize]
         public async Task<IActionResult> GetPendingList([FromQuery] PaginationParams request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var appRequest = _mapper.Map<ApplicationDtos.Common.PaginationParams>(request);
-            var result = await _recipeQueryService.GetPendingListAsync(userId, appRequest);
+            var result = await _recipeQueryService.GetRecipePendingsByUserIdAsync(userId, appRequest);
             return Ok(result);
         }
     }

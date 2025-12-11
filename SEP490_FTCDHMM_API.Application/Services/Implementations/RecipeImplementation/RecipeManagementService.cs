@@ -1,4 +1,5 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+﻿using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -11,28 +12,26 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
     public class RecipeManagementService : IRecipeManagementService
     {
         private readonly IRecipeRepository _recipeRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
 
         public RecipeManagementService(
             IRecipeRepository recipeRepository,
-            IUserRepository userRepository,
             IMailService mailService,
             IEmailTemplateService emailTemplateService)
         {
             _recipeRepository = recipeRepository;
-            _userRepository = userRepository;
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
         }
 
-        public async Task LockAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
+        public async Task LockRecipeAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
+                include: i => i.Include(r => r.Author));
 
             if (recipe == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Công thức không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             if (recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể khóa công thức này");
@@ -41,11 +40,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             recipe.Reason = request.Reason;
             recipe.UpdatedAtUtc = DateTime.UtcNow;
 
-            var author = await _userRepository.GetByIdAsync(recipe.AuthorId);
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+            var author = recipe.Author;
 
             var placeholders = new Dictionary<string, string>
                     {
@@ -62,21 +57,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _recipeRepository.UpdateAsync(recipe);
         }
 
-        public async Task DeleteAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
+        public async Task DeleteRecipeByManageAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
+                            include: i => i.Include(r => r.Author));
 
-            if (recipe == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Công thức không tồn tại");
+            if ((recipe == null) || (recipe.Status == RecipeStatus.Deleted))
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
 
             recipe.Status = RecipeStatus.Deleted;
             recipe.Reason = request.Reason;
+            recipe.UpdatedAtUtc = DateTime.UtcNow;
 
-            var author = await _userRepository.GetByIdAsync(recipe.AuthorId);
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+            var author = recipe.Author;
 
             var placeholders = new Dictionary<string, string>
                     {
@@ -93,41 +86,41 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _recipeRepository.UpdateAsync(recipe);
         }
 
-        public async Task ApproveAsync(Guid userId, Guid recipeId)
+        public async Task ApproveRecipeAsync(Guid userId, Guid recipeId)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
+                            include: i => i.Include(r => r.Author));
 
             if (recipe == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Công thức không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            if (recipe.Status != RecipeStatus.Pending)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             recipe.Status = RecipeStatus.Posted;
             recipe.UpdatedAtUtc = DateTime.UtcNow;
 
-            var author = await _userRepository.GetByIdAsync(recipe.AuthorId);
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+            var author = recipe.Author;
 
             await _recipeRepository.UpdateAsync(recipe);
         }
 
-        public async Task RejectAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
+        public async Task RejectRecipeAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
         {
-            var recipe = await _recipeRepository.GetByIdAsync(recipeId);
+            var recipe = await _recipeRepository.GetByIdAsync(recipeId,
+                            include: i => i.Include(r => r.Author));
 
             if (recipe == null)
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Công thức không tồn tại");
+                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
+
+            if (recipe.Status != RecipeStatus.Pending)
+                throw new AppException(AppResponseCode.INVALID_ACTION);
 
             recipe.Status = RecipeStatus.Locked;
             recipe.Reason = request.Reason;
             recipe.UpdatedAtUtc = DateTime.UtcNow;
 
-            var author = await _userRepository.GetByIdAsync(recipe.AuthorId);
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
+            var author = recipe.Author;
 
             var placeholders = new Dictionary<string, string>
                     {

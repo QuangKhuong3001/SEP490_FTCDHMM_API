@@ -31,7 +31,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var result = await _recommentdationService.RecommendAsync(userId, appRequest);
+            var result = await _recommentdationService.RecommendRecipesAsync(userId, appRequest);
             return Ok(result);
         }
     }

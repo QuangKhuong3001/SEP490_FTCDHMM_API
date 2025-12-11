@@ -61,7 +61,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var stepOrders = stepList.Select(s => s.StepOrder).ToList();
             if (stepOrders.HasDuplicate())
-                throw new AppException(AppResponseCode.INVALID_ACTION, "Thứ tự bước nấu bị trùng");
+                throw new AppException(AppResponseCode.DUPLICATE, "Thứ tự bước nấu bị trùng");
 
             foreach (var step in stepList)
             {
@@ -73,7 +73,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 {
                     var imageOrders = images.Select(i => i.ImageOrder).ToList();
                     if (imageOrders.HasDuplicate())
-                        throw new AppException(AppResponseCode.INVALID_ACTION, "Thứ tự ảnh trong bước nấu bị trùng");
+                        throw new AppException(AppResponseCode.DUPLICATE, "Thứ tự ảnh trong bước nấu bị trùng");
                 }
             }
 
@@ -86,6 +86,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             if (!ids.Any())
                 return;
 
+            if (ids.HasDuplicate())
+                throw new AppException(AppResponseCode.DUPLICATE, "Người dùng được gắn thẻ bị trùng lặp");
+
             foreach (var id in ids)
             {
                 if (id == authorId)
@@ -93,21 +96,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
                 var exists = await _userRepository.ExistsAsync(u => u.Id == id);
                 if (!exists)
-                    throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION, $"Người dùng không tồn tại.");
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Người dùng không tồn tại.");
             }
-        }
-
-        public async Task ValidateUserExistsAsync(Guid userId)
-        {
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
         }
 
         public Task ValidateRecipeOwnerAsync(Guid userId, Recipe recipe)
         {
             if (recipe.AuthorId != userId)
-                throw new AppException(AppResponseCode.ACCESS_DENIED, "Bạn không có quyền chỉnh sửa công thức");
+                throw new AppException(AppResponseCode.FORBIDDEN, "Bạn không có quyền chỉnh sửa công thức");
 
             if (recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");

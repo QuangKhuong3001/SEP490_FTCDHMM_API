@@ -16,7 +16,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _recipeRepository = recipeRepository;
         }
 
-        public async Task AggregateAsync(Recipe recipe)
+        public async Task AggregateRecipeAsync(Recipe recipe)
         {
             await _recipeNutritionAggregator.AggregateAndSaveAsync(recipe);
         }

@@ -68,7 +68,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.HealthGoalControllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _userHealthGoalService.RemoveFromCurrent(userId);
+            await _userHealthGoalService.RemoveGoalFromCurrentAsync(userId);
             return Ok();
         }
     }

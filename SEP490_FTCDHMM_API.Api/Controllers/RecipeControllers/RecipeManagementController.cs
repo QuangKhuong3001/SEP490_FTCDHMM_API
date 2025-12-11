@@ -29,7 +29,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipeManagementReasonRequest>(request);
 
-            await _recipeManagementService.LockAsync(userId, recipeId, appRequest);
+            await _recipeManagementService.LockRecipeAsync(userId, recipeId, appRequest);
             return Ok();
         }
 
@@ -39,7 +39,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            await _recipeManagementService.ApproveAsync(userId, recipeId);
+            await _recipeManagementService.ApproveRecipeAsync(userId, recipeId);
             return Ok();
         }
 
@@ -50,7 +50,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipeManagementReasonRequest>(request);
 
-            await _recipeManagementService.RejectAsync(userId, recipeId, appRequest);
+            await _recipeManagementService.RejectRecipeAsync(userId, recipeId, appRequest);
             return Ok();
         }
 
@@ -61,7 +61,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var appRequest = _mapper.Map<ApplicationDtos.RecipeDtos.RecipeManagementReasonRequest>(request);
 
-            await _recipeManagementService.DeleteAsync(userId, recipeId, appRequest);
+            await _recipeManagementService.DeleteRecipeByManageAsync(userId, recipeId, appRequest);
             return Ok();
         }
     }

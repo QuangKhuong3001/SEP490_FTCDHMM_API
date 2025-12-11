@@ -14,7 +14,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
         public async Task Create_ShouldThrow_WhenNameExists()
         {
             HealthGoalRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Domain.Entities.HealthGoal, bool>>>()))
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<HealthGoal, bool>>>()))
                 .ReturnsAsync(true);
 
             var req = new CreateHealthGoalRequest

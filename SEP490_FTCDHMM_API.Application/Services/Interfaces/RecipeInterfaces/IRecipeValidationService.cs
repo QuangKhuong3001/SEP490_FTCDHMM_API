@@ -5,7 +5,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
 {
     public interface IRecipeValidationService
     {
-        Task ValidateUserExistsAsync(Guid userId);
         Task ValidateLabelsAsync(IEnumerable<Guid> labelIds);
         Task ValidateIngredientsAsync(IEnumerable<Guid> ingredientIds);
         Task ValidateCookingStepsAsync(IEnumerable<CookingStepRequest> steps);

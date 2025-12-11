@@ -6,6 +6,7 @@ using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
 {
@@ -49,7 +50,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
                 : request.Description.Trim();
 
-            await _validator.ValidateUserExistsAsync(userId);
             await _validator.ValidateLabelsAsync(request.LabelIds);
             await _validator.ValidateIngredientsAsync(request.Ingredients.Select(i => i.IngredientId));
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
@@ -70,6 +70,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 Difficulty = DifficultyValue.From(request.Difficulty),
                 CookTime = request.CookTime,
                 Labels = labels.ToList(),
+                NormalizedName = request.Name.NormalizeVi(),
                 CreatedAtUtc = DateTime.UtcNow,
                 UpdatedAtUtc = DateTime.UtcNow,
                 Ration = request.Ration,
@@ -107,7 +108,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                                 .ThenInclude(n => n.Nutrient)
             );
 
-            await _nutritionService.AggregateAsync(fullRecipe!);
+            await _nutritionService.AggregateRecipeAsync(fullRecipe!);
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)
@@ -116,7 +117,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
                 : request.Description.Trim();
 
-            await _validator.ValidateUserExistsAsync(userId);
             await _validator.ValidateLabelsAsync(request.LabelIds);
             await _validator.ValidateIngredientsAsync(request.Ingredients.Select(i => i.IngredientId));
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
@@ -140,6 +140,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 recipe.Status = RecipeStatus.Pending;
             }
 
+            recipe.NormalizedName = request.Name.NormalizeVi();
             recipe.Name = request.Name;
             recipe.Description = description;
             recipe.Difficulty = DifficultyValue.From(request.Difficulty);
@@ -193,28 +194,25 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                                 .ThenInclude(n => n.Nutrient)
             );
 
-            await _nutritionService.AggregateAsync(fullRecipe!);
+            await _nutritionService.AggregateRecipeAsync(fullRecipe!);
         }
 
 
         public async Task DeleteRecipeAsync(Guid userId, Guid recipeId)
         {
-            await _validator.ValidateUserExistsAsync(userId);
-
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.Status == RecipeStatus.Deleted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             await _validator.ValidateRecipeOwnerAsync(userId, recipe);
 
+            recipe.UpdatedAtUtc = DateTime.UtcNow;
             recipe.Status = RecipeStatus.Deleted;
             await _recipeRepository.UpdateAsync(recipe);
         }
 
         public async Task SaveRecipeAsync(Guid userId, Guid recipeId)
         {
-            await _validator.ValidateUserExistsAsync(userId);
-
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -232,8 +230,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task UnsaveRecipeAsync(Guid userId, Guid recipeId)
         {
-            await _validator.ValidateUserExistsAsync(userId);
-
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
             if (recipe == null || recipe.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -245,13 +241,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _userSaveRecipeRepository.DeleteAsync(exist.First());
         }
 
-        public async Task CopyRecipe(Guid userId, Guid parentId, CopyRecipeRequest request)
+        public async Task CopyRecipeAsync(Guid userId, Guid parentId, CopyRecipeRequest request)
         {
             var description = string.IsNullOrWhiteSpace(request.Description)
                ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
                : request.Description.Trim();
 
-            await _validator.ValidateUserExistsAsync(userId);
             await _validator.ValidateLabelsAsync(request.LabelIds);
             await _validator.ValidateIngredientsAsync(request.Ingredients.Select(i => i.IngredientId));
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
@@ -261,9 +256,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             if (parent == null || parent.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức được sao chép không tồn tại");
 
+            Guid? parentIdToSet = parentId;
+
+            if (parent.AuthorId == userId)
+            {
+                parentIdToSet = null;
+            }
+
             if (parent.ParentId.HasValue)
             {
-                parentId = parent.ParentId.Value;
+                parentIdToSet = parent.ParentId.Value;
             }
 
             var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
@@ -275,6 +277,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var recipe = new Recipe
             {
                 Id = Guid.NewGuid(),
+                NormalizedName = request.Name.NormalizeVi(),
                 Name = request.Name,
                 Description = description,
                 AuthorId = userId,
@@ -284,7 +287,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 Ration = request.Ration,
                 CreatedAtUtc = DateTime.UtcNow,
                 UpdatedAtUtc = DateTime.UtcNow,
-                ParentId = parentId,
+                ParentId = parentIdToSet,
                 RecipeIngredients = request.Ingredients.Select(i => new RecipeIngredient
                 {
                     IngredientId = i.IngredientId,
@@ -319,7 +322,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                                 .ThenInclude(n => n.Nutrient)
             );
 
-            await _nutritionService.AggregateAsync(fullRecipe!);
+            await _nutritionService.AggregateRecipeAsync(fullRecipe!);
         }
     }
 }

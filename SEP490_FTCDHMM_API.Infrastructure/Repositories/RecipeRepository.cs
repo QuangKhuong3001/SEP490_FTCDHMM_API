@@ -57,7 +57,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                     !r.Labels.Any(lbl => spec.ExcludeLabelIds.Contains(lbl.Id)));
 
             if (!string.IsNullOrEmpty(spec.Keyword))
-                query = query.Where(r => r.Name.Contains(spec.Keyword));
+                query = query.Where(r => r.NormalizedName.Contains(spec.Keyword));
 
             return await query.ToListAsync();
         }
@@ -66,11 +66,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         {
             var oneYearAgo = DateTime.UtcNow.AddMonths(-12);
 
-            return await _context.Recipes
+            var recipes = await _context.Recipes
                 .Where(r => r.Status == RecipeStatus.Posted &&
-                            r.CreatedAtUtc >= oneYearAgo)
+                            r.UpdatedAtUtc >= oneYearAgo)
                 .Include(r => r.RecipeIngredients)
                     .ThenInclude(r => r.Ingredient)
+                        .ThenInclude(r => r.IngredientNutrients)
                 .Include(r => r.Author)
                     .ThenInclude(a => a.Avatar)
                 .Include(r => r.Image)
@@ -78,6 +79,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
                 .Include(r => r.NutritionAggregates)
                     .ThenInclude(na => na.Nutrient)
                 .ToListAsync();
+
+            var sorted = recipes.OrderByDescending(r => r.UpdatedAtUtc);
+
+            return sorted.Take(500).ToList();
         }
 
     }

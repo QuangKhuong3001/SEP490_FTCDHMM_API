@@ -88,6 +88,9 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.Name,
                     opt => opt.MapFrom(r => r.Ingredient.Name)
+                ).ForMember(
+                    dest => dest.RestrictionType,
+                    opt => opt.Ignore()
                 );
 
             CreateMap<Recipe, RecipeRatingResponse>();

@@ -18,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response
         public decimal CookTime { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public int Ration { get; set; }
+        public int ViewCount { get; set; }
         public string? ImageUrl { get; set; }
         public bool IsFavorited { get; set; }
         public bool IsSaved { get; set; }

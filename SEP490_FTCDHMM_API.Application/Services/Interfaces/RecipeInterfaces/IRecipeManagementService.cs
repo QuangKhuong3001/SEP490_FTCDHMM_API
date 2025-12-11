@@ -4,9 +4,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
 {
     public interface IRecipeManagementService
     {
-        Task LockAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
-        Task ApproveAsync(Guid userId, Guid recipeId);
-        Task RejectAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
-        Task DeleteAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
+        Task LockRecipeAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
+        Task ApproveRecipeAsync(Guid userId, Guid recipeId);
+        Task RejectRecipeAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
+        Task DeleteRecipeByManageAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request);
     }
 }
