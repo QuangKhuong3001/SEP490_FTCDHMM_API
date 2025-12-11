@@ -78,6 +78,119 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
         }
 
         [Fact]
+        public async Task GetRecipes_ShouldThrow_WhenIngredient_IncludeAndExclude_Conflict()
+        {
+            var id = NewId();
+
+            IngredientRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            LabelRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            var req = new RecipeFilterRequest
+            {
+                IncludeIngredientIds = new List<Guid> { id },
+                ExcludeIngredientIds = new List<Guid> { id },
+                PaginationParams = new RecipePaginationParams()
+            };
+
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.GetRecipesAsync(req));
+
+            Assert.Equal(AppResponseCode.INVALID_ACTION, ex.ResponseCode);
+        }
+
+        [Fact]
+        public async Task GetRecipes_ShouldThrow_WhenLabel_IncludeAndExclude_Conflict()
+        {
+            var id = NewId();
+
+            IngredientRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            LabelRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            var req = new RecipeFilterRequest
+            {
+                IncludeLabelIds = new List<Guid> { id },
+                ExcludeLabelIds = new List<Guid> { id },
+                PaginationParams = new RecipePaginationParams()
+            };
+
+            var ex = await Assert.ThrowsAsync<AppException>(() => Sut.GetRecipesAsync(req));
+
+            Assert.Equal(AppResponseCode.INVALID_ACTION, ex.ResponseCode);
+        }
+
+        [Fact]
+        public async Task GetRecipes_ShouldNotThrow_WhenIngredient_IncludeAndExclude_AreDifferent()
+        {
+            IngredientRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            LabelRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            RecipeRepositoryMock
+                .Setup(r => r.GetRecipesRawAsync(It.IsAny<RecipeBasicFilterSpec>()))
+                .ReturnsAsync(new List<Recipe>());
+
+            MapperMock
+                .Setup(m => m.Map<List<RecipeResponse>>(It.IsAny<List<Recipe>>()))
+                .Returns(new List<RecipeResponse>());
+
+            var req = new RecipeFilterRequest
+            {
+                IncludeIngredientIds = new List<Guid> { NewId() },
+                ExcludeIngredientIds = new List<Guid> { NewId() },
+                PaginationParams = new RecipePaginationParams()
+            };
+
+            var res = await Sut.GetRecipesAsync(req);
+
+            Assert.Empty(res.Items);
+        }
+
+        [Fact]
+        public async Task GetRecipes_ShouldNotThrow_WhenLabel_IncludeAndExclude_AreDifferent()
+        {
+            IngredientRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            LabelRepositoryMock
+                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
+                .ReturnsAsync(true);
+
+            RecipeRepositoryMock
+                .Setup(r => r.GetRecipesRawAsync(It.IsAny<RecipeBasicFilterSpec>()))
+                .ReturnsAsync(new List<Recipe>());
+
+            MapperMock
+                .Setup(m => m.Map<List<RecipeResponse>>(It.IsAny<List<Recipe>>()))
+                .Returns(new List<RecipeResponse>());
+
+            var req = new RecipeFilterRequest
+            {
+                IncludeLabelIds = new List<Guid> { NewId() },
+                ExcludeLabelIds = new List<Guid> { NewId() },
+                PaginationParams = new RecipePaginationParams()
+            };
+
+            var res = await Sut.GetRecipesAsync(req);
+
+            Assert.Empty(res.Items);
+        }
+
+
+        [Fact]
         public async Task GetRecipes_ShouldFilter_ByIncludeIngredients()
         {
             var ing1 = NewId();

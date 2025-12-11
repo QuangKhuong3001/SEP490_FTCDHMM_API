@@ -73,6 +73,32 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn trong danh sách loại trừ không tồn tại trong hệ thống");
             }
 
+            if (request.IncludeIngredientIds.Any() && request.ExcludeIngredientIds.Any())
+            {
+                var conflictIngredientIds = request.IncludeIngredientIds
+                    .Intersect(request.ExcludeIngredientIds)
+                    .ToList();
+
+                if (conflictIngredientIds.Any())
+                    throw new AppException(
+                        AppResponseCode.INVALID_ACTION,
+                        "Không thể đồng thời bao gồm và loại trừ cùng một nguyên liệu"
+                    );
+            }
+
+            if (request.IncludeLabelIds.Any() && request.ExcludeLabelIds.Any())
+            {
+                var conflictLabelIds = request.IncludeLabelIds
+                    .Intersect(request.ExcludeLabelIds)
+                    .ToList();
+
+                if (conflictLabelIds.Any())
+                    throw new AppException(
+                        AppResponseCode.INVALID_ACTION,
+                        "Không thể đồng thời bao gồm và loại trừ cùng một nhãn"
+                    );
+            }
+
             var spec = new RecipeBasicFilterSpec
             {
                 IncludeIngredientIds = request.IncludeIngredientIds,
