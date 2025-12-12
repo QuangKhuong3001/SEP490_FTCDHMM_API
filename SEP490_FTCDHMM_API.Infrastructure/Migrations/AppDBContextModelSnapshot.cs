@@ -1289,12 +1289,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UploadedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UploadedById");
 
                     b.ToTable("Images", (string)null);
 
@@ -1303,7 +1298,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 12, 18, 42, 0, 530, DateTimeKind.Utc).AddTicks(5933),
+                            CreatedAtUTC = new DateTime(2025, 12, 12, 19, 8, 16, 784, DateTimeKind.Utc).AddTicks(2740),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -3025,15 +3020,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("HealthGoal");
 
                     b.Navigation("Nutrient");
-                });
-
-            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Image", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "UploadedBy")
-                        .WithMany()
-                        .HasForeignKey("UploadedById");
-
-                    b.Navigation("UploadedBy");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Ingredient", b =>

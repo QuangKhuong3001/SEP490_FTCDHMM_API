@@ -7,7 +7,5 @@
         public string? ContentType { get; set; }
         public DateTime CreatedAtUTC { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
-        public Guid? UploadedById { get; set; }
-        public AppUser? UploadedBy { get; set; }
     }
 }
