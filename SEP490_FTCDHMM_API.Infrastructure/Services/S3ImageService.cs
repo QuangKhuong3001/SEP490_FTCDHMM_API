@@ -31,7 +31,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder, AppUser? uploadedBy)
+        public async Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder)
         {
             try
             {
@@ -51,7 +51,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     Id = id,
                     Key = key,
                     ContentType = file.ContentType,
-                    UploadedBy = uploadedBy,
                     CreatedAtUTC = DateTime.UtcNow
                 };
 
@@ -66,7 +65,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
         }
 
-        public async Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder, Guid? userId)
+        public async Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder)
         {
             try
             {
@@ -85,7 +84,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     Id = id,
                     Key = key,
                     ContentType = file.ContentType,
-                    UploadedById = userId,
                     CreatedAtUTC = DateTime.UtcNow
                 };
 
@@ -100,7 +98,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
         }
 
-        public async Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder, AppUser uploadedBy)
+        public async Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder)
         {
             try
             {
@@ -124,7 +122,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                         Id = id,
                         Key = key,
                         ContentType = file.ContentType,
-                        UploadedBy = uploadedBy,
                         CreatedAtUTC = DateTime.UtcNow
                     };
 
@@ -142,7 +139,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             }
         }
 
-        public async Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder, Guid? userId)
+        public async Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder)
         {
             try
             {
@@ -150,7 +147,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                 foreach (var f in files)
                 {
-                    var img = await UploadImageAsync(f, folder, userId);
+                    var img = await UploadImageAsync(f, folder);
                     result.Add(img);
                 }
 
@@ -194,7 +191,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return result;
         }
 
-        public async Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url, Guid uploadedById)
+        public async Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url)
         {
             using var http = new HttpClient();
             using var resp = await http.GetAsync(url);
@@ -230,7 +227,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 Key = key,
                 ContentType = contentType,
                 CreatedAtUTC = DateTime.UtcNow,
-                UploadedById = uploadedById
             };
 
             _dbContext.Images.Add(image);

@@ -21,11 +21,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(i => i.CreatedAtUTC)
                    .HasDefaultValueSql("GETDATE()");
-
-            builder.HasOne(i => i.UploadedBy)
-                   .WithMany()
-                   .HasForeignKey(i => i.UploadedById)
-                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

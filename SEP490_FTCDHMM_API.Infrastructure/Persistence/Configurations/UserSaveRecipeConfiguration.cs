@@ -4,9 +4,9 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
-    public class UserSaveRecipeConfiguration : IEntityTypeConfiguration<UserSaveRecipe>
+    public class UserSaveRecipeConfiguration : IEntityTypeConfiguration<RecipeUserSave>
     {
-        public void Configure(EntityTypeBuilder<UserSaveRecipe> builder)
+        public void Configure(EntityTypeBuilder<RecipeUserSave> builder)
         {
             builder.ToTable("UserSaveRecipes");
 

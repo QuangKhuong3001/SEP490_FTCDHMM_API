@@ -5,7 +5,7 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Specifications;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
     public class GetRecipesAsyncTests : RecipeQueryServiceTestBase
     {

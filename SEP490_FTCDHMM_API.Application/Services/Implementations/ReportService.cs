@@ -8,6 +8,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
+using SEP490_FTCDHMM_API.Shared.Utils;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 {
@@ -124,15 +125,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<PagedResult<ReportsResponse>> GetReportsAsync(ReportFilterRequest request)
         {
-            var targetType = ReportObjectType.From(request.Type ?? "");
+            var type = ReportObjectType.Recipe;
+            if (request.Type != null)
+            {
+                type = ReportObjectType.From(request.Type);
+            }
 
             Expression<Func<Report, bool>> filter = r =>
                 r.Status == ReportStatus.Pending &&
                 (string.IsNullOrEmpty(request.Type) ||
-                r.TargetType == targetType)
-                    &&
-                        (string.IsNullOrEmpty(request.Keyword) ||
-                        r.Description.Contains(request.Keyword));
+                r.TargetType == type);
 
 
             Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
@@ -156,6 +158,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .ToList();
 
             var resultList = new List<ReportsResponse>();
+            var keywordNormalized = request.Keyword?.NormalizeVi() ?? "";
 
             foreach (var g in grouped)
             {
@@ -166,15 +169,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 };
 
                 var targetName = await ResolveTargetNameAsync(temp);
+                var normalizedTargetName = targetName.NormalizeVi();
 
-                resultList.Add(new ReportsResponse
+                if (normalizedTargetName.Contains(keywordNormalized))
                 {
-                    TargetType = g.TargetType,
-                    TargetId = g.TargetId,
-                    TargetName = targetName,
-                    Count = g.Count,
-                    LatestReportAtUtc = g.LatestAt
-                });
+                    resultList.Add(new ReportsResponse
+                    {
+                        TargetType = g.TargetType,
+                        TargetId = g.TargetId,
+                        TargetName = targetName,
+                        Count = g.Count,
+                        LatestReportAtUtc = g.LatestAt
+                    });
+                }
             }
 
             var totalCount = resultList.Count;
@@ -193,12 +200,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         }
         public async Task<PagedResult<ReportsResponse>> GetReportHistoriesAsync(ReportFilterRequest request)
         {
+            var type = ReportObjectType.Recipe;
+
+            if (!string.IsNullOrEmpty(request.Type))
+                type = ReportObjectType.From(request.Type);
+
             Expression<Func<Report, bool>> filter = r =>
                 (r.Status == ReportStatus.Approved || r.Status == ReportStatus.Rejected) &&
                 (string.IsNullOrEmpty(request.Type) ||
-                    r.TargetType.Value == ReportObjectType.From(request.Type).Value) &&
-                (string.IsNullOrEmpty(request.Keyword) ||
-                    r.Description.Contains(request.Keyword));
+                    r.TargetType == type);
 
             Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
 
@@ -220,6 +230,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 .ToList();
 
             var resultList = new List<ReportsResponse>();
+            var keywordNormalized = request.Keyword?.NormalizeVi() ?? "";
 
             foreach (var g in grouped)
             {
@@ -230,15 +241,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 };
 
                 var targetName = await ResolveTargetNameAsync(temp);
+                var normalizedTargetName = targetName.NormalizeVi();
 
-                resultList.Add(new ReportsResponse
+                if (normalizedTargetName.Contains(keywordNormalized))
                 {
-                    TargetType = g.TargetType,
-                    TargetId = g.TargetId,
-                    TargetName = targetName,
-                    Count = g.Count,
-                    LatestReportAtUtc = g.LatestAt
-                });
+                    resultList.Add(new ReportsResponse
+                    {
+                        TargetType = g.TargetType,
+                        TargetId = g.TargetId,
+                        TargetName = targetName,
+                        Count = g.Count,
+                        LatestReportAtUtc = g.LatestAt
+                    });
+                }
             }
 
             var totalCount = resultList.Count;
@@ -353,7 +368,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 var comment = await _commentRepository.GetByIdAsync(report.TargetId);
                 if (comment == null)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Bình luận không tồn tại.");
+                    return "[Bình luận đã bị xóa]";
 
                 return comment.Content;
             }
@@ -362,7 +377,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 var rating = await _ratingRepository.GetByIdAsync(report.TargetId);
                 if (rating == null)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Đánh giá không tồn tại.");
+                    return "[Đánh giá đã bị xóa]";
 
                 var feedback = rating.Feedback?.Trim();
 

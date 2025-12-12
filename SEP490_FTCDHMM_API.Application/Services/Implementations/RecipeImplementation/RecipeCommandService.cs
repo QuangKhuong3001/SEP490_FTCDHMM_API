@@ -93,9 +93,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image);
 
-            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
+            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);
@@ -163,7 +163,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 QuantityGram = i.QuantityGram
             }).ToList();
 
-            await _imageService.ReplaceRecipeImageAsync(recipe, request.Image, userId);
+            await _imageService.ReplaceRecipeImageAsync(recipe, request.Image);
 
             var oldTags = await _recipeUserTagRepository.GetAllAsync(t => t.RecipeId == recipe.Id);
             if (oldTags.Any())
@@ -181,7 +181,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.ReplaceCookingStepsAsync(recipe.Id, request.CookingSteps, userId);
+            await _imageService.ReplaceCookingStepsAsync(recipe.Id, request.CookingSteps);
 
             await _recipeRepository.UpdateAsync(recipe);
 
@@ -221,7 +221,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             if (exist)
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
-            await _userSaveRecipeRepository.AddAsync(new UserSaveRecipe
+            await _userSaveRecipeRepository.AddAsync(new RecipeUserSave
             {
                 RecipeId = recipeId,
                 UserId = userId
@@ -307,9 +307,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, userId);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image);
 
-            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe, userId);
+            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);

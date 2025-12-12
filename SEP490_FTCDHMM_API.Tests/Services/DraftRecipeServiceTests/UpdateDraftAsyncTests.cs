@@ -274,8 +274,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             S3Mock
                 .Setup(s => s.UploadImageAsync(
                     It.IsAny<FileUploadModel>(),
-                    It.IsAny<StorageFolder>(),
-                    userId))
+                    It.IsAny<StorageFolder>())
+                )
                 .ThrowsAsync(new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE));
 
             UserRepositoryMock
@@ -300,8 +300,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             S3Mock
                 .Setup(s => s.UploadImageAsync(
                     It.IsAny<FileUploadModel>(),
-                    It.IsAny<StorageFolder>(),
-                    userId))
+                    It.IsAny<StorageFolder>())
+                )
                 .ReturnsAsync(new Image
                 {
                     Id = Guid.NewGuid(),

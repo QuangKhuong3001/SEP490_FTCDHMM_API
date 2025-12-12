@@ -57,7 +57,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
             {
                 Id = id ?? Guid.NewGuid(),
                 Name = "Ingredient",
-                LowerName = "ingredient",
+                UpperName = "INGREDIENT",
                 NormalizedName = "ingredient",
                 Description = "desc",
                 LastUpdatedUtc = DateTime.UtcNow,

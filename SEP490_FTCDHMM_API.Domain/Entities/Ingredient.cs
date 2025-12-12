@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
-        public string LowerName { get; set; } = string.Empty;
+        public string UpperName { get; set; } = string.Empty;
         public string NormalizedName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime LastUpdatedUtc { get; set; } = DateTime.UtcNow;

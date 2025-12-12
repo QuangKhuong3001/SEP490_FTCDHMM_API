@@ -4,7 +4,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
 
-namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagement
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagementServiceTests
 {
     public abstract class RecipeManagementServiceTestsBase
     {

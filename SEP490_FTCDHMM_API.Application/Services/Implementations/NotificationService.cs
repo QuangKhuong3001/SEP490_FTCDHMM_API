@@ -28,6 +28,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 n => n.ReceiverId == userId,
                 q => q
                     .Include(x => x.Sender)
+                        .ThenInclude(s => s!.Avatar)
                     .OrderByDescending(x => x.CreatedAtUtc)
             );
 

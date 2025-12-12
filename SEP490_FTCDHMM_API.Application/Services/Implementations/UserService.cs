@@ -218,7 +218,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (dto.Avatar != null && dto.Avatar.Length > 0)
             {
-                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.AVATARS, user);
+                var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Avatar, StorageFolder.AVATARS);
 
                 if (user.AvatarId.HasValue)
                 {

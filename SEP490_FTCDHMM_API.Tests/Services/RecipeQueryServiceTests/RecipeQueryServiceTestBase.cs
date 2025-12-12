@@ -3,7 +3,7 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
 
-namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
     public abstract class RecipeQueryServiceTestBase
     {

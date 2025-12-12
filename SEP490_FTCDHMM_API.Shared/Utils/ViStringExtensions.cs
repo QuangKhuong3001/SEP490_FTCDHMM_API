@@ -11,7 +11,7 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
         {
             if (string.IsNullOrWhiteSpace(text)) return string.Empty;
 
-            text = text.ToLowerInvariant().CleanDuplicateSpace();
+            text = text.ToUpperInvariant().CleanDuplicateSpace();
 
             var normalized = text.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();
@@ -33,6 +33,11 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
         public static string CleanDuplicateSpace(this string name)
         {
             return Regex.Replace(name.Trim(), @"\s+", " ");
+        }
+
+        public static string UpperName(this string name)
+        {
+            return Regex.Replace(name.Trim().ToUpperInvariant(), @"\s+", " ");
         }
 
         public static string RemoveDiacritics(string text)

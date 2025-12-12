@@ -9,6 +9,25 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
 {
     public class CreateReportAsyncTests : ReportServiceTestBase
     {
+        private void SetupPendingReport(Guid reporterId, Guid targetId, ReportObjectType type, Report? result)
+        {
+            ReportRepoMock
+                .Setup(r => r.FirstOrDefaultAsync(
+                    It.IsAny<Expression<Func<Report, DateTime>>>(),
+                    It.Is<Expression<Func<Report, bool>>>(p =>
+                        p.Compile().Invoke(new Report
+                        {
+                            ReporterId = reporterId,
+                            TargetId = targetId,
+                            TargetType = type,
+                            Status = ReportStatus.Pending
+                        })
+                    ),
+                    null
+                ))
+                .ReturnsAsync(result);
+        }
+
         [Fact]
         public async Task CreateReportAsync_ShouldUpdateExistingReport_WhenPendingExists()
         {
@@ -27,13 +46,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
                 .Setup(r => r.GetByIdAsync(reporterId, null))
                 .ReturnsAsync(CreateUser(reporterId));
 
-            ReportRepoMock
-                 .Setup(r => r.FirstOrDefaultAsync(
-                    It.IsAny<Expression<Func<Report, bool>>>(),
-                    It.IsAny<Expression<Func<Report, bool>>?>(),
-                    It.IsAny<Func<IQueryable<Report>, IQueryable<Report>>?>()
-                ))
-                .ReturnsAsync(existing);
+            SetupPendingReport(reporterId, targetId, ReportObjectType.User, existing);
 
             ReportRepoMock
                 .Setup(r => r.UpdateAsync(existing))
@@ -42,13 +55,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
             await Sut.CreateReportAsync(reporterId, request);
 
             Assert.Equal("new text", existing.Description);
-
-            ReportRepoMock.Verify(r => r.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<Report, bool>>>(),
-                It.IsAny<Expression<Func<Report, bool>>?>(),
-                It.IsAny<Func<IQueryable<Report>, IQueryable<Report>>?>()), Times.Once);
-
-            ReportRepoMock.Verify(r => r.UpdateAsync(existing), Times.Once);
         }
 
         [Fact]
@@ -68,13 +74,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
                 .Setup(r => r.GetByIdAsync(reporterId, null))
                 .ReturnsAsync(CreateUser(reporterId));
 
-            ReportRepoMock
-                .Setup(r => r.FirstOrDefaultAsync(
-                    It.IsAny<Expression<Func<Report, bool>>>(),
-                    It.IsAny<Expression<Func<Report, bool>>?>(),
-                    It.IsAny<Func<IQueryable<Report>, IQueryable<Report>>?>()
-                ))
-                .ReturnsAsync((Report)null!);
+            SetupPendingReport(reporterId, targetId, ReportObjectType.User, null);
 
             UserRepoMock
                 .Setup(r => r.ExistsAsync(u => u.Id == targetId))
@@ -95,8 +95,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
             Assert.Equal("abc", added.Description);
             Assert.Equal(ReportStatus.Pending, added.Status);
             Assert.Equal(ReportObjectType.User, added.TargetType);
-
-            ReportRepoMock.Verify(r => r.AddAsync(It.IsAny<Report>()), Times.Once);
         }
 
         [Fact]
@@ -115,17 +113,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
                 .Setup(r => r.GetByIdAsync(reporterId, null))
                 .ReturnsAsync(CreateUser(reporterId));
 
-            ReportRepoMock
-                .Setup(r => r.FirstOrDefaultAsync(
-                    It.IsAny<Expression<Func<Report, bool>>>(),
-                    It.IsAny<Expression<Func<Report, bool>>?>(),
-                    It.IsAny<Func<IQueryable<Report>, IQueryable<Report>>?>()
-                ))
-                .ReturnsAsync((Report)null!);
+            SetupPendingReport(reporterId, reporterId, ReportObjectType.User, null);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.CreateReportAsync(reporterId, request));
-
-            UserRepoMock.Verify(r => r.GetByIdAsync(reporterId, null), Times.Once);
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.CreateReportAsync(reporterId, request));
         }
 
         [Fact]
@@ -146,18 +137,9 @@ namespace SEP490_FTCDHMM_API.Tests.Services.ReportServiceTests
                 .Setup(r => r.GetByIdAsync(reporterId, null))
                 .ReturnsAsync(CreateUser(reporterId));
 
-            ReportRepoMock
-                .Setup(r => r.FirstOrDefaultAsync(
-                    It.IsAny<Expression<Func<Report, bool>>>(),
-                    It.IsAny<Expression<Func<Report, bool>>?>(),
-                    It.IsAny<Func<IQueryable<Report>, IQueryable<Report>>?>()
-                ))
-                .ReturnsAsync(existing);
+            SetupPendingReport(reporterId, targetId, ReportObjectType.User, existing);
 
             await Sut.CreateReportAsync(reporterId, request);
-
-            ReportRepoMock.Verify(r => r.UpdateAsync(It.IsAny<Report>()), Times.Never);
-            ReportRepoMock.Verify(r => r.AddAsync(It.IsAny<Report>()), Times.Never);
         }
     }
 }

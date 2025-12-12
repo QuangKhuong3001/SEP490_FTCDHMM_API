@@ -6,38 +6,21 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
     public class GetRecipeDetailsAsyncTests : RecipeQueryServiceTestBase
     {
-        private void SetupUser(Guid id, bool hasPermission = false)
+        private void SetupUser(Guid id, AppUser? user = null)
         {
             UserRepositoryMock
                 .Setup(r => r.GetByIdAsync(
                     id,
                     It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(new AppUser
+                .ReturnsAsync(user ?? new AppUser
                 {
                     Id = id,
-                    Role = new AppRole
-                    {
-                        RolePermissions = hasPermission
-                            ? new List<AppRolePermission>
-                            {
-                                new()
-                                {
-                                    PermissionAction = new PermissionAction
-                                    {
-                                        Name = PermissionValue.Recipe_ManagementView.Action,
-                                        PermissionDomain = new PermissionDomain
-                                        {
-                                            Name = PermissionValue.Recipe_ManagementView.Domain
-                                        }
-                                    }
-                                }
-                            }
-                            : new List<AppRolePermission>()
-                    }
+                    Role = new AppRole { RolePermissions = new List<AppRolePermission>() },
+                    DietRestrictions = new List<UserDietRestriction>()
                 });
         }
 
@@ -60,8 +43,8 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Pending,
-                AuthorId = NewId()
+                AuthorId = NewId(),
+                Status = RecipeStatus.Pending
             };
 
             RecipeRepositoryMock
@@ -75,8 +58,9 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
         }
 
         [Fact]
-        public async Task Details_ShouldThrow_WhenStatusNotPosted_AndUserNotOwner()
+        public async Task Details_ShouldThrow_WhenStatusNotPosted_AndNotOwner()
         {
+            var userId = NewId();
             var recipe = new Recipe
             {
                 Id = NewId(),
@@ -84,35 +68,29 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 AuthorId = NewId()
             };
 
-            var callerId = NewId();
-
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            SetupUser(callerId);
+            SetupUser(userId);
 
             await Assert.ThrowsAsync<AppException>(() =>
-                Sut.GetRecipeDetailsAsync(callerId, recipe.Id));
+                Sut.GetRecipeDetailsAsync(userId, recipe.Id));
         }
 
         [Fact]
-        public async Task Details_Guest_ShouldReturnMappedResult_AndNotAddView()
+        public async Task Details_Guest_ShouldReturnMappedResult_AndNotCreateView()
         {
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
+                Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>()
             };
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
             MapperMock
@@ -121,85 +99,48 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             var result = await Sut.GetRecipeDetailsAsync(null, recipe.Id);
 
-            Assert.NotNull(result);
             Assert.Equal(recipe.Id, result.Id);
 
             UserRecipeViewRepositoryMock.VerifyNoOtherCalls();
+            UserSaveRecipeRepositoryMock.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task Details_UserNotOwner_ShouldCreateView_AndUpdateViewCount()
+        public async Task Details_NotOwner_ShouldCreateView_AndUpdateViewCount()
         {
+            var viewerId = NewId();
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
+                Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>()
             };
 
-            var viewerId = NewId();
-
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
             SetupUser(viewerId);
 
-            UserSaveRecipeRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+            UserRecipeViewRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
                 .ReturnsAsync(false);
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView r) => Task.FromResult(r));
+                .Setup(r => r.AddAsync(It.IsAny<RecipeUserView>()))
+                .Returns((RecipeUserView v) => Task.FromResult(v));
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
-                .ReturnsAsync(5);
+                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
+                .ReturnsAsync(7);
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(recipe))
                 .Returns(Task.CompletedTask);
 
-            MapperMock
-                .Setup(m => m.Map<RecipeDetailsResponse>(recipe))
-                .Returns(new RecipeDetailsResponse
-                {
-                    Id = recipe.Id,
-                    Ingredients = new List<RecipeIngredientResponse>()
-                });
-
-            var res = await Sut.GetRecipeDetailsAsync(viewerId, recipe.Id);
-
-            Assert.Equal(5, recipe.ViewCount);
-        }
-
-        [Fact]
-        public async Task Details_Owner_ShouldNotCreateView()
-        {
-            var userId = NewId();
-
-            var recipe = new Recipe
-            {
-                Id = NewId(),
-                Status = RecipeStatus.Posted,
-                AuthorId = userId,
-                RecipeIngredients = new List<RecipeIngredient>()
-            };
-
-            RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
-                .ReturnsAsync(recipe);
-
-            SetupUser(userId);
-
             UserSaveRecipeRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
                 .ReturnsAsync(false);
 
             MapperMock
@@ -210,7 +151,59 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     Ingredients = new List<RecipeIngredientResponse>()
                 });
 
-            var _ = await Sut.GetRecipeDetailsAsync(userId, recipe.Id);
+            UserRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    viewerId,
+                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .ReturnsAsync(new AppUser
+                {
+                    Id = viewerId,
+                    DietRestrictions = new List<UserDietRestriction>()
+                });
+
+            var res = await Sut.GetRecipeDetailsAsync(viewerId, recipe.Id);
+
+            Assert.Equal(7, recipe.ViewCount);
+        }
+
+        [Fact]
+        public async Task Details_Owner_ShouldNotCreateView()
+        {
+            var ownerId = NewId();
+
+            var recipe = new Recipe
+            {
+                Id = NewId(),
+                AuthorId = ownerId,
+                Status = RecipeStatus.Posted,
+                RecipeIngredients = new List<RecipeIngredient>()
+            };
+
+            RecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .ReturnsAsync(recipe);
+
+            SetupUser(ownerId);
+
+            UserSaveRecipeRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
+                .ReturnsAsync(false);
+
+            MapperMock
+                .Setup(m => m.Map<RecipeDetailsResponse>(recipe))
+                .Returns(new RecipeDetailsResponse
+                {
+                    Id = recipe.Id,
+                    Ingredients = new List<RecipeIngredientResponse>()
+                });
+
+            UserRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    ownerId,
+                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .ReturnsAsync(new AppUser { Id = ownerId });
+
+            var _ = await Sut.GetRecipeDetailsAsync(ownerId, recipe.Id);
 
             UserRecipeViewRepositoryMock.VerifyNoOtherCalls();
         }
@@ -219,38 +212,45 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
         public async Task Details_ShouldSet_IsSaved()
         {
             var userId = NewId();
-
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
+                Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>()
             };
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
             SetupUser(userId);
 
-            UserSaveRecipeRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
-                .ReturnsAsync(true);
+            UserRecipeViewRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
+                .ReturnsAsync(false);
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView r) => Task.FromResult(r));
+                .Setup(r => r.AddAsync(It.IsAny<RecipeUserView>()))
+                .Returns((RecipeUserView v) => Task.FromResult(v));
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
-                .ReturnsAsync(1);
+                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
+                .ReturnsAsync(2);
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(recipe))
                 .Returns(Task.CompletedTask);
+
+            UserSaveRecipeRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
+                .ReturnsAsync(true);
+
+            UserRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    userId,
+                    It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
+                .ReturnsAsync(new AppUser { Id = userId, DietRestrictions = new List<UserDietRestriction>() });
 
             MapperMock
                 .Setup(m => m.Map<RecipeDetailsResponse>(recipe))
@@ -275,8 +275,8 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
+                Status = RecipeStatus.Posted,
                 RecipeIngredients =
                 {
                     new RecipeIngredient
@@ -305,9 +305,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             };
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
             UserRepositoryMock
@@ -316,21 +314,25 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
                 .ReturnsAsync(user);
 
-            UserSaveRecipeRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+            UserRecipeViewRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
                 .ReturnsAsync(false);
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView r) => Task.FromResult(r));
+                .Setup(r => r.AddAsync(It.IsAny<RecipeUserView>()))
+                .Returns((RecipeUserView v) => Task.FromResult(v));
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
+                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
                 .ReturnsAsync(1);
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(recipe))
                 .Returns(Task.CompletedTask);
+
+            UserSaveRecipeRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
+                .ReturnsAsync(false);
 
             MapperMock
                 .Setup(m => m.Map<RecipeDetailsResponse>(recipe))
@@ -358,8 +360,8 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var recipe = new Recipe
             {
                 Id = NewId(),
-                Status = RecipeStatus.Posted,
                 AuthorId = NewId(),
+                Status = RecipeStatus.Posted,
                 RecipeIngredients =
                 {
                     new RecipeIngredient
@@ -391,9 +393,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             };
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    recipe.Id,
-                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
             UserRepositoryMock
@@ -402,21 +402,25 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                     It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
                 .ReturnsAsync(user);
 
-            UserSaveRecipeRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+            UserRecipeViewRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
                 .ReturnsAsync(false);
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<UserRecipeView>()))
-                .Returns((UserRecipeView r) => Task.FromResult(r));
+                .Setup(r => r.AddAsync(It.IsAny<RecipeUserView>()))
+                .Returns((RecipeUserView v) => Task.FromResult(v));
 
             UserRecipeViewRepositoryMock
-                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<UserRecipeView, bool>>>()))
-                .ReturnsAsync(3);
+                .Setup(r => r.CountAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>()))
+                .ReturnsAsync(2);
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(recipe))
                 .Returns(Task.CompletedTask);
+
+            UserSaveRecipeRepositoryMock
+                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
+                .ReturnsAsync(false);
 
             MapperMock
                 .Setup(m => m.Map<RecipeDetailsResponse>(recipe))

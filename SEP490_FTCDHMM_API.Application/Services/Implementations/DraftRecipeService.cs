@@ -90,7 +90,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (request.Image != null)
             {
-                var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS, userId);
+                var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS);
                 draft.Image = uploaded;
             }
 
@@ -129,7 +129,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS, userId);
+                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
 
                         step.DraftCookingStepImages.Add(new DraftCookingStepImage
                         {
@@ -208,7 +208,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (request.Image != null)
             {
-                var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS, userId);
+                var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS);
                 draft.Image = uploaded;
             }
 
@@ -247,7 +247,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS, userId);
+                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
 
                         step.DraftCookingStepImages.Add(new DraftCookingStepImage
                         {

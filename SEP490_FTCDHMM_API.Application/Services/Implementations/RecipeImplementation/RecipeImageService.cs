@@ -23,21 +23,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _cookingStepRepository = cookingStepRepository;
         }
 
-        public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file, Guid userId)
+        public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file)
         {
             if (file == null)
                 return;
 
             var uploaded = await _imageService.UploadImageAsync(
                 file,
-                StorageFolder.RECIPES,
-                userId
+                StorageFolder.RECIPES
             );
 
             recipe.Image = uploaded;
         }
 
-        public async Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file, Guid userId)
+        public async Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file)
         {
             if (file == null)
                 return;
@@ -49,14 +48,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var newImage = await _imageService.UploadImageAsync(
                 file,
-                StorageFolder.RECIPES,
-                userId
-            );
+                StorageFolder.RECIPES
+                );
 
             recipe.Image = newImage;
         }
 
-        public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe, Guid userId)
+        public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe)
         {
             var result = new List<CookingStep>();
 
@@ -79,8 +77,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     {
                         var uploaded = await _imageService.UploadImageAsync(
                             img.Image,
-                            StorageFolder.COOKING_STEPS,
-                            userId
+                            StorageFolder.COOKING_STEPS
                         );
 
                         newStep.CookingStepImages.Add(new CookingStepImage
@@ -99,7 +96,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             return result;
         }
 
-        public async Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps, Guid userId)
+        public async Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps)
         {
             var oldSteps = await _cookingStepRepository.GetAllAsync(r => r.RecipeId == recipeId,
                 include: q => q
@@ -136,8 +133,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     {
                         var uploaded = await _imageService.UploadImageAsync(
                             img.Image,
-                            StorageFolder.COOKING_STEPS,
-                            userId
+                            StorageFolder.COOKING_STEPS
                         );
 
                         newStep.CookingStepImages.Add(new CookingStepImage

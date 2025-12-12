@@ -172,10 +172,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreateIngredientAsync(CreateIngredientRequest dto)
         {
-            var lowerName = dto.Name.CleanDuplicateSpace().ToLowerInvariant();
+            var upperName = dto.Name.UpperName();
 
             if (await _ingredientRepository.ExistsAsync(
-                    i => i.LowerName == lowerName))
+                    i => i.UpperName == upperName))
             {
                 throw new AppException(AppResponseCode.EXISTS);
             }
@@ -189,7 +189,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await HasMacroNutrients(nutrientIds);
 
-            var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image!, StorageFolder.INGREDIENTS, null);
+            var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image!, StorageFolder.INGREDIENTS);
 
             var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
@@ -201,7 +201,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             {
                 Name = dto.Name.CleanDuplicateSpace(),
                 NormalizedName = dto.Name.NormalizeVi(),
-                LowerName = lowerName,
+                UpperName = upperName,
                 Description = dto.Description == null ? DefaultValues.DEFAULT_INGREDIENT_DESCRIPTION : dto.Description,
                 Image = uploadedImage,
                 LastUpdatedUtc = DateTime.UtcNow,
@@ -289,7 +289,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                 if (dto.Image != null && dto.Image.Length > 0)
                 {
-                    var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image, StorageFolder.INGREDIENTS, null);
+                    var uploadedImage = await _s3ImageService.UploadImageAsync(dto.Image, StorageFolder.INGREDIENTS);
                     var oldImageId = ingredient.ImageId;
 
                     ingredient.Image = uploadedImage;
@@ -406,10 +406,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var vietName = await _translateService.TranslateToVietnameseAsync(translated);
 
-            var lower = vietName.CleanDuplicateSpace().ToLowerInvariant();
-            if (await _ingredientRepository.ExistsAsync(u => u.LowerName == lower))
+            var upperName = vietName.UpperName();
+            if (await _ingredientRepository.ExistsAsync(u => u.UpperName == upperName))
             {
-                var dbItems = await _ingredientRepository.GetTop5Async(lower);
+                var dbItems = await _ingredientRepository.GetTop5Async(upperName);
                 return _mapper.Map<IngredientNameResponse>(dbItems.First());
             }
 
@@ -443,7 +443,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Id = Guid.NewGuid(),
                 Name = vietName,
                 NormalizedName = vietName.NormalizeVi(),
-                LowerName = vietName.CleanDuplicateSpace().ToLowerInvariant(),
+                UpperName = upperName,
                 Description = descriptionViet,
                 LastUpdatedUtc = DateTime.UtcNow,
                 Calories = ExtractCalories(detail),

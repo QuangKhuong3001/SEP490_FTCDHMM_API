@@ -30,8 +30,8 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public ICollection<Label> Labels { get; set; } = new List<Label>();
         public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
         public ICollection<RecipeNutritionAggregate> NutritionAggregates { get; set; } = new List<RecipeNutritionAggregate>();
-        public ICollection<UserRecipeView> Views { get; set; } = new List<UserRecipeView>();
-        public ICollection<UserSaveRecipe> SavedBy { get; set; } = new List<UserSaveRecipe>();
+        public ICollection<RecipeUserView> Views { get; set; } = new List<RecipeUserView>();
+        public ICollection<RecipeUserSave> SavedBy { get; set; } = new List<RecipeUserSave>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public ICollection<RecipeUserTag> RecipeUserTags { get; set; } = new List<RecipeUserTag>();

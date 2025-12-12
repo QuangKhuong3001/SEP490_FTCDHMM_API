@@ -1,6 +1,6 @@
 ﻿namespace SEP490_FTCDHMM_API.Domain.Entities
 {
-    public class UserSaveRecipe
+    public class RecipeUserSave
     {
         public Guid UserId { get; set; }
         public Guid RecipeId { get; set; }

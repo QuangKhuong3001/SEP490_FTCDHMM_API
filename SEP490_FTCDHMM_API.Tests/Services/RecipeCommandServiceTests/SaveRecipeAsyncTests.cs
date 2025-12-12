@@ -31,7 +31,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .ReturnsAsync(recipe);
 
             UserSaveRecipeRepositoryMock
-                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
                 .ReturnsAsync(true);
 
             await Assert.ThrowsAsync<AppException>(() =>
@@ -49,16 +49,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .ReturnsAsync(recipe);
 
             UserSaveRecipeRepositoryMock
-                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<UserSaveRecipe, bool>>>()))
+                .Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>()))
                 .ReturnsAsync(false);
 
             UserSaveRecipeRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UserSaveRecipe>()))
-                .ReturnsAsync((UserSaveRecipe u) => u);
+                .Setup(x => x.AddAsync(It.IsAny<RecipeUserSave>()))
+                .ReturnsAsync((RecipeUserSave u) => u);
 
             await Sut.SaveRecipeAsync(userId, recipeId);
 
-            UserSaveRecipeRepositoryMock.Verify(x => x.AddAsync(It.IsAny<UserSaveRecipe>()), Times.Once);
+            UserSaveRecipeRepositoryMock.Verify(x => x.AddAsync(It.IsAny<RecipeUserSave>()), Times.Once);
         }
     }
 }

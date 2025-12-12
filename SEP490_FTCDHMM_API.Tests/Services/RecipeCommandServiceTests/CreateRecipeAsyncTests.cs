@@ -46,11 +46,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .ReturnsAsync(labels);
 
             RecipeImageServiceMock
-                .Setup(x => x.SetRecipeImageAsync(It.IsAny<Recipe>(), null, userId))
+                .Setup(x => x.SetRecipeImageAsync(It.IsAny<Recipe>(), null))
                 .Returns(Task.CompletedTask);
 
             RecipeImageServiceMock
-                .Setup(x => x.CreateCookingStepsAsync(request.CookingSteps, It.IsAny<Recipe>(), userId))
+                .Setup(x => x.CreateCookingStepsAsync(request.CookingSteps, It.IsAny<Recipe>()))
                 .ReturnsAsync(new List<CookingStep>());
 
             RecipeRepositoryMock.Setup(x =>

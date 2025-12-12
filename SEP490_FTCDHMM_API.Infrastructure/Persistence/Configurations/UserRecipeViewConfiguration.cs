@@ -4,9 +4,9 @@ using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 {
-    public class UserRecipeViewConfiguration : IEntityTypeConfiguration<UserRecipeView>
+    public class UserRecipeViewConfiguration : IEntityTypeConfiguration<RecipeUserView>
     {
-        public void Configure(EntityTypeBuilder<UserRecipeView> builder)
+        public void Configure(EntityTypeBuilder<RecipeUserView> builder)
         {
             builder.ToTable("UserRecipeViews");
 

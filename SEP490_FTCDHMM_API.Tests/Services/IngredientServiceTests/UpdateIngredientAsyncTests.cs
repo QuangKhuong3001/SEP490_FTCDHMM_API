@@ -125,7 +125,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
                 .ReturnsAsync(categories);
 
             S3ImageServiceMock
-                .Setup(s => s.UploadImageAsync(dto.Image!, StorageFolder.INGREDIENTS, null))
+                .Setup(s => s.UploadImageAsync(dto.Image!, StorageFolder.INGREDIENTS))
                 .ReturnsAsync(new Image { Id = Guid.NewGuid(), Key = "images/new.png" });
 
             IngredientNutritionCalculatorMock

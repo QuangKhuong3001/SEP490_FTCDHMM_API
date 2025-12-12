@@ -64,7 +64,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
                 .ReturnsAsync(user);
 
             S3ImageServiceMock
-                .Setup(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS, user))
+                .Setup(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS))
                 .ReturnsAsync(uploadedImg);
 
             UserRepositoryMock
@@ -74,7 +74,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             await Sut.UpdateProfileAsync(userId, dto);
 
             Assert.Equal(uploadedImg.Id, user.AvatarId);
-            S3ImageServiceMock.Verify(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS, user), Times.Once);
+            S3ImageServiceMock.Verify(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS), Times.Once);
             S3ImageServiceMock.Verify(s => s.DeleteImageAsync(It.IsAny<Guid>()), Times.Never);
             UserRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
         }
@@ -101,7 +101,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
                 .ReturnsAsync(user);
 
             S3ImageServiceMock
-                .Setup(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS, user))
+                .Setup(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS))
                 .ReturnsAsync(uploadedImg);
 
             S3ImageServiceMock
@@ -116,7 +116,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
 
             Assert.Equal(uploadedImg.Id, user.AvatarId);
             S3ImageServiceMock.Verify(s => s.DeleteImageAsync(oldAvatarId), Times.Once);
-            S3ImageServiceMock.Verify(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS, user), Times.Once);
+            S3ImageServiceMock.Verify(s => s.UploadImageAsync(dto.Avatar!, StorageFolder.AVATARS), Times.Once);
             UserRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
         }
 
@@ -144,7 +144,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             Assert.Equal(dto.DateOfBirth, user.DateOfBirth);
             Assert.Equal(dto.Bio, user.Bio);
             Assert.Equal(dto.Address, user.Address);
-            S3ImageServiceMock.Verify(s => s.UploadImageAsync(It.IsAny<IFormFile>(), It.IsAny<StorageFolder>(), It.IsAny<AppUser>()), Times.Never);
+            S3ImageServiceMock.Verify(s => s.UploadImageAsync(It.IsAny<IFormFile>(), It.IsAny<StorageFolder>()), Times.Never);
             S3ImageServiceMock.Verify(s => s.DeleteImageAsync(It.IsAny<Guid>()), Times.Never);
             UserRepositoryMock.Verify(r => r.UpdateAsync(user), Times.Once);
         }

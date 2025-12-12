@@ -194,15 +194,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             if (!isOwner)
             {
-                await _userRecipeViewRepository.AddAsync(new UserRecipeView
-                {
-                    UserId = uid,
-                    RecipeId = recipeId,
-                    ViewedAtUtc = now
-                });
+                var existingView = await _userRecipeViewRepository.ExistsAsync(v =>
+                    v.UserId == uid && v.RecipeId == recipeId);
 
-                recipe.ViewCount = await _userRecipeViewRepository.CountAsync(v => v.RecipeId == recipeId);
-                await _recipeRepository.UpdateAsync(recipe);
+                if (!existingView)
+                {
+                    await _userRecipeViewRepository.AddAsync(new RecipeUserView
+                    {
+                        UserId = uid,
+                        RecipeId = recipeId,
+                        ViewedAtUtc = now
+                    });
+
+                    recipe.ViewCount = await _userRecipeViewRepository.CountAsync(v => v.RecipeId == recipeId);
+                    await _recipeRepository.UpdateAsync(recipe);
+                }
             }
 
             var user = await _userRepository.GetByIdAsync(

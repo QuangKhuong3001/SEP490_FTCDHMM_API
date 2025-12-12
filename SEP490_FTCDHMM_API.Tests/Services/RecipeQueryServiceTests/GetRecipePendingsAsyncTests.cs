@@ -5,7 +5,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
     public class GetRecipePendingsAsyncTests : RecipeQueryServiceTestBase
     {

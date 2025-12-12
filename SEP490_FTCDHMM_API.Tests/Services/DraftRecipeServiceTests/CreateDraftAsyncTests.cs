@@ -131,8 +131,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             S3Mock
                 .Setup(s => s.UploadImageAsync(
                     It.IsAny<FileUploadModel>(),
-                    It.IsAny<StorageFolder>(),
-                    It.IsAny<Guid?>()))
+                    It.IsAny<StorageFolder>())
+                )
                 .ReturnsAsync(new Image
                 {
                     Id = Guid.NewGuid(),

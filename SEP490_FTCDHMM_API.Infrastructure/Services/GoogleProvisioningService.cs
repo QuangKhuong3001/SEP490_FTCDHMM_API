@@ -76,7 +76,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             if (!string.IsNullOrWhiteSpace(picture) && user.AvatarId == null)
             {
-                var avatar = await _s3ImageService.MirrorExternalImageAsync(StorageFolder.AVATARS, picture, user.Id);
+                var avatar = await _s3ImageService.MirrorExternalImageAsync(StorageFolder.AVATARS, picture);
                 user.Avatar = avatar;
                 await _userManager.UpdateAsync(user);
             }

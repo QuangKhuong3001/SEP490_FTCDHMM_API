@@ -2,7 +2,7 @@
 
 namespace SEP490_FTCDHMM_API.Application.Interfaces.Persistence
 {
-    public interface IUserRecipeViewRepository : IRepository<UserRecipeView>
+    public interface IUserRecipeViewRepository : IRepository<RecipeUserView>
     {
     }
 }

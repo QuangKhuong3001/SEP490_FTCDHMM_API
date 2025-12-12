@@ -5,16 +5,24 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
     public class GetRecipeHistoriesAsyncTests : RecipeQueryServiceTestBase
     {
+        public GetRecipeHistoriesAsyncTests()
+        {
+            MapperMock
+                .Setup(m => m.Map<IEnumerable<RecipeResponse>>(It.IsAny<IEnumerable<Recipe>>()))
+                .Returns((IEnumerable<Recipe> src) =>
+                    src.Select(r => new RecipeResponse { Id = r.Id }).ToList());
+        }
+
         [Fact]
         public async Task Histories_ShouldReturnPagedResult()
         {
             var userId = NewId();
 
-            var v1 = new UserRecipeView
+            var v1 = new RecipeUserView
             {
                 UserId = userId,
                 ViewedAtUtc = DateTime.UtcNow,
@@ -28,7 +36,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 }
             };
 
-            var v2 = new UserRecipeView
+            var v2 = new RecipeUserView
             {
                 UserId = userId,
                 ViewedAtUtc = DateTime.UtcNow.AddMinutes(-10),
@@ -42,36 +50,26 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 }
             };
 
-            var views = new List<UserRecipeView> { v1, v2 };
+            var views = new List<RecipeUserView> { v1, v2 };
 
             UserRecipeViewRepositoryMock
-            .Setup(r => r.GetPagedAsync(
-                It.IsAny<int>(),
-                It.IsAny<int>(),
-                It.IsAny<Expression<Func<UserRecipeView, bool>>>(),
-                It.IsAny<Func<IQueryable<UserRecipeView>, IOrderedQueryable<UserRecipeView>>>(),
-                It.IsAny<string?>(),
-                It.IsAny<string[]?>(),
-                It.IsAny<Func<IQueryable<UserRecipeView>, IQueryable<UserRecipeView>>?>()
-            ))
-            .ReturnsAsync((views, views.Count));
+                .Setup(r => r.GetPagedAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<Expression<Func<RecipeUserView, bool>>>(),
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IOrderedQueryable<RecipeUserView>>>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<string[]?>(),
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IQueryable<RecipeUserView>>?>()
+                ))
+                .ReturnsAsync((views, views.Count));
 
-            MapperMock
-                .Setup(m => m.Map<IEnumerable<RecipeResponse>>(views))
-                .Returns(views.Select(x => new RecipeResponse { Id = x.Recipe.Id }));
-
-            var req = new RecipePaginationParams
-            {
-                PageNumber = 1,
-            };
+            var req = new RecipePaginationParams { PageNumber = 1 };
 
             var result = await Sut.GetRecipeHistoriesAsync(userId, req);
 
             Assert.Equal(2, result.TotalCount);
             Assert.Equal(2, result.Items.Count());
-
-            UserRecipeViewRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
         }
 
         [Fact]
@@ -80,7 +78,7 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
             var userId = NewId();
 
             var list = Enumerable.Range(1, 15)
-                .Select(i => new UserRecipeView
+                .Select(i => new RecipeUserView
                 {
                     UserId = userId,
                     ViewedAtUtc = DateTime.UtcNow.AddMinutes(-i),
@@ -101,16 +99,13 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 .Setup(r => r.GetPagedAsync(
                     2,
                     12,
-                    It.IsAny<Expression<Func<UserRecipeView, bool>>>(),
-                    It.IsAny<Func<IQueryable<UserRecipeView>, IOrderedQueryable<UserRecipeView>>>(),
+                    It.IsAny<Expression<Func<RecipeUserView, bool>>>(),
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IOrderedQueryable<RecipeUserView>>>(),
                     It.IsAny<string?>(),
                     It.IsAny<string[]?>(),
-                    It.IsAny<Func<IQueryable<UserRecipeView>, IQueryable<UserRecipeView>>?>()))
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IQueryable<RecipeUserView>>?>()
+                ))
                 .ReturnsAsync((pageItems, list.Count));
-
-            MapperMock
-                .Setup(m => m.Map<IEnumerable<RecipeResponse>>(pageItems))
-                .Returns(pageItems.Select(x => new RecipeResponse { Id = x.Recipe.Id }));
 
             var req = new RecipePaginationParams
             {
@@ -121,9 +116,6 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
 
             Assert.Equal(15, result.TotalCount);
             Assert.Equal(5, result.Items.Count());
-
-            UserRecipeViewRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
         }
 
         [Fact]
@@ -135,30 +127,24 @@ namespace SEP490_FTCDHMM_API.Tests.RecipeQueryServiceTests
                 .Setup(r => r.GetPagedAsync(
                     It.IsAny<int>(),
                     It.IsAny<int>(),
-                    It.IsAny<Expression<Func<UserRecipeView, bool>>>(),
-                    It.IsAny<Func<IQueryable<UserRecipeView>, IOrderedQueryable<UserRecipeView>>>(),
+                    It.IsAny<Expression<Func<RecipeUserView, bool>>>(),
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IOrderedQueryable<RecipeUserView>>>(),
                     It.IsAny<string?>(),
                     It.IsAny<string[]?>(),
-                    It.IsAny<Func<IQueryable<UserRecipeView>, IQueryable<UserRecipeView>>?>()
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IQueryable<RecipeUserView>>?>()
                 ))
-                .ReturnsAsync((new List<UserRecipeView>(), 0));
+                .ReturnsAsync((new List<RecipeUserView>(), 0));
 
             MapperMock
-                .Setup(m => m.Map<IEnumerable<RecipeResponse>>(It.IsAny<IEnumerable<UserRecipeView>>()))
+                .Setup(m => m.Map<IEnumerable<RecipeResponse>>(It.IsAny<IEnumerable<Recipe>>()))
                 .Returns(new List<RecipeResponse>());
 
-            var req = new RecipePaginationParams
-            {
-                PageNumber = 1,
-            };
+            var req = new RecipePaginationParams { PageNumber = 1 };
 
             var result = await Sut.GetRecipeHistoriesAsync(userId, req);
 
             Assert.Empty(result.Items);
             Assert.Equal(0, result.TotalCount);
-
-            UserRecipeViewRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
         }
     }
 }

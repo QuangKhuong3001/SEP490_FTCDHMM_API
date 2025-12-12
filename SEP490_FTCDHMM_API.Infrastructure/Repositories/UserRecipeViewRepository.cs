@@ -4,7 +4,7 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 {
-    public class UserRecipeViewRepository : EfRepository<UserRecipeView>, IUserRecipeViewRepository
+    public class UserRecipeViewRepository : EfRepository<RecipeUserView>, IUserRecipeViewRepository
     {
         private readonly AppDbContext _dbContext;
 

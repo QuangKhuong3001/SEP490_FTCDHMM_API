@@ -7,12 +7,12 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices
 {
     public interface IS3ImageService
     {
-        Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder, AppUser? uploadedBy);
-        Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder, Guid? userId);
-        Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder, AppUser uploadedBy);
-        Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder, Guid? userId);
+        Task<Image> UploadImageAsync(IFormFile file, StorageFolder folder);
+        Task<Image> UploadImageAsync(FileUploadModel file, StorageFolder folder);
+        Task<List<Image>> UploadImagesAsync(IEnumerable<IFormFile> files, StorageFolder folder);
+        Task<List<Image>> UploadImagesAsync(IReadOnlyList<FileUploadModel> files, StorageFolder folder);
         string? GeneratePreSignedUrl(string? key);
-        Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url, Guid uploadedById);
+        Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url);
         Task DeleteImageAsync(Guid imageId);
     }
 }

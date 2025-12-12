@@ -112,7 +112,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .Returns(Task.CompletedTask);
 
             RecipeImageServiceMock.Setup(x =>
-                x.ReplaceRecipeImageAsync(recipe, null, userId))
+                x.ReplaceRecipeImageAsync(recipe, null))
                 .Returns(Task.CompletedTask);
 
             RecipeUserTagRepositoryMock.Setup(x =>
@@ -120,7 +120,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .ReturnsAsync(new List<RecipeUserTag>());
 
             RecipeImageServiceMock.Setup(x =>
-                x.ReplaceCookingStepsAsync(recipe.Id, request.CookingSteps, userId))
+                x.ReplaceCookingStepsAsync(recipe.Id, request.CookingSteps))
                 .Returns(Task.CompletedTask);
 
             RecipeRepositoryMock.Setup(x => x.UpdateAsync(recipe))
