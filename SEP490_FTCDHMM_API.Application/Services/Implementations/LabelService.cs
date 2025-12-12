@@ -23,16 +23,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task CreatLabelAsync(CreateLabelRequest dto)
         {
-            var lowerName = dto.Name.ToLowerInvariant().CleanDuplicateSpace();
+            var upperName = dto.Name.UpperName();
             var normalizeName = dto.Name.NormalizeVi();
 
-            if (await _labelRepository.ExistsAsync(l => l.LowerName == lowerName))
+            if (await _labelRepository.ExistsAsync(l => l.UpperName == upperName))
                 throw new AppException(AppResponseCode.EXISTS);
 
             await _labelRepository.AddAsync(new Label
             {
                 Name = dto.Name.CleanDuplicateSpace(),
-                LowerName = lowerName,
+                UpperName = upperName,
                 NormalizedName = normalizeName,
                 ColorCode = dto.ColorCode
             });

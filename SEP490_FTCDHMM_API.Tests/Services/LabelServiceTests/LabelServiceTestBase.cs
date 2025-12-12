@@ -25,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
             {
                 Id = id ?? Guid.NewGuid(),
                 Name = "Label",
-                LowerName = "label",
+                UpperName = "LABEL",
                 NormalizedName = "label",
                 ColorCode = "#FFFFFF",
                 IsDeleted = false
