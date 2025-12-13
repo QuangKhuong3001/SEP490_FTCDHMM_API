@@ -7,7 +7,7 @@
         public static readonly AppResponseCode INVALID_ACTION = new(401, "Hành động không hợp lệ");
         public static readonly AppResponseCode EMAIL_NOT_CONFIRMED = new(402, "Email chưa được xác thực");
         public static readonly AppResponseCode ACCOUNT_LOCKED = new(403, "Tài khoản đã bị khóa");
-        public static readonly AppResponseCode INVALID_ACCOUNT_INFORMATION = new(404, "Tài khoản không hợp lệ hoặc không tồn tại");
+        public static readonly AppResponseCode INVALID_ACCOUNT_INFORMATION = new(404, "Thông tin tài khoản không hợp lệ");
         public static readonly AppResponseCode DUPLICATE = new(405, "Dữ liệu bị trùng lặp");
         public static readonly AppResponseCode OTP_INVALID = new(406, "Mã OTP không hợp lệ hoặc đã hết hạn");
         public static readonly AppResponseCode INVALID_ROLE = new(407, "Vai trò không hợp lệ");
@@ -15,7 +15,7 @@
         public static readonly AppResponseCode UNAUTHORIZED = new(409, "Chưa được xác thực");
         public static readonly AppResponseCode SECURITY_TOKEN_EXCEPTION = new(410, "Lỗi xác thực token bảo mật");
         public static readonly AppResponseCode ACCESS_DENIED = new(411, "Không có quyền truy cập");
-        public static readonly AppResponseCode FORBIDDEN = new(412, "Bạn không có quyền thực hiện yều cầu này");
+        public static readonly AppResponseCode FORBIDDEN = new(412, "Bạn không có quyền thực hiện yêu cầu này");
         public static readonly AppResponseCode NOT_FOUND = new(413, "Không tìm thấy dữ liệu yêu cầu");
         public static readonly AppResponseCode EXISTS = new(415, "Dữ liệu đã tồn tại trong hệ thống");
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(416, "Dịch vụ tạm thời không khả dụng");
