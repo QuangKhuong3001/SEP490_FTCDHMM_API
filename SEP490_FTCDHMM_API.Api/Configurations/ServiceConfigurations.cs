@@ -51,12 +51,20 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>
             {
-                var conn = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis")!);
-                conn.AbortOnConnectFail = false;
-                conn.ConnectRetry = 5;
-                conn.ConnectTimeout = 5000;
-                conn.SyncTimeout = 5000;
-                return ConnectionMultiplexer.Connect(conn);
+                var options = ConfigurationOptions.Parse(
+                    configuration.GetConnectionString("Redis")!
+                );
+
+                options.AbortOnConnectFail = false;
+                options.ConnectRetry = 5;
+                options.ConnectTimeout = 10000;
+                options.SyncTimeout = 10000;
+
+                options.Ssl = true;
+                options.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+                options.CheckCertificateRevocation = false;
+
+                return ConnectionMultiplexer.Connect(options);
             });
 
             //hangfire

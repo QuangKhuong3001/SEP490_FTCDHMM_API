@@ -3,6 +3,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -14,13 +15,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly ICacheService _cacheService;
 
         public RecipeManagementService(
             IRecipeRepository recipeRepository,
             IMailService mailService,
+            ICacheService cacheService,
             IEmailTemplateService emailTemplateService)
         {
             _recipeRepository = recipeRepository;
+            _cacheService = cacheService;
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
         }
@@ -55,6 +59,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _mailService.SendEmailAsync(author!.Email!, htmlBody, "Công thức của bạn đã bị khóa – FitFood Tracker");
 
             await _recipeRepository.UpdateAsync(recipe);
+            await _cacheService.RemoveByPrefixAsync("recipe");
         }
 
         public async Task DeleteRecipeByManageAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
@@ -84,6 +89,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _mailService.SendEmailAsync(author!.Email!, htmlBody, "Công thức của bạn đã bị xóa – FitFood Tracker");
 
             await _recipeRepository.UpdateAsync(recipe);
+            await _cacheService.RemoveByPrefixAsync("recipe");
         }
 
         public async Task ApproveRecipeAsync(Guid userId, Guid recipeId)
@@ -128,7 +134,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                         { "UserName", $"{author !.FirstName} {author.LastName}" },
                         { "RecipeName", recipe.Name },
                     };
-
 
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.RejectRecipe, placeholders);
 

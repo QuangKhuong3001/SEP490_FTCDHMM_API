@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -21,6 +22,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRecipeImageService _imageService;
         private readonly IRecipeNutritionService _nutritionService;
         private readonly IRecipeIngredientRepository _recipeIngredientRepository;
+        private readonly ICacheService _cacheService;
 
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
@@ -29,6 +31,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             IDraftRecipeRepository draftRecipeRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
             IRecipeValidationService validator,
+            ICacheService cacheService,
             IRecipeIngredientRepository recipeIngredientRepository,
             IRecipeImageService imageService,
             IRecipeNutritionService nutritionService)
@@ -36,6 +39,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
+            _cacheService = cacheService;
             _draftRecipeRepository = draftRecipeRepository;
             _recipeIngredientRepository = recipeIngredientRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
@@ -109,6 +113,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             );
 
             await _nutritionService.AggregateRecipeAsync(fullRecipe!);
+            await _cacheService.RemoveByPrefixAsync("recipe");
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)
@@ -195,6 +200,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             );
 
             await _nutritionService.AggregateRecipeAsync(fullRecipe!);
+            await _cacheService.RemoveByPrefixAsync("recipe");
         }
 
 
@@ -209,6 +215,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             recipe.UpdatedAtUtc = DateTime.UtcNow;
             recipe.Status = RecipeStatus.Deleted;
             await _recipeRepository.UpdateAsync(recipe);
+            await _cacheService.RemoveByPrefixAsync("recipe");
         }
 
         public async Task SaveRecipeAsync(Guid userId, Guid recipeId)

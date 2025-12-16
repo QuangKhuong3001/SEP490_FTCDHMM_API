@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
@@ -6,6 +7,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Specifications;
@@ -24,7 +26,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IIngredientRepository _ingredientRepository;
         private readonly ILabelRepository _labelRepository;
         private readonly IUserRecipeViewRepository _userRecipeViewRepository;
-
+        private readonly ICacheService _cacheService;
         public RecipeQueryService(
             IRecipeRepository recipeRepository,
             IUserRepository userRepository,
@@ -32,6 +34,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             IIngredientRepository ingredientRepository,
             ILabelRepository labelRepository,
             IUserRecipeViewRepository userRecipeViewRepository,
+            ICacheService cacheService,
             IMapper mapper)
         {
             _recipeRepository = recipeRepository;
@@ -41,10 +44,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _userRecipeViewRepository = userRecipeViewRepository;
             _ingredientRepository = ingredientRepository;
             _labelRepository = labelRepository;
+            _cacheService = cacheService;
         }
 
         public async Task<PagedResult<RecipeResponse>> GetRecipesAsync(RecipeFilterRequest request)
         {
+            var cacheKey = $"recipe:list:{JsonSerializer.Serialize(request)}";
+            var cached = await _cacheService.GetAsync<PagedResult<RecipeResponse>>(cacheKey);
+            if (cached != null)
+                return cached;
+
             if (request.IncludeIngredientIds.Any())
             {
                 var inIngredientExist = await _ingredientRepository.IdsExistAsync(request.IncludeIngredientIds);
@@ -155,6 +164,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var result = _mapper.Map<List<RecipeResponse>>(paged);
 
+            await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5));
+
             return new PagedResult<RecipeResponse>
             {
                 Items = result,
@@ -166,6 +177,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId)
         {
+            if (!userId.HasValue)
+            {
+                var cacheKey = $"recipe:detail:{recipeId}";
+                var cached = await _cacheService.GetAsync<RecipeDetailsResponse>(cacheKey);
+                if (cached != null)
+                    return cached;
+            }
+
             IQueryable<Recipe> IncludeRecipeDetails(IQueryable<Recipe> q) =>
                 q.Include(r => r.Author).ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
@@ -224,6 +243,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 .ToList();
 
             var result = _mapper.Map<RecipeDetailsResponse>(recipe);
+
+            if (!userId.HasValue)
+            {
+                await _cacheService.SetAsync(
+                    $"recipe:detail:{recipeId}",
+                    result,
+                    TimeSpan.FromMinutes(10)
+                );
+                return result;
+            }
+
             result.IsSaved = isSaved;
 
             if (!activeRestrictions.Any())
@@ -265,7 +295,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             return result;
         }
-
 
         public async Task<PagedResult<RecipeResponse>> GetSavedRecipesAsync(Guid userId, SaveRecipeFilterRequest request)
         {
@@ -355,11 +384,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<RecipeRatingResponse> GetRecipeRatingsAsync(Guid? userId, Guid recipeId)
         {
+            if (!userId.HasValue)
+            {
+                var cacheKey = $"recipe:rating:{recipeId}";
+                var cached = await _cacheService.GetAsync<RecipeRatingResponse>(cacheKey);
+                if (cached != null)
+                    return cached;
+            }
+
             var recipe = await _recipeRepository.GetByIdAsync(recipeId);
 
             await ValidateAccessRecipeAsync(userId, recipe);
 
             var result = _mapper.Map<RecipeRatingResponse>(recipe);
+
+            if (!userId.HasValue)
+            {
+                await _cacheService.SetAsync(
+                    $"recipe:rating:{recipeId}",
+                    result,
+                    TimeSpan.FromMinutes(10)
+                );
+                return result;
+            }
             return result;
         }
 
