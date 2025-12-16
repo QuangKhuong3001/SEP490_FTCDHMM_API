@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
@@ -20,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
         protected Mock<IUsdaApiService> UsdaApiServiceMock { get; }
         protected Mock<IMapper> MapperMock { get; }
         protected Mock<IUnitOfWork> UnitOfWorkMock { get; }
+        protected Mock<ICacheService> CacheServiceMock { get; }
         protected IngredientService Sut { get; }
 
         protected IngredientServiceTestBase()
@@ -34,6 +36,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
             UsdaApiServiceMock = new Mock<IUsdaApiService>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
             UnitOfWorkMock = new Mock<IUnitOfWork>(MockBehavior.Strict);
+            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
 
             Sut = new IngredientService(
                 IngredientRepositoryMock.Object,
@@ -45,7 +48,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
                 NutrientRepositoryMock.Object,
                 UsdaApiServiceMock.Object,
                 MapperMock.Object,
-                UnitOfWorkMock.Object
+                UnitOfWorkMock.Object,
+                CacheServiceMock.Object
             );
         }
 

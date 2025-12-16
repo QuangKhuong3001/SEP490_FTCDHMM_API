@@ -164,15 +164,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var result = _mapper.Map<List<RecipeResponse>>(paged);
 
-            await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5));
-
-            return new PagedResult<RecipeResponse>
+            var pagedResult = new PagedResult<RecipeResponse>
             {
                 Items = result,
                 TotalCount = ordered.Count(),
                 PageNumber = request.PaginationParams.PageNumber,
                 PageSize = request.PaginationParams.PageSize
             };
+
+            await _cacheService.SetAsync(cacheKey, pagedResult, TimeSpan.FromMinutes(5));
+
+            return pagedResult;
         }
 
         public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId)

@@ -2,6 +2,7 @@
 using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {
@@ -14,6 +15,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
         protected Mock<ILabelRepository> LabelRepositoryMock { get; }
         protected Mock<IUserRecipeViewRepository> UserRecipeViewRepositoryMock { get; }
         protected Mock<IMapper> MapperMock { get; }
+        protected Mock<ICacheService> CacheServiceMock;
 
         protected RecipeQueryService Sut { get; }
 
@@ -26,6 +28,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
             LabelRepositoryMock = new Mock<ILabelRepository>(MockBehavior.Strict);
             UserRecipeViewRepositoryMock = new Mock<IUserRecipeViewRepository>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
+            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
 
             Sut = new RecipeQueryService(
                 RecipeRepositoryMock.Object,
@@ -34,7 +37,9 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
                 IngredientRepositoryMock.Object,
                 LabelRepositoryMock.Object,
                 UserRecipeViewRepositoryMock.Object,
+                CacheServiceMock.Object,
                 MapperMock.Object
+
             );
         }
 

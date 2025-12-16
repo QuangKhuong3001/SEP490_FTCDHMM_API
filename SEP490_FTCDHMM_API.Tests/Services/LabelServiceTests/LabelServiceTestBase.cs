@@ -2,6 +2,7 @@
 using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
@@ -10,13 +11,19 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
     {
         protected Mock<ILabelRepository> LabelRepositoryMock { get; }
         protected Mock<IMapper> MapperMock { get; }
+        protected Mock<ICacheService> CacheServiceMock { get; }
         protected LabelService Sut { get; }
 
         protected LabelServiceTestBase()
         {
             LabelRepositoryMock = new Mock<ILabelRepository>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
-            Sut = new LabelService(LabelRepositoryMock.Object, MapperMock.Object);
+            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
+
+            Sut = new LabelService(
+                LabelRepositoryMock.Object,
+                MapperMock.Object,
+                CacheServiceMock.Object);
         }
 
         protected Label CreateLabel(Guid? id = null)
@@ -28,7 +35,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
                 UpperName = "LABEL",
                 NormalizedName = "label",
                 ColorCode = "#FFFFFF",
-                IsDeleted = false
             };
         }
     }

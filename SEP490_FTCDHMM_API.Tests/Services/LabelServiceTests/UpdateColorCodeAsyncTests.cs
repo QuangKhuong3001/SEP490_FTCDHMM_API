@@ -27,7 +27,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
         {
             var id = Guid.NewGuid();
             var label = CreateLabel(id);
-            label.IsDeleted = true;
 
             var dto = new UpdateColorCodeRequest { ColorCode = "#111" };
 

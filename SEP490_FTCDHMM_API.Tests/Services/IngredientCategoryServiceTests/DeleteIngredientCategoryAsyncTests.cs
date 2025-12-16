@@ -22,7 +22,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
         [Fact]
         public async Task Delete_ShouldThrow_WhenCategoryIsDeleted()
         {
-            var cat = new IngredientCategory { Name = "Test", IsDeleted = true };
+            var cat = new IngredientCategory { Name = "Test" };
 
             IngredientCateRepositoryMock
                 .Setup(r => r.GetByIdAsync(
@@ -41,7 +41,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
             {
                 Name = "Category 1",
                 Id = NewId(),
-                IsDeleted = false,
                 Ingredients = new List<Ingredient>
                 { new Ingredient
                     {
@@ -64,10 +63,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
                     It.IsAny<Func<IQueryable<IngredientCategory>, IQueryable<IngredientCategory>>>()))
                 .ReturnsAsync(cat);
 
-            IngredientCateRepositoryMock
-                .Setup(r => r.UpdateAsync(It.Is<IngredientCategory>(c => c.IsDeleted)))
-                .Returns(Task.CompletedTask);
-
             await Sut.DeleteIngredientCategoryAsync(cat.Id);
 
             IngredientCateRepositoryMock.VerifyAll();
@@ -80,7 +75,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
             {
                 Name = "Category 1",
                 Id = NewId(),
-                IsDeleted = false,
                 Ingredients = new List<Ingredient>()
             };
 

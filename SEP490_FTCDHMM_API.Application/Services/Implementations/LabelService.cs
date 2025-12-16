@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
@@ -14,11 +15,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cache;
 
-        public LabelService(ILabelRepository labelRepository, IMapper mapper)
+
+        public LabelService(
+            ILabelRepository labelRepository,
+            IMapper mapper,
+            ICacheService cacheService)
         {
             _labelRepository = labelRepository;
             _mapper = mapper;
+            _cache = cacheService;
         }
 
         public async Task CreatLabelAsync(CreateLabelRequest dto)
@@ -36,6 +43,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 NormalizedName = normalizeName,
                 ColorCode = dto.ColorCode
             });
+
+            await _cache.RemoveByPrefixAsync("label");
+
         }
         public async Task<PagedResult<LabelResponse>> GetPagedLabelsAsync(LabelFilterRequest request)
         {
@@ -43,8 +53,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var (labels, totalCount) = await _labelRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
-                l => l.IsDeleted == false &&
-                    (string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!)),
+                l => string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!),
                 q => q.OrderBy(u => u.Name));
 
             var result = _mapper.Map<List<LabelResponse>>(labels);
@@ -60,13 +69,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         public async Task<IEnumerable<LabelResponse>> GetLabelsAsync(LabelSearchDropboxRequest request)
         {
             var normalizeKeyword = request.Keyword?.NormalizeVi();
+            var cacheKey = $"label:dropdown:{normalizeKeyword}";
+
+            var cached = await _cache.GetAsync<IEnumerable<LabelResponse>>(cacheKey);
+            if (cached != null)
+                return cached;
 
             var labels = await _labelRepository.GetAllAsync(
-                l => !l.IsDeleted &&
-                    (string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!)));
+                l => string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!));
             labels = labels.OrderBy(l => l.Name).ToList();
 
             var result = _mapper.Map<IEnumerable<LabelResponse>>(labels);
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
             return result;
         }
 
@@ -79,20 +94,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             if (label.Recipes.Any())
             {
-                label.IsDeleted = true;
-                await _labelRepository.UpdateAsync(label);
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Nhãn đang được sử dụng, không thể xóa");
             }
             else
             {
                 await _labelRepository.DeleteAsync(label);
             }
+
+            await _cache.RemoveByPrefixAsync("label");
         }
 
         public async Task UpdateColorCodeAsync(Guid labelId, UpdateColorCodeRequest request)
         {
             var label = await _labelRepository.GetByIdAsync(labelId);
 
-            if (label == null || label.IsDeleted)
+            if (label == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             label.ColorCode = request.ColorCode;

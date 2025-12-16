@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RoleDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -19,6 +20,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IPermissionDomainRepository _permissionDomainRepository;
         private readonly IRolePermissionRepository _rolePermissionRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
         public RoleService(
             IRoleRepository roleRepository,
@@ -26,6 +28,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IPermissionActionRepository permissionActionRepository,
             IPermissionDomainRepository permissionDomainRepository,
             IRolePermissionRepository rolePermissionRepository,
+            ICacheService cache,
             IMapper mapper)
         {
             _roleRepository = roleRepository;
@@ -33,6 +36,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _permissionActionRepository = permissionActionRepository;
             _permissionDomainRepository = permissionDomainRepository;
             _rolePermissionRepository = rolePermissionRepository;
+            _cacheService = cache;
             _mapper = mapper;
         }
 
@@ -62,6 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             }).ToList();
 
             await _rolePermissionRepository.AddRangeAsync(rolePermissions);
+            await _cacheService.RemoveByPrefixAsync("role");
         }
 
         public async Task DeleteRoleAsync(Guid roleId)
@@ -78,6 +83,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Hiện đang có người dùng sử dụng vai trò này");
 
             await _roleRepository.DeleteAsync(role);
+            await _cacheService.RemoveByPrefixAsync("role");
         }
 
         public async Task<PagedResult<RoleResponse>> GetRolesAsync(PaginationParams pagination)
@@ -97,11 +103,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<List<RoleNameResponse>> GetActivateRolesAsync()
         {
+            const string cacheKey = "role:active:list";
+
+            var cached = await _cacheService.GetAsync<List<RoleNameResponse>>(cacheKey);
+            if (cached != null)
+                return cached;
+
             var roles = await _roleRepository.GetAllAsync(r => r.IsActive);
 
             var result = _mapper.Map<List<RoleNameResponse>>(roles);
+
+            await _cacheService.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
+
             return result;
         }
+
 
         public async Task ActiveRoleAsync(Guid roleId)
         {
@@ -114,7 +130,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             role.IsActive = true;
             await _roleRepository.UpdateAsync(role);
-
+            await _cacheService.RemoveByPrefixAsync("role");
         }
         public async Task DeactiveRoleAsync(Guid roleId)
         {
@@ -136,6 +152,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             role.IsActive = false;
             await _roleRepository.UpdateAsync(role);
+            await _cacheService.RemoveByPrefixAsync("role");
         }
 
         public async Task UpdateRolePermissionsAsync(Guid roleId, RolePermissionSettingRequest dto)

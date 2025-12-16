@@ -3,6 +3,7 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Mappings;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
 {
@@ -13,7 +14,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
         protected readonly Mock<IPermissionActionRepository> PermissionActionRepoMock = new();
         protected readonly Mock<IPermissionDomainRepository> PermissionDomainRepoMock = new();
         protected readonly Mock<IRolePermissionRepository> RolePermissionRepoMock = new();
-
+        protected readonly Mock<ICacheService> CacheServiceMock = new();
         protected readonly IMapper Mapper;
         protected readonly RoleService Sut;
 
@@ -32,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
                 PermissionActionRepoMock.Object,
                 PermissionDomainRepoMock.Object,
                 RolePermissionRepoMock.Object,
+                CacheServiceMock.Object,
                 Mapper
             );
         }

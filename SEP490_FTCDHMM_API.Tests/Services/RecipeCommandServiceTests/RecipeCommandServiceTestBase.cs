@@ -1,6 +1,7 @@
 ﻿using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -18,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
         protected Mock<IRecipeImageService> RecipeImageServiceMock { get; }
         protected Mock<IRecipeNutritionService> RecipeNutritionServiceMock { get; }
         protected Mock<IRecipeIngredientRepository> RecipeIngredientRepositoryMock { get; }
+        protected readonly Mock<ICacheService> CacheServiceMock;
 
         protected RecipeCommandService Sut { get; }
 
@@ -32,6 +34,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             RecipeImageServiceMock = new Mock<IRecipeImageService>(MockBehavior.Strict);
             RecipeNutritionServiceMock = new Mock<IRecipeNutritionService>(MockBehavior.Strict);
             RecipeIngredientRepositoryMock = new Mock<IRecipeIngredientRepository>(MockBehavior.Strict);
+            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
 
             Sut = new RecipeCommandService(
                 RecipeRepositoryMock.Object,
@@ -40,6 +43,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 DraftRecipeRepositoryMock.Object,
                 UserSaveRecipeRepositoryMock.Object,
                 RecipeValidationServiceMock.Object,
+                CacheServiceMock.Object,
                 RecipeIngredientRepositoryMock.Object,
                 RecipeImageServiceMock.Object,
                 RecipeNutritionServiceMock.Object

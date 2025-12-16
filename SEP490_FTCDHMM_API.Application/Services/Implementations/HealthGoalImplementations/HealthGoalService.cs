@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -19,15 +20,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
         private readonly IMapper _mapper;
         private readonly ICustomHealthGoalRepository _customHealthGoalRepository;
         private readonly IHealthGoalTargetRepository _healthGoalTargetRepository;
+        private readonly ICacheService _cache;
 
         public HealthGoalService(IHealthGoalRepository healthGoalRepository,
             INutrientRepository nutrientRepository,
             IHealthGoalTargetRepository healthGoalTargetRepository,
             IMapper mapper,
+            ICacheService cache,
             ICustomHealthGoalRepository customHealthGoalRepository)
         {
             _healthGoalRepository = healthGoalRepository;
             _nutrientRepository = nutrientRepository;
+            _cache = cache;
             _mapper = mapper;
             _healthGoalTargetRepository = healthGoalTargetRepository;
             _customHealthGoalRepository = customHealthGoalRepository;
@@ -93,6 +97,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             };
 
             await _healthGoalRepository.AddAsync(goal);
+            await _cache.RemoveByPrefixAsync("health-goal");
         }
 
         public async Task UpdateHealthGoalAsync(Guid id, UpdateHealthGoalRequest request)
@@ -149,22 +154,27 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             }).ToList();
 
             await _healthGoalRepository.UpdateAsync(healthGoal);
+
+            await _cache.RemoveByPrefixAsync("health-goal");
         }
 
         public async Task<IEnumerable<HealthGoalResponse>> GetHealthGoalsAsync()
         {
-            var goals = await _healthGoalRepository.GetAllAsync(
-                include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient)
+            const string cacheKey = "health-goal:system:list";
 
-            );
+            var goals = await _healthGoalRepository.GetAllWithTargetsAsync();
 
             var result = _mapper.Map<IEnumerable<HealthGoalResponse>>(goals).OrderBy(u => u.Name);
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
 
             return result;
         }
 
         public async Task<HealthGoalResponse> GetHealthGoalByIdAsync(Guid id)
         {
+            var cacheKey = $"health-goal:system:detail:{id}";
+
             var goal = await _healthGoalRepository.GetByIdAsync(id,
                 include: q => q.Include(g => g.Targets).ThenInclude(t => t.Nutrient));
 
@@ -172,6 +182,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
                 throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu dinh dưỡng không tồn tại");
 
             var result = _mapper.Map<HealthGoalResponse>(goal);
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
             return result;
 
         }
@@ -186,20 +198,34 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
             await _healthGoalTargetRepository.DeleteRangeAsync(goal.Targets);
             await _healthGoalRepository.DeleteAsync(goal);
+
+            await _cache.RemoveByPrefixAsync("health-goal");
         }
 
         public async Task<IEnumerable<UserHealthGoalResponse>> GetListGoalAsync(Guid userId)
         {
+            const string cacheKey = "health-goal:system:user-view";
+
             var result = new List<UserHealthGoalResponse>();
 
-            var healthGoals = await _healthGoalRepository.GetAllWithTargetsAsync();
-            var defaults = _mapper.Map<IEnumerable<UserHealthGoalResponse>>(healthGoals).OrderBy(x => x.Name);
+            var systemGoals = await _cache.GetAsync<List<UserHealthGoalResponse>>(cacheKey);
+
+            if (systemGoals == null)
+            {
+                var healthGoals = await _healthGoalRepository.GetAllWithTargetsAsync();
+                systemGoals = _mapper
+                    .Map<List<UserHealthGoalResponse>>(healthGoals)
+                    .OrderBy(x => x.Name)
+                    .ToList();
+
+                await _cache.SetAsync(cacheKey, systemGoals, TimeSpan.FromMinutes(30));
+            }
 
             var customGoals = await _customHealthGoalRepository.GetByUserIdWithTargetsAsync(userId);
             var customs = _mapper.Map<IEnumerable<UserHealthGoalResponse>>(customGoals).OrderBy(x => x.Name);
 
             result.AddRange(customs);
-            result.AddRange(defaults);
+            result.AddRange(systemGoals);
 
             return result.ToList();
         }

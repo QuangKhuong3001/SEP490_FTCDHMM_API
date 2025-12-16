@@ -8,6 +8,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.USDA;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
+using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -30,9 +31,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUsdaApiService _usdaApi;
         private readonly IIngredientNutritionCalculator _ingredientNutritionCalculator;
         private readonly ITranslateService _translateService;
-        //private readonly ICacheService _cache;
+        private readonly ICacheService _cache;
 
-        private readonly TimeSpan _ttl = TimeSpan.FromMinutes(10);
         private const int MinLength = 2;
 
         public IngredientService(IIngredientRepository ingredientRepository,
@@ -43,8 +43,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             ITranslateService translateService,
             INutrientRepository nutrientRepository,
             IUsdaApiService usdaApi,
-            IMapper mapper, IUnitOfWork unitOfWork)
-        //ICacheService cache)
+            IMapper mapper, IUnitOfWork unitOfWork,
+            ICacheService cache)
         {
             _ingredientRepository = ingredientRepository;
             _ingredientCategoryRepository = ingredientCategoryRepository;
@@ -56,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _ingredientNutritionCalculator = ingredientNutritionCalculator;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            //_cache = cache;
+            _cache = cache;
         }
 
         private async Task HasMacroNutrients(List<Guid> nutrientIds)
@@ -194,9 +194,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
 
-            if (categories.Any(c => c.IsDeleted))
-                throw new AppException(AppResponseCode.INVALID_ACTION);
-
             var ingredient = new Ingredient
             {
                 Name = dto.Name.CleanDuplicateSpace(),
@@ -276,9 +273,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 var categories = await _ingredientCategoryRepository
                 .GetAllAsync(c => dto.IngredientCategoryIds.Contains(c.Id));
 
-                if (categories.Any(c => c.IsDeleted))
-                    throw new AppException(AppResponseCode.INVALID_ACTION);
-
                 ingredient.Categories.Clear();
                 foreach (var category in categories)
                 {
@@ -338,10 +332,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 );
 
                 await _ingredientRepository.UpdateAsync(ingredient);
+                await _cache.RemoveByPrefixAsync("ingredient");
             });
         }
         public async Task<IngredientDetailsResponse> GetIngredientDetailsAsync(Guid ingredientId)
         {
+            var cacheKey = $"ingredient:detail:{ingredientId}";
+
+            var cached = await _cache.GetAsync<IngredientDetailsResponse>(cacheKey);
+            if (cached != null)
+                return cached;
+
             var ingredient = await _ingredientRepository.GetByIdAsync(
                 ingredientId,
                 include: q => q
@@ -356,6 +357,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var result = _mapper.Map<IngredientDetailsResponse>(ingredient);
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(30));
 
             return result;
         }
