@@ -8,7 +8,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RoleDtos
         [MinLength(1, ErrorMessage = "Permissions phải chứa ít nhất 1 mục")]
         public List<PermissionToggleRequest> Permissions { get; set; } = new();
 
-        [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu sức khỏe.")]
+        [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu.")]
         public DateTime? LastUpdatedUtc { get; set; }
     }
 }

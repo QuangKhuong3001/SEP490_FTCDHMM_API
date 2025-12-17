@@ -5,7 +5,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.IngredientDtos
 {
     public class UpdateIngredientRequest
     {
-        [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu sức khỏe.")]
+        [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu.")]
         public DateTime? LastUpdatedUtc { get; set; }
 
         [StringLength(1000, ErrorMessage = "Mô tả không được vượt quá 1000 ký tự")]
