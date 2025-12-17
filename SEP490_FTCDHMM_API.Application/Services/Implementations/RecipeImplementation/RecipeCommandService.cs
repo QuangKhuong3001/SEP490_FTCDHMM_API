@@ -61,17 +61,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _nutritionService = nutritionService;
         }
 
-        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid targetId)
+        private async Task CreateAndSendNotificationsAsync(Guid senderId, Guid targetId)
         {
             var followers = await _userFollowRepository.GetAllAsync(u => u.FolloweeId == senderId);
 
             foreach (var follow in followers)
             {
-                await this.CreateAndSendNotificationsAsync(senderId, follow.FollowerId, targetId);
+                await this.CreateAndSendNotificationAsync(senderId, follow.FollowerId, targetId);
             }
         }
 
-        private async Task CreateAndSendNotificationsAsync(Guid senderId, Guid receiverId, Guid targetId)
+        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid receiverId, Guid targetId)
         {
             var notification = new Notification
             {
@@ -176,7 +176,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await _nutritionService.AggregateRecipeAsync(fullRecipe!);
             await _cacheService.RemoveByPrefixAsync("recipe");
-            await this.CreateAndSendNotificationAsync(userId, recipe.Id);
+            await this.CreateAndSendNotificationsAsync(userId, recipe.Id);
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)

@@ -9,24 +9,30 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagementServiceTests
 {
     public abstract class RecipeManagementServiceTestsBase
     {
-        protected readonly Mock<IRecipeRepository> RecipeRepoMock;
-        protected readonly Mock<IMailService> MailServiceMock;
-        protected readonly Mock<IEmailTemplateService> TemplateServiceMock;
-        protected readonly Mock<ICacheService> CacheServiceMock;
+        protected Mock<IRecipeRepository> RecipeRepoMock { get; }
+        protected Mock<IMailService> MailServiceMock { get; }
+        protected Mock<ICacheService> CacheServiceMock { get; }
+        protected Mock<INotificationRepository> NotificationRepositoryMock { get; }
+        protected Mock<IRealtimeNotifier> RealtimeNotifierMock { get; }
+        protected Mock<IEmailTemplateService> TemplateServiceMock { get; }
 
-        protected readonly RecipeManagementService Service;
+        protected RecipeManagementService Service { get; }
 
         protected RecipeManagementServiceTestsBase()
         {
-            RecipeRepoMock = new Mock<IRecipeRepository>(MockBehavior.Strict);
-            MailServiceMock = new Mock<IMailService>(MockBehavior.Strict);
-            TemplateServiceMock = new Mock<IEmailTemplateService>(MockBehavior.Strict);
-            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
+            RecipeRepoMock = new(MockBehavior.Strict);
+            MailServiceMock = new(MockBehavior.Strict);
+            CacheServiceMock = new(MockBehavior.Strict);
+            NotificationRepositoryMock = new(MockBehavior.Strict);
+            RealtimeNotifierMock = new(MockBehavior.Strict);
+            TemplateServiceMock = new(MockBehavior.Strict);
 
             Service = new RecipeManagementService(
                 RecipeRepoMock.Object,
                 MailServiceMock.Object,
                 CacheServiceMock.Object,
+                NotificationRepositoryMock.Object,
+                RealtimeNotifierMock.Object,
                 TemplateServiceMock.Object
             );
         }

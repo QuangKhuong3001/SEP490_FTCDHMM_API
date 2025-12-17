@@ -10,6 +10,10 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
         public static readonly NotificationType Like = new("LIKE");
         public static readonly NotificationType Follow = new("FOLLOW");
         public static readonly NotificationType NewRecipe = new("NEWRECIPE");
+        public static readonly NotificationType LockRecipe = new("LOCKRECIPE");
+        public static readonly NotificationType DeleteRecipe = new("DELETERECIPE");
+        public static readonly NotificationType ApproveRecipe = new("APPROVERECIPE");
+        public static readonly NotificationType RejectRecipe = new("REJECTRECIPE");
         public static readonly NotificationType Reply = new("REPLY");
         public static readonly NotificationType Achievement = new("ACHIEVEMENT");
 
@@ -27,6 +31,10 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "REPLY" => Reply,
                 "ACHIEVEMENT" => Achievement,
                 "NEWRECIPE" => NewRecipe,
+                "LOCKRECIPE" => LockRecipe,
+                "DELETERECIPE" => DeleteRecipe,
+                "APPROVERECIPE" => ApproveRecipe,
+                "REJECTRECIPE" => RejectRecipe,
                 _ => throw new AppException(AppResponseCode.INVALID_ACTION)
             };
         }

@@ -5,6 +5,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
+using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
@@ -16,17 +17,51 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IMailService _mailService;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly ICacheService _cacheService;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IRealtimeNotifier _notifier;
 
         public RecipeManagementService(
             IRecipeRepository recipeRepository,
             IMailService mailService,
             ICacheService cacheService,
+            INotificationRepository notificationRepository,
+            IRealtimeNotifier notifier,
             IEmailTemplateService emailTemplateService)
         {
             _recipeRepository = recipeRepository;
             _cacheService = cacheService;
             _mailService = mailService;
+            _notificationRepository = notificationRepository;
+            _notifier = notifier;
             _emailTemplateService = emailTemplateService;
+        }
+
+        private async Task CreateAndSendNotificationAsync(Guid? senderId, Guid receiverId, NotificationType type, Guid targetId)
+        {
+            if (senderId == receiverId)
+                return;
+
+            var notification = new Notification
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Type = type,
+                TargetId = targetId,
+                CreatedAtUtc = DateTime.UtcNow,
+            };
+
+            await _notificationRepository.AddAsync(notification);
+
+            var notificationResponse = new
+            {
+                Id = notification.Id,
+                Type = type,
+                TargetId = targetId,
+                IsRead = false,
+                CreatedAtUtc = notification.CreatedAtUtc
+            };
+
+            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
 
         public async Task LockRecipeAsync(Guid userId, Guid recipeId, RecipeManagementReasonRequest request)
@@ -57,6 +92,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.LockRecipe, placeholders);
 
             await _mailService.SendEmailAsync(author!.Email!, htmlBody, "Công thức của bạn đã bị khóa – FitFood Tracker");
+            await this.CreateAndSendNotificationAsync(null, recipe.AuthorId, NotificationType.LockRecipe, recipe.Id);
 
             await _recipeRepository.UpdateAsync(recipe);
             await _cacheService.RemoveByPrefixAsync("recipe");
@@ -87,6 +123,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.DeleteRecipe, placeholders);
 
             await _mailService.SendEmailAsync(author!.Email!, htmlBody, "Công thức của bạn đã bị xóa – FitFood Tracker");
+            await this.CreateAndSendNotificationAsync(null, recipe.AuthorId, NotificationType.DeleteRecipe, recipe.Id);
 
             await _recipeRepository.UpdateAsync(recipe);
             await _cacheService.RemoveByPrefixAsync("recipe");
@@ -107,6 +144,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             recipe.UpdatedAtUtc = DateTime.UtcNow;
 
             var author = recipe.Author;
+
+            await this.CreateAndSendNotificationAsync(null, recipe.AuthorId, NotificationType.ApproveRecipe, recipe.Id);
 
             await _recipeRepository.UpdateAsync(recipe);
         }
@@ -138,6 +177,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.RejectRecipe, placeholders);
 
             await _mailService.SendEmailAsync(author!.Email!, htmlBody, "Công thức của bạn đã bị từ chối – FitFood Tracker");
+            await this.CreateAndSendNotificationAsync(null, recipe.AuthorId, NotificationType.RejectRecipe, recipe.Id);
 
             await _recipeRepository.UpdateAsync(recipe);
         }
