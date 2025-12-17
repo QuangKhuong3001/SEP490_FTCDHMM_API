@@ -1,10 +1,10 @@
 ﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RoleDtos
 {
-    public class RoleResponse
+    public class RoleDetailsResponse
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public bool IsActive { get; set; } = false;
         public DateTime LastUpdatedUtc { get; set; }
+        public List<PermissionDomainResponse> Domains { get; set; } = new();
+
     }
 }

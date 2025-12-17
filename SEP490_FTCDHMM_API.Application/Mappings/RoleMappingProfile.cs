@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
         {
             CreateMap<AppRole, RoleResponse>();
             CreateMap<AppRole, RoleNameResponse>();
+            CreateMap<AppRole, RoleDetailsResponse>();
         }
     }
 }

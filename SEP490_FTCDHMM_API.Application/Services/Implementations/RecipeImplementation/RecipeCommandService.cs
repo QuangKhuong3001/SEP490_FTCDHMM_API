@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
@@ -23,6 +24,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRecipeNutritionService _nutritionService;
         private readonly IRecipeIngredientRepository _recipeIngredientRepository;
         private readonly ICacheService _cacheService;
+        private readonly IRealtimeNotifier _notifier;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserFollowRepository _userFollowRepository;
 
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
@@ -34,18 +39,75 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             ICacheService cacheService,
             IRecipeIngredientRepository recipeIngredientRepository,
             IRecipeImageService imageService,
+            IRealtimeNotifier notifier,
+            INotificationRepository notificationRepository,
+            IUserFollowRepository userFollowRepository,
+            IUserRepository userRepository,
             IRecipeNutritionService nutritionService)
         {
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _cacheService = cacheService;
+            _notificationRepository = notificationRepository;
             _draftRecipeRepository = draftRecipeRepository;
             _recipeIngredientRepository = recipeIngredientRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _validator = validator;
+            _notifier = notifier;
+            _userFollowRepository = userFollowRepository;
             _imageService = imageService;
+            _userRepository = userRepository;
             _nutritionService = nutritionService;
+        }
+
+        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid targetId)
+        {
+            var followers = await _userFollowRepository.GetAllAsync(u => u.FolloweeId == senderId);
+
+            foreach (var follow in followers)
+            {
+                await this.CreateAndSendNotificationsAsync(senderId, follow.FollowerId, targetId);
+            }
+        }
+
+        private async Task CreateAndSendNotificationsAsync(Guid senderId, Guid receiverId, Guid targetId)
+        {
+            var notification = new Notification
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Type = NotificationType.NewRecipe,
+                Message = null,
+                TargetId = targetId,
+                CreatedAtUtc = DateTime.UtcNow,
+            };
+
+            await _notificationRepository.AddAsync(notification);
+
+            var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
+
+            var notificationResponse = new
+            {
+                Id = notification.Id,
+                Type = NotificationType.NewRecipe,
+                Message = "",
+                TargetId = targetId,
+                IsRead = false,
+                CreatedAtUtc = notification.CreatedAtUtc,
+                Senders = new[]
+                {
+                    new
+                    {
+                        Id = sender!.Id,
+                        FirstName = sender.FirstName,
+                        LastName = sender.LastName,
+                        AvatarUrl = sender.Avatar?.Key
+                    }
+                }
+            };
+
+            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
 
         public async Task CreateRecipeAsync(Guid userId, CreateRecipeRequest request)
@@ -114,6 +176,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await _nutritionService.AggregateRecipeAsync(fullRecipe!);
             await _cacheService.RemoveByPrefixAsync("recipe");
+            await this.CreateAndSendNotificationAsync(userId, recipe.Id);
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)

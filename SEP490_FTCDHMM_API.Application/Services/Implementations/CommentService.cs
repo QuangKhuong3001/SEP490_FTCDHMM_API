@@ -268,21 +268,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var notificationResponse = new
             {
                 Id = notification.Id,
-                Type = new { name = type.Name },
+                Type = type,
                 Message = message,
                 TargetId = targetId,
                 IsRead = false,
                 CreatedAtUtc = notification.CreatedAtUtc,
-                Senders = sender != null ? new[]
+                Senders = new[]
                 {
                     new
                     {
-                        Id = sender.Id,
+                        Id = sender!.Id,
                         FirstName = sender.FirstName,
                         LastName = sender.LastName,
                         AvatarUrl = sender.Avatar?.Key
                     }
-                } : Array.Empty<object>()
+                }
             };
 
             await _notifier.SendNotificationAsync(receiverId, notificationResponse);

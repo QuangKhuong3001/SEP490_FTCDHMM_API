@@ -10,6 +10,7 @@ namespace SEP490_FTCDHMM_API.Domain.Entities
         public DateTime DateOfBirth { get; set; }
         public Gender Gender { get; set; } = Gender.Male;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime LastUpdatedUtc { get; set; } = DateTime.UtcNow;
         public ActivityLevel ActivityLevel { get; set; } = ActivityLevel.Moderate;
         public string? Address { get; set; }
         public string? Bio { get; set; }

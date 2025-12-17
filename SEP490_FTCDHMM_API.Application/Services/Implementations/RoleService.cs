@@ -188,7 +188,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         }
 
-        public async Task<IEnumerable<PermissionDomainRequest>> GetRolePermissionsAsync(Guid roleId)
+        public async Task<RoleDetailsResponse> GetRolePermissionsAsync(Guid roleId)
         {
             var role = await _roleRepository.GetByIdAsync(roleId,
                 include: i => i.Include(r => r.RolePermissions));
@@ -201,10 +201,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var domains = await _permissionDomainRepository.GetAllAsync(
                 include: i => i.Include(rd => rd.Actions));
 
-            var result = domains.Select(d => new PermissionDomainRequest
+            var result = _mapper.Map<RoleDetailsResponse>(role);
+            result.Domains = domains.Select(d => new PermissionDomainResponse
             {
                 DomainName = d.Name,
-                Actions = d.Actions.Select(a => new PermissionActionRequest
+                Actions = d.Actions.Select(a => new PermissionActionResponse
                 {
                     ActionId = a.Id,
                     ActionName = a.Name,

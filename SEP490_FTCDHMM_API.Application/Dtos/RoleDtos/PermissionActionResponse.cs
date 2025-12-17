@@ -1,6 +1,6 @@
 ﻿namespace SEP490_FTCDHMM_API.Application.Dtos.RoleDtos
 {
-    public class PermissionActionRequest
+    public class PermissionActionResponse
     {
         public Guid ActionId { get; set; }
         public string ActionName { get; set; } = string.Empty;

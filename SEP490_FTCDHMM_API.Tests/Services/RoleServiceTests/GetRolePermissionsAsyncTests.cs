@@ -32,11 +32,19 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
         public async Task GetRolePermissionsAsync_ShouldReturnPermissions()
         {
             var roleId = Guid.NewGuid();
+            var actionId = Guid.NewGuid();
 
             var role = new AppRole
             {
                 Id = roleId,
-                RolePermissions = new List<AppRolePermission>()
+                RolePermissions = new List<AppRolePermission>
+                {
+                    new AppRolePermission
+                    {
+                        PermissionActionId = actionId,
+                        IsActive = true
+                    }
+                }
             };
 
             RoleRepoMock
@@ -45,18 +53,19 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
                     It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
                 .ReturnsAsync(role);
 
-            var action = new PermissionAction
-            {
-                Id = Guid.NewGuid(),
-                Name = "View"
-            };
-
             var domains = new List<PermissionDomain>
             {
                 new PermissionDomain
                 {
                     Name = "Recipe",
-                    Actions = new List<PermissionAction> { action }
+                    Actions = new List<PermissionAction>
+                    {
+                        new PermissionAction
+                        {
+                            Id = actionId,
+                            Name = "View"
+                        }
+                    }
                 }
             };
 
@@ -68,9 +77,17 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
 
             var result = await Sut.GetRolePermissionsAsync(roleId);
 
-            Assert.Single(result);
-            Assert.Single(result.First().Actions);
-        }
+            Assert.NotNull(result);
+            Assert.Single(result.Domains);
 
+            var domain = result.Domains.First();
+            Assert.Equal("Recipe", domain.DomainName);
+            Assert.Single(domain.Actions);
+
+            var action = domain.Actions.First();
+            Assert.Equal(actionId, action.ActionId);
+            Assert.Equal("View", action.ActionName);
+            Assert.True(action.IsActive);
+        }
     }
 }
