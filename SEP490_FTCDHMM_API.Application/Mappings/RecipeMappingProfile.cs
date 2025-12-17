@@ -2,9 +2,9 @@
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.RecipeUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings
@@ -51,13 +51,21 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     opt => opt.MapFrom(r => r.Labels)
                 );
 
-            CreateMap<RecipeUserTag, RecipeUserTaggedResponse>()
+            CreateMap<RecipeUserTag, UserInteractionResponse>()
                 .ForMember(dest => dest.Id,
                     opt => opt.MapFrom(src => src.TaggedUserId))
                 .ForMember(dest => dest.FirstName,
                     opt => opt.MapFrom(src => src.TaggedUser.FirstName))
                 .ForMember(dest => dest.LastName,
-                    opt => opt.MapFrom(src => src.TaggedUser.LastName));
+                    opt => opt.MapFrom(src => src.TaggedUser.LastName))
+                .ForMember(dest => dest.UserName,
+                    opt => opt.MapFrom(src => src.TaggedUser.UserName))
+                .ForMember(dest => dest.Email,
+                    opt => opt.MapFrom(src => src.TaggedUser.Email))
+                .ForMember(
+                    dest => dest.AvatarUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<RecipeUserTag, UserInteractionResponse>>()
+                );
 
             CreateMap<Recipe, MyRecipeResponse>()
                 .ForMember(

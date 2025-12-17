@@ -2,8 +2,8 @@
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep.DraftCookingStepImage;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftRecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 
 namespace SEP490_FTCDHMM_API.Application.Mappings
@@ -53,13 +53,21 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                     opt => opt.MapFrom<UniversalImageUrlResolver<DraftCookingStepImage, DraftCookingStepImageResponse>>()
                 );
 
-            CreateMap<DraftRecipeUserTag, DraftRecipeUserTaggedResponse>()
-                            .ForMember(dest => dest.Id,
-                                opt => opt.MapFrom(src => src.TaggedUserId))
-                            .ForMember(dest => dest.FirstName,
-                                opt => opt.MapFrom(src => src.TaggedUser.FirstName))
-                            .ForMember(dest => dest.LastName,
-                                opt => opt.MapFrom(src => src.TaggedUser.LastName));
+            CreateMap<DraftRecipeUserTag, UserInteractionResponse>()
+                .ForMember(dest => dest.Id,
+                    opt => opt.MapFrom(src => src.TaggedUserId))
+                .ForMember(dest => dest.FirstName,
+                    opt => opt.MapFrom(src => src.TaggedUser.FirstName))
+                .ForMember(dest => dest.LastName,
+                    opt => opt.MapFrom(src => src.TaggedUser.LastName))
+                .ForMember(dest => dest.UserName,
+                    opt => opt.MapFrom(src => src.TaggedUser.UserName))
+                .ForMember(dest => dest.Email,
+                    opt => opt.MapFrom(src => src.TaggedUser.Email))
+                .ForMember(
+                    dest => dest.AvatarUrl,
+                    opt => opt.MapFrom<UniversalImageUrlResolver<DraftRecipeUserTag, UserInteractionResponse>>()
+                );
         }
     }
 }

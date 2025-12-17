@@ -1,7 +1,7 @@
 ﻿using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftCookingStep;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftRecipeIngredient;
-using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.DraftUserTagged;
 using SEP490_FTCDHMM_API.Application.Dtos.LabelDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response
 {
@@ -16,6 +16,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response
         public List<LabelResponse> Labels { get; set; } = new();
         public List<DraftRecipeIngredientResponse> Ingredients { get; set; } = new();
         public List<DraftCookingStepResponse> CookingSteps { get; set; } = new();
-        public List<DraftRecipeUserTaggedResponse> TaggedUser { get; set; } = new();
+        public List<UserInteractionResponse> TaggedUser { get; set; } = new();
     }
 }
