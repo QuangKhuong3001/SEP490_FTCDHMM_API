@@ -111,6 +111,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (label == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            if (label.LastUpdatedUtc != request.LastUpdatedUtc)
+                throw new AppException(AppResponseCode.CONFLICT);
+
+            label.LastUpdatedUtc = DateTime.UtcNow;
             label.ColorCode = request.ColorCode;
             await _labelRepository.UpdateAsync(label);
         }

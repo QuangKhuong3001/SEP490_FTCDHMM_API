@@ -91,7 +91,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var (roles, totalCount) = await _roleRepository.GetPagedAsync(
                 pagination.PageNumber, pagination.PageSize);
 
-            var result = _mapper.Map<List<RoleResponse>>(roles);
+            var result = _mapper.Map<List<RoleResponse>>(roles).OrderBy(r => r.Name);
+
             return new PagedResult<RoleResponse>
             {
                 Items = result,
@@ -163,10 +164,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             if (role == null)
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
+            if (role.LastUpdatedUtc != dto.LastUpdatedUtc)
+                throw new AppException(AppResponseCode.CONFLICT);
+
             if (role.Name == RoleConstants.Admin)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
 
             var rolePermissions = role.RolePermissions;
+            role.LastUpdatedUtc = DateTime.UtcNow;
 
             foreach (var permission in dto.Permissions)
             {

@@ -133,6 +133,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (healthGoal == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Mục tiêu sức khỏe không tồn tại");
 
+            if (request.LastUpdatedUtc != healthGoal.LastUpdatedUtc)
+            {
+                throw new AppException(AppResponseCode.CONFLICT);
+            }
+
             var nutrientIds = request.Targets.Select(n => n.NutrientId).ToList();
 
             var nutrientsExist = await _nutrientRepository.IdsExistAsync(nutrientIds);
@@ -140,6 +145,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             if (!nutrientsExist)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Dinh dưỡng không tồn tại");
 
+            healthGoal.LastUpdatedUtc = DateTime.UtcNow;
             healthGoal.Description = request.Description;
             await _healthGoalTargetRepository.DeleteRangeAsync(healthGoal.Targets);
             healthGoal.Targets = request.Targets.Select(t => new HealthGoalTarget

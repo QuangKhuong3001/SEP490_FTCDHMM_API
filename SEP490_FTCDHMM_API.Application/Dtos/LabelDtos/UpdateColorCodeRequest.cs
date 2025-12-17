@@ -2,6 +2,7 @@
 {
     public class UpdateColorCodeRequest
     {
+        public DateTime? LastUpdatedUtc { get; set; }
         public string ColorCode { get; set; } = string.Empty;
     }
 }

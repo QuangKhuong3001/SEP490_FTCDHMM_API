@@ -34,7 +34,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly ICacheService _cache;
 
         private const int MinLength = 2;
-
         public IngredientService(IIngredientRepository ingredientRepository,
             IIngredientCategoryRepository ingredientCategoryRepository,
             IS3ImageService s3ImageService,
@@ -259,6 +258,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (ingredient == null)
                     throw new AppException(AppResponseCode.NOT_FOUND);
 
+                if (ingredient.LastUpdatedUtc != dto.LastUpdatedUtc)
+                    throw new AppException(AppResponseCode.CONFLICT);
+
                 var nutrientIds = dto.Nutrients.Select(n => n.NutrientId).ToList();
                 if (!await _nutrientRepository.IdsExistAsync(nutrientIds))
                     throw new AppException(AppResponseCode.NOT_FOUND);
@@ -322,6 +324,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         });
                     }
                 }
+
+                ingredient.LastUpdatedUtc = DateTime.UtcNow;
 
                 ingredient.Calories = _ingredientNutritionCalculator.CalculateCalories(
                     dto.Nutrients.Select(n => new NutrientValueInput

@@ -3,5 +3,6 @@
     public class RolePermissionSettingRequest
     {
         public List<PermissionToggleRequest> Permissions { get; set; } = new();
+        public DateTime? LastUpdatedUtc { get; set; }
     }
 }

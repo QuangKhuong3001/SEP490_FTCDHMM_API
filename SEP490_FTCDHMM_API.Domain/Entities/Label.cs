@@ -7,6 +7,7 @@
         public string UpperName { get; set; } = string.Empty;
         public string NormalizedName { get; set; } = string.Empty;
         public string ColorCode { get; set; } = string.Empty;
+        public DateTime LastUpdatedUtc { get; set; } = DateTime.UtcNow;
         public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
 
     }

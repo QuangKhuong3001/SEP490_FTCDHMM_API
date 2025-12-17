@@ -21,6 +21,7 @@
         public static readonly AppResponseCode SERVICE_NOT_AVAILABLE = new(416, "Dịch vụ tạm thời không khả dụng");
         public static readonly AppResponseCode MISSING_REQUIRED_NUTRIENTS = new(419, "Thiếu các chất dinh dưỡng bắt buộc");
         public static readonly AppResponseCode MISSING_GENDER = new(421, "Thiếu thông tin giới tính");
+        public static readonly AppResponseCode CONFLICT = new(422, "Dữ liệu đã cũ, vui lòng tải lại trang và thử lại");
         public static readonly AppResponseCode UNKNOWN_ERROR = new(500, "Đã xảy ra lỗi không xác định");
     }
 }

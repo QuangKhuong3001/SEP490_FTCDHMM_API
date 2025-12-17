@@ -2,6 +2,7 @@
 {
     public class ChangeRoleRequest
     {
+        public DateTime? LastUpdatedUtc { get; set; }
         public Guid RoleId { get; set; }
     }
 }

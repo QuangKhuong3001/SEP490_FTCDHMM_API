@@ -337,10 +337,16 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.NOT_FOUND, "Vai trò không tồn tại");
             }
 
+            if (role.LastUpdatedUtc != request.LastUpdatedUtc)
+                throw new AppException(AppResponseCode.CONFLICT);
+
             if (role.Name == RoleConstants.Admin)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Không được quyền chỉnh sửa tài khoàn admin");
 
+            role.LastUpdatedUtc = DateTime.UtcNow;
             user.RoleId = request.RoleId;
+
+            await _roleRepository.UpdateAsync(role);
             await _userRepository.UpdateAsync(user);
         }
 

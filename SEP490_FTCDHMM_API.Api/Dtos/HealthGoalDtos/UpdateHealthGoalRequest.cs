@@ -10,5 +10,9 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.HealthGoalDtos
 
         [MinLength(1, ErrorMessage = "Vui lòng định nghĩa ít nhất một chỉ tiêu dinh dưỡng")]
         public List<NutrientTargetRequest> Targets { get; set; } = new();
+
+        [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu sức khỏe.")]
+        public DateTime? LastUpdatedUtc { get; set; }
+
     }
 }

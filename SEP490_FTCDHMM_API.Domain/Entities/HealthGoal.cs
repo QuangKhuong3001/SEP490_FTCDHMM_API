@@ -6,7 +6,7 @@
         public string Name { get; set; } = string.Empty;
         public string UpperName { get; set; } = string.Empty;
         public string? Description { get; set; }
-
+        public DateTime LastUpdatedUtc { get; set; } = DateTime.UtcNow;
         public ICollection<HealthGoalTarget> Targets { get; set; } = null!;
     }
 }
