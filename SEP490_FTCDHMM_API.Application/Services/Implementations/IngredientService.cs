@@ -448,7 +448,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredient = new Ingredient
             {
                 Id = Guid.NewGuid(),
-                Name = vietName,
+                Name = vietName.ToSentenceCase(),
                 NormalizedName = vietName.NormalizeVi(),
                 UpperName = upperName,
                 Description = descriptionViet,

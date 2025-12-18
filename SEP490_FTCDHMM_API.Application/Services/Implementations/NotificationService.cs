@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -15,11 +16,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
         private readonly IRealtimeNotifier _notifier;
-        public NotificationService(INotificationRepository notificationRepository, IMapper mapper, IRealtimeNotifier notifier)
+        private readonly IRecipeRepository _recipeRepository;
+        private readonly IS3ImageService _s3ImageService;
+        public NotificationService(INotificationRepository notificationRepository, IMapper mapper, IRealtimeNotifier notifier, IRecipeRepository recipeRepository, IS3ImageService s3ImageService)
         {
             _notificationRepository = notificationRepository;
             _mapper = mapper;
             _notifier = notifier;
+            _recipeRepository = recipeRepository;
+            _s3ImageService = s3ImageService;
         }
 
         public async Task<IEnumerable<NotificationResponse>> GetNotificationsByUserIdAsync(Guid userId)
@@ -46,6 +51,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     if (response.Type == NotificationType.System)
                     {
                         response.Senders = new List<UserInteractionResponse>();
+                        if (response.TargetId.HasValue)
+                        {
+                            var recipe = _recipeRepository.GetByIdAsync(response.TargetId.Value,
+                                include: r => r.Include(rec => rec.Image)).Result;
+                            if (recipe?.Image != null)
+                            {
+                                response.RecipeImageUrl = _s3ImageService.GeneratePreSignedUrl(recipe.Image.Key);
+                            }
+                        }
                     }
                     else
                     {

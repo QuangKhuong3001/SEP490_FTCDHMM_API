@@ -18,6 +18,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
         protected readonly Mock<IEmailTemplateService> EmailTemplateServiceMock;
         protected readonly Mock<IS3ImageService> S3ImageServiceMock;
         protected readonly Mock<IUserFollowRepository> UserFollowRepositoryMock;
+        protected readonly Mock<INotificationRepository> NotificationRepositoryMock;
+        protected readonly Mock<IRealtimeNotifier> RealtimeNotifierMock;
 
         protected readonly UserService Sut;
 
@@ -30,6 +32,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             EmailTemplateServiceMock = new Mock<IEmailTemplateService>();
             S3ImageServiceMock = new Mock<IS3ImageService>();
             UserFollowRepositoryMock = new Mock<IUserFollowRepository>();
+            NotificationRepositoryMock = new Mock<INotificationRepository>();
+            RealtimeNotifierMock = new Mock<IRealtimeNotifier>();
 
             Sut = new UserService(
                 UserRepositoryMock.Object,
@@ -38,7 +42,9 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
                 MailServiceMock.Object,
                 EmailTemplateServiceMock.Object,
                 S3ImageServiceMock.Object,
-                UserFollowRepositoryMock.Object
+                UserFollowRepositoryMock.Object,
+                NotificationRepositoryMock.Object,
+                RealtimeNotifierMock.Object
             );
         }
 
@@ -58,4 +64,3 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
         }
     }
 }
-

@@ -1,4 +1,5 @@
 ﻿using Moq;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
@@ -59,7 +60,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 NotificationRepositoryMock.Object,
                 UserFollowRepositoryMock.Object,
                 UserRepositoryMock.Object,
-                RecipeNutritionServiceMock.Object
+                RecipeNutritionServiceMock.Object,
+                new Mock<IS3ImageService>().Object
             );
         }
 

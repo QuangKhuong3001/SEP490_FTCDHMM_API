@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
@@ -28,6 +29,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly INotificationRepository _notificationRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserFollowRepository _userFollowRepository;
+        private readonly IS3ImageService _s3ImageService;
 
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
@@ -43,7 +45,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             INotificationRepository notificationRepository,
             IUserFollowRepository userFollowRepository,
             IUserRepository userRepository,
-            IRecipeNutritionService nutritionService)
+            IRecipeNutritionService nutritionService,
+            IS3ImageService s3ImageService)
         {
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
@@ -57,6 +60,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _notifier = notifier;
             _userFollowRepository = userFollowRepository;
             _imageService = imageService;
+            _s3ImageService = s3ImageService;
             _userRepository = userRepository;
             _nutritionService = nutritionService;
         }
@@ -102,7 +106,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                         Id = sender!.Id,
                         FirstName = sender.FirstName,
                         LastName = sender.LastName,
-                        AvatarUrl = sender.Avatar?.Key
+                        AvatarUrl = sender.Avatar != null ? _s3ImageService.GeneratePreSignedUrl(sender.Avatar.Key) : null
                     }
                 }
             };

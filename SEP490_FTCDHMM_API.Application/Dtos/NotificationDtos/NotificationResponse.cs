@@ -12,5 +12,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos
         public bool IsRead { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public List<UserInteractionResponse> Senders { get; set; } = new List<UserInteractionResponse>();
+        public string? RecipeImageUrl { get; set; }
     }
 }

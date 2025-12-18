@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -18,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IRecipeRepository _recipeRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IS3ImageService _s3ImageService;
 
 
         public CommentService(
@@ -26,7 +28,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IUserRepository userRepository,
             IRecipeRepository recipeRepository,
             INotificationRepository notificationRepository,
-            IRealtimeNotifier notifier)
+            IRealtimeNotifier notifier,
+            IS3ImageService s3ImageService)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
@@ -34,6 +37,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _userRepository = userRepository;
             _notificationRepository = notificationRepository;
             _notifier = notifier;
+            _s3ImageService = s3ImageService;
         }
 
         public async Task CreateCommentAsync(Guid userId, Guid recipeId, CreateCommentRequest request)
@@ -280,7 +284,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         Id = sender!.Id,
                         FirstName = sender.FirstName,
                         LastName = sender.LastName,
-                        AvatarUrl = sender.Avatar?.Key
+                        AvatarUrl = sender.Avatar != null ? _s3ImageService.GeneratePreSignedUrl(sender.Avatar.Key) : null
                     }
                 }
             };

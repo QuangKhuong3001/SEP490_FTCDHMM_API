@@ -19,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly ICacheService _cacheService;
         private readonly INotificationRepository _notificationRepository;
         private readonly IRealtimeNotifier _notifier;
+        private readonly IS3ImageService _s3ImageService;
 
         public RecipeManagementService(
             IRecipeRepository recipeRepository,
@@ -26,7 +27,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             ICacheService cacheService,
             INotificationRepository notificationRepository,
             IRealtimeNotifier notifier,
-            IEmailTemplateService emailTemplateService)
+            IEmailTemplateService emailTemplateService,
+            IS3ImageService s3ImageService)
         {
             _recipeRepository = recipeRepository;
             _cacheService = cacheService;
@@ -34,6 +36,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _notificationRepository = notificationRepository;
             _notifier = notifier;
             _emailTemplateService = emailTemplateService;
+            _s3ImageService = s3ImageService;
         }
 
         private async Task CreateAndSendNotificationAsync(Guid? senderId, Guid receiverId, NotificationType type, Guid targetId)
@@ -52,13 +55,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await _notificationRepository.AddAsync(notification);
 
+            string? recipeImageUrl = null;
+            var recipe = await _recipeRepository.GetByIdAsync(targetId,
+                include: r => r.Include(rec => rec.Image));
+            if (recipe?.Image != null)
+            {
+                recipeImageUrl = _s3ImageService.GeneratePreSignedUrl(recipe.Image.Key);
+            }
+
             var notificationResponse = new
             {
                 Id = notification.Id,
                 Type = type,
                 TargetId = targetId,
                 IsRead = false,
-                CreatedAtUtc = notification.CreatedAtUtc
+                CreatedAtUtc = notification.CreatedAtUtc,
+                Senders = Array.Empty<object>(),
+                RecipeImageUrl = recipeImageUrl
             };
 
             await _notifier.SendNotificationAsync(receiverId, notificationResponse);

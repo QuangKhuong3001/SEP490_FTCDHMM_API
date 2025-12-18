@@ -25,6 +25,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IS3ImageService _s3ImageService;
         private readonly IUserFollowRepository _userFollowRepository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IRealtimeNotifier _notifier;
 
         public UserService(IUserRepository userRepository,
             IMapper mapper,
@@ -32,7 +34,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IMailService mailService,
             IEmailTemplateService emailTemplateService,
             IS3ImageService s3ImageService,
-            IUserFollowRepository userFollowRepository)
+            IUserFollowRepository userFollowRepository,
+            INotificationRepository notificationRepository,
+            IRealtimeNotifier notifier)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -41,6 +45,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _emailTemplateService = emailTemplateService;
             _s3ImageService = s3ImageService;
             _userFollowRepository = userFollowRepository;
+            _notificationRepository = notificationRepository;
+            _notifier = notifier;
         }
 
         public async Task<PagedResult<UserResponse>> GetUserListAsync(UserFilterRequest request)
@@ -253,6 +259,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
 
             await _userFollowRepository.AddAsync(follow);
+
+            await CreateAndSendFollowNotificationAsync(followerId, followeeId);
         }
 
 
@@ -355,6 +363,49 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var result = _mapper.Map<List<MentionUserResponse>>(users);
             return result;
+        }
+
+        private async Task CreateAndSendFollowNotificationAsync(Guid followerId, Guid followeeId)
+        {
+            if (followerId == followeeId)
+                return;
+
+            var notification = new Notification
+            {
+                SenderId = followerId,
+                ReceiverId = followeeId,
+                Type = NotificationType.Follow,
+                Message = null,
+                TargetId = followerId,
+                CreatedAtUtc = DateTime.UtcNow,
+            };
+
+            await _notificationRepository.AddAsync(notification);
+
+            var follower = await _userRepository.GetByIdAsync(followerId, u => u.Include(x => x.Avatar));
+
+            var notificationResponse = new
+            {
+                Id = notification.Id,
+                Type = NotificationType.Follow,
+                Message = (string?)null,
+                TargetId = followerId,
+                IsRead = false,
+                CreatedAtUtc = notification.CreatedAtUtc,
+                Senders = new[]
+                {
+                    new
+                    {
+                        Id = follower!.Id,
+                        FirstName = follower.FirstName,
+                        LastName = follower.LastName,
+                        UserName = follower.UserName,
+                        AvatarUrl = follower.Avatar != null ? _s3ImageService.GeneratePreSignedUrl(follower.Avatar.Key) : null
+                    }
+                }
+            };
+
+            await _notifier.SendNotificationAsync(followeeId, notificationResponse);
         }
     }
 }

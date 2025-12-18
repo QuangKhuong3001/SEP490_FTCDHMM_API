@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Moq;
+using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
@@ -34,7 +35,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 UserRepositoryMock.Object,
                 RecipeRepositoryMock.Object,
                 NotificationRepositoryMock.Object,
-                NotifierMock.Object
+                NotifierMock.Object,
+                new Mock<IS3ImageService>().Object
             );
         }
 
