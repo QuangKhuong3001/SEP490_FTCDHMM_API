@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
+using SEP490_FTCDHMM_API.Application.Jobs.Interfaces.PreComputedInterfaces;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Hangfire
 {
@@ -27,6 +28,33 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Hangfire
                 recurringJobId: "deleted-images",
                 methodCall: () => deletedImagesJob.ExecuteAsync(),
                 cronExpression: "0 1 * * *",
+                options: new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),
+                    MisfireHandling = MisfireHandlingMode.Strict
+                }
+            );
+
+            var clusterAssignmentJob = provider.GetRequiredService<IClusterAssignmentJob>();
+
+            RecurringJob.AddOrUpdate(
+                recurringJobId: "cluster-assignment",
+                methodCall: () => clusterAssignmentJob.ExecuteAsync(),
+                cronExpression: "0 2 * * 0",
+                options: new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),
+                    MisfireHandling = MisfireHandlingMode.Strict
+                }
+            );
+
+            var clusterRecommendationPrecomputeJob =
+                provider.GetRequiredService<IClusterRecommendationPrecomputeJob>();
+
+            RecurringJob.AddOrUpdate(
+                recurringJobId: "cluster-recommendation-precompute",
+                methodCall: () => clusterRecommendationPrecomputeJob.ExecuteAsync(),
+                cronExpression: "0 3 * * *",
                 options: new RecurringJobOptions
                 {
                     TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),

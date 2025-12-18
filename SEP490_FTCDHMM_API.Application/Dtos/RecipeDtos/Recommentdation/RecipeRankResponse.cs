@@ -20,6 +20,6 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
         public RecipeParentResponse? Parent { get; set; }
-        public double Score { get; set; }
+        public double? Score { get; set; }
     }
 }

@@ -9,16 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SEP490_FTCDHMM_API.Api.Authorization;
+using SEP490_FTCDHMM_API.Application.Configurations;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Implementations;
+using SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImplementations;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces;
+using SEP490_FTCDHMM_API.Application.Jobs.Interfaces.PreComputedInterfaces;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.ClusterImplementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImplementations;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.ClusterInterfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
@@ -174,6 +176,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<AppSettings>(configuration.GetSection("Application"));
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+            services.Configure<KMeansSettings>(configuration.GetSection("KMeansSettings"));
             services.Configure<GoogleAuthSettings>(configuration.GetSection("GoogleAuth"));
             services.Configure<MealDistributionSettings>(configuration.GetSection("MealDistribution"));
             services.Configure<FitScoreWeightsSettings>(configuration.GetSection("FitScoreWeightsSettings"));
@@ -182,6 +185,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //job
             services.AddScoped<IExpireUserDietRestrictionsJob, ExpireUserDietRestrictionsJob>();
             services.AddScoped<IDeletedImagesJob, DeletedImagesJob>();
+            services.AddScoped<IClusterAssignmentJob, ClusterAssignmentJob>();
+            services.AddScoped<IClusterRecipeScoringSystem, ClusterRecipeScoringSystem>();
+            services.AddScoped<IClusterRecommendationPrecomputeJob, ClusterRecommendationPrecomputeJob>();
 
             // DI External Service
 

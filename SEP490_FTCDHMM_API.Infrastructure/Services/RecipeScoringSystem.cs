@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Enum;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
@@ -21,13 +22,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             _mealDistributionSettings = mealDistributionSettings.Value;
             _weightsSettings = weightsSettings.Value;
             _nutrientIdProvider = nutrientIdProvider;
-        }
-
-        private enum MealType
-        {
-            Breakfast,
-            Lunch,
-            Dinner
         }
 
         public double CalculateFinalScore(AppUser user, Recipe recipe)

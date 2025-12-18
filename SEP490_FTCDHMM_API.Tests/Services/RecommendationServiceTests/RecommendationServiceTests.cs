@@ -16,6 +16,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecommendationServiceTests
         private readonly Mock<IRecipeScoringSystem> _scoring;
         private readonly Mock<IMapper> _mapper;
         private readonly RecommendationService _service;
+        private readonly Mock<ICacheService> _cache;
 
         public RecommendationServiceTests()
         {
@@ -23,11 +24,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecommendationServiceTests
             _recipeRepo = new Mock<IRecipeRepository>();
             _scoring = new Mock<IRecipeScoringSystem>();
             _mapper = new Mock<IMapper>();
+            _cache = new Mock<ICacheService>();
 
             _service = new RecommendationService(
                 _userRepo.Object,
                 _recipeRepo.Object,
                 _mapper.Object,
+                _cache.Object,
                 _scoring.Object
             );
         }

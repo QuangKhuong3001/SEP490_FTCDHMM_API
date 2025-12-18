@@ -31,8 +31,18 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == p.Email);
 
-            var firstName = req.UserInfo?.GivenName ?? p.GivenName ?? p.Name?.Split(' ').FirstOrDefault() ?? "";
-            var lastName = req.UserInfo?.FamilyName ?? p.FamilyName ?? p.Name?.Split(' ').LastOrDefault() ?? "";
+            var firstName =
+                req.UserInfo?.GivenName ??
+                p.GivenName ??
+                p.Name?.Split(' ').FirstOrDefault() ??
+                string.Empty;
+
+            var lastName =
+                req.UserInfo?.FamilyName ??
+                p.FamilyName ??
+                p.Name?.Split(' ').LastOrDefault() ??
+                string.Empty;
+
             var picture = req.UserInfo?.PictureUrl ?? p.PictureUrl;
 
             Gender gender = Gender.Male;
@@ -46,8 +56,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 };
             }
 
-            var phone = req.UserInfo?.PhoneNumber;
-
             if (user == null)
             {
                 user = new AppUser
@@ -59,7 +67,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     LastName = lastName,
                     CreatedAtUtc = DateTime.UtcNow,
                     Gender = gender,
-                    PhoneNumber = phone,
+                    DateOfBirth = req.UserInfo?.Birthday ?? DateTime.UtcNow.AddYears(-18)
                 };
 
                 var customerRole = await _roleRepository.FindByNameAsync(RoleValue.Customer.Name);

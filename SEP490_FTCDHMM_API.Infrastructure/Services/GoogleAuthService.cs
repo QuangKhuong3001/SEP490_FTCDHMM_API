@@ -59,7 +59,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 Name = payload.Name,
                 GivenName = payload.GivenName,
                 FamilyName = payload.FamilyName,
-                PictureUrl = payload.Picture
+                PictureUrl = payload.Picture,
             };
         }
 
@@ -82,13 +82,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 info.Gender = genders[0].GetProperty("value").GetString();
             }
 
-            if (root.TryGetProperty("phoneNumbers", out var phones) && phones.GetArrayLength() > 0)
+            if (root.TryGetProperty("birthdays", out var birthdays) && birthdays.GetArrayLength() > 0)
             {
-                info.PhoneNumber = phones[0].GetProperty("value").GetString();
+                var date = birthdays[0].GetProperty("date");
+
+                var year = date.TryGetProperty("year", out var y) ? y.GetInt32() : 1;
+                var month = date.GetProperty("month").GetInt32();
+                var day = date.GetProperty("day").GetInt32();
+
+                info.Birthday = DateTime.SpecifyKind(
+                    new DateTime(year, month, day),
+                    DateTimeKind.Unspecified
+                );
             }
 
             return info;
         }
+
 
     }
 }

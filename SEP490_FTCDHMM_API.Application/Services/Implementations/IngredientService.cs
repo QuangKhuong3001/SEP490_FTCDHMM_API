@@ -8,7 +8,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.IngredientDtos.USDA;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;

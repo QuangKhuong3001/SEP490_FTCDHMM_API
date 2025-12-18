@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 {

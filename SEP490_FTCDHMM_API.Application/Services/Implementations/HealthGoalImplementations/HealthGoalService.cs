@@ -4,7 +4,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.HealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;

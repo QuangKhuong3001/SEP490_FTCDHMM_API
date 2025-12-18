@@ -19,8 +19,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.ClusterImpleme
         public async Task<ClusterOutput> ComputeAsync(int k)
         {
             var vectors = await _userVectorBuilder.BuildAllAsync();
-            if (!vectors.Any())
-                throw new Exception("No user vectors to cluster.");
 
             return _kMeansService.Compute(vectors, k);
         }

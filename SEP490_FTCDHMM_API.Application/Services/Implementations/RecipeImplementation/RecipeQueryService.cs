@@ -7,7 +7,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.UserSaveRecipe;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
-using SEP490_FTCDHMM_API.Application.Services.Implementations.SEP490_FTCDHMM_API.Application.Interfaces;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Specifications;
@@ -276,26 +276,44 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             foreach (var ing in result.Ingredients)
             {
+                RestrictionType? selected = null;
+
                 if (ingredientRestrictions.TryGetValue(ing.IngredientId, out var directType))
                 {
-                    ing.RestrictionType = directType;
-                    continue;
+                    selected = directType;
                 }
 
-                if (!ingredientLookup.TryGetValue(ing.IngredientId, out var ingredientEntity))
-                    continue;
-
-                foreach (var category in ingredientEntity.Categories)
+                if (ingredientLookup.TryGetValue(ing.IngredientId, out var ingredientEntity))
                 {
-                    if (categoryRestrictions.TryGetValue(category.Id, out var catType))
+                    foreach (var category in ingredientEntity.Categories)
                     {
-                        ing.RestrictionType = catType;
-                        break;
+                        if (categoryRestrictions.TryGetValue(category.Id, out var catType))
+                        {
+                            if (selected == null ||
+                                GetRestrictionPriority(catType) > GetRestrictionPriority(selected))
+                            {
+                                selected = catType;
+                            }
+                        }
                     }
+                }
+
+                if (selected != null)
+                {
+                    ing.RestrictionType = selected;
                 }
             }
 
+
             return result;
+        }
+
+        private static int GetRestrictionPriority(RestrictionType type)
+        {
+            if (type == RestrictionType.Allergy) return 3;
+            if (type == RestrictionType.Dislike) return 2;
+            if (type == RestrictionType.TemporaryAvoid) return 1;
+            return 0;
         }
 
         public async Task<PagedResult<RecipeResponse>> GetSavedRecipesAsync(Guid userId, SaveRecipeFilterRequest request)

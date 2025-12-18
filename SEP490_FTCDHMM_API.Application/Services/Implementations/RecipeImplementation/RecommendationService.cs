@@ -5,6 +5,8 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
+using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Enum;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
 {
@@ -14,21 +16,65 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRecipeRepository _recipeRepository;
         private readonly IRecipeScoringSystem _recipeScoringSystem;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
         public RecommendationService(
             IUserRepository userRepository,
             IRecipeRepository recipeRepository,
             IMapper mapper,
+            ICacheService cacheService,
             IRecipeScoringSystem recipeScoringSystem)
         {
             _userRepository = userRepository;
             _recipeRepository = recipeRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
             _recipeScoringSystem = recipeScoringSystem;
+        }
+
+        private MealType GetCurrentMeal()
+        {
+            var now = DateTime.Now.TimeOfDay;
+
+            if (now >= new TimeSpan(5, 0, 0) && now < new TimeSpan(11, 0, 0))
+                return MealType.Breakfast;
+
+            if (now >= new TimeSpan(11, 0, 0) && now < new TimeSpan(16, 0, 0))
+                return MealType.Lunch;
+
+            return MealType.Dinner;
         }
 
         public async Task<PagedResult<RecipeRankResponse>> RecommendRecipesAsync(Guid userId, PaginationParams request)
         {
+            if (request.PageNumber == 1)
+            {
+                var clusterId = await _cacheService.GetAsync<int>($"cluster:user:{userId}");
+                var meal = GetCurrentMeal().ToString().ToLower();
+
+                var key =
+                    $"recommend:cluster:{clusterId}:meal:{meal}:page:1";
+
+                var cached = await _cacheService.GetAsync<List<Recipe>>(key);
+
+                if (cached != null)
+                {
+                    var cacheMapped = _mapper.Map<List<RecipeRankResponse>>(cached);
+
+
+                    for (var i = 0; i < cacheMapped.Count; i++)
+                        cacheMapped[i].Score = null;
+
+                    return new PagedResult<RecipeRankResponse>
+                    {
+                        Items = cacheMapped,
+                        TotalCount = cacheMapped.Count,
+                        PageNumber = 1,
+                        PageSize = request.PageSize
+                    };
+                }
+            }
+
             var user = await _userRepository.GetByIdAsync(
                 id: userId,
                 include: q =>
