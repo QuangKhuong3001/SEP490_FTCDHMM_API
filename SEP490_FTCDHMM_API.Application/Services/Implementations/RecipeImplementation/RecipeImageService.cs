@@ -233,6 +233,103 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _cookingStepRepository.AddRangeAsync(newStepEntities);
         }
 
+        public async Task CopyMainImageFromParentAsync(Recipe recipe, Recipe parentRecipe)
+        {
+            if (!parentRecipe.ImageId.HasValue)
+                return;
+
+            var copiedImage = await _imageService.CopyImageAsync(parentRecipe.ImageId.Value, StorageFolder.RECIPES);
+            if (copiedImage != null)
+            {
+                recipe.Image = copiedImage;
+            }
+        }
+
+        public async Task<List<CookingStep>> CreateCookingStepsWithCopyFromParentAsync(
+            IEnumerable<CookingStepRequest> steps,
+            Recipe recipe,
+            IEnumerable<CookingStep> parentSteps)
+        {
+            var result = new List<CookingStep>();
+            var parentStepsList = parentSteps.ToList();
+
+            foreach (var step in steps.OrderBy(s => s.StepOrder))
+            {
+                var newStep = new CookingStep
+                {
+                    Id = Guid.NewGuid(),
+                    Instruction = step.Instruction.Trim(),
+                    StepOrder = step.StepOrder,
+                    RecipeId = recipe.Id
+                };
+
+                var imageRequests = step.Images?.ToList() ?? new List<CookingStepImageRequest>();
+
+                // Check if we have new images to upload
+                var hasNewImages = imageRequests.Any(img => img.Image != null || img.ExistingImageId.HasValue);
+
+                if (hasNewImages)
+                {
+                    // Process new images as usual
+                    newStep.CookingStepImages = new List<CookingStepImage>();
+
+                    foreach (var img in imageRequests)
+                    {
+                        Guid imageId;
+
+                        if (img.Image != null)
+                        {
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.COOKING_STEPS);
+                            imageId = uploaded.Id;
+                        }
+                        else if (img.ExistingImageId.HasValue)
+                        {
+                            imageId = img.ExistingImageId.Value;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        newStep.CookingStepImages.Add(new CookingStepImage
+                        {
+                            Id = Guid.NewGuid(),
+                            CookingStepId = newStep.Id,
+                            ImageOrder = img.ImageOrder,
+                            ImageId = imageId
+                        });
+                    }
+                }
+                else
+                {
+                    // Copy images from parent step with matching StepOrder
+                    var parentStep = parentStepsList.FirstOrDefault(ps => ps.StepOrder == step.StepOrder);
+                    if (parentStep?.CookingStepImages != null && parentStep.CookingStepImages.Any())
+                    {
+                        newStep.CookingStepImages = new List<CookingStepImage>();
+
+                        foreach (var parentImg in parentStep.CookingStepImages.OrderBy(i => i.ImageOrder))
+                        {
+                            var copiedImage = await _imageService.CopyImageAsync(parentImg.ImageId, StorageFolder.COOKING_STEPS);
+                            if (copiedImage != null)
+                            {
+                                newStep.CookingStepImages.Add(new CookingStepImage
+                                {
+                                    Id = Guid.NewGuid(),
+                                    CookingStepId = newStep.Id,
+                                    ImageOrder = parentImg.ImageOrder,
+                                    ImageId = copiedImage.Id
+                                });
+                            }
+                        }
+                    }
+                }
+
+                result.Add(newStep);
+            }
+
+            return result;
+        }
 
     }
 }

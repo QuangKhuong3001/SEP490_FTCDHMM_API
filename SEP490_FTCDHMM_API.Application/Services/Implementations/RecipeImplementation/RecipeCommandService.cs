@@ -276,7 +276,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
             await _validator.ValidateTaggedUsersAsync(userId, request.TaggedUserIds);
 
-            var parent = await _recipeRepository.GetByIdAsync(parentId);
+            // Load parent with images and cooking steps for potential copying
+            var parent = await _recipeRepository.GetByIdAsync(
+                id: parentId,
+                include: q => q
+                    .Include(r => r.Image)
+                    .Include(r => r.CookingSteps)
+                        .ThenInclude(cs => cs.CookingStepImages)
+            );
             if (parent == null || parent.Status != RecipeStatus.Posted)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Công thức được sao chép không tồn tại");
 
@@ -331,9 +338,33 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image);
+            // Handle main image
+            if (request.Image != null)
+            {
+                // New image uploaded
+                await _imageService.SetRecipeImageAsync(recipe, request.Image);
+            }
+            else if (request.CopyMainImageFromParent)
+            {
+                // Copy image from parent recipe
+                await _imageService.CopyMainImageFromParentAsync(recipe, parent);
+            }
 
-            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
+            // Handle cooking steps
+            List<CookingStep> steps;
+            if (request.CopyStepImagesFromParent)
+            {
+                // Create steps with images copied from parent
+                steps = await _imageService.CreateCookingStepsWithCopyFromParentAsync(
+                    request.CookingSteps, 
+                    recipe, 
+                    parent.CookingSteps);
+            }
+            else
+            {
+                // Normal creation (new images only)
+                steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
+            }
             recipe.CookingSteps = steps;
 
             await _recipeRepository.AddAsync(recipe);

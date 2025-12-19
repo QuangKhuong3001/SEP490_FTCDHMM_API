@@ -20,6 +20,12 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         public int CookTime { get; set; }
         public IFormFile? Image { get; set; }
 
+        /// If true, copy the main image from parent recipe (when no new image is uploaded)
+        public bool CopyMainImageFromParent { get; set; }
+
+        /// If true, copy step images from parent recipe (for steps without new images)
+        public bool CopyStepImagesFromParent { get; set; }
+
         [Range(1, int.MaxValue, ErrorMessage = "Khẩu phần ăn tối thiểu là 1")]
         public int Ration { get; set; }
 

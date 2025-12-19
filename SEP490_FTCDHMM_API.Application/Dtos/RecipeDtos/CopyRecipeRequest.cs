@@ -11,6 +11,13 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos
         public string Difficulty { get; set; } = string.Empty;
         public int CookTime { get; set; }
         public FileUploadModel? Image { get; set; }
+
+        /// If true, copy the main image from parent recipe (when no new image is uploaded)
+        public bool CopyMainImageFromParent { get; set; }
+
+        /// If true, copy step images from parent recipe (for steps without new images)
+        public bool CopyStepImagesFromParent { get; set; }
+
         public int Ration { get; set; }
         public List<Guid> LabelIds { get; set; } = new();
         public List<RecipeIngredientRequest> Ingredients { get; set; } = new();

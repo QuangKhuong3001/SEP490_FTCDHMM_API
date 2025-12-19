@@ -128,6 +128,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 q.Include(r => r.Author).ThenInclude(u => u.Avatar)
                  .Include(r => r.Image)
                  .Include(r => r.Labels)
+                 .Include(r => r.Parent)
                  .Include(r => r.RecipeUserTags).ThenInclude(t => t.TaggedUser)
                  .Include(r => r.CookingSteps)
                      .ThenInclude(cs => cs.CookingStepImages)

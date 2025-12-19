@@ -14,5 +14,7 @@ namespace SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices
         string? GeneratePreSignedUrl(string? key);
         Task<Image> MirrorExternalImageAsync(StorageFolder folder, string url);
         Task DeleteImageAsync(Guid imageId);
+        /// Creates a copy of an existing image in S3 (new S3 object and new Image entity)
+        Task<Image?> CopyImageAsync(Guid sourceImageId, StorageFolder targetFolder);
     }
 }
