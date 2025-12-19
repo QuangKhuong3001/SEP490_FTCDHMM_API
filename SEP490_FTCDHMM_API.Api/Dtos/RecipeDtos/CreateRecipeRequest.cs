@@ -21,6 +21,9 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         public int? CookTime { get; set; }
         public IFormFile? Image { get; set; }
 
+        /// ID of existing main image to use (e.g., when publishing a draft)
+        public Guid? ExistingMainImageId { get; set; }
+
         [Range(1, int.MaxValue, ErrorMessage = "Khẩu phần ăn tối thiểu là 1")]
         public int Ration { get; set; }
 

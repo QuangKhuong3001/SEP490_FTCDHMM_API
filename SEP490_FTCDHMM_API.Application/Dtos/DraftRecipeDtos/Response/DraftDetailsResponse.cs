@@ -12,6 +12,10 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos.Response
         public string Difficulty { get; set; } = string.Empty;
         public int CookTime { get; set; }
         public string? ImageUrl { get; set; }
+
+        /// ID of the main image (used to keep existing image when updating)
+        public Guid? ImageId { get; set; }
+
         public int? Ration { get; set; }
         public List<LabelResponse> Labels { get; set; } = new();
         public List<DraftRecipeIngredientResponse> Ingredients { get; set; } = new();

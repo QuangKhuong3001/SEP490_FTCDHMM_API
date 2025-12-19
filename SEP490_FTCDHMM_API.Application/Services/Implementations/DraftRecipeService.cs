@@ -129,13 +129,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
-
-                        step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                        // Only process images with actual file data
+                        if (img.Image != null)
                         {
-                            ImageOrder = img.ImageOrder,
-                            Image = uploaded
-                        });
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
+
+                            step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                            {
+                                ImageOrder = img.ImageOrder,
+                                Image = uploaded
+                            });
+                        }
                     }
                 }
 
@@ -181,7 +185,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nhãn dán bị trùng.");
             }
 
-            var draft = await _draftRecipeRepository.GetByIdAsync(draftId);
+            var draft = await _draftRecipeRepository.GetByIdAsync(
+                id: draftId,
+                include: i => i.Include(d => d.DraftCookingSteps)
+                                .ThenInclude(ds => ds.DraftCookingStepImages)
+                                    .ThenInclude(dsi => dsi.Image)
+                              .Include(d => d.Image));
             if (draft == null)
                 throw new AppException(AppResponseCode.NOT_FOUND, "Bản nháp không tồn tại");
 
@@ -190,11 +199,48 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
-            await _imageRepository.MarkDeletedAsync(draft.ImageId);
-            await _imageRepository.MarkDeletedStepsImageFromDraftAsync(draft);
+            // Collect all existing image IDs to keep
+            var imageIdsToKeep = new HashSet<Guid>();
+
+            // Check if we should keep the main image
+            if (request.ExistingMainImageId.HasValue)
+            {
+                imageIdsToKeep.Add(request.ExistingMainImageId.Value);
+            }
+
+            // Collect existing step image IDs to keep
+            foreach (var step in request.CookingSteps)
+            {
+                foreach (var img in step.Images)
+                {
+                    if (img.ExistingImageId.HasValue)
+                    {
+                        imageIdsToKeep.Add(img.ExistingImageId.Value);
+                    }
+                }
+            }
+
+            // Only delete images that are NOT being kept
+            if (draft.ImageId.HasValue && !imageIdsToKeep.Contains(draft.ImageId.Value))
+            {
+                await _imageRepository.MarkDeletedAsync(draft.ImageId);
+            }
+
+            // Mark deleted step images that are not being kept
+            foreach (var oldStep in draft.DraftCookingSteps)
+            {
+                foreach (var oldImg in oldStep.DraftCookingStepImages)
+                {
+                    if (!imageIdsToKeep.Contains(oldImg.ImageId))
+                    {
+                        await _imageRepository.MarkDeletedAsync(oldImg.ImageId);
+                    }
+                }
+            }
+
             await _draftRecipeRepository.DeleteAsync(draft);
 
-            draft = new DraftRecipe
+            var newDraft = new DraftRecipe
             {
                 AuthorId = userId,
                 Name = request.Name,
@@ -206,13 +252,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 Labels = labels.ToList()
             };
 
+            // Handle main image
             if (request.Image != null)
             {
+                // New image uploaded
                 var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS);
-                draft.Image = uploaded;
+                newDraft.Image = uploaded;
+            }
+            else if (request.ExistingMainImageId.HasValue)
+            {
+                // Keep existing image
+                var existingImage = await _imageRepository.GetByIdAsync(request.ExistingMainImageId.Value);
+                if (existingImage != null)
+                {
+                    newDraft.Image = existingImage;
+                }
             }
 
-            draft.DraftRecipeIngredients = request.Ingredients.Select(i => new DraftRecipeIngredient
+            newDraft.DraftRecipeIngredients = request.Ingredients.Select(i => new DraftRecipeIngredient
             {
                 IngredientId = i.IngredientId,
                 QuantityGram = i.QuantityGram
@@ -227,7 +284,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (!exists)
                     throw new AppException(AppResponseCode.INVALID_ACCOUNT_INFORMATION);
 
-                draft.DraftRecipeUserTags.Add(new DraftRecipeUserTag
+                newDraft.DraftRecipeUserTags.Add(new DraftRecipeUserTag
                 {
                     TaggedUserId = uid
                 });
@@ -247,20 +304,37 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
-
-                        step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                        if (img.Image != null)
                         {
-                            ImageOrder = img.ImageOrder,
-                            Image = uploaded
-                        });
+                            // New image uploaded
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
+
+                            step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                            {
+                                ImageOrder = img.ImageOrder,
+                                Image = uploaded
+                            });
+                        }
+                        else if (img.ExistingImageId.HasValue)
+                        {
+                            // Keep existing image
+                            var existingImage = await _imageRepository.GetByIdAsync(img.ExistingImageId.Value);
+                            if (existingImage != null)
+                            {
+                                step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                                {
+                                    ImageOrder = img.ImageOrder,
+                                    Image = existingImage
+                                });
+                            }
+                        }
                     }
                 }
 
-                draft.DraftCookingSteps.Add(step);
+                newDraft.DraftCookingSteps.Add(step);
             }
 
-            await _draftRecipeRepository.AddAsync(draft);
+            await _draftRecipeRepository.AddAsync(newDraft);
         }
         public async Task<IEnumerable<DraftRecipeResponse>> GetDraftsAsync(Guid userId)
         {

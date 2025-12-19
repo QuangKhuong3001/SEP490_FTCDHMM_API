@@ -4,7 +4,12 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep.CookingStep
 {
     public class CookingStepImageRequest
     {
-        public FileUploadModel Image { get; set; } = null!;
+        /// New image file to upload (required if ExistingImageId is not provided)
+        public FileUploadModel? Image { get; set; }
+
+        /// ID of existing image to keep (used when publishing draft or updating recipe)
+        public Guid? ExistingImageId { get; set; }
+
         public int ImageOrder { get; set; }
     }
 }

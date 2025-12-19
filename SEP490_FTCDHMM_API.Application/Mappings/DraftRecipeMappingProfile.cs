@@ -17,6 +17,9 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
             .ForMember(dest => dest.ImageUrl,
                 opt => opt.MapFrom<UniversalImageUrlResolver<DraftRecipe, DraftDetailsResponse>>()
             )
+            .ForMember(dest => dest.ImageId,
+                opt => opt.MapFrom(src => src.ImageId)
+            )
             .ForMember(dest => dest.Ingredients,
                 opt => opt.MapFrom(src => src.DraftRecipeIngredients)
             )
@@ -51,6 +54,10 @@ namespace SEP490_FTCDHMM_API.Application.Mappings
                 .ForMember(
                     dest => dest.ImageUrl,
                     opt => opt.MapFrom<UniversalImageUrlResolver<DraftCookingStepImage, DraftCookingStepImageResponse>>()
+                )
+                .ForMember(
+                    dest => dest.ImageId,
+                    opt => opt.MapFrom(src => src.ImageId)
                 );
 
             CreateMap<DraftRecipeUserTag, UserInteractionResponse>()
