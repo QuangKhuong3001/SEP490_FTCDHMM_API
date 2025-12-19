@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Configurations;
 using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -12,15 +13,18 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
     private readonly ICacheService _cache;
     private readonly IUserRepository _userRepository;
     private readonly KMeansSettings _settings;
+    private readonly ILogger<ClusterAssignmentJob> _logger;
 
     public ClusterAssignmentJob(
         IKMeansAppService kMeansAppService,
         ICacheService cache,
         IUserRepository userRepository,
+        ILogger<ClusterAssignmentJob> logger,
         IOptions<KMeansSettings> settings)
     {
         _kMeansAppService = kMeansAppService;
         _cache = cache;
+        _logger = logger;
         _userRepository = userRepository;
         _settings = settings.Value;
     }
@@ -28,6 +32,7 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
     public async Task ExecuteAsync()
     {
         await _cache.RemoveByPrefixAsync("cluster");
+        await _cache.DeleteKeyAsync("cluster:profiles");
 
         var userCount = await _userRepository.CountAsync();
 
@@ -54,13 +59,25 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
                 FatPct = c.Value[3]
             };
 
-            await _cache.SetAddJsonAsync("cluster:profiles", profile);
+            await _cache.HashSetAsync(
+                "cluster:profiles",
+                profile.ClusterId.ToString(),
+                profile,
+                TimeSpan.FromDays(7));
+
+            _logger.LogWarning("✅ Added cluster profile {ClusterId}", profile.ClusterId);
         }
+
+        _logger.LogWarning("✅ Added cluster profile");
+
     }
 
     private int CalculateClusterCount(int userCount)
     {
         var estimated = userCount / _settings.UserPerClusterRatio;
+
+        if (estimated < 1)
+            return 1;
 
         return estimated;
     }

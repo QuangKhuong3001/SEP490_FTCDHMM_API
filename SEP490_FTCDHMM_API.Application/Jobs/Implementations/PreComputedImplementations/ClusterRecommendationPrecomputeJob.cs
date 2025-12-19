@@ -1,4 +1,7 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces.PreComputedInterfaces;
@@ -12,34 +15,54 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
         private readonly IRecipeRepository _recipeRepository;
         private readonly IClusterRecipeScoringSystem _clusterScoring;
         private readonly ICacheService _cache;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ClusterRecommendationPrecomputeJob> _logger;
 
         private const int pageSize = 10;
 
         public ClusterRecommendationPrecomputeJob(
             IRecipeRepository recipeRepository,
             IClusterRecipeScoringSystem clusterScoring,
+            IMapper mapper,
+            ILogger<ClusterRecommendationPrecomputeJob> logger,
             ICacheService cache)
         {
             _recipeRepository = recipeRepository;
             _clusterScoring = clusterScoring;
+            _mapper = mapper;
             _cache = cache;
+            _logger = logger;
         }
 
         public async Task ExecuteAsync()
         {
+            _logger.LogWarning("🔥 ClusterRecommendationPrecomputeJob START");
+
             await _cache.RemoveByPrefixAsync("recommend");
 
             var recipes = await _recipeRepository.GetActiveRecentRecipesAsync();
             if (!recipes.Any())
+            {
+                _logger.LogWarning("🔥 ClusterRecommendationPrecomputeJob 1");
                 return;
 
-            var clusters = await _cache.SetMembersJsonAsync<ClusterProfile>("cluster:profiles");
+            }
+
+            var clusters = await _cache.HashGetAllAsync<ClusterProfile>("cluster:profiles");
+
+            _logger.LogWarning($"🔥 Cluster profiles after assign = {clusters.Count}");
             if (!clusters.Any())
+            {
+                _logger.LogWarning("🔥 ClusterRecommendationPrecomputeJob 2");
                 return;
+            }
 
             await Precompute(recipes, clusters, MealType.Breakfast, new TimeSpan(8, 0, 0));
             await Precompute(recipes, clusters, MealType.Lunch, new TimeSpan(13, 0, 0));
             await Precompute(recipes, clusters, MealType.Dinner, new TimeSpan(19, 0, 0));
+
+            _logger.LogWarning("🔥 ClusterRecommendationPrecomputeJob END");
+
         }
 
         private async Task Precompute(
@@ -52,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
 
             foreach (var cluster in clusters)
             {
-                var ranked = recipes
+                var scored = recipes
                     .Select(r => new
                     {
                         Recipe = r,
@@ -61,8 +84,14 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
                     .OrderByDescending(x => x.Score)
                     .ThenByDescending(x => x.Recipe.UpdatedAtUtc)
                     .Take(pageSize)
-                    .Select(x => x.Recipe)
                     .ToList();
+
+                var ranked = _mapper.Map<List<RecipeRankResponse>>(
+                    scored.Select(x => x.Recipe).ToList()
+                );
+
+                for (var i = 0; i < ranked.Count; i++)
+                    ranked[i].Score = scored[i].Score;
 
                 await _cache.SetAsync(
                     $"recommend:cluster:{cluster.ClusterId}:meal:{mealKey}:page:1",
@@ -70,5 +99,6 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
                     TimeSpan.FromHours(24));
             }
         }
+
     }
 }

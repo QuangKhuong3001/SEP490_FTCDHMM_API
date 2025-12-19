@@ -34,23 +34,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             await _db.SetAddAsync($"__prefix::{prefix}", key);
         }
 
-        public async Task SetAddJsonAsync<T>(string key, T value)
-        {
-            var json = JsonSerializer.Serialize(value, JsonOptions);
-            await _db.SetAddAsync(key, json);
-
-            var prefix = key.Split(':')[0];
-            await _db.SetAddAsync($"__prefix::{prefix}", key);
-        }
-
-        public async Task<List<T>> SetMembersJsonAsync<T>(string key)
-        {
-            var values = await _db.SetMembersAsync(key);
-            return values
-                .Select(v => JsonSerializer.Deserialize<T>(v!, JsonOptions)!)
-                .ToList();
-        }
-
         public async Task RemoveByPrefixAsync(string prefix)
         {
             var indexKey = $"__prefix::{prefix}";
@@ -60,6 +43,29 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 await _db.KeyDeleteAsync(key.ToString());
 
             await _db.KeyDeleteAsync(indexKey);
+        }
+
+        public async Task HashSetAsync<T>(string key, string field, T value, TimeSpan? ttl = null)
+        {
+            var json = JsonSerializer.Serialize(value, JsonOptions);
+            await _db.HashSetAsync(key, field, json);
+
+            if (ttl.HasValue)
+                await _db.KeyExpireAsync(key, ttl);
+        }
+
+        public async Task<List<T>> HashGetAllAsync<T>(string key)
+        {
+            var entries = await _db.HashGetAllAsync(key);
+
+            return entries
+                .Select(e => JsonSerializer.Deserialize<T>(e.Value!, JsonOptions)!)
+                .ToList();
+        }
+
+        public async Task DeleteKeyAsync(string key)
+        {
+            await _db.KeyDeleteAsync(key);
         }
     }
 }

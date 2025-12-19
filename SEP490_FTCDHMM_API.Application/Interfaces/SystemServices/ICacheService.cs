@@ -6,7 +6,9 @@
         Task SetAsync<T>(string key, T value, TimeSpan ttl);
         Task RemoveByPrefixAsync(string prefix);
 
-        Task SetAddJsonAsync<T>(string key, T value);
-        Task<List<T>> SetMembersJsonAsync<T>(string key);
+        Task HashSetAsync<T>(string key, string field, T value, TimeSpan? ttl = null);
+        Task<List<T>> HashGetAllAsync<T>(string key);
+        Task DeleteKeyAsync(string key);
+
     }
 }

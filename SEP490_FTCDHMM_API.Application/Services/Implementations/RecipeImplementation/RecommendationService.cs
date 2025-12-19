@@ -5,7 +5,6 @@ using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
-using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Enum;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
@@ -55,20 +54,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 var key =
                     $"recommend:cluster:{clusterId}:meal:{meal}:page:1";
 
-                var cached = await _cacheService.GetAsync<List<Recipe>>(key);
+                var cached = await _cacheService.GetAsync<List<RecipeRankResponse>>(key);
 
                 if (cached != null)
                 {
-                    var cacheMapped = _mapper.Map<List<RecipeRankResponse>>(cached);
-
-
-                    for (var i = 0; i < cacheMapped.Count; i++)
-                        cacheMapped[i].Score = null;
+                    for (var i = 0; i < cached.Count; i++)
+                        cached[i].Score = null;
 
                     return new PagedResult<RecipeRankResponse>
                     {
-                        Items = cacheMapped,
-                        TotalCount = cacheMapped.Count,
+                        Items = cached,
+                        TotalCount = cached.Count,
                         PageNumber = 1,
                         PageSize = request.PageSize
                     };
