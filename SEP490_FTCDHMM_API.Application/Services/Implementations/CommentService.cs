@@ -17,22 +17,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IRealtimeNotifier _notifier;
         private readonly IUserRepository _userRepository;
         private readonly IRecipeRepository _recipeRepository;
-        private readonly INotificationRepository _notificationRepository;
-
+        private readonly INotificationCommandService _notificationCommandService;
 
         public CommentService(
             ICommentRepository commentRepository,
             IMapper mapper,
             IUserRepository userRepository,
             IRecipeRepository recipeRepository,
-            INotificationRepository notificationRepository,
+            INotificationCommandService notificationCommandService,
             IRealtimeNotifier notifier)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
             _recipeRepository = recipeRepository;
             _userRepository = userRepository;
-            _notificationRepository = notificationRepository;
+            _notificationCommandService = notificationCommandService;
             _notifier = notifier;
         }
 
@@ -93,7 +92,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     if (recipe.AuthorId != mentionedId && (parentComment == null || parentComment.UserId != mentionedId))
                     {
-                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                        await _notificationCommandService.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, recipeId);
                     }
                 }
             }
@@ -111,11 +110,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var response = _mapper.Map<CommentResponse>(saved);
 
             await _notifier.SendCommentAddedAsync(recipeId, response);
-            await this.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, null, recipeId);
+            await _notificationCommandService.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Comment, recipeId);
 
             if (parentComment != null && parentComment.UserId != recipe.AuthorId)
             {
-                await this.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, null, recipeId);
+                await _notificationCommandService.CreateAndSendNotificationAsync(userId, parentComment.UserId, NotificationType.Reply, recipeId);
             }
         }
 
@@ -232,7 +231,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     if (!oldMentionIds.Contains(mentionedId))
                     {
-                        await this.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, null, recipeId);
+                        await _notificationCommandService.CreateAndSendNotificationAsync(userId, mentionedId, NotificationType.Mention, recipeId);
                     }
                 }
             }
@@ -244,48 +243,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var response = _mapper.Map<CommentResponse>(updated);
             await _notifier.SendCommentUpdatedAsync(recipeId, response);
-        }
-
-        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid receiverId, NotificationType type, string? message, Guid targetId)
-        {
-            if (senderId == receiverId)
-                return;
-
-            var notification = new Notification
-            {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                Type = type,
-                Message = message,
-                TargetId = targetId,
-                CreatedAtUtc = DateTime.UtcNow,
-            };
-
-            await _notificationRepository.AddAsync(notification);
-
-            var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
-
-            var notificationResponse = new
-            {
-                Id = notification.Id,
-                Type = type,
-                Message = message,
-                TargetId = targetId,
-                IsRead = false,
-                CreatedAtUtc = notification.CreatedAtUtc,
-                Senders = new[]
-                {
-                    new
-                    {
-                        Id = sender!.Id,
-                        FirstName = sender.FirstName,
-                        LastName = sender.LastName,
-                        AvatarUrl = sender.Avatar?.Key
-                    }
-                }
-            };
-
-            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
     }
 }

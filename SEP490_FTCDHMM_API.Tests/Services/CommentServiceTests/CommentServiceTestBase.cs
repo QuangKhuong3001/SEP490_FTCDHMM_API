@@ -3,6 +3,7 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -15,7 +16,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
         protected readonly Mock<IRealtimeNotifier> NotifierMock;
         protected readonly Mock<IUserRepository> UserRepositoryMock;
         protected readonly Mock<IRecipeRepository> RecipeRepositoryMock;
-        protected readonly Mock<INotificationRepository> NotificationRepositoryMock;
+        protected readonly Mock<INotificationCommandService> NotificationCommandServiceMock;
 
         protected readonly CommentService Sut;
 
@@ -26,14 +27,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             NotifierMock = new Mock<IRealtimeNotifier>();
             UserRepositoryMock = new Mock<IUserRepository>();
             RecipeRepositoryMock = new Mock<IRecipeRepository>();
-            NotificationRepositoryMock = new Mock<INotificationRepository>();
+            NotificationCommandServiceMock = new Mock<INotificationCommandService>();
 
             Sut = new CommentService(
                 CommentRepositoryMock.Object,
                 MapperMock.Object,
                 UserRepositoryMock.Object,
                 RecipeRepositoryMock.Object,
-                NotificationRepositoryMock.Object,
+                NotificationCommandServiceMock.Object,
                 NotifierMock.Object
             );
         }

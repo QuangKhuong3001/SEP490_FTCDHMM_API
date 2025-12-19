@@ -11,8 +11,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
         protected Mock<IRecipeRepository> RecipeRepositoryMock { get; }
         protected Mock<IUserRepository> UserRepositoryMock { get; }
         protected Mock<IUserSaveRecipeRepository> UserSaveRecipeRepositoryMock { get; }
-        protected Mock<IIngredientRepository> IngredientRepositoryMock { get; }
-        protected Mock<ILabelRepository> LabelRepositoryMock { get; }
         protected Mock<IUserRecipeViewRepository> UserRecipeViewRepositoryMock { get; }
         protected Mock<IMapper> MapperMock { get; }
         protected Mock<ICacheService> CacheServiceMock;
@@ -24,8 +22,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
             RecipeRepositoryMock = new Mock<IRecipeRepository>(MockBehavior.Strict);
             UserRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
             UserSaveRecipeRepositoryMock = new Mock<IUserSaveRecipeRepository>(MockBehavior.Strict);
-            IngredientRepositoryMock = new Mock<IIngredientRepository>(MockBehavior.Strict);
-            LabelRepositoryMock = new Mock<ILabelRepository>(MockBehavior.Strict);
             UserRecipeViewRepositoryMock = new Mock<IUserRecipeViewRepository>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
             CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
@@ -34,8 +30,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
                 RecipeRepositoryMock.Object,
                 UserRepositoryMock.Object,
                 UserSaveRecipeRepositoryMock.Object,
-                IngredientRepositoryMock.Object,
-                LabelRepositoryMock.Object,
                 UserRecipeViewRepositoryMock.Object,
                 CacheServiceMock.Object,
                 MapperMock.Object

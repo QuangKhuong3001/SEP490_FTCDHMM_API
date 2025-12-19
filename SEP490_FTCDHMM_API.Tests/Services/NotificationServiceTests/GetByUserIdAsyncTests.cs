@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Moq;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -39,9 +40,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.NotificationServiceTests
                 .Setup(m => m.Map<NotificationResponse>(n1))
                 .Returns(mapped);
 
-            var result = await Sut.GetNotificationsByUserIdAsync(userId);
+            var pagination = new PaginationParams
+            {
+                PageNumber = 1,
+                PageSize = 10
+            };
 
-            Assert.Single(result);
+            var result = await Sut.GetNotificationsByUserIdAsync(userId, pagination);
+
+            Assert.Single(result.Items);
+            Assert.Equal(1, result.TotalCount);
 
             NotificationRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
@@ -74,9 +82,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.NotificationServiceTests
                 .Setup(m => m.Map<NotificationResponse>(n))
                 .Returns(mapped);
 
-            var result = await Sut.GetNotificationsByUserIdAsync(userId);
+            var pagination = new PaginationParams
+            {
+                PageNumber = 1,
+                PageSize = 10
+            };
 
-            Assert.Empty(result.First().Senders);
+            var result = await Sut.GetNotificationsByUserIdAsync(userId, pagination);
+
+            Assert.Single(result.Items);
+            Assert.Empty(result.Items.First().Senders);
 
             NotificationRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();

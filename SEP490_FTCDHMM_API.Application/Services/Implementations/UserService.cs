@@ -25,6 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IS3ImageService _s3ImageService;
         private readonly IUserFollowRepository _userFollowRepository;
+        private readonly INotificationCommandService _notificationCommandService;
 
         public UserService(IUserRepository userRepository,
             IMapper mapper,
@@ -32,6 +33,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IMailService mailService,
             IEmailTemplateService emailTemplateService,
             IS3ImageService s3ImageService,
+            INotificationCommandService notificationCommandService,
             IUserFollowRepository userFollowRepository)
         {
             _userRepository = userRepository;
@@ -40,6 +42,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mailService = mailService;
             _emailTemplateService = emailTemplateService;
             _s3ImageService = s3ImageService;
+            _notificationCommandService = notificationCommandService;
             _userFollowRepository = userFollowRepository;
         }
 
@@ -253,6 +256,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
 
             await _userFollowRepository.AddAsync(follow);
+
+            await _notificationCommandService.CreateAndSendNotificationAsync(followerId, followeeId, NotificationType.Follow, followeeId);
         }
 
 

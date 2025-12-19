@@ -2,6 +2,7 @@
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -19,10 +20,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
         protected Mock<ICacheService> CacheServiceMock { get; }
         protected Mock<IRecipeIngredientRepository> RecipeIngredientRepositoryMock { get; }
         protected Mock<IRecipeImageService> RecipeImageServiceMock { get; }
-        protected Mock<IRealtimeNotifier> RealtimeNotifierMock { get; }
-        protected Mock<INotificationRepository> NotificationRepositoryMock { get; }
         protected Mock<IUserFollowRepository> UserFollowRepositoryMock { get; }
-        protected Mock<IUserRepository> UserRepositoryMock { get; }
+        protected Mock<INotificationCommandService> NotificationCommandServiceMock { get; }
         protected Mock<IRecipeNutritionService> RecipeNutritionServiceMock { get; }
 
         protected RecipeCommandService Sut { get; }
@@ -38,10 +37,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             CacheServiceMock = new(MockBehavior.Strict);
             RecipeIngredientRepositoryMock = new(MockBehavior.Strict);
             RecipeImageServiceMock = new(MockBehavior.Strict);
-            RealtimeNotifierMock = new(MockBehavior.Strict);
-            NotificationRepositoryMock = new(MockBehavior.Strict);
             UserFollowRepositoryMock = new(MockBehavior.Strict);
-            UserRepositoryMock = new(MockBehavior.Strict);
+            NotificationCommandServiceMock = new(MockBehavior.Strict);
             RecipeNutritionServiceMock = new(MockBehavior.Strict);
 
             Sut = new RecipeCommandService(
@@ -54,22 +51,18 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 CacheServiceMock.Object,
                 RecipeIngredientRepositoryMock.Object,
                 RecipeImageServiceMock.Object,
-                RealtimeNotifierMock.Object,
-                NotificationRepositoryMock.Object,
                 UserFollowRepositoryMock.Object,
-                UserRepositoryMock.Object,
+                NotificationCommandServiceMock.Object,
                 RecipeNutritionServiceMock.Object
             );
         }
 
         protected Recipe CreateRecipe(Guid id)
         {
-            RecipeStatus status = RecipeStatus.Posted;
-
             return new Recipe
             {
                 Id = id,
-                Status = status,
+                Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>(),
                 RecipeUserTags = new List<RecipeUserTag>(),
                 Labels = new List<Label>(),

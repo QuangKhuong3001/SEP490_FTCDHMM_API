@@ -18,16 +18,19 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IRealtimeNotifier _notifier;
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
+        private readonly INotificationCommandService _notificationCommandService;
 
         public RatingService(
             IRatingRepository ratingRepository,
             IRealtimeNotifier notifier,
             IRecipeRepository recipeRepository,
+            INotificationCommandService notificationCommandService,
             IMapper mapper)
         {
             _ratingRepository = ratingRepository;
             _notifier = notifier;
             _recipeRepository = recipeRepository;
+            _notificationCommandService = notificationCommandService;
             _mapper = mapper;
         }
 
@@ -71,6 +74,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var ratingResponse = _mapper.Map<RatingDetailsResponse>(existingRating);
             await _notifier.SendRatingUpdateAsync(recipeId, ratingResponse);
+
+            await _notificationCommandService.CreateAndSendNotificationAsync(userId, recipe.AuthorId, NotificationType.Rating, recipeId);
         }
 
         public async Task DeleteRatingAsync(Guid userId, Guid ratingId)

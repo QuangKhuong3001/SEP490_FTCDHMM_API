@@ -332,6 +332,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             //Notification
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<INotificationCommandService, NotificationCommandService>();
 
             //userhealthmetric
             services.AddScoped<IUserHealthMetricRepository, UserHealthMetricRepository>();

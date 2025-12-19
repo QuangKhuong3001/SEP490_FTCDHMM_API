@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
@@ -22,17 +23,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _notifier = notifier;
         }
 
-        public async Task<IEnumerable<NotificationResponse>> GetNotificationsByUserIdAsync(Guid userId)
+        public async Task<PagedResult<NotificationResponse>> GetNotificationsByUserIdAsync(
+             Guid userId,
+             PaginationParams pagination)
         {
-            var notifications = await _notificationRepository.GetAllAsync(
-                n => n.ReceiverId == userId,
-                q => q
-                    .Include(x => x.Sender)
+            var (items, totalCount) = await _notificationRepository.GetPagedAsync(
+                pageNumber: pagination.PageNumber,
+                pageSize: pagination.PageSize,
+                filter: n => n.ReceiverId == userId,
+                orderBy: q => q.OrderByDescending(n => n.CreatedAtUtc),
+                include: q => q
+                    .Include(n => n.Sender)
                         .ThenInclude(s => s!.Avatar)
-                    .OrderByDescending(x => x.CreatedAtUtc)
             );
 
-            var grouped = notifications
+            var grouped = items
                 .GroupBy(n => new
                 {
                     n.TargetId,
@@ -43,26 +48,27 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 {
                     var response = _mapper.Map<NotificationResponse>(g.First());
 
-                    if (response.Type == NotificationType.System)
-                    {
-                        response.Senders = new List<UserInteractionResponse>();
-                    }
-                    else
-                    {
-                        response.Senders = g
-                            .Where(n => n.Sender != null)
+                    response.Senders = response.Type == NotificationType.System
+                        ? []
+                        : g.Where(n => n.Sender != null)
                             .Select(n => _mapper.Map<UserInteractionResponse>(n.Sender))
                             .DistinctBy(s => s.Id)
                             .ToList();
-                    }
 
                     return response;
                 })
                 .OrderByDescending(n => n.CreatedAtUtc)
                 .ToList();
 
-            return grouped;
+            return new PagedResult<NotificationResponse>
+            {
+                Items = grouped,
+                TotalCount = totalCount,
+                PageNumber = pagination.PageNumber,
+                PageSize = pagination.PageSize
+            };
         }
+
 
         public async Task MarkAsReadAsync(Guid userId, Guid notificationId)
         {

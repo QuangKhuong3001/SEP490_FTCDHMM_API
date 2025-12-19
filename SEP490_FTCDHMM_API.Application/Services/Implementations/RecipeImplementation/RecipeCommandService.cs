@@ -2,6 +2,7 @@
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
@@ -23,11 +24,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRecipeNutritionService _nutritionService;
         private readonly IRecipeIngredientRepository _recipeIngredientRepository;
         private readonly ICacheService _cacheService;
-        private readonly IRealtimeNotifier _notifier;
-        private readonly INotificationRepository _notificationRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IUserFollowRepository _userFollowRepository;
-
+        private readonly INotificationCommandService _notificationCommandService;
         public RecipeCommandService(
             IRecipeRepository recipeRepository,
             ILabelRepository labelRepository,
@@ -38,25 +36,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             ICacheService cacheService,
             IRecipeIngredientRepository recipeIngredientRepository,
             IRecipeImageService imageService,
-            IRealtimeNotifier notifier,
-            INotificationRepository notificationRepository,
             IUserFollowRepository userFollowRepository,
-            IUserRepository userRepository,
+            INotificationCommandService notificationCommandService,
             IRecipeNutritionService nutritionService)
         {
             _recipeRepository = recipeRepository;
             _labelRepository = labelRepository;
             _recipeUserTagRepository = recipeUserTagRepository;
             _cacheService = cacheService;
-            _notificationRepository = notificationRepository;
             _draftRecipeRepository = draftRecipeRepository;
             _recipeIngredientRepository = recipeIngredientRepository;
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _validator = validator;
-            _notifier = notifier;
+            _notificationCommandService = notificationCommandService;
             _userFollowRepository = userFollowRepository;
             _imageService = imageService;
-            _userRepository = userRepository;
             _nutritionService = nutritionService;
         }
 
@@ -66,47 +60,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             foreach (var follow in followers)
             {
-                await this.CreateAndSendNotificationAsync(senderId, follow.FollowerId, targetId);
+                await _notificationCommandService.CreateAndSendNotificationAsync(senderId, follow.FollowerId, NotificationType.NewRecipe, targetId);
             }
-        }
-
-        private async Task CreateAndSendNotificationAsync(Guid senderId, Guid receiverId, Guid targetId)
-        {
-            var notification = new Notification
-            {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                Type = NotificationType.NewRecipe,
-                Message = null,
-                TargetId = targetId,
-                CreatedAtUtc = DateTime.UtcNow,
-            };
-
-            await _notificationRepository.AddAsync(notification);
-
-            var sender = await _userRepository.GetByIdAsync(senderId, u => u.Include(x => x.Avatar));
-
-            var notificationResponse = new
-            {
-                Id = notification.Id,
-                Type = NotificationType.NewRecipe,
-                Message = "",
-                TargetId = targetId,
-                IsRead = false,
-                CreatedAtUtc = notification.CreatedAtUtc,
-                Senders = new[]
-                {
-                    new
-                    {
-                        Id = sender!.Id,
-                        FirstName = sender.FirstName,
-                        LastName = sender.LastName,
-                        AvatarUrl = sender.Avatar?.Key
-                    }
-                }
-            };
-
-            await _notifier.SendNotificationAsync(receiverId, notificationResponse);
         }
 
         public async Task CreateRecipeAsync(Guid userId, CreateRecipeRequest request)

@@ -3,6 +3,7 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -14,6 +15,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
         protected Mock<IRecipeRepository> RecipeRepositoryMock { get; }
         protected Mock<IRealtimeNotifier> NotifierMock { get; }
         protected Mock<IMapper> MapperMock { get; }
+        protected Mock<INotificationCommandService> NotificationCommandServiceMock { get; }
         protected RatingService Sut { get; }
 
         protected RatingServiceTestBase()
@@ -22,11 +24,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
             RecipeRepositoryMock = new Mock<IRecipeRepository>(MockBehavior.Strict);
             NotifierMock = new Mock<IRealtimeNotifier>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
+            NotificationCommandServiceMock = new Mock<INotificationCommandService>(MockBehavior.Strict);
 
             Sut = new RatingService(
                 RatingRepositoryMock.Object,
                 NotifierMock.Object,
                 RecipeRepositoryMock.Object,
+                NotificationCommandServiceMock.Object,
                 MapperMock.Object);
         }
 

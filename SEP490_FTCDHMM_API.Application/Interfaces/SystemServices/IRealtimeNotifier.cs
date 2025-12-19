@@ -7,7 +7,7 @@
         Task SendCommentDeletedAsync(Guid recipeId, Guid commentId);
         Task SendRatingUpdateAsync(Guid recipeId, object rating);
         Task SendRatingDeletedAsync(Guid recipeId, Guid ratingId);
-        Task SendNotificationAsync(Guid userId, object notification);
+        Task SendNotificationAsync(Guid userId, object message);
         Task SendMarkNotificationAsReadAsync(Guid userId, Guid notificationId);
     }
 }

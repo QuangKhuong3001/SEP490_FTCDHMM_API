@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Specifications;
@@ -15,21 +16,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IReadOnlyList<Recipe>> GetRecipesRawAsync(RecipeBasicFilterSpec spec)
+        public async Task<IReadOnlyList<RecipeRankSource>> GetRecipesForRankingAsync(RecipeBasicFilterSpec spec)
         {
             var query = _context.Recipes
-                .Where(r => r.Status == RecipeStatus.Posted)
-                .Include(r => r.Author).ThenInclude(u => u.Avatar)
-                .Include(r => r.Image)
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient)
-                .Include(r => r.Labels)
-                .Include(r => r.RecipeUserTags)
-                    .ThenInclude(cs => cs.TaggedUser)
-                .Include(r => r.CookingSteps)
-                    .ThenInclude(cs => cs.CookingStepImages)
-                        .ThenInclude(cs => cs.Image)
-                .AsQueryable();
+                .AsNoTracking()
+                .Where(r => r.Status == RecipeStatus.Posted);
 
             if (spec.Difficulty != null)
                 query = query.Where(r => r.Difficulty == DifficultyValue.From(spec.Difficulty));
@@ -39,6 +30,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
             if (spec.MaxCookTime != null)
                 query = query.Where(r => r.CookTime <= spec.MaxCookTime);
+
+            if (!string.IsNullOrEmpty(spec.Keyword))
+                query = query.Where(r => r.NormalizedName.Contains(spec.Keyword));
 
             if (spec.IncludeIngredientIds.Any())
                 query = query.Where(r =>
@@ -50,17 +44,22 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
 
             if (spec.IncludeLabelIds.Any())
                 query = query.Where(r =>
-                    r.Labels.Any(lbl => spec.IncludeLabelIds.Contains(lbl.Id)));
+                    r.Labels.Any(l => spec.IncludeLabelIds.Contains(l.Id)));
 
             if (spec.ExcludeLabelIds.Any())
                 query = query.Where(r =>
-                    !r.Labels.Any(lbl => spec.ExcludeLabelIds.Contains(lbl.Id)));
+                    !r.Labels.Any(l => spec.ExcludeLabelIds.Contains(l.Id)));
 
-            if (!string.IsNullOrEmpty(spec.Keyword))
-                query = query.Where(r => r.NormalizedName.Contains(spec.Keyword));
-
-            return await query.ToListAsync();
+            return await query
+                .Select(r => new RecipeRankSource
+                {
+                    RecipeId = r.Id,
+                    UpdatedAtUtc = r.UpdatedAtUtc,
+                    IngredientIds = r.RecipeIngredients.Select(ri => ri.IngredientId).ToList()
+                })
+                .ToListAsync();
         }
+
 
         public async Task<List<Recipe>> GetActiveRecentRecipesAsync()
         {

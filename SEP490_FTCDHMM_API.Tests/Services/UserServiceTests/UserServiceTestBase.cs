@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -17,6 +18,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
         protected readonly Mock<IMailService> MailServiceMock;
         protected readonly Mock<IEmailTemplateService> EmailTemplateServiceMock;
         protected readonly Mock<IS3ImageService> S3ImageServiceMock;
+        protected readonly Mock<INotificationCommandService> NotificationCommandServiceMock;
         protected readonly Mock<IUserFollowRepository> UserFollowRepositoryMock;
 
         protected readonly UserService Sut;
@@ -29,6 +31,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
             MailServiceMock = new Mock<IMailService>();
             EmailTemplateServiceMock = new Mock<IEmailTemplateService>();
             S3ImageServiceMock = new Mock<IS3ImageService>();
+            NotificationCommandServiceMock = new Mock<INotificationCommandService>();
             UserFollowRepositoryMock = new Mock<IUserFollowRepository>();
 
             Sut = new UserService(
@@ -38,11 +41,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
                 MailServiceMock.Object,
                 EmailTemplateServiceMock.Object,
                 S3ImageServiceMock.Object,
+                NotificationCommandServiceMock.Object,
                 UserFollowRepositoryMock.Object
             );
         }
 
-        protected static AppUser CreateUser(Guid? id = null, ActivityLevel? activityLevel = null)
+        protected static AppUser CreateUser(
+            Guid? id = null,
+            ActivityLevel? activityLevel = null)
         {
             return new AppUser
             {
@@ -58,4 +64,3 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
         }
     }
 }
-

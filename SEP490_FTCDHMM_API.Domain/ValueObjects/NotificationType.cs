@@ -6,6 +6,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
     {
         public static readonly NotificationType System = new("SYSTEM");
         public static readonly NotificationType Comment = new("COMMENT");
+        public static readonly NotificationType Rating = new("RATING");
         public static readonly NotificationType Mention = new("MENTION");
         public static readonly NotificationType Like = new("LIKE");
         public static readonly NotificationType Follow = new("FOLLOW");
@@ -26,6 +27,7 @@ namespace SEP490_FTCDHMM_API.Domain.ValueObjects
                 "SYSTEM" => System,
                 "COMMENT" => Comment,
                 "LIKE" => Like,
+                "RATING" => Rating,
                 "FOLLOW" => Follow,
                 "MENTION" => Mention,
                 "REPLY" => Reply,

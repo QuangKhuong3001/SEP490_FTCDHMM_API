@@ -23,16 +23,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IUserRepository _userRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
         private readonly IMapper _mapper;
-        private readonly IIngredientRepository _ingredientRepository;
-        private readonly ILabelRepository _labelRepository;
         private readonly IUserRecipeViewRepository _userRecipeViewRepository;
         private readonly ICacheService _cacheService;
         public RecipeQueryService(
             IRecipeRepository recipeRepository,
             IUserRepository userRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
-            IIngredientRepository ingredientRepository,
-            ILabelRepository labelRepository,
             IUserRecipeViewRepository userRecipeViewRepository,
             ICacheService cacheService,
             IMapper mapper)
@@ -42,8 +38,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _userSaveRecipeRepository = userSaveRecipeRepository;
             _mapper = mapper;
             _userRecipeViewRepository = userRecipeViewRepository;
-            _ingredientRepository = ingredientRepository;
-            _labelRepository = labelRepository;
             _cacheService = cacheService;
         }
 
@@ -53,60 +47,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var cached = await _cacheService.GetAsync<PagedResult<RecipeResponse>>(cacheKey);
             if (cached != null)
                 return cached;
-
-            if (request.IncludeIngredientIds.Any())
-            {
-                var inIngredientExist = await _ingredientRepository.IdsExistAsync(request.IncludeIngredientIds);
-                if (!inIngredientExist)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu trong danh sách bao gồm không tồn tại trong hệ thống");
-            }
-
-            if (request.ExcludeIngredientIds.Any())
-            {
-                var exIngredientExist = await _ingredientRepository.IdsExistAsync(request.ExcludeIngredientIds);
-                if (!exIngredientExist)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nguyên liệu trong danh sách loại trừ không tồn tại trong hệ thống");
-            }
-
-            if (request.IncludeLabelIds.Any())
-            {
-                var inLabelExist = await _labelRepository.IdsExistAsync(request.IncludeLabelIds);
-                if (!inLabelExist)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn trong danh sách bao gồm không tồn tại trong hệ thống");
-            }
-
-            if (request.ExcludeLabelIds.Any())
-            {
-                var exLabelExist = await _labelRepository.IdsExistAsync(request.ExcludeLabelIds);
-                if (!exLabelExist)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Một hoặc nhiều nhãn trong danh sách loại trừ không tồn tại trong hệ thống");
-            }
-
-            if (request.IncludeIngredientIds.Any() && request.ExcludeIngredientIds.Any())
-            {
-                var conflictIngredientIds = request.IncludeIngredientIds
-                    .Intersect(request.ExcludeIngredientIds)
-                    .ToList();
-
-                if (conflictIngredientIds.Any())
-                    throw new AppException(
-                        AppResponseCode.INVALID_ACTION,
-                        "Không thể đồng thời bao gồm và loại trừ cùng một nguyên liệu"
-                    );
-            }
-
-            if (request.IncludeLabelIds.Any() && request.ExcludeLabelIds.Any())
-            {
-                var conflictLabelIds = request.IncludeLabelIds
-                    .Intersect(request.ExcludeLabelIds)
-                    .ToList();
-
-                if (conflictLabelIds.Any())
-                    throw new AppException(
-                        AppResponseCode.INVALID_ACTION,
-                        "Không thể đồng thời bao gồm và loại trừ cùng một nhãn"
-                    );
-            }
 
             var spec = new RecipeBasicFilterSpec
             {
@@ -120,54 +60,50 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 MaxCookTime = request.MaxCookTime
             };
 
-            var recipes = await _recipeRepository.GetRecipesRawAsync(spec);
+            var sources = await _recipeRepository.GetRecipesForRankingAsync(spec);
 
-            var hasIncludeIngredient = request.IncludeIngredientIds.Any();
-
-            var ranked = recipes
+            var ranked = sources
                 .Select(r => new
                 {
-                    Recipe = r,
+                    r.RecipeId,
                     Matched = request.IncludeIngredientIds.Any()
-                        ? r.RecipeIngredients.Count(ri =>
-                              request.IncludeIngredientIds.Contains(ri.IngredientId))
+                        ? r.IngredientIds.Count(id => request.IncludeIngredientIds.Contains(id))
                         : 0,
-
                     NotMatched = request.IncludeIngredientIds.Any()
-                        ? request.IncludeIngredientIds.Count(id =>
-                              !r.RecipeIngredients.Any(ri => ri.IngredientId == id))
-                        : 0
+                        ? request.IncludeIngredientIds.Count(id => !r.IngredientIds.Contains(id))
+                        : 0,
+                    r.UpdatedAtUtc
                 })
-                .Where(x => !hasIncludeIngredient || x.Matched > 0)
+                .Where(x => !request.IncludeIngredientIds.Any() || x.Matched > 0)
                 .OrderByDescending(x => x.Matched)
-                .ThenBy(x => x.NotMatched);
+                .ThenBy(x => x.NotMatched)
+                .ThenByDescending(x => x.UpdatedAtUtc);
 
-            var ordered = request.SortBy?.ToLower() switch
-            {
-                "name_asc" => ranked.ThenBy(x => x.Recipe.Name),
-                "name_desc" => ranked.ThenByDescending(x => x.Recipe.Name),
-                "time_asc" => ranked.ThenBy(x => x.Recipe.CookTime),
-                "time_desc" => ranked.ThenByDescending(x => x.Recipe.CookTime),
-                "latest" => ranked.ThenByDescending(x => x.Recipe.UpdatedAtUtc),
-                "rate_asc" => ranked.ThenBy(x => x.Recipe.AvgRating),
-                "rate_desc" => ranked.ThenByDescending(x => x.Recipe.AvgRating),
-                "view_asc" => ranked.ThenBy(x => x.Recipe.ViewCount),
-                "view_desc" => ranked.ThenByDescending(x => x.Recipe.ViewCount),
-                _ => ranked
-            };
+            var totalCount = ranked.Count();
 
-            var paged = ordered
+            var pageIds = ranked
                 .Skip((request.PaginationParams.PageNumber - 1) * request.PaginationParams.PageSize)
                 .Take(request.PaginationParams.PageSize)
-                .Select(x => x.Recipe)
+                .Select(x => x.RecipeId)
                 .ToList();
 
-            var result = _mapper.Map<List<RecipeResponse>>(paged);
+            var recipes = await _recipeRepository.GetAllAsync(
+                r => pageIds.Contains(r.Id),
+                include: q => q
+                    .Include(r => r.Image)
+                    .Include(r => r.Author).ThenInclude(u => u.Avatar)
+            );
+
+            var orderedRecipes = pageIds
+                .Join(recipes, id => id, r => r.Id, (_, r) => r)
+                .ToList();
+
+            var result = _mapper.Map<List<RecipeResponse>>(orderedRecipes);
 
             var pagedResult = new PagedResult<RecipeResponse>
             {
                 Items = result,
-                TotalCount = ordered.Count(),
+                TotalCount = totalCount,
                 PageNumber = request.PaginationParams.PageNumber,
                 PageSize = request.PaginationParams.PageSize
             };
@@ -176,6 +112,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             return pagedResult;
         }
+
 
         public async Task<RecipeDetailsResponse> GetRecipeDetailsAsync(Guid? userId, Guid recipeId)
         {

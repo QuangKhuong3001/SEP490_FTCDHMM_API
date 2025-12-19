@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly INotificationRepository _notificationRepository;
+        private readonly INotificationCommandService _notificationCommandServices;
         private readonly IRoleRepository _roleRepository;
         private readonly IOtpRepository _otpRepo;
         private readonly IMailService _mailService;
@@ -27,13 +27,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IGoogleProvisioningService _googleProvisioningService;
-        private readonly IUserRepository _userRepository;
 
         public AuthService(UserManager<AppUser> userManager,
             IRoleRepository roleRepository,
-            IUserRepository userRepository,
             IOtpRepository otpRepo,
-            INotificationRepository notificationRepository,
+            INotificationCommandService notificationCommandService,
             IMailService mailService,
             IJwtAuthService jwtService,
             IGoogleProvisioningService googleProvisioningService,
@@ -41,9 +39,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
-            _notificationRepository = notificationRepository;
+            _notificationCommandServices = notificationCommandService;
             _roleRepository = roleRepository;
-            _userRepository = userRepository;
             _otpRepo = otpRepo;
             _mailService = mailService;
             _jwtService = jwtService;
@@ -135,7 +132,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody, "Chào mừng bạn đến với FitFood Tracker");
-            await _notificationRepository.AddNotification(null, user.Id, NotificationType.System, "Chào mừng bạn đến với FitFood Tracker", null);
+            await _notificationCommandServices.CreateAndSendNotificationAsync(null, user.Id, NotificationType.System, null);
             return (true, Array.Empty<string>());
         }
 

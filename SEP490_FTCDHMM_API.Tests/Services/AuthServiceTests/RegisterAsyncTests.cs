@@ -106,8 +106,12 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(x => x.SendEmailAsync(dto.Email, "html", It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            NotificationRepositoryMock
-                .Setup(x => x.AddNotification(null, It.IsAny<Guid>(), NotificationType.System, It.IsAny<string>(), null))
+            NotificationCommandServiceMock
+                .Setup(x => x.CreateAndSendNotificationAsync(
+                    null,
+                    It.IsAny<Guid>(),
+                    NotificationType.System,
+                    null))
                 .Returns(Task.CompletedTask);
 
             var result = await Sut.RegisterAsync(dto);
@@ -174,8 +178,12 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 .Setup(x => x.SendEmailAsync(dto.Email, "html", It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            NotificationRepositoryMock
-                .Setup(x => x.AddNotification(null, It.IsAny<Guid>(), NotificationType.System, It.IsAny<string>(), null))
+            NotificationCommandServiceMock
+                .Setup(x => x.CreateAndSendNotificationAsync(
+                    null,
+                    It.IsAny<Guid>(),
+                    NotificationType.System,
+                    null))
                 .Returns(Task.CompletedTask);
 
             var result = await Sut.RegisterAsync(dto);

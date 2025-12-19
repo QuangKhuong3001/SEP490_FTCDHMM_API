@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations;
+using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
@@ -13,9 +14,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
     {
         protected readonly Mock<UserManager<AppUser>> UserManagerMock;
         protected readonly Mock<IRoleRepository> RoleRepositoryMock;
-        protected readonly Mock<IUserRepository> UserRepositoryMock;
         protected readonly Mock<IOtpRepository> OtpRepositoryMock;
-        protected readonly Mock<INotificationRepository> NotificationRepositoryMock;
+        protected readonly Mock<INotificationCommandService> NotificationCommandServiceMock;
         protected readonly Mock<IMailService> MailServiceMock;
         protected readonly Mock<IJwtAuthService> JwtServiceMock;
         protected readonly Mock<IGoogleAuthService> GoogleAuthServiceMock;
@@ -29,9 +29,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
             UserManagerMock = CreateUserManagerMock();
 
             RoleRepositoryMock = new Mock<IRoleRepository>();
-            UserRepositoryMock = new Mock<IUserRepository>();
             OtpRepositoryMock = new Mock<IOtpRepository>();
-            NotificationRepositoryMock = new Mock<INotificationRepository>();
+            NotificationCommandServiceMock = new Mock<INotificationCommandService>();
             MailServiceMock = new Mock<IMailService>();
             JwtServiceMock = new Mock<IJwtAuthService>();
             GoogleAuthServiceMock = new Mock<IGoogleAuthService>();
@@ -41,9 +40,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
             Sut = new AuthService(
                 UserManagerMock.Object,
                 RoleRepositoryMock.Object,
-                UserRepositoryMock.Object,
                 OtpRepositoryMock.Object,
-                NotificationRepositoryMock.Object,
+                NotificationCommandServiceMock.Object,
                 MailServiceMock.Object,
                 JwtServiceMock.Object,
                 GoogleProvisioningServiceMock.Object,
