@@ -46,7 +46,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 .ReturnsAsync(labels);
 
             RecipeImageServiceMock
-                .Setup(x => x.SetRecipeImageAsync(It.IsAny<Recipe>(), null))
+                .Setup(x => x.SetRecipeImageAsync(It.IsAny<Recipe>(), null, null))
                 .Returns(Task.CompletedTask);
 
             RecipeImageServiceMock
