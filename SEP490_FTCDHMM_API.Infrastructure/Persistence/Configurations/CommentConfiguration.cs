@@ -34,6 +34,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasForeignKey(c => c.ParentCommentId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasIndex(c => new { c.RecipeId, c.ParentCommentId })
+                .HasDatabaseName("IX_Comments_Recipe_Parent");
+
+            builder.HasIndex(c => c.ParentCommentId)
+                   .HasDatabaseName("IX_Comments_Parent");
         }
     }
 }

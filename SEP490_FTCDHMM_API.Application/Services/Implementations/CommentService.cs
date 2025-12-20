@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.CommentDtos.CommentMention;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
@@ -18,17 +19,20 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IRecipeRepository _recipeRepository;
         private readonly INotificationCommandService _notificationCommandService;
+        private readonly ICommentMentionRepository _commentMentionRepository;
 
         public CommentService(
             ICommentRepository commentRepository,
             IMapper mapper,
             IUserRepository userRepository,
             IRecipeRepository recipeRepository,
+            ICommentMentionRepository commentMentionRepository,
             INotificationCommandService notificationCommandService,
             IRealtimeNotifier notifier)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
+            _commentMentionRepository = commentMentionRepository;
             _recipeRepository = recipeRepository;
             _userRepository = userRepository;
             _notificationCommandService = notificationCommandService;
@@ -120,24 +124,71 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task<List<CommentResponse>> GetCommentsByRecipeAsync(Guid recipeId)
         {
-            var exist = await _recipeRepository.ExistsAsync(r => r.Id == recipeId);
-
-            if (!exist)
-                throw new AppException(AppResponseCode.NOT_FOUND, "Công thức không tồn tại");
-
-            var comments = await _commentRepository.GetAllAsync(
+            var rootComments = await _commentRepository.GetAllAsync(
                 predicate: c => c.RecipeId == recipeId && c.ParentCommentId == null,
-                include: c => c.Include(x => x.User)
-                        .ThenInclude(x => x.Avatar)
-                    .Include(x => x.Replies)
-                        .ThenInclude(x => x.User)
-                            .ThenInclude(x => x.Avatar)
-                    .Include(x => x.Mentions)
-                        .ThenInclude(x => x.MentionedUser)
-                            .ThenInclude(x => x.Avatar)
+                include: q => q
+                    .AsNoTracking()
+                    .Include(c => c.User)
+                        .ThenInclude(u => u.Avatar)
             );
 
-            return _mapper.Map<List<CommentResponse>>(comments);
+            if (!rootComments.Any())
+                return new List<CommentResponse>();
+
+            var rootIds = rootComments.Select(c => c.Id).ToList();
+
+            var replies = await _commentRepository.GetAllAsync(
+                predicate: c => c.ParentCommentId.HasValue && rootIds.Contains(c.ParentCommentId.Value),
+                include: q => q
+                    .AsNoTracking()
+                    .Include(c => c.User)
+                        .ThenInclude(u => u.Avatar)
+            );
+
+            var allCommentIds = rootComments
+                .Select(c => c.Id)
+                .Concat(replies.Select(r => r.Id))
+                .ToList();
+
+            var mentions = await _commentMentionRepository.GetAllAsync(
+                predicate: m => allCommentIds.Contains(m.CommentId),
+                include: q => q
+                    .AsNoTracking()
+                    .Include(m => m.MentionedUser)
+                        .ThenInclude(u => u.Avatar)
+            );
+
+            var rootDtos = _mapper.Map<List<CommentResponse>>(rootComments);
+            var replyDtos = _mapper.Map<List<CommentResponse>>(replies);
+            var mentionDtos = _mapper.Map<List<MentionedUserResponse>>(mentions);
+
+            var replyLookup = replyDtos
+                .GroupBy(r => r.ParentCommentId!.Value)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var root in rootDtos)
+            {
+                if (replyLookup.TryGetValue(root.Id, out var children))
+                    root.Replies = children;
+            }
+
+            var mentionLookup = mentionDtos
+                .GroupBy(m => m.CommentId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            void AttachMentions(CommentResponse c)
+            {
+                if (mentionLookup.TryGetValue(c.Id, out var m))
+                    c.Mentions = m;
+
+                foreach (var r in c.Replies)
+                    AttachMentions(r);
+            }
+
+            foreach (var root in rootDtos)
+                AttachMentions(root);
+
+            return rootDtos;
         }
 
         public async Task DeleteCommentAsync(Guid userId, Guid commentId, DeleteMode mode)

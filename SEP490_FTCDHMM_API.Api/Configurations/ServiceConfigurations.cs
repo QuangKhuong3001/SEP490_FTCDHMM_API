@@ -47,8 +47,15 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             // Connect with SQL Server
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("MyCnn"),
-                        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+               options.UseSqlServer(
+                   configuration.GetConnectionString("MyCnn"),
+                   o =>
+                   {
+                       o.CommandTimeout(300);
+                       o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                   }
+               ));
+
 
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -62,8 +69,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 options.ConnectTimeout = 10000;
                 options.SyncTimeout = 10000;
 
-                //options.Ssl = true;
-                //options.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+                options.Ssl = true;
+                options.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
                 options.CheckCertificateRevocation = false;
 
                 return ConnectionMultiplexer.Connect(options);
@@ -295,6 +302,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IIngredientDetectionService, IngredientDetectionService>();
             //comment rating
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<ICommentMentionRepository, CommentMentionRepository>();
             services.AddScoped<IRatingService, RatingService>();
 
             //healthgoal

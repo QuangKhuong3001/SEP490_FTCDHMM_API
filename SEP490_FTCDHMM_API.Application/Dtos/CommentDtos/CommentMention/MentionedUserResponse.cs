@@ -2,6 +2,7 @@
 {
     public class MentionedUserResponse
     {
+        public Guid CommentId { get; set; }
         public Guid MentionedUserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;

@@ -22,6 +22,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasForeignKey(x => x.MentionedUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasIndex(x => x.CommentId)
+                .HasDatabaseName("IX_CommentMentions_CommentId");
         }
     }
 }
