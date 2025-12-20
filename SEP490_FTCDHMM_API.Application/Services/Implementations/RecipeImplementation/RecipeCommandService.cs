@@ -75,7 +75,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
             await _validator.ValidateTaggedUsersAsync(userId, request.TaggedUserIds);
 
-            var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
+            var draftExist = await _draftRecipeRepository.GetByIdAsync(request.DraftId ?? new Guid());
             if (draftExist != null)
                 await _draftRecipeRepository.DeleteAsync(draftExist);
 
@@ -113,7 +113,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image, null);
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;
@@ -292,10 +292,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 parentIdToSet = parent.ParentId.Value;
             }
 
-            var draftExist = await _draftRecipeRepository.GetDraftByAuthorIdAsync(userId);
-            if (draftExist != null)
-                await _draftRecipeRepository.DeleteAsync(draftExist);
-
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
             var recipe = new Recipe
@@ -331,7 +327,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageId);
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;

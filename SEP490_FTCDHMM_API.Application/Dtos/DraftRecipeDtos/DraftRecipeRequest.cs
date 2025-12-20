@@ -11,6 +11,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos
         public string Difficulty { get; set; } = string.Empty;
         public int CookTime { get; set; }
         public FileUploadModel? Image { get; set; }
+        public string? ExistingMainImageUrl { get; set; }
         public int? Ration { get; set; }
         public List<Guid> LabelIds { get; set; } = new();
         public List<DraftRecipeIngredientRequest> Ingredients { get; set; } = new();

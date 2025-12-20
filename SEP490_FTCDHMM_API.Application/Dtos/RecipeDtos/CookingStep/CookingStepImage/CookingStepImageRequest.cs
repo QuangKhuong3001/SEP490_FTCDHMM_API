@@ -5,6 +5,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.CookingStep.CookingStep
     public class CookingStepImageRequest
     {
         public FileUploadModel Image { get; set; } = null!;
+        public string? ExistingImageUrl { get; set; }
         public int ImageOrder { get; set; }
     }
 }

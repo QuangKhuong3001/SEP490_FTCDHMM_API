@@ -6,7 +6,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
 {
     public interface IRecipeImageService
     {
-        Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file);
+        Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file, string? url);
         Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file);
         Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe);
         Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps);

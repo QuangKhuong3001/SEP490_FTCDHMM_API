@@ -23,35 +23,33 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _cookingStepRepository = cookingStepRepository;
         }
 
-        public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file)
+        public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file, string? url)
         {
-            if (file == null)
-                return;
-
-            var uploaded = await _imageService.UploadImageAsync(
-                file,
-                StorageFolder.RECIPES
-            );
-
-            recipe.Image = uploaded;
+            if (file != null)
+            {
+                var uploaded = await _imageService.UploadImageAsync(file, StorageFolder.RECIPES);
+                recipe.Image = uploaded;
+            }
+            else if (url != null)
+            {
+                var mirrored = await _imageService.MirrorExternalImageAsync(StorageFolder.RECIPES, url);
+                recipe.Image = mirrored;
+            }
         }
 
         public async Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file)
         {
-            if (file == null)
-                return;
-
-            if (recipe.ImageId.HasValue)
+            if (file != null)
             {
-                await _imageService.DeleteImageAsync(recipe.ImageId.Value);
+                if (recipe.ImageId.HasValue)
+                {
+                    await _imageService.DeleteImageAsync(recipe.ImageId.Value);
+                }
+
+                var newImage = await _imageService.UploadImageAsync(file, StorageFolder.RECIPES);
+
+                recipe.Image = newImage;
             }
-
-            var newImage = await _imageService.UploadImageAsync(
-                file,
-                StorageFolder.RECIPES
-                );
-
-            recipe.Image = newImage;
         }
 
         public async Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe)
@@ -75,18 +73,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
                     foreach (var img in imageRequests)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(
-                            img.Image,
-                            StorageFolder.COOKING_STEPS
-                        );
-
-                        newStep.CookingStepImages.Add(new CookingStepImage
+                        if (img.Image != null)
                         {
-                            Id = Guid.NewGuid(),
-                            CookingStepId = newStep.Id,
-                            ImageOrder = img.ImageOrder,
-                            ImageId = uploaded.Id
-                        });
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.COOKING_STEPS);
+
+                            newStep.CookingStepImages.Add(new CookingStepImage
+                            {
+                                Id = Guid.NewGuid(),
+                                CookingStepId = newStep.Id,
+                                ImageOrder = img.ImageOrder,
+                                ImageId = uploaded.Id
+                            });
+                        }
+                        else if (img.ExistingImageUrl != null)
+                        {
+                            var mirrored = await _imageService.MirrorExternalImageAsync(StorageFolder.COOKING_STEPS, img.ExistingImageUrl);
+                            newStep.CookingStepImages.Add(new CookingStepImage
+                            {
+                                Id = Guid.NewGuid(),
+                                CookingStepId = newStep.Id,
+                                ImageOrder = img.ImageOrder,
+                                ImageId = mirrored.Id
+                            });
+                        }
                     }
                 }
 
@@ -131,18 +140,29 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
                     foreach (var img in imageRequests)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(
-                            img.Image,
-                            StorageFolder.COOKING_STEPS
-                        );
-
-                        newStep.CookingStepImages.Add(new CookingStepImage
+                        if (img.Image != null)
                         {
-                            Id = Guid.NewGuid(),
-                            CookingStepId = newStep.Id,
-                            ImageOrder = img.ImageOrder,
-                            ImageId = uploaded.Id
-                        });
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.COOKING_STEPS);
+
+                            newStep.CookingStepImages.Add(new CookingStepImage
+                            {
+                                Id = Guid.NewGuid(),
+                                CookingStepId = newStep.Id,
+                                ImageOrder = img.ImageOrder,
+                                ImageId = uploaded.Id
+                            });
+                        }
+                        else if (img.ExistingImageUrl != null)
+                        {
+                            var mirrored = await _imageService.MirrorExternalImageAsync(StorageFolder.COOKING_STEPS, img.ExistingImageUrl);
+                            newStep.CookingStepImages.Add(new CookingStepImage
+                            {
+                                Id = Guid.NewGuid(),
+                                CookingStepId = newStep.Id,
+                                ImageOrder = img.ImageOrder,
+                                ImageId = mirrored.Id
+                            });
+                        }
                     }
                 }
 
@@ -151,7 +171,5 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await _cookingStepRepository.AddRangeAsync(newStepEntities);
         }
-
-
     }
 }

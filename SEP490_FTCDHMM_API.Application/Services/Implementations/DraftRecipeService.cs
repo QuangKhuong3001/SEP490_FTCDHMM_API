@@ -129,13 +129,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
-
-                        step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                        if (img.Image != null)
                         {
-                            ImageOrder = img.ImageOrder,
-                            Image = uploaded
-                        });
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
+                            step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                            {
+                                ImageOrder = img.ImageOrder,
+                                Image = uploaded
+                            });
+                        }
                     }
                 }
 
@@ -211,6 +213,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 var uploaded = await _imageService.UploadImageAsync(request.Image, StorageFolder.DRAFTS);
                 draft.Image = uploaded;
             }
+            else if (request.ExistingMainImageUrl != null)
+            {
+                var existing = await _imageService.MirrorExternalImageAsync(StorageFolder.DRAFTS, request.ExistingMainImageUrl);
+                draft.Image = existing;
+            }
 
             draft.DraftRecipeIngredients = request.Ingredients.Select(i => new DraftRecipeIngredient
             {
@@ -247,13 +254,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
                     foreach (var img in s.Images)
                     {
-                        var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
-
-                        step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                        if (img.Image != null)
                         {
-                            ImageOrder = img.ImageOrder,
-                            Image = uploaded
-                        });
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.DRAFT_COOKING_STEPS);
+                            step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                            {
+                                ImageOrder = img.ImageOrder,
+                                Image = uploaded
+                            });
+                        }
+                        else if (img.ExistingImageUrl != null)
+                        {
+                            var existing = await _imageService.MirrorExternalImageAsync(StorageFolder.DRAFT_COOKING_STEPS, img.ExistingImageUrl);
+                            step.DraftCookingStepImages.Add(new DraftCookingStepImage
+                            {
+                                ImageOrder = img.ImageOrder,
+                                Image = existing
+                            });
+                        }
                     }
                 }
 
