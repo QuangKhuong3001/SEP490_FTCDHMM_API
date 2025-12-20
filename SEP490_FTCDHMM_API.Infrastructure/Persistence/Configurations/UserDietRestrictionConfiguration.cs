@@ -40,6 +40,16 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .WithMany()
                    .HasForeignKey(x => x.IngredientCategoryId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => new { x.UserId, x.ExpiredAtUtc })
+                .HasDatabaseName("IX_DietRestrictions_User_Active");
+
+            builder.HasIndex(x => x.IngredientId)
+                .HasDatabaseName("IX_DietRestrictions_Ingredient");
+
+            builder.HasIndex(x => x.IngredientCategoryId)
+                .HasDatabaseName("IX_DietRestrictions_Category");
+
         }
     }
 }

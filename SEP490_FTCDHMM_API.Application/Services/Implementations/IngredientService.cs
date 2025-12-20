@@ -103,6 +103,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             );
 
             var result = _mapper.Map<List<IngredientResponse>>(ingredients);
+            foreach (var item in result)
+            {
+                item.IsNew = false;
+            }
 
             return new PagedResult<IngredientResponse>
             {

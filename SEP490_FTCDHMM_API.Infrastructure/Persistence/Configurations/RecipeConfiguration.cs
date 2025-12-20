@@ -88,6 +88,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .WithOne()
                 .HasForeignKey<Recipe>(r => r.ImageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(r => new { r.Status, r.UpdatedAtUtc })
+                .HasDatabaseName("IX_Recipes_Status_Updated");
+
+            builder.HasIndex(r => r.AuthorId)
+                .HasDatabaseName("IX_Recipes_Author");
+
         }
     }
 }

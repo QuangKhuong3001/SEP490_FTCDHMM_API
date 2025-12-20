@@ -23,6 +23,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(f => f.CreatedAtUtc).IsRequired();
+
+            builder.HasIndex(x => new { x.RecipeId, x.CreatedAtUtc })
+                .HasDatabaseName("IX_SaveRecipes_Recipe_Time");
+
         }
     }
 }

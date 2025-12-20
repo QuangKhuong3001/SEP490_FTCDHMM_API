@@ -33,6 +33,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                     .WithMany(u => u.HealthMetrics)
                    .HasForeignKey(x => x.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(x => new { x.UserId, x.RecordedAt })
+                .HasDatabaseName("IX_UserHealthMetrics_User_Time");
+
         }
     }
 }

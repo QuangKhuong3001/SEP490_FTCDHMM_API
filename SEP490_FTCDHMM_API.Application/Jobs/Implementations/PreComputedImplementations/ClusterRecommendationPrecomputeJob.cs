@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces.PreComputedInterfaces;
-using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Enum;
 
 namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImplementations
@@ -16,7 +16,7 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
         private readonly ICacheService _cache;
         private readonly IMapper _mapper;
 
-        private const int pageSize = 10;
+        private const int PageSize = 20;
 
         public ClusterRecommendationPrecomputeJob(
             IRecipeRepository recipeRepository,
@@ -34,22 +34,21 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
         {
             await _cache.RemoveByPrefixAsync("recommend");
 
-            var recipes = await _recipeRepository.GetActiveRecentRecipesAsync();
-            if (!recipes.Any())
+            var snapshots = await _recipeRepository.GetRecipesForScoringAsync();
+            if (!snapshots.Any())
                 return;
 
             var clusters = await _cache.HashGetAllAsync<ClusterProfile>("cluster:profiles");
-
             if (!clusters.Any())
                 return;
 
-            await Precompute(recipes, clusters, MealType.Breakfast, new TimeSpan(8, 0, 0));
-            await Precompute(recipes, clusters, MealType.Lunch, new TimeSpan(13, 0, 0));
-            await Precompute(recipes, clusters, MealType.Dinner, new TimeSpan(19, 0, 0));
+            await Precompute(snapshots, clusters, MealType.Breakfast, new TimeSpan(8, 0, 0));
+            await Precompute(snapshots, clusters, MealType.Lunch, new TimeSpan(13, 0, 0));
+            await Precompute(snapshots, clusters, MealType.Dinner, new TimeSpan(19, 0, 0));
         }
 
         private async Task Precompute(
-            List<Recipe> recipes,
+            List<RecipeScoringSnapshot> recipes,
             List<ClusterProfile> clusters,
             MealType meal,
             TimeSpan time)
@@ -61,27 +60,35 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
                 var scored = recipes
                     .Select(r => new
                     {
-                        Recipe = r,
+                        r.Id,
+                        r.UpdatedAtUtc,
                         Score = _clusterScoring.CalculateClusterScore(r, cluster, time)
                     })
                     .OrderByDescending(x => x.Score)
-                    .ThenByDescending(x => x.Recipe.UpdatedAtUtc)
-                    .Take(pageSize)
+                    .ThenByDescending(x => x.UpdatedAtUtc)
+                    .Take(PageSize)
                     .ToList();
 
+                var recipeIds = scored.Select(x => x.Id).ToList();
+
+                var fullRecipes = await _recipeRepository.Query()
+                    .Where(r => recipeIds.Contains(r.Id))
+                    .ToListAsync();
+
+                var map = fullRecipes.ToDictionary(r => r.Id);
+
                 var ranked = _mapper.Map<List<RecipeRankResponse>>(
-                    scored.Select(x => x.Recipe).ToList()
+                    scored.Select(x => map[x.Id]).ToList()
                 );
 
                 for (var i = 0; i < ranked.Count; i++)
                     ranked[i].Score = scored[i].Score;
 
                 await _cache.SetAsync(
-                    $"recommend:cluster:{cluster.ClusterId}:meal:{mealKey}:page:1",
+                    $"recommend:cluster:{cluster.ClusterId}:meal:{mealKey}:page:0",
                     ranked,
                     TimeSpan.FromHours(24));
             }
         }
-
     }
 }

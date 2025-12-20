@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
-using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Enum;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Infrastructure.ModelSettings;
@@ -10,245 +10,210 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 {
     public class RecipeScoringSystem : IRecipeScoringSystem
     {
-        private readonly FitScoreWeightsSettings _weightsSettings;
+        private readonly FitScoreWeightsSettings _weights;
+        private readonly MealDistributionSettings _mealDistribution;
         private readonly INutrientIdProvider _nutrientIdProvider;
-        private readonly MealDistributionSettings _mealDistributionSettings;
 
         public RecipeScoringSystem(
-            IOptions<FitScoreWeightsSettings> weightsSettings,
-            IOptions<MealDistributionSettings> mealDistributionSettings,
+            IOptions<FitScoreWeightsSettings> weights,
+            IOptions<MealDistributionSettings> mealDistribution,
             INutrientIdProvider nutrientIdProvider)
         {
-            _mealDistributionSettings = mealDistributionSettings.Value;
-            _weightsSettings = weightsSettings.Value;
+            _weights = weights.Value;
+            _mealDistribution = mealDistribution.Value;
             _nutrientIdProvider = nutrientIdProvider;
         }
 
-        public double CalculateFinalScore(AppUser user, Recipe recipe)
+        public double CalculateFinalScore(
+            RecommendationUserContext user,
+            RecipeScoringSnapshot recipe)
         {
-            var nutrientFit = 0d;
+            if (IsRestricted(user, recipe))
+                return 0;
 
-            var currentGoal = user.UserHealthGoals
-                .FirstOrDefault(g => g.StartedAtUtc < DateTime.UtcNow && g.ExpiredAtUtc > DateTime.UtcNow);
-            if (currentGoal != null)
-            {
-                nutrientFit = CalculateNutrientFit(recipe, currentGoal);
-            }
+            var nutrientFit = CalculateNutrientFit(recipe, user.Targets);
+            var tdeeFit = CalculateTdeeFit(recipe, user.Tdee);
+            var behaviorFit = CalculateBehaviorFit(recipe, user);
 
-            var tdeeFit = CalculateTdeeFit(recipe, user.HealthMetrics.FirstOrDefault());
-            var behaviorFit = this.CalculateBehaviorFit(recipe, user);
+            var totalWeight =
+                _weights.Nutrient +
+                _weights.Tdee +
+                _weights.Behavior;
 
-            var finalScore =
-                (_weightsSettings.Nutrient * nutrientFit
-                + _weightsSettings.Tdee * tdeeFit
-                + _weightsSettings.Behavior * behaviorFit
-                )
-                /
-                (_weightsSettings.Nutrient
-                + _weightsSettings.Tdee
-                + _weightsSettings.Behavior
-                );
+            if (totalWeight == 0)
+                return 0;
 
-            return finalScore;
+            return
+                (_weights.Nutrient * nutrientFit +
+                 _weights.Tdee * tdeeFit +
+                 _weights.Behavior * behaviorFit)
+                / totalWeight;
         }
-        private double CalculateNutrientFit(Recipe recipe, UserHealthGoal? userGoal)
+
+        private bool IsRestricted(
+            RecommendationUserContext user,
+            RecipeScoringSnapshot recipe)
         {
-            if (recipe == null || userGoal == null)
+            if (!user.RestrictedIngredientIds.Any() &&
+                !user.RestrictedCategoryIds.Any())
+                return false;
+
+            if (recipe.IngredientIds.Any(user.RestrictedIngredientIds.Contains))
+                return true;
+
+            return recipe.IngredientCategoryIds.Any(user.RestrictedCategoryIds.Contains);
+        }
+
+        private double CalculateNutrientFit(
+            RecipeScoringSnapshot recipe,
+            List<NutrientTargetDto> targets)
+        {
+            if (!targets.Any())
                 return 0;
 
-            IEnumerable<HealthGoalTarget>? targets = null;
-
-            if (userGoal.Type == HealthGoalType.SYSTEM)
-                targets = userGoal.HealthGoal?.Targets;
-
-            else if (userGoal.Type == HealthGoalType.CUSTOM)
-                targets = userGoal.CustomHealthGoal?.Targets;
-
-            if (targets == null || !targets.Any())
-                return 0;
-
-            var nutrientDict = recipe.NutritionAggregates
+            var nutrientMap = recipe.NutritionAggregates
                 .GroupBy(n => n.NutrientId)
                 .ToDictionary(g => g.Key, g => g.First().AmountPerServing);
 
-            double totalScore = 0;
+            double total = 0;
             int count = 0;
+            var perServingCalories = recipe.Calories / recipe.Ration;
 
-            foreach (var target in targets)
+            foreach (var t in targets)
             {
-                if (!nutrientDict.TryGetValue(target.NutrientId, out var recipeAmount))
+                if (!nutrientMap.TryGetValue(t.NutrientId, out var amount))
                     continue;
 
-                double score;
+                double score = t.TargetType == NutrientTargetType.Absolute
+                    ? ScoreAbsolute(amount, t)
+                    : ScorePercentage(amount, t, perServingCalories);
 
-                if (target.TargetType == NutrientTargetType.Absolute)
-                {
-                    score = CalculateAbsoluteNutrientScore(recipeAmount, target);
-                }
-                else
-                {
-                    score = CalculatePercentageNutrientScore(recipeAmount, target, recipe.Calories);
-                }
-
-                score = Math.Clamp(score, 0, 1);
-
-                totalScore += score;
+                total += Math.Clamp(score, 0, 1);
                 count++;
             }
 
-            return count == 0 ? 0 : totalScore / count;
+            return count == 0 ? 0 : total / count;
         }
 
-        private double CalculateAbsoluteNutrientScore(decimal recipeAmount, HealthGoalTarget target)
+        private double ScoreAbsolute(decimal value, NutrientTargetDto t)
         {
-            var score = 0.0;
-            if (recipeAmount < target.MinValue!.Value)
-            {
-                var diff = (double)(target.MinValue.Value - recipeAmount);
-                score = 1 - diff / (double)target.MinValue.Value;
-            }
-            else if (recipeAmount > target.MaxValue!.Value)
-            {
-                var diff = (double)(recipeAmount - target.MaxValue.Value);
-                score = 1 - diff / (double)target.MaxValue.Value;
-            }
-            else
-            {
-                score = 1;
-            }
+            if (value < t.MinValue)
+                return 1 - (double)((t.MinValue - value) / t.MinValue);
 
-            score *= (double)target.Weight;
+            if (value > t.MaxValue)
+                return 1 - (double)((value - t.MaxValue) / t.MaxValue);
 
-            return Math.Clamp(score, 0, 1);
+            return 1;
         }
 
-        private double CalculatePercentageNutrientScore(decimal recipeAmount,
-                                                HealthGoalTarget target,
-                                                decimal recipeCalories)
+        private double ScorePercentage(
+            decimal amount,
+            NutrientTargetDto t,
+            decimal calories)
         {
-            if (recipeCalories <= 0)
+            if (calories <= 0)
                 return 0;
 
-            double amount = (double)recipeAmount;
-            double calories = (double)recipeCalories;
-
-            double kcalPerGram = GetMacroCaloriesPerGram(target.NutrientId);
+            var kcalPerGram = GetMacroCaloriesPerGram(t.NutrientId);
             if (kcalPerGram == 0)
                 return 0;
 
-            double kcal = amount * kcalPerGram;
-            double pct = (kcal / calories) * 100;
+            var pct = ((double)amount * kcalPerGram) / (double)calories * 100;
 
-            double minPct = (double)target.MinEnergyPct!;
+            var minPct = t.MinEnergyPct.HasValue
+                ? (double)t.MinEnergyPct.Value
+                : 0;
 
-            double maxPct = (double)target.MaxEnergyPct!;
-
-            double score;
+            var maxPct = t.MaxEnergyPct.HasValue
+                ? (double)t.MaxEnergyPct.Value
+                : 100;
 
             if (pct < minPct)
             {
-                double diff = minPct - pct;
-                score = 1 - diff / minPct;
-            }
-            else if (pct > maxPct)
-            {
-                double diff = pct - maxPct;
-                score = 1 - diff / maxPct;
-            }
-            else
-            {
-                score = 1;
+                var diff = minPct - pct;
+                return Math.Clamp(1 - diff / minPct, 0, 1);
             }
 
-            score *= (double)target.Weight;
+            if (pct > maxPct)
+            {
+                var diff = pct - maxPct;
+                return Math.Clamp(1 - diff / maxPct, 0, 1);
+            }
 
-            return Math.Clamp(score, 0, 1);
+            return 1;
         }
 
-        private MealType GetCurrentMeal()
+        private double CalculateTdeeFit(RecipeScoringSnapshot recipe, double tdee)
+        {
+            if (tdee <= 0)
+                return 0;
+
+            var mealPct = GetMealDistribution();
+            var targetCalories = tdee * mealPct;
+            var perServing = (double)recipe.Calories / recipe.Ration;
+
+            var diff = Math.Abs(perServing - targetCalories);
+            return Math.Clamp(1 - diff / targetCalories, 0, 1);
+        }
+
+        private double CalculateBehaviorFit(RecipeScoringSnapshot recipe, RecommendationUserContext user)
+        {
+            if (recipe.LabelIds.Count == 0)
+                return 0;
+
+            double viewRatio = CalculateLabelRatio(
+                recipe.LabelIds,
+                user.ViewByLabel
+            );
+
+            double commentRatio = CalculateLabelRatio(
+                recipe.LabelIds,
+                user.CommentByLabel
+            );
+
+            double ratingRatio = CalculateLabelRatio(
+                recipe.LabelIds,
+                user.RatingByLabel
+            );
+
+            double saveRatio = CalculateLabelRatio(
+                recipe.LabelIds,
+                user.SaveByLabel
+            );
+
+            return
+                0.3 * ratingRatio +
+                0.4 * saveRatio +
+                0.2 * commentRatio +
+                0.1 * viewRatio;
+        }
+
+        private double CalculateLabelRatio(List<Guid> recipeLabels, Dictionary<Guid, int> userLabelStats)
+        {
+            if (userLabelStats.Count == 0)
+                return 0;
+
+            var total = userLabelStats.Values.Sum();
+            if (total == 0)
+                return 0;
+
+            var matched = recipeLabels
+                .Where(l => userLabelStats.ContainsKey(l))
+                .Sum(l => userLabelStats[l]);
+
+            return Math.Clamp((double)matched / total, 0, 1);
+        }
+
+        private double GetMealDistribution()
         {
             var now = DateTime.Now.TimeOfDay;
 
-            if (now >= new TimeSpan(5, 0, 0) && now < new TimeSpan(11, 0, 0))
-                return MealType.Breakfast;
+            if (now < new TimeSpan(11, 0, 0))
+                return _mealDistribution.Breakfast;
+            if (now < new TimeSpan(16, 0, 0))
+                return _mealDistribution.Lunch;
 
-            if (now >= new TimeSpan(11, 0, 0) && now < new TimeSpan(16, 0, 0))
-                return MealType.Lunch;
-
-            return MealType.Dinner;
-        }
-        private double CalculateTdeeFit(Recipe recipe, UserHealthMetric? metric)
-        {
-            if (metric == null)
-                return 0;
-
-            var meal = GetCurrentMeal();
-
-            double mealPct = meal switch
-            {
-                MealType.Breakfast => _mealDistributionSettings.Breakfast,
-                MealType.Lunch => _mealDistributionSettings.Lunch,
-                MealType.Dinner => _mealDistributionSettings.Dinner,
-                _ => 1.0 / 3.0
-            };
-
-            double tdee = (double)metric.TDEE;
-            double targetCalories = tdee * mealPct;
-
-            var caloriesPerServing = (double)recipe.Calories / recipe.Ration;
-
-            double diff = Math.Abs(caloriesPerServing - (double)targetCalories);
-            double score = 1 - diff / (double)targetCalories;
-
-            return Math.Clamp(score, 0, 1);
-        }
-
-        public double CalculateBehaviorFit(Recipe recipe, AppUser user)
-        {
-            if (recipe.Labels == null || recipe.Labels.Count == 0)
-                return 0;
-
-            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
-
-            var recentViews = user.ViewedRecipes
-                .Where(v => v.ViewedAtUtc >= oneWeekAgo)
-                .ToList();
-
-            var recentSaves = user.SaveRecipes
-                .Where(s => s.CreatedAtUtc >= oneWeekAgo)
-                .ToList();
-
-            var recentRatings = user.Ratings
-                .Where(s => s.CreatedAtUtc >= oneWeekAgo)
-                .ToList();
-
-            double viewAffinity = 0;
-            double saveAffinity = 0;
-            double ratingAffinity = 0;
-
-            int labelCount = recipe.Labels.Count;
-
-            double totalViews = recentViews.Count;
-            double totalSaves = recentSaves.Count;
-            double totalRatings = recentRatings.Count;
-
-            foreach (var label in recipe.Labels)
-            {
-                var viewCount = recentViews.Count(v => v.Recipe.Labels.Any(l => l.Id == label.Id));
-                viewAffinity += totalViews == 0 ? 0 : (viewCount / totalViews);
-
-                var saveCount = recentSaves.Count(s => s.Recipe.Labels.Any(l => l.Id == label.Id));
-                saveAffinity += totalSaves == 0 ? 0 : (saveCount / totalSaves);
-
-                var ratingCount = recentRatings.Count(r => r.Recipe.Labels.Any(l => l.Id == label.Id));
-                ratingAffinity += totalRatings == 0 ? 0 : (ratingCount / totalRatings);
-            }
-
-            double score =
-                (viewAffinity + saveAffinity + ratingAffinity)
-                / (labelCount * 3);
-
-            return Math.Clamp(score, 0, 1);
+            return _mealDistribution.Dinner;
         }
 
         private double GetMacroCaloriesPerGram(Guid nutrientId)

@@ -38,7 +38,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                 .HasDatabaseName("IX_Comments_Recipe_Parent");
 
             builder.HasIndex(c => c.ParentCommentId)
-                   .HasDatabaseName("IX_Comments_Parent");
+                .HasDatabaseName("IX_Comments_Parent");
+
+            builder.HasIndex(c => new { c.RecipeId, c.CreatedAtUtc })
+                .HasDatabaseName("IX_Comments_Recipe_Created");
         }
     }
 }

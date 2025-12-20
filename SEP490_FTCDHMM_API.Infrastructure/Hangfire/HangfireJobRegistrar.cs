@@ -40,7 +40,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Hangfire
             RecurringJob.AddOrUpdate(
                 recurringJobId: "cluster-assignment",
                 methodCall: () => clusterAssignmentJob.ExecuteAsync(),
-                cronExpression: "0 2 * * *",
+                cronExpression: "0 4 * * *",
                 options: new RecurringJobOptions
                 {
                     TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),
@@ -54,7 +54,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Hangfire
             RecurringJob.AddOrUpdate(
                 recurringJobId: "cluster-recommendation-precompute",
                 methodCall: () => clusterRecommendationPrecomputeJob.ExecuteAsync(),
-                cronExpression: "0 3 * * *",
+                cronExpression: "0 5 * * *",
                 options: new RecurringJobOptions
                 {
                     TimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"),

@@ -44,6 +44,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.StartedAtUtc)
                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.HasIndex(x => new { x.UserId, x.StartedAtUtc, x.ExpiredAtUtc })
+                .HasDatabaseName("IX_UserHealthGoals_Active");
+
         }
     }
 }

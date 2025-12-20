@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Specifications;
@@ -61,28 +62,36 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
         }
 
 
-        public async Task<List<Recipe>> GetActiveRecentRecipesAsync()
+        public async Task<List<RecipeScoringSnapshot>> GetRecipesForScoringAsync()
         {
             var oneYearAgo = DateTime.UtcNow.AddMonths(-12);
 
-            var recipes = await _context.Recipes
+            return await _context.Recipes
+                .AsNoTracking()
                 .Where(r => r.Status == RecipeStatus.Posted &&
                             r.UpdatedAtUtc >= oneYearAgo)
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(r => r.Ingredient)
-                        .ThenInclude(r => r.IngredientNutrients)
-                .Include(r => r.Author)
-                    .ThenInclude(a => a.Avatar)
-                .Include(r => r.Image)
-                .Include(r => r.Labels)
-                .Include(r => r.NutritionAggregates)
-                    .ThenInclude(na => na.Nutrient)
+                .OrderByDescending(r => r.UpdatedAtUtc)
+                .Select(r => new RecipeScoringSnapshot
+                {
+                    Id = r.Id,
+                    UpdatedAtUtc = r.UpdatedAtUtc,
+                    NutritionAggregates = r.NutritionAggregates.Select(na => new NutrientSnapshot
+                    {
+                        NutrientId = na.NutrientId,
+                        AmountPerServing = na.AmountPerServing
+                    }).ToList(),
+                    Calories = r.Calories,
+                    Ration = r.Ration,
+                    LabelIds = r.Labels.Select(l => l.Id).ToList(),
+                    IngredientIds = r.RecipeIngredients.Select(ri => ri.IngredientId).ToList(),
+                    IngredientCategoryIds = r.RecipeIngredients
+                        .SelectMany(ri => ri.Ingredient.Categories.Select(c => c.Id))
+                        .ToList()
+                })
+                .Take(1000)
                 .ToListAsync();
-
-            var sorted = recipes.OrderByDescending(r => r.UpdatedAtUtc);
-
-            return sorted.Take(500).ToList();
         }
+
 
     }
 }

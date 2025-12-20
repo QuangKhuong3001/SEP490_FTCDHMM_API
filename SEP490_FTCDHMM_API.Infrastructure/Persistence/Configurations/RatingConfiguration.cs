@@ -33,6 +33,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence.Configurations
                    .WithMany(rp => rp.Ratings)
                    .HasForeignKey(r => r.RecipeId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(r => new { r.RecipeId, r.CreatedAtUtc })
+                .HasDatabaseName("IX_Ratings_Recipe_Time");
+
         }
     }
 }

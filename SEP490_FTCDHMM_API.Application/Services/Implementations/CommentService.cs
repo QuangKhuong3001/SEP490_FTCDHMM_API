@@ -158,7 +158,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                         .ThenInclude(u => u.Avatar)
             );
 
-            var rootDtos = _mapper.Map<List<CommentResponse>>(rootComments);
+            var rootDtos = _mapper.Map<List<CommentResponse>>(rootComments).OrderByDescending(i => i.CreatedAtUtc).ToList();
             var replyDtos = _mapper.Map<List<CommentResponse>>(replies);
             var mentionDtos = _mapper.Map<List<MentionedUserResponse>>(mentions);
 

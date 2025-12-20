@@ -15,6 +15,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
+
+        public IQueryable<T> Query()
+        => _dbContext.Set<T>();
+
         public async Task<T?> GetByIdAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             IQueryable<T> query = _dbContext.Set<T>();
