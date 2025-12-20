@@ -19,6 +19,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
         [Range(1, 1440, ErrorMessage = "Thời gian nấu phải từ 1-1440 phút")]
         public int CookTime { get; set; }
         public IFormFile? Image { get; set; }
+        public string? ExistingMainImageId { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Khẩu phần ăn tối thiểu là 1")]
         public int Ration { get; set; }

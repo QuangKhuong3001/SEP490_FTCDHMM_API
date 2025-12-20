@@ -6,6 +6,8 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.RecipeDtos
 {
     public class CreateRecipeRequest
     {
+        public Guid? DraftId { get; set; }
+
         [Required(ErrorMessage = "Tên công thức không được để trống")]
         [StringLength(200, MinimumLength = 1, ErrorMessage = "Tên công thức phải từ 1-200 ký tự")]
         public string Name { get; set; } = string.Empty;
