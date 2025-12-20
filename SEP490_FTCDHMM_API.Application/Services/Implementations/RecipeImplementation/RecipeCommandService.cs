@@ -125,7 +125,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageId);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageUrl);
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;
@@ -339,7 +339,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageId);
+            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageUrl);
 
             var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
             recipe.CookingSteps = steps;

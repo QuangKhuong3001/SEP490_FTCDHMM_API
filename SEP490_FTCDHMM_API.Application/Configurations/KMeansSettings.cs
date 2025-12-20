@@ -2,6 +2,8 @@
 {
     public class KMeansSettings
     {
-        public int UserPerClusterRatio { get; set; }
+        public int MinK { get; set; } = 2;
+        public int MaxK { get; set; } = 6;
     }
+
 }

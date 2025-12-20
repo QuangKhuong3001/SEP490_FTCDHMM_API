@@ -37,6 +37,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.ClusterImpleme
             {
                 var activatingMetric = u.HealthMetrics.OrderByDescending(uh => uh.RecordedAt).FirstOrDefault();
 
+                var latestUserHealthGoal = u.HealthGoals
+                    .OrderByDescending(hg => hg.StartedAtUtc)
+                    .FirstOrDefault();
+
+                var healthGoal = latestUserHealthGoal?.HealthGoal;
+
+                if (activatingMetric == null || healthGoal == null)
+                    continue;
+
                 double tdee = 0;
                 if (activatingMetric != null)
                 {
@@ -44,12 +53,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.ClusterImpleme
                 }
 
                 double carbPct = 0, proteinPct = 0, fatPct = 0;
-
-                var latestUserHealthGoal = u.HealthGoals
-                    .OrderByDescending(hg => hg.StartedAtUtc)
-                    .FirstOrDefault();
-
-                var healthGoal = latestUserHealthGoal?.HealthGoal;
 
                 if (healthGoal != null)
                 {

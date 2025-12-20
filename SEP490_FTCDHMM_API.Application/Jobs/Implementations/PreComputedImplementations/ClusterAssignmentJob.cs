@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Configurations;
 using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
-using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Jobs.Interfaces.PreComputedInterfaces;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.ClusterInterfaces;
@@ -10,18 +9,15 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
 {
     private readonly IKMeansAppService _kMeansAppService;
     private readonly ICacheService _cache;
-    private readonly IUserRepository _userRepository;
     private readonly KMeansSettings _settings;
 
     public ClusterAssignmentJob(
         IKMeansAppService kMeansAppService,
         ICacheService cache,
-        IUserRepository userRepository,
         IOptions<KMeansSettings> settings)
     {
         _kMeansAppService = kMeansAppService;
         _cache = cache;
-        _userRepository = userRepository;
         _settings = settings.Value;
     }
 
@@ -30,9 +26,11 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
         await _cache.RemoveByPrefixAsync("cluster");
         await _cache.DeleteKeyAsync("cluster:profiles");
 
-        var userCount = await _userRepository.CountAsync();
+        var evaluation = await _kMeansAppService.EvaluateKAsync(
+            _settings.MinK,
+            _settings.MaxK);
 
-        var k = CalculateClusterCount(userCount);
+        var k = evaluation.BestK;
 
         var result = await _kMeansAppService.ComputeAsync(k);
 
@@ -61,16 +59,5 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
                 profile,
                 TimeSpan.FromDays(7));
         }
-
-    }
-
-    private int CalculateClusterCount(int userCount)
-    {
-        var estimated = userCount / _settings.UserPerClusterRatio;
-
-        if (estimated < 1)
-            return 1;
-
-        return estimated;
     }
 }
