@@ -23,6 +23,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _cookingStepRepository = cookingStepRepository;
         }
 
+        public async Task DeleteImageAsync(Guid? imageId)
+        {
+            if (imageId.HasValue)
+                await _imageService.DeleteImageAsync(imageId.Value);
+        }
+
         public async Task SetRecipeImageAsync(Recipe recipe, FileUploadModel? file, string? url)
         {
             if (file != null)

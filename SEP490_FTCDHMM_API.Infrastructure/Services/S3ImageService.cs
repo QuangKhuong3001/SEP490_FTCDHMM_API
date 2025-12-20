@@ -240,7 +240,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             {
                 var image = await _dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
                 if (image == null)
-                    throw new Exception("Image not found");
+                    throw new AppException(AppResponseCode.NOT_FOUND);
 
                 var deleteRequest = new DeleteObjectRequest
                 {

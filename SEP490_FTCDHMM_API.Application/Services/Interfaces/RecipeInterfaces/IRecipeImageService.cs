@@ -10,5 +10,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces
         Task ReplaceRecipeImageAsync(Recipe recipe, FileUploadModel? file);
         Task<List<CookingStep>> CreateCookingStepsAsync(IEnumerable<CookingStepRequest> steps, Recipe recipe);
         Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps);
+        Task DeleteImageAsync(Guid? imageId);
     }
 }

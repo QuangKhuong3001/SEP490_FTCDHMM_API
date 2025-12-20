@@ -4,6 +4,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.GoogleAuthDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.ExternalServices;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.Services;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Infrastructure.Services
@@ -45,6 +46,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             var picture = req.UserInfo?.PictureUrl ?? p.PictureUrl;
 
+            var userName = UsernameHelper.ExtractUserName(p.Email);
+
             Gender gender = Gender.Male;
             if (!string.IsNullOrWhiteSpace(req.UserInfo?.Gender))
             {
@@ -60,7 +63,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             {
                 user = new AppUser
                 {
-                    UserName = p.Email,
+                    UserName = userName,
                     Email = p.Email,
                     EmailConfirmed = p.EmailVerified,
                     FirstName = firstName,

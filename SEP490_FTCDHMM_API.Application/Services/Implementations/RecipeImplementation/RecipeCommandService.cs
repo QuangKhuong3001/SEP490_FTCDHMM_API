@@ -75,9 +75,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
             await _validator.ValidateTaggedUsersAsync(userId, request.TaggedUserIds);
 
-            var draftExist = await _draftRecipeRepository.GetByIdAsync(request.DraftId ?? new Guid());
+            var draftExist = await _draftRecipeRepository.GetByIdAsync(request.DraftId ?? new Guid(),
+                include: i => i.Include(d => d.DraftRecipeIngredients)
+                                .Include(d => d.DraftCookingSteps)
+                                .Include(d => d.Labels)
+                                .Include(d => d.DraftRecipeUserTags));
             if (draftExist != null)
+            {
+                await _imageService.DeleteImageAsync(draftExist.ImageId);
+
+                draftExist.Labels.Clear();
+                draftExist.DraftRecipeIngredients.Clear();
+                draftExist.DraftCookingSteps.Clear();
+                draftExist.DraftRecipeUserTags.Clear();
                 await _draftRecipeRepository.DeleteAsync(draftExist);
+            }
 
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
