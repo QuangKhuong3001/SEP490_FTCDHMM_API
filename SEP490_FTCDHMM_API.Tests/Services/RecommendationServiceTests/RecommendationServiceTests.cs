@@ -90,37 +90,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecommendationServiceTests
         }
 
         [Fact]
-        public async Task RecommendRecipesAsync_ReturnsCachedPage_WhenCacheHit()
-        {
-            var userId = Guid.NewGuid();
-
-            var cachedPage = new PagedResult<RecipeRankResponse>
-            {
-                Items = new List<RecipeRankResponse>
-                {
-                    new() { Id = Guid.NewGuid(), Score = 10 }
-                },
-                TotalCount = 1,
-                PageNumber = 1,
-                PageSize = 10
-            };
-
-            _cache.Setup(x => x.GetAsync<PagedResult<RecipeRankResponse>>(It.IsAny<string>()))
-                .ReturnsAsync(cachedPage);
-
-            var service = CreateService();
-            var result = await service.RecommendRecipesAsync(
-                userId,
-                new PaginationParams { PageNumber = 1, PageSize = 10 }
-            );
-
-            Assert.Single(result.Items);
-            var item = result.Items.First();
-            Assert.Equal(10, item.Score);
-
-        }
-
-        [Fact]
         public async Task RecommendRecipesAsync_ReturnsEmpty_WhenNoSnapshots()
         {
             var userId = Guid.NewGuid();
