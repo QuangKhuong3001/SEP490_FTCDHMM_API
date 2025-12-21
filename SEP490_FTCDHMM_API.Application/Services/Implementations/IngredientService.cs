@@ -492,10 +492,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var list = new List<IngredientNutrient>();
 
-            // Create a mapping dictionary for USDA nutrient names to system nutrient names
             var nutrientMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                // Vitamins
                 { "Vitamin A, RAE", "Vitamin A" },
                 { "Vitamin A, IU", "Vitamin A" },
                 { "Vitamin D (D2 + D3)", "Vitamin D" },
@@ -521,7 +519,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 { "Folate, food", "Folate (Folic Acid)" },
                 { "Folate, DFE", "Folate (Folic Acid)" },
 
-                // Minerals
                 { "Calcium, Ca", "Calcium" },
                 { "Iron, Fe", "Iron" },
                 { "Magnesium, Mg", "Magnesium" },
@@ -533,7 +530,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 { "Manganese, Mn", "Manganese" },
                 { "Selenium, Se", "Selenium" },
 
-                // Macronutrients
                 { "Protein", "Protein" },
                 { "Total lipid (fat)", "Fat" },
                 { "Carbohydrate, by difference", "Carbohydrate" },
@@ -543,14 +539,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 { "Cholesterol", "Cholesterol" }
             };
 
-            // Track which nutrients have already been added to avoid duplicates
             var addedNutrientIds = new HashSet<Guid>();
 
             foreach (var usda in detail.FoodNutrients)
             {
                 var usdaName = usda.Nutrient.Name;
 
-                // Try to find mapped name first
                 string? targetName = null;
                 if (nutrientMapping.TryGetValue(usdaName, out var mappedName))
                 {
@@ -558,7 +552,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 }
                 else
                 {
-                    // If no mapping found, try direct match
                     targetName = usdaName;
                 }
 
@@ -569,7 +562,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 if (sys == null)
                     continue;
 
-                // Skip if this nutrient has already been added (avoid duplicate key)
                 if (addedNutrientIds.Contains(sys.Id))
                     continue;
 

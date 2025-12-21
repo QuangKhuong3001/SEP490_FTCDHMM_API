@@ -50,6 +50,45 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             UnitOfWorkMock
                 .Setup(u => u.RegisterAfterCommit(It.IsAny<Func<Task>>()));
 
+            DraftRecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Func<IQueryable<DraftRecipe>, IQueryable<DraftRecipe>>>()
+                ))
+                .ReturnsAsync((DraftRecipe)null!);
+
+            DraftRecipeRepositoryMock
+                .Setup(r => r.DeleteAsync(It.IsAny<DraftRecipe>()))
+                .Returns(Task.CompletedTask);
+
+            RecipeRepositoryMock
+                .Setup(r => r.AddAsync(It.IsAny<Recipe>()))
+                .ReturnsAsync((Recipe r) => r);
+
+            RecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()
+                ))
+                .ReturnsAsync(CreateRecipe());
+
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            RecipeNutritionServiceMock
+                .Setup(n => n.AggregateRecipeAsync(It.IsAny<Recipe>()))
+                .Returns(Task.CompletedTask);
+
+            NotificationCommandServiceMock
+                .Setup(n => n.CreateAndSendNotificationAsync(
+                    It.IsAny<Guid?>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<NotificationType>(),
+                    It.IsAny<Guid?>()
+                ))
+                .Returns(Task.CompletedTask);
+
             Sut = new RecipeCommandService(
                 RecipeRepositoryMock.Object,
                 LabelRepositoryMock.Object,

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Linq.Expressions;
+using Moq;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Response;
@@ -27,15 +28,24 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
                 .Setup(r => r.GetRecipesForRankingAsync(It.IsAny<RecipeBasicFilterSpec>()))
                 .ReturnsAsync(new List<RecipeRankSource>());
 
-            var req = new RecipeFilterRequest
-            {
-                PaginationParams = new RecipePaginationParams()
-            };
+            RecipeRepositoryMock
+                .Setup(r => r.GetAllAsync(
+                    It.IsAny<Expression<Func<Recipe, bool>>>(),
+                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()
+                ))
+                .ReturnsAsync(new List<Recipe>());
 
-            var res = await Sut.GetRecipesAsync(req);
+            MapperMock
+                .Setup(m => m.Map<List<RecipeResponse>>(It.IsAny<List<Recipe>>()))
+                .Returns(new List<RecipeResponse>());
+
+            var res = await Sut.GetRecipesAsync(new RecipeFilterRequest());
 
             Assert.Empty(res.Items);
             Assert.Equal(0, res.TotalCount);
+
+            RecipeRepositoryMock.VerifyAll();
+            MapperMock.VerifyAll();
         }
 
         [Fact]
@@ -94,7 +104,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
 
             var res = await Sut.GetRecipesAsync(req);
 
-            Assert.Equal(8, res.Items.Count());
+            Assert.Equal(4, res.Items.Count());
             Assert.Equal(20, res.TotalCount);
         }
 

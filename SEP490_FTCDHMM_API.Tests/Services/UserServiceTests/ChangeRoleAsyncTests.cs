@@ -57,15 +57,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
         public async Task ChangeRoleAsync_ShouldUpdate_WhenValid()
         {
             var userId = Guid.NewGuid();
-            var req = new ChangeRoleRequest { RoleId = Guid.NewGuid() };
 
             var user = CreateUser(userId);
+
+            var req = new ChangeRoleRequest { RoleId = Guid.NewGuid(), LastUpdatedUtc = user.LastUpdatedUtc };
 
             var role = new AppRole
             {
                 Id = req.RoleId,
                 Name = "STAFF",
-                IsActive = true
+                IsActive = true,
             };
 
             UserRepositoryMock

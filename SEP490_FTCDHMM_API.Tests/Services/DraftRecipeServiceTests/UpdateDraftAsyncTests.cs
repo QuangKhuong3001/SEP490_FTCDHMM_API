@@ -170,6 +170,17 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
                     CreatedAtUTC = DateTime.UtcNow
                 });
 
+            UnitOfWorkMock
+                .Setup(u => u.RegisterAfterCommit(It.IsAny<Func<Task>>()))
+                .Callback<Func<Task>>(f => f());
+            ImageRepositoryMock
+                .Setup(i => i.MarkDeletedAsync(It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
+            ImageRepositoryMock
+                .Setup(i => i.MarkDeletedStepsImageFromDraftAsync(It.IsAny<DraftRecipe>()))
+                .Returns(Task.CompletedTask);
+
             await Sut.UpdateDraftAsync(userId, draftId, BuildValidRequest());
 
             DraftRecipeRepositoryMock.Verify(
@@ -180,5 +191,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
                 r => r.AddAsync(It.IsAny<DraftRecipe>()),
                 Times.Once);
         }
+
     }
 }

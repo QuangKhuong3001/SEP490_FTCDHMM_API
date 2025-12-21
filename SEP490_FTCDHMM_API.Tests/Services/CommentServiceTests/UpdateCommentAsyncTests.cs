@@ -283,6 +283,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 .ReturnsAsync(comment)
                 .ReturnsAsync(updatedComment);
 
+            NotificationCommandServiceMock
+                .Setup(n => n.CreateAndSendNotificationAsync(
+                    userId,
+                    It.IsAny<Guid>(),
+                    NotificationType.Mention,
+                    recipeId))
+                .Returns(Task.CompletedTask);
+
             RecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);

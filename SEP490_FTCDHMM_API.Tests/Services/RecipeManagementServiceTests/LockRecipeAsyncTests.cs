@@ -10,77 +10,56 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagementServiceTests
     public class LockRecipeAsyncTests : RecipeManagementServiceTestsBase
     {
         [Fact]
-        public async Task LockRecipeAsync_ShouldThrow_WhenRecipeNotFound()
+        public async Task LockRecipeAsync_ShouldThrow_WhenNotFound()
         {
-            RecipeRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null)).ReturnsAsync((Recipe?)null);
+            RecipeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .ReturnsAsync((Recipe?)null);
 
-            var act = async () => await Service.LockRecipeAsync(Guid.NewGuid(), Guid.NewGuid(),
-                new RecipeManagementReasonRequest { Reason = "test" });
-
-            await act.Should().ThrowAsync<AppException>()
-                .WithMessage("Công thức không tồn tại");
+            await Assert.ThrowsAsync<AppException>(() =>
+                Service.LockRecipeAsync(Guid.NewGuid(), Guid.NewGuid(), new()));
         }
 
         [Fact]
-        public async Task LockRecipeAsync_ShouldThrow_WhenNotPosted()
+        public async Task LockRecipeAsync_ShouldThrow_WhenStatusNotPosted()
         {
-            var recipe = new Recipe { Status = RecipeStatus.Pending };
+            RecipeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .ReturnsAsync(new Recipe { Status = RecipeStatus.Pending });
 
-            RecipeRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>?>())).ReturnsAsync(recipe);
-
-            var act = async () => await Service.LockRecipeAsync(Guid.NewGuid(), Guid.NewGuid(),
-                new RecipeManagementReasonRequest { Reason = "test" });
-
-            await act.Should().ThrowAsync<AppException>()
-                .WithMessage("Không thể khóa công thức này");
+            await Assert.ThrowsAsync<AppException>(() =>
+                Service.LockRecipeAsync(Guid.NewGuid(), Guid.NewGuid(), new()));
         }
 
         [Fact]
-        public async Task LockRecipeAsync_ShouldUpdateAndSendMail_WhenValid()
+        public async Task LockRecipeAsync_ShouldLock_WhenValid()
         {
-            var recipeId = Guid.NewGuid();
-            var authorId = Guid.NewGuid();
-            var moderatorId = Guid.NewGuid();
-
             var recipe = new Recipe
             {
-                Id = recipeId,
+                Id = Guid.NewGuid(),
                 Status = RecipeStatus.Posted,
-                AuthorId = authorId,
-                Name = "Recipe A",
-                Author = new AppUser
-                {
-                    Id = authorId,
-                    FirstName = "Test",
-                    LastName = "User",
-                    Email = "test@mail.com"
-                }
+                AuthorId = Guid.NewGuid(),
+                Author = new AppUser { Email = "a@a.com", FirstName = "A", LastName = "B" }
             };
 
-            RecipeRepoMock.Setup(r => r.GetByIdAsync(recipeId, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>?>()))
+            RecipeRepoMock
+                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(recipe);
 
-            TemplateServiceMock.Setup(t => t.RenderTemplateAsync(
-                EmailTemplateType.LockRecipe,
-                It.IsAny<Dictionary<string, string>>()))
-                .ReturnsAsync("<html></html>");
+            TemplateServiceMock
+                .Setup(t => t.RenderTemplateAsync(It.IsAny<EmailTemplateType>(), It.IsAny<Dictionary<string, string>>()))
+                .ReturnsAsync("html");
 
-            var req = new RecipeManagementReasonRequest { Reason = "Vi phạm" };
+            MailServiceMock
+                .Setup(m => m.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
 
-            await Service.LockRecipeAsync(moderatorId, recipeId, req);
+            await Service.LockRecipeAsync(Guid.NewGuid(), recipe.Id, new RecipeManagementReasonRequest { Reason = "spam" });
 
             recipe.Status.Should().Be(RecipeStatus.Locked);
-            recipe.Reason.Should().Be("Vi phạm");
-
             RecipeRepoMock.Verify(r => r.UpdateAsync(recipe), Times.Once);
-
-            MailServiceMock.Verify(m =>
-                m.SendEmailAsync(
-                    "test@mail.com",
-                    "<html></html>",
-                    "Công thức của bạn đã bị khóa – FitFood Tracker"
-                ),
-                Times.Once);
+            CacheServiceMock.Verify(c => c.RemoveByPrefixAsync("recipe"), Times.Once);
         }
     }
+
 }

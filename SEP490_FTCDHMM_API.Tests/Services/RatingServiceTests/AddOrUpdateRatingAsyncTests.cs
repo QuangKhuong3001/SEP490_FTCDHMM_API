@@ -3,6 +3,7 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Dtos.RatingDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Rating;
 using SEP490_FTCDHMM_API.Domain.Entities;
+using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
@@ -10,35 +11,43 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
     public class AddOrUpdateRatingAsyncTests : RatingServiceTestBase
     {
         [Fact]
-        public async Task AddOrUpdateRatingAsync_ShouldThrow_WhenFeedbackRequired()
+        public async Task ShouldThrow_WhenLowScoreWithoutFeedback()
         {
-            var userId = Guid.NewGuid();
-            var recipeId = Guid.NewGuid();
-            var request = new RatingRequest { Score = 2, Feedback = null };
+            var request = new RatingRequest { Score = 3, Feedback = null };
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.AddOrUpdateRatingAsync(userId, recipeId, request));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.AddOrUpdateRatingAsync(Guid.NewGuid(), Guid.NewGuid(), request));
         }
 
         [Fact]
-        public async Task AddOrUpdateRatingAsync_ShouldAddNewRating_WhenNotExists()
+        public async Task ShouldThrow_WhenRecipeNotFound()
+        {
+            RecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
+                .ReturnsAsync((Recipe)null!);
+
+            var request = new RatingRequest { Score = 5, Feedback = "ok" };
+
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.AddOrUpdateRatingAsync(Guid.NewGuid(), Guid.NewGuid(), request));
+        }
+
+        [Fact]
+        public async Task ShouldAddNewRating_WhenNotExists()
         {
             var userId = Guid.NewGuid();
             var recipeId = Guid.NewGuid();
-            var request = new RatingRequest { Score = 5, Feedback = "ok" };
-
             var recipe = CreateRecipe(recipeId);
-            var includeRating = (Func<IQueryable<Rating>, IQueryable<Rating>>?)null;
-            var includeRecipe = (Func<IQueryable<Recipe>, IQueryable<Recipe>>?)null;
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(recipeId, includeRecipe))
+                .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);
 
             RatingRepositoryMock
                 .Setup(r => r.FirstOrDefaultAsync(
                     It.IsAny<Expression<Func<Rating, DateTime>>>(),
                     It.IsAny<Expression<Func<Rating, bool>>>(),
-                    includeRating))
+                    null))
                 .ReturnsAsync((Rating)null!);
 
             RatingRepositoryMock
@@ -46,10 +55,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
                 .ReturnsAsync((Rating r) => r);
 
             RatingRepositoryMock
-                .Setup(r => r.GetAllAsync(
-                    It.IsAny<Expression<Func<Rating, bool>>>(),
-                    includeRating))
-                .ReturnsAsync(new List<Rating> { new Rating { Score = 5 } });
+                .Setup(r => r.GetAllAsync(It.IsAny<Expression<Func<Rating, bool>>>(), null))
+                .ReturnsAsync(new List<Rating>
+                {
+                    new Rating { Score = 5 }
+                });
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(It.IsAny<Recipe>()))
@@ -63,63 +73,77 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RatingServiceTests
                 .Setup(n => n.SendRatingUpdateAsync(recipeId, It.IsAny<RatingDetailsResponse>()))
                 .Returns(Task.CompletedTask);
 
-            await Sut.AddOrUpdateRatingAsync(userId, recipeId, request);
+            NotificationCommandServiceMock
+                .Setup(n => n.CreateAndSendNotificationAsync(
+                    userId,
+                    recipe.AuthorId,
+                    NotificationType.Rating,
+                    recipeId))
+                .Returns(Task.CompletedTask);
+
+            await Sut.AddOrUpdateRatingAsync(userId, recipeId, new RatingRequest
+            {
+                Score = 5,
+                Feedback = "ok"
+            });
 
             RatingRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Rating>()), Times.Once);
-            NotifierMock.Verify(n => n.SendRatingUpdateAsync(recipeId, It.IsAny<RatingDetailsResponse>()), Times.Once);
         }
 
         [Fact]
-        public async Task AddOrUpdateRatingAsync_ShouldUpdateExistingRating()
+        public async Task ShouldUpdateExistingRating()
         {
             var userId = Guid.NewGuid();
             var recipeId = Guid.NewGuid();
-
-            var existing = CreateRating(Guid.NewGuid(), userId, recipeId);
             var recipe = CreateRecipe(recipeId);
-
-            var request = new RatingRequest { Score = 4, Feedback = "nice" };
-
-            var includeRating = (Func<IQueryable<Rating>, IQueryable<Rating>>?)null;
-            var includeRecipe = (Func<IQueryable<Recipe>, IQueryable<Recipe>>?)null;
+            var rating = CreateRating(Guid.NewGuid(), userId, recipeId);
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(recipeId, includeRecipe))
+                .Setup(r => r.GetByIdAsync(recipeId, null))
                 .ReturnsAsync(recipe);
 
             RatingRepositoryMock
                 .Setup(r => r.FirstOrDefaultAsync(
                     It.IsAny<Expression<Func<Rating, DateTime>>>(),
                     It.IsAny<Expression<Func<Rating, bool>>>(),
-                    includeRating))
-                .ReturnsAsync(existing);
+                    null))
+                .ReturnsAsync(rating);
 
             RatingRepositoryMock
-                .Setup(r => r.UpdateAsync(existing))
+                .Setup(r => r.UpdateAsync(rating))
                 .Returns(Task.CompletedTask);
 
             RatingRepositoryMock
-                .Setup(r => r.GetAllAsync(
-                    It.IsAny<Expression<Func<Rating, bool>>>(),
-                    includeRating))
-                .ReturnsAsync(new List<Rating> { existing });
+                .Setup(r => r.GetAllAsync(It.IsAny<Expression<Func<Rating, bool>>>(), null))
+                .ReturnsAsync(new List<Rating> { rating });
 
             RecipeRepositoryMock
                 .Setup(r => r.UpdateAsync(It.IsAny<Recipe>()))
                 .Returns(Task.CompletedTask);
 
             MapperMock
-                .Setup(m => m.Map<RatingDetailsResponse>(existing))
+                .Setup(m => m.Map<RatingDetailsResponse>(rating))
                 .Returns(new RatingDetailsResponse());
 
             NotifierMock
                 .Setup(n => n.SendRatingUpdateAsync(recipeId, It.IsAny<RatingDetailsResponse>()))
                 .Returns(Task.CompletedTask);
 
-            await Sut.AddOrUpdateRatingAsync(userId, recipeId, request);
+            NotificationCommandServiceMock
+                .Setup(n => n.CreateAndSendNotificationAsync(
+                    userId,
+                    recipe.AuthorId,
+                    NotificationType.Rating,
+                    recipeId))
+                .Returns(Task.CompletedTask);
 
-            RatingRepositoryMock.Verify(r => r.UpdateAsync(existing), Times.Once);
-            NotifierMock.Verify(n => n.SendRatingUpdateAsync(recipeId, It.IsAny<RatingDetailsResponse>()), Times.Once);
+            await Sut.AddOrUpdateRatingAsync(userId, recipeId, new RatingRequest
+            {
+                Score = 4,
+                Feedback = "nice"
+            });
+
+            RatingRepositoryMock.Verify(r => r.UpdateAsync(rating), Times.Once);
         }
     }
 }

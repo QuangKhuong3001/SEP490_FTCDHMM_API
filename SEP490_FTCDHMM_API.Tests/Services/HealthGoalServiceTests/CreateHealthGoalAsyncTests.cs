@@ -63,6 +63,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 .Setup(r => r.AddAsync(It.IsAny<HealthGoal>()))
                 .ReturnsAsync(new HealthGoal());
 
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync("health-goal"))
+                .Returns(Task.CompletedTask);
+
             var req = new CreateHealthGoalRequest
             {
                 Name = "Goal",
@@ -79,8 +83,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
             };
 
             await Sut.CreateHealthGoalAsync(req);
+
             HealthGoalRepositoryMock.VerifyAll();
             NutrientRepositoryMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
     }
 }

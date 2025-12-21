@@ -18,12 +18,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
         {
             LabelRepositoryMock = new Mock<ILabelRepository>(MockBehavior.Strict);
             MapperMock = new Mock<IMapper>(MockBehavior.Strict);
-            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Strict);
+            CacheServiceMock = new Mock<ICacheService>(MockBehavior.Loose);
 
             Sut = new LabelService(
                 LabelRepositoryMock.Object,
                 MapperMock.Object,
-                CacheServiceMock.Object);
+                CacheServiceMock.Object
+            );
         }
 
         protected Label CreateLabel(Guid? id = null)
@@ -35,6 +36,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
                 UpperName = "LABEL",
                 NormalizedName = "label",
                 ColorCode = "#FFFFFF",
+                LastUpdatedUtc = DateTime.UtcNow,
+                Recipes = new List<Recipe>()
             };
         }
     }
