@@ -132,7 +132,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var htmlBody = await _emailTemplateService.RenderTemplateAsync(EmailTemplateType.VerifyAccountEmail, placeholders);
 
             await _mailService.SendEmailAsync(dto.Email, htmlBody, "Chào mừng bạn đến với FitFood Tracker");
-            await _notificationCommandServices.CreateAndSendNotificationAsync(null, user.Id, NotificationType.System, null);
+            await _notificationCommandServices.CreateAndSendNotificationAsync(
+                null,
+                user.Id,
+                NotificationType.System,
+                null,
+                "Chào mừng bạn đến với FitFood Tracker! Hãy khám phá và tận hưởng những tính năng tuyệt vời của chúng tôi nhé.");
             return (true, Array.Empty<string>());
         }
 

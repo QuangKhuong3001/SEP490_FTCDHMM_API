@@ -18,7 +18,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _notifier = notifier;
         }
 
-        public async Task CreateAndSendNotificationAsync(Guid? senderId, Guid receiverId, NotificationType type, Guid? targetId)
+        public async Task CreateAndSendNotificationAsync(Guid? senderId, Guid receiverId, NotificationType type, Guid? targetId, string? message = null)
         {
             if (senderId == receiverId)
                 return;
@@ -29,6 +29,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 ReceiverId = receiverId,
                 Type = type,
                 TargetId = targetId,
+                Message = message,
                 CreatedAtUtc = DateTime.UtcNow,
             };
 
