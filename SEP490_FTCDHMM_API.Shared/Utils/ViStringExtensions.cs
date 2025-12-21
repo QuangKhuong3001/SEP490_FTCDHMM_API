@@ -40,6 +40,13 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
             return Regex.Replace(name.Trim().ToUpperInvariant(), @"\s+", " ");
         }
 
+        public static string ToSentenceCase(this string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+            text = text.Trim().CleanDuplicateSpace();
+            if (text.Length > 0) return char.ToUpper(text[0]) + text.Substring(1);
+            return text;
+        }
         public static string RemoveDiacritics(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
