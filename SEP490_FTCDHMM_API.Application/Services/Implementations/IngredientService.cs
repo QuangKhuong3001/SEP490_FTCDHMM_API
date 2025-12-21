@@ -252,7 +252,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
         public async Task UpdateIngredientAsync(Guid ingredientId, UpdateIngredientRequest dto)
         {
-            await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var ingredient = await _ingredientRepository.GetByIdAsync(ingredientId,
                     include: i => i.Include(u => u.IngredientNutrients)

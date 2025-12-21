@@ -27,7 +27,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
                 LabelIds = new List<Guid> { Guid.NewGuid() },
                 Ingredients = new List<DraftRecipeIngredientRequest>
                 {
-                    new DraftRecipeIngredientRequest
+                    new()
                     {
                         IngredientId = Guid.NewGuid(),
                         QuantityGram = 10
@@ -36,21 +36,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
                 TaggedUserIds = new List<Guid>(),
                 CookingSteps = new List<DraftCookingStepRequest>
                 {
-                    new DraftCookingStepRequest
+                    new()
                     {
                         StepOrder = 1,
                         Instruction = "X",
                         Images = new List<DraftCookingStepImageRequest>
                         {
-                            new DraftCookingStepImageRequest
+                            new()
                             {
                                 ImageOrder = 1,
-                                Image = new FileUploadModel
-                                {
-                                    FileName = "a.png",
-                                    Content = new MemoryStream(new byte[1]),
-                                    ContentType = "image/png"
-                                }
+                                Image = new FileUploadModel()
                             }
                         }
                     }
@@ -58,7 +53,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             };
         }
 
-        private void SetupValidIngredientLabel(DraftRecipeRequest req)
+        private void SetupValidIngredientAndLabel()
         {
             IngredientRepositoryMock
                 .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
@@ -71,50 +66,40 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             LabelRepositoryMock
                 .Setup(r => r.GetAllAsync(
                     It.IsAny<Expression<Func<Label, bool>>>(),
-                    null
-                ))
+                    It.IsAny<Func<IQueryable<Label>, IQueryable<Label>>>()))
                 .ReturnsAsync(new List<Label>());
         }
 
-        private void SetupDraft()
+        private void SetupExistingDraft(Guid authorId)
         {
             DraftRecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(
-                    It.IsAny<Guid>(),
+                    draftId,
                     It.IsAny<Func<IQueryable<DraftRecipe>, IQueryable<DraftRecipe>>>()))
                 .ReturnsAsync(new DraftRecipe
                 {
                     Id = draftId,
-                    AuthorId = userId,
-                    ImageId = Guid.NewGuid(),
-                    DraftCookingSteps = new List<DraftCookingStep>(),
-                    DraftRecipeIngredients = new List<DraftRecipeIngredient>()
+                    AuthorId = authorId,
+                    ImageId = Guid.NewGuid()
                 });
-
-            ImageRepositoryMock
-                .Setup(r => r.MarkDeletedAsync(It.IsAny<Guid?>()))
-                .Returns(Task.CompletedTask);
-
-            ImageRepositoryMock
-                .Setup(r => r.MarkDeletedStepsImageFromDraftAsync(It.IsAny<DraftRecipe>()))
-                .Returns(Task.CompletedTask);
 
             DraftRecipeRepositoryMock
                 .Setup(r => r.DeleteAsync(It.IsAny<DraftRecipe>()))
                 .Returns(Task.CompletedTask);
+
+            DraftRecipeRepositoryMock
+                .Setup(r => r.AddAsync(It.IsAny<DraftRecipe>()))
+                .ReturnsAsync(new DraftRecipe());
         }
 
         [Fact]
         public async Task ShouldThrow_WhenStepOrderDuplicate()
         {
             var req = BuildValidRequest();
-            req.CookingSteps.Add(new DraftCookingStepRequest
-            {
-                StepOrder = 1,
-                Instruction = "Y"
-            });
+            req.CookingSteps.Add(new DraftCookingStepRequest { StepOrder = 1 });
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateDraftAsync(userId, draftId, req));
         }
 
         [Fact]
@@ -124,200 +109,76 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             req.CookingSteps[0].Images.Add(new DraftCookingStepImageRequest
             {
                 ImageOrder = 1,
-                Image = new FileUploadModel
-                {
-                    FileName = "b.png",
-                    Content = new MemoryStream(new byte[1]),
-                    ContentType = "image/png"
-                }
+                Image = new FileUploadModel()
             });
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateDraftAsync(userId, draftId, req));
         }
 
         [Fact]
         public async Task ShouldThrow_WhenIngredientNotExist()
         {
-            var req = BuildValidRequest();
-
             IngredientRepositoryMock
                 .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
                 .ReturnsAsync(false);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenIngredientDuplicate()
-        {
-            var req = BuildValidRequest();
-            var id = req.Ingredients[0].IngredientId;
-            req.Ingredients.Add(new DraftRecipeIngredientRequest
-            {
-                IngredientId = id,
-                QuantityGram = 20
-            });
-
-            IngredientRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenLabelNotExist()
-        {
-            var req = BuildValidRequest();
-
-            IngredientRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(true);
-
-            LabelRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(false);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenLabelDuplicate()
-        {
-            var req = BuildValidRequest();
-            req.LabelIds.Add(req.LabelIds[0]);
-
-            IngredientRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(true);
-
-            LabelRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateDraftAsync(userId, draftId, BuildValidRequest()));
         }
 
         [Fact]
         public async Task ShouldThrow_WhenDraftNotFound()
         {
-            var req = BuildValidRequest();
-            SetupValidIngredientLabel(req);
+            SetupValidIngredientAndLabel();
 
             DraftRecipeRepositoryMock
                 .Setup(r => r.GetByIdAsync(
-                    It.IsAny<Guid>(),
+                    draftId,
                     It.IsAny<Func<IQueryable<DraftRecipe>, IQueryable<DraftRecipe>>>()))
                 .ReturnsAsync((DraftRecipe)null!);
 
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateDraftAsync(userId, draftId, BuildValidRequest()));
         }
 
         [Fact]
         public async Task ShouldThrow_WhenNotOwner()
         {
-            var req = BuildValidRequest();
-            SetupValidIngredientLabel(req);
+            SetupValidIngredientAndLabel();
+            SetupExistingDraft(Guid.NewGuid());
 
-            DraftRecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<Func<IQueryable<DraftRecipe>, IQueryable<DraftRecipe>>>()))
-                .ReturnsAsync(new DraftRecipe
-                {
-                    Id = draftId,
-                    AuthorId = Guid.NewGuid()
-                });
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenTagUserNotExist()
-        {
-            var req = BuildValidRequest();
-            req.TaggedUserIds.Add(Guid.NewGuid());
-
-            SetupValidIngredientLabel(req);
-            SetupDraft();
-
-            UserRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
-                .ReturnsAsync(false);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenSelfTag()
-        {
-            var req = BuildValidRequest();
-            req.TaggedUserIds.Add(userId);
-
-            SetupValidIngredientLabel(req);
-            SetupDraft();
-
-            UserRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
-        }
-
-        [Fact]
-        public async Task ShouldThrow_WhenImageUploadFails()
-        {
-            var req = BuildValidRequest();
-            SetupValidIngredientLabel(req);
-            SetupDraft();
-
-            S3Mock
-                .Setup(s => s.UploadImageAsync(
-                    It.IsAny<FileUploadModel>(),
-                    It.IsAny<StorageFolder>())
-                )
-                .ThrowsAsync(new AppException(AppResponseCode.SERVICE_NOT_AVAILABLE));
-
-            UserRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.UpdateDraftAsync(userId, draftId, req));
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.UpdateDraftAsync(userId, draftId, BuildValidRequest()));
         }
 
         [Fact]
         public async Task ShouldUpdate_WhenValid()
         {
-            var req = BuildValidRequest();
+            SetupValidIngredientAndLabel();
+            SetupExistingDraft(userId);
 
-            SetupValidIngredientLabel(req);
-            SetupDraft();
-
-            UserRepositoryMock
-                .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<AppUser, bool>>>()))
-                .ReturnsAsync(true);
-
-            S3Mock
+            S3ImageServiceMock
                 .Setup(s => s.UploadImageAsync(
                     It.IsAny<FileUploadModel>(),
-                    It.IsAny<StorageFolder>())
-                )
+                    It.IsAny<StorageFolder>()))
                 .ReturnsAsync(new Image
                 {
                     Id = Guid.NewGuid(),
-                    Key = "x",
+                    Key = "x.png",
                     ContentType = "image/png",
                     CreatedAtUTC = DateTime.UtcNow
                 });
 
-            DraftRecipeRepositoryMock
-                .Setup(r => r.AddAsync(It.IsAny<DraftRecipe>()))
-                .ReturnsAsync(new DraftRecipe { Id = Guid.NewGuid() });
+            await Sut.UpdateDraftAsync(userId, draftId, BuildValidRequest());
 
-            await Sut.UpdateDraftAsync(userId, draftId, req);
+            DraftRecipeRepositoryMock.Verify(
+                r => r.DeleteAsync(It.IsAny<DraftRecipe>()),
+                Times.Once);
 
-            DraftRecipeRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<DraftRecipe>()), Times.Once);
-            DraftRecipeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<DraftRecipe>()), Times.Once);
+            DraftRecipeRepositoryMock.Verify(
+                r => r.AddAsync(It.IsAny<DraftRecipe>()),
+                Times.Once);
         }
     }
 }

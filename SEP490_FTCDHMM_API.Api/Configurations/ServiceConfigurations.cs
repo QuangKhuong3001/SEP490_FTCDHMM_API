@@ -69,8 +69,8 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                 options.ConnectTimeout = 10000;
                 options.SyncTimeout = 10000;
 
-                options.Ssl = true;
-                options.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+                //options.Ssl = true;
+                //options.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
                 options.CheckCertificateRevocation = false;
 
                 return ConnectionMultiplexer.Connect(options);
@@ -91,6 +91,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                           DisableGlobalLocks = true
                       });
             });
+
             services.AddHangfireServer();
 
             // Config Identity

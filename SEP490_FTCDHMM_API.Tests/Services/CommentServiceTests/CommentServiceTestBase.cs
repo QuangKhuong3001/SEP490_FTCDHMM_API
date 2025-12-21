@@ -11,35 +11,41 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
 {
     public abstract class CommentServiceTestBase
     {
-        protected readonly Mock<ICommentRepository> CommentRepositoryMock;
-        protected readonly Mock<IMapper> MapperMock;
-        protected readonly Mock<IRealtimeNotifier> NotifierMock;
-        protected readonly Mock<IUserRepository> UserRepositoryMock;
-        protected readonly Mock<IRecipeRepository> RecipeRepositoryMock;
-        protected readonly Mock<INotificationCommandService> NotificationCommandServiceMock;
+        protected Mock<ICommentRepository> CommentRepositoryMock { get; }
+        protected Mock<ICommentMentionRepository> CommentMentionRepositoryMock { get; }
+        protected Mock<IMapper> MapperMock { get; }
+        protected Mock<IRealtimeNotifier> NotifierMock { get; }
+        protected Mock<IUserRepository> UserRepositoryMock { get; }
+        protected Mock<IRecipeRepository> RecipeRepositoryMock { get; }
+        protected Mock<INotificationCommandService> NotificationCommandServiceMock { get; }
 
-        protected readonly CommentService Sut;
+        protected CommentService Sut { get; }
 
         protected CommentServiceTestBase()
         {
-            CommentRepositoryMock = new Mock<ICommentRepository>();
-            MapperMock = new Mock<IMapper>();
-            NotifierMock = new Mock<IRealtimeNotifier>();
-            UserRepositoryMock = new Mock<IUserRepository>();
-            RecipeRepositoryMock = new Mock<IRecipeRepository>();
-            NotificationCommandServiceMock = new Mock<INotificationCommandService>();
+            CommentRepositoryMock = new Mock<ICommentRepository>(MockBehavior.Strict);
+            CommentMentionRepositoryMock = new Mock<ICommentMentionRepository>(MockBehavior.Strict);
+            MapperMock = new Mock<IMapper>(MockBehavior.Strict);
+            NotifierMock = new Mock<IRealtimeNotifier>(MockBehavior.Strict);
+            UserRepositoryMock = new Mock<IUserRepository>(MockBehavior.Strict);
+            RecipeRepositoryMock = new Mock<IRecipeRepository>(MockBehavior.Strict);
+            NotificationCommandServiceMock = new Mock<INotificationCommandService>(MockBehavior.Strict);
 
             Sut = new CommentService(
                 CommentRepositoryMock.Object,
                 MapperMock.Object,
                 UserRepositoryMock.Object,
                 RecipeRepositoryMock.Object,
+                CommentMentionRepositoryMock.Object,
                 NotificationCommandServiceMock.Object,
                 NotifierMock.Object
             );
         }
 
-        protected static Comment CreateComment(Guid? id = null, Guid? userId = null, Guid? recipeId = null)
+        protected static Comment CreateComment(
+            Guid? id = null,
+            Guid? userId = null,
+            Guid? recipeId = null)
         {
             return new Comment
             {
@@ -53,7 +59,9 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
             };
         }
 
-        protected static Recipe CreateRecipe(Guid? id = null, Guid? authorId = null)
+        protected static Recipe CreateRecipe(
+            Guid? id = null,
+            Guid? authorId = null)
         {
             return new Recipe
             {
@@ -64,7 +72,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 Ration = 1,
                 CookTime = 10,
                 CreatedAtUtc = DateTime.UtcNow,
-                Difficulty = DifficultyValue.Medium
+                Difficulty = DifficultyValue.Medium,
+                Status = RecipeStatus.Posted
             };
         }
 

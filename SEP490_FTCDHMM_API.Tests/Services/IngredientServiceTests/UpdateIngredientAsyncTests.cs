@@ -41,8 +41,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
             var dto = CreateRequest(nutrientId, new List<Guid> { NewId() }, false);
 
             UnitOfWorkMock
-                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<Func<CancellationToken, Task>, CancellationToken>((op, ct) => op(ct));
+                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<Task>>()))
+                .Returns<Func<Task>>((op) => op());
 
             IngredientRepositoryMock
                 .Setup(r => r.GetByIdAsync(
@@ -84,8 +84,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientServiceTests
             var dto = CreateRequest(nutrientId, new List<Guid> { categoryId }, true);
 
             UnitOfWorkMock
-                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<Func<CancellationToken, Task>, CancellationToken>((op, ct) => op(ct));
+                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<Task>>()))
+                .Returns<Func<Task>>((op) => op());
 
             IngredientRepositoryMock
                 .Setup(r => r.GetByIdAsync(
