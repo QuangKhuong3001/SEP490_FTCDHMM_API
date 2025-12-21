@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthMetricDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.Services;
@@ -12,12 +13,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
     {
         private readonly IUserHealthMetricRepository _userHealthMetricRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
         private readonly IUserRepository _userRepository;
 
-        public UserHealthMetricService(IUserHealthMetricRepository userHealthMetricRepository, IMapper mapper, IUserRepository userRepository)
+        public UserHealthMetricService(
+            IUserHealthMetricRepository userHealthMetricRepository,
+            IMapper mapper,
+            ICacheService cacheService,
+            IUserRepository userRepository)
         {
             _userHealthMetricRepository = userHealthMetricRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
             _userRepository = userRepository;
         }
 
@@ -58,6 +65,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             };
 
             await _userHealthMetricRepository.AddAsync(metric);
+            await _cacheService.RemoveByPrefixAsync($"recommend:user:{userId}");
         }
 
         public async Task UpdateHealthMetricAsync(Guid userId, Guid metricId, UpdateUserHealthMetricRequest request)
@@ -98,8 +106,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             metric.Notes = request.Notes;
             metric.RecordedAt = DateTime.UtcNow;
             metric.ActivityLevel = user.ActivityLevel;
-
             await _userHealthMetricRepository.UpdateAsync(metric);
+
+            await _cacheService.RemoveByPrefixAsync($"recommend:user:{userId}");
+
         }
 
         public async Task DeleteHealthMetricAsync(Guid userId, Guid metricId)
@@ -113,6 +123,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.FORBIDDEN);
 
             await _userHealthMetricRepository.DeleteAsync(metric);
+            await _cacheService.RemoveByPrefixAsync($"recommend:user:{userId}");
         }
 
         public async Task<IEnumerable<UserHealthMetricResponse>> GetHealthMetricHistoryByUserIdAsync(Guid userId)

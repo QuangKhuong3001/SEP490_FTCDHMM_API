@@ -30,8 +30,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             var json = JsonSerializer.Serialize(value, JsonOptions);
             await _db.StringSetAsync(key, json, ttl);
 
-            var prefix = key.Split(':')[0];
-            await _db.SetAddAsync($"__prefix::{prefix}", key);
+            var parts = key.Split(':');
+
+            for (int i = 1; i <= parts.Length; i++)
+            {
+                var prefix = string.Join(':', parts.Take(i));
+                await _db.SetAddAsync($"__prefix::{prefix}", key);
+            }
         }
 
         public async Task RemoveByPrefixAsync(string prefix)
