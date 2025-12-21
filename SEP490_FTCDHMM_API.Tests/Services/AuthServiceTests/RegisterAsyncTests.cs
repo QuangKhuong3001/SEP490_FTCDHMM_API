@@ -111,6 +111,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                     null,
                     It.IsAny<Guid>(),
                     NotificationType.System,
+                    null,
                     null))
                 .Returns(Task.CompletedTask);
 
@@ -183,6 +184,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                     null,
                     It.IsAny<Guid>(),
                     NotificationType.System,
+                    null,
                     null))
                 .Returns(Task.CompletedTask);
 

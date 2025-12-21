@@ -161,7 +161,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
 
             NotificationCommandServiceMock
                 .Setup(r => r.CreateAndSendNotificationAsync(
-                    userId, authorId, NotificationType.Comment, recipeId))
+                    userId, authorId, NotificationType.Comment, recipeId, null))
                 .Returns(Task.CompletedTask);
 
             NotifierMock
