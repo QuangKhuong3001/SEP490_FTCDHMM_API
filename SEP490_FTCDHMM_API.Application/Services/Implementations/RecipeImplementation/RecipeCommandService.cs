@@ -113,6 +113,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }).ToList()
             };
 
+            var notifiedUserIds = new HashSet<Guid>();
+
             if (request.TaggedUserIds.Any())
             {
                 foreach (var tagUserId in request.TaggedUserIds.Distinct())
@@ -122,6 +124,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                         RecipeId = recipe.Id,
                         TaggedUserId = tagUserId
                     });
+                    notifiedUserIds.Add(tagUserId);
                 }
             }
 
@@ -142,7 +145,14 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             await _nutritionService.AggregateRecipeAsync(fullRecipe!);
             await _cacheService.RemoveByPrefixAsync("recipe");
+
             await this.CreateAndSendNotificationsAsync(userId, recipe.Id);
+
+            notifiedUserIds.Remove(userId);
+            foreach (var targetUserId in notifiedUserIds)
+            {
+                await this.CreateAndSendNotificationsAsync(targetUserId, recipe.Id);
+            }
         }
 
         public async Task UpdateRecipeAsync(Guid userId, Guid recipeId, UpdateRecipeRequest request)

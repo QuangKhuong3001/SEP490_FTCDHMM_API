@@ -16,7 +16,7 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
         private readonly ICacheService _cache;
         private readonly IMapper _mapper;
 
-        private const int PageSize = 20;
+        private const int PageSize = 12;
 
         public ClusterRecommendationPrecomputeJob(
             IRecipeRepository recipeRepository,
