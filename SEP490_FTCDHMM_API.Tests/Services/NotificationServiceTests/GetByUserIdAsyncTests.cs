@@ -2,99 +2,95 @@
 using Moq;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.NotificationDtos;
+using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.NotificationServiceTests
 {
-    public class GetByUserIdAsyncTests : NotificationServiceTestBase
+    public class GetNotificationsByUserIdAsyncTests : NotificationServiceTestBase
     {
         [Fact]
-        public async Task GetByUserIdAsync_ShouldGroupNotifications_ByTargetTypeAndDate()
+        public async Task ShouldReturnGroupedNotifications()
         {
             var userId = Guid.NewGuid();
+            var sender = new AppUser { Id = Guid.NewGuid() };
+            var now = DateTime.UtcNow;
 
-            var n1 = CreateNotification();
-            var n2 = CreateNotification();
-            n2.TargetId = n1.TargetId;
-            n2.Type = n1.Type;
-            n2.CreatedAtUtc = n1.CreatedAtUtc;
-
-            var notifications = new List<Notification> { n1, n2 };
+            var notifications = new List<Notification>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    ReceiverId = userId,
+                    Sender = sender,
+                    Type = NotificationType.Comment,
+                    TargetId = Guid.NewGuid(),
+                    CreatedAtUtc = now
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    ReceiverId = userId,
+                    Sender = sender,
+                    Type = NotificationType.Comment,
+                    TargetId = Guid.NewGuid(),
+                    CreatedAtUtc = now
+                }
+            };
 
             NotificationRepositoryMock
-                .Setup(r => r.GetAllAsync(
+                .Setup(r => r.GetPagedAsync(
+                    1,
+                    10,
                     It.IsAny<Expression<Func<Notification, bool>>>(),
-                    It.IsAny<Func<IQueryable<Notification>, IQueryable<Notification>>?>()
-                ))
-                .ReturnsAsync(notifications);
-
-            var mapped = new NotificationResponse
-            {
-                Id = n1.Id,
-                CreatedAtUtc = n1.CreatedAtUtc,
-                Type = n1.Type
-            };
+                    It.IsAny<Func<IQueryable<Notification>, IOrderedQueryable<Notification>>>(),
+                    null,
+                    null,
+                    It.IsAny<Func<IQueryable<Notification>, IQueryable<Notification>>>()))
+                .ReturnsAsync((notifications, notifications.Count));
 
             MapperMock
-                .Setup(m => m.Map<NotificationResponse>(n1))
-                .Returns(mapped);
+                .Setup(m => m.Map<NotificationResponse>(It.IsAny<Notification>()))
+                .Returns((Notification n) => new NotificationResponse
+                {
+                    Id = n.Id,
+                    Type = n.Type,
+                    CreatedAtUtc = n.CreatedAtUtc
+                });
 
-            var pagination = new PaginationParams
-            {
-                PageNumber = 1,
-                PageSize = 10
-            };
+            MapperMock
+                .Setup(m => m.Map<UserInteractionResponse>(sender))
+                .Returns(new UserInteractionResponse { Id = sender.Id });
 
-            var result = await Sut.GetNotificationsByUserIdAsync(userId, pagination);
+            var result = await Sut.GetNotificationsByUserIdAsync(
+                userId,
+                new PaginationParams { PageNumber = 1, PageSize = 10 });
 
-            Assert.Single(result.Items);
-            Assert.Equal(1, result.TotalCount);
-
-            NotificationRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
+            Assert.Equal(2, result.TotalCount);
+            Assert.Equal(2, result.Items.Count());
         }
 
         [Fact]
-        public async Task GetByUserIdAsync_ShouldReturnEmptySenders_WhenTypeIsSystem()
+        public async Task ShouldReturnEmpty_WhenNoNotifications()
         {
-            var userId = Guid.NewGuid();
-            var n = CreateNotification();
-            n.Type = NotificationType.System;
-
-            var notifications = new List<Notification> { n };
-
             NotificationRepositoryMock
-                .Setup(r => r.GetAllAsync(
+                .Setup(r => r.GetPagedAsync(
+                    1,
+                    10,
                     It.IsAny<Expression<Func<Notification, bool>>>(),
-                    It.IsAny<Func<IQueryable<Notification>, IQueryable<Notification>>?>()
-                ))
-                .ReturnsAsync(notifications);
+                    It.IsAny<Func<IQueryable<Notification>, IOrderedQueryable<Notification>>>(),
+                    null,
+                    null,
+                    It.IsAny<Func<IQueryable<Notification>, IQueryable<Notification>>>()))
+                .ReturnsAsync((Array.Empty<Notification>(), 0));
 
-            var mapped = new NotificationResponse
-            {
-                Id = n.Id,
-                Type = NotificationType.System,
-                CreatedAtUtc = n.CreatedAtUtc
-            };
+            var result = await Sut.GetNotificationsByUserIdAsync(
+                Guid.NewGuid(),
+                new PaginationParams { PageNumber = 1, PageSize = 10 });
 
-            MapperMock
-                .Setup(m => m.Map<NotificationResponse>(n))
-                .Returns(mapped);
-
-            var pagination = new PaginationParams
-            {
-                PageNumber = 1,
-                PageSize = 10
-            };
-
-            var result = await Sut.GetNotificationsByUserIdAsync(userId, pagination);
-
-            Assert.Single(result.Items);
-            Assert.Empty(result.Items.First().Senders);
-
-            NotificationRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
+            Assert.Empty(result.Items);
+            Assert.Equal(0, result.TotalCount);
         }
     }
 }

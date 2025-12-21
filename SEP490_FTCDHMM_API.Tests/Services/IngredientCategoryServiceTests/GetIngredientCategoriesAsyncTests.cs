@@ -10,30 +10,45 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
         [Fact]
         public async Task GetDropBox_ShouldReturnMappedItems()
         {
-            var list = new List<IngredientCategory>
-            {
-                new IngredientCategory { Id = NewId(), Name = "A" },
-                new IngredientCategory { Id = NewId(), Name = "B" }
-            };
+            CacheServiceMock
+                .Setup(c => c.GetAsync<IEnumerable<IngredientCategoryResponse>>(
+                    It.IsAny<string>()))
+                .ReturnsAsync((IEnumerable<IngredientCategoryResponse>)null!);
 
             IngredientCateRepositoryMock
                 .Setup(r => r.GetAllAsync(
                     It.IsAny<Expression<Func<IngredientCategory, bool>>>(),
-                    null))
-                .ReturnsAsync(list);
-
-            MapperMock
-                .Setup(m => m.Map<IEnumerable<IngredientCategoryResponse>>(It.IsAny<IEnumerable<IngredientCategory>>()))
-                .Returns(new List<IngredientCategoryResponse>
+                    It.IsAny<Func<IQueryable<IngredientCategory>, IQueryable<IngredientCategory>>>()))
+                .ReturnsAsync(new List<IngredientCategory>
                 {
-                    new IngredientCategoryResponse { Name = "A" },
-                    new IngredientCategoryResponse { Name = "B" }
+                    new IngredientCategory { Name = "A" }
                 });
 
-            var req = new IngredientCategorySearchDropboxRequest { Keyword = "" };
+            MapperMock
+                .Setup(m => m.Map<IEnumerable<IngredientCategoryResponse>>(
+                    It.IsAny<IEnumerable<IngredientCategory>>()))
+                .Returns(new List<IngredientCategoryResponse>
+                {
+            new IngredientCategoryResponse { Name = "A" }
+                });
+
+            CacheServiceMock
+                .Setup(c => c.SetAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<IEnumerable<IngredientCategoryResponse>>(),
+                    It.IsAny<TimeSpan>()))
+                .Returns(Task.CompletedTask);
+
+            var req = new IngredientCategorySearchDropboxRequest
+            {
+                Keyword = ""
+            };
+
             var result = await Sut.GetIngredientCategoriesAsync(req);
 
-            Assert.Equal(2, result.Count());
+            Assert.Single(result);
+
+            CacheServiceMock.VerifyAll();
             IngredientCateRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
         }

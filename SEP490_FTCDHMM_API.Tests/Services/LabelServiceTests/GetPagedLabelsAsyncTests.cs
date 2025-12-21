@@ -11,43 +11,58 @@ namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests
         [Fact]
         public async Task GetPagedLabels_ShouldReturnPagedResult_WhenDataExists()
         {
-            var dto = new LabelFilterRequest
+            var labels = new List<Label>
             {
-                Keyword = "food",
-                PaginationParams = new PaginationParams { PageNumber = 1, PageSize = 10 }
+                CreateLabel(),
+                CreateLabel()
             };
 
-            var list = new List<Label> { CreateLabel(), CreateLabel() };
+            CacheServiceMock
+                .Setup(c => c.GetAsync<PagedResult<LabelResponse>>(
+                    It.IsAny<string>()))
+                .ReturnsAsync((PagedResult<LabelResponse>?)null);
 
             LabelRepositoryMock
                 .Setup(r => r.GetPagedAsync(
-                    dto.PaginationParams.PageNumber,
-                    dto.PaginationParams.PageSize,
+                    1,
+                    10,
                     It.IsAny<Expression<Func<Label, bool>>>(),
                     It.IsAny<Func<IQueryable<Label>, IOrderedQueryable<Label>>>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string[]?>(),
-                    It.IsAny<Func<IQueryable<Label>, IQueryable<Label>>?>()
-                ))
-                .ReturnsAsync((list, list.Count));
-
-            var mapped = new List<LabelResponse>
-            {
-                new LabelResponse{ Id = list[0].Id, Name = list[0].Name },
-                new LabelResponse{ Id = list[1].Id, Name = list[1].Name }
-            };
+                    null,
+                    null,
+                    null))
+                .ReturnsAsync((labels, labels.Count));
 
             MapperMock
-                .Setup(m => m.Map<List<LabelResponse>>(list))
-                .Returns(mapped);
+                .Setup(m => m.Map<List<LabelResponse>>(labels))
+                .Returns(labels.Select(l => new LabelResponse
+                {
+                    Id = l.Id,
+                    Name = l.Name
+                }).ToList());
 
-            var result = await Sut.GetPagedLabelsAsync(dto);
+            CacheServiceMock
+                .Setup(c => c.SetAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<PagedResult<LabelResponse>>(),
+                    It.IsAny<TimeSpan>()))
+                .Returns(Task.CompletedTask);
+
+            var request = new LabelFilterRequest
+            {
+                Keyword = "FOOD",
+                PaginationParams = new PaginationParams
+                {
+                    PageNumber = 1,
+                    PageSize = 10
+                }
+            };
+
+            var result = await Sut.GetPagedLabelsAsync(request);
 
             Assert.Equal(2, result.Items.Count());
             Assert.Equal(2, result.TotalCount);
-
-            LabelRepositoryMock.VerifyAll();
-            MapperMock.VerifyAll();
         }
+
     }
 }

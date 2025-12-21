@@ -90,7 +90,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeQueryServiceTests
             };
 
             RecipeRepositoryMock
-                .Setup(r => r.GetByIdAsync(recipe.Id, It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
+                .Setup(r => r.GetByIdAsync(
+                    recipe.Id,
+                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()
+                ))
                 .ReturnsAsync(recipe);
 
             MapperMock

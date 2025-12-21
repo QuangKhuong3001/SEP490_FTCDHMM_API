@@ -3,7 +3,6 @@ using Moq;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.DraftRecipeDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.ValueObjects;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
@@ -134,26 +133,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
                 .ReturnsAsync(true);
 
             LabelRepositoryMock
-                .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
-                .ReturnsAsync(true);
-
-            LabelRepositoryMock
                 .Setup(r => r.GetAllAsync(
                     It.IsAny<Expression<Func<Label, bool>>>(),
                     It.IsAny<Func<IQueryable<Label>, IQueryable<Label>>>()))
                 .ReturnsAsync(new List<Label>());
-
-            S3ImageServiceMock
-                .Setup(s => s.UploadImageAsync(
-                    It.IsAny<FileUploadModel>(),
-                    StorageFolder.DRAFTS))
-                .ReturnsAsync(new Image
-                {
-                    Id = Guid.NewGuid(),
-                    Key = "draft.png",
-                    ContentType = "image/png",
-                    CreatedAtUTC = DateTime.UtcNow
-                });
 
             DraftRecipeRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<DraftRecipe>()))
@@ -172,9 +155,12 @@ namespace SEP490_FTCDHMM_API.Tests.Services.DraftRecipeServiceTests
             await Sut.CreateDraftAsync(NewId(), req);
 
             IngredientRepositoryMock.VerifyAll();
-            LabelRepositoryMock.VerifyAll();
+            LabelRepositoryMock.Verify(
+                r => r.GetAllAsync(
+                    It.IsAny<Expression<Func<Label, bool>>>(),
+                    It.IsAny<Func<IQueryable<Label>, IQueryable<Label>>>()),
+                Times.Once);
             DraftRecipeRepositoryMock.VerifyAll();
-            S3ImageServiceMock.VerifyAll();
         }
     }
 }

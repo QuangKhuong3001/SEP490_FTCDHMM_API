@@ -45,6 +45,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
         protected static Comment CreateComment(
             Guid? id = null,
             Guid? userId = null,
+            Guid? parentId = null,
             Guid? recipeId = null)
         {
             return new Comment
@@ -53,11 +54,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
                 UserId = userId ?? Guid.NewGuid(),
                 RecipeId = recipeId ?? Guid.NewGuid(),
                 Content = "Test comment",
+                ParentCommentId = parentId,
+                ParentComment = parentId != null ? new Comment { Id = parentId.Value } : null,
                 CreatedAtUtc = DateTime.UtcNow,
                 Mentions = new List<CommentMention>(),
                 Replies = new List<Comment>()
             };
         }
+
 
         protected static Recipe CreateRecipe(
             Guid? id = null,
