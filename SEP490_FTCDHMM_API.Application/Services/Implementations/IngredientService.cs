@@ -539,7 +539,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 { "Carbohydrate, by difference", "Carbohydrate" },
                 { "Fiber, total dietary", "Dietary Fiber" },
                 { "Sugars, total including NLEA", "Sugars" },
-                { "Sugars, total", "Sugars" },
+                { "Total Sugars", "Sugars" },
                 { "Cholesterol", "Cholesterol" }
             };
 
