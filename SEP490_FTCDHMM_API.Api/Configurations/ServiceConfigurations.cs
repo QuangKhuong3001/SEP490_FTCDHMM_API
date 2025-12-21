@@ -91,6 +91,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
                           DisableGlobalLocks = true
                       });
             });
+
             services.AddHangfireServer();
 
             // Config Identity

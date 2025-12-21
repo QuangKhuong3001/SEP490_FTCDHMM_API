@@ -23,6 +23,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
         protected Mock<IUserFollowRepository> UserFollowRepositoryMock { get; }
         protected Mock<INotificationCommandService> NotificationCommandServiceMock { get; }
         protected Mock<IRecipeNutritionService> RecipeNutritionServiceMock { get; }
+        protected Mock<IUnitOfWork> UnitOfWorkMock { get; }
 
         protected RecipeCommandService Sut { get; }
 
@@ -40,6 +41,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             UserFollowRepositoryMock = new(MockBehavior.Strict);
             NotificationCommandServiceMock = new(MockBehavior.Strict);
             RecipeNutritionServiceMock = new(MockBehavior.Strict);
+            UnitOfWorkMock = new(MockBehavior.Strict);
+
+            UnitOfWorkMock
+                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<Task>>()))
+                .Returns<Func<Task>>(f => f());
+
+            UnitOfWorkMock
+                .Setup(u => u.RegisterAfterCommit(It.IsAny<Func<Task>>()));
 
             Sut = new RecipeCommandService(
                 RecipeRepositoryMock.Object,
@@ -53,15 +62,19 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 RecipeImageServiceMock.Object,
                 UserFollowRepositoryMock.Object,
                 NotificationCommandServiceMock.Object,
-                RecipeNutritionServiceMock.Object
+                RecipeNutritionServiceMock.Object,
+                UnitOfWorkMock.Object
             );
         }
 
-        protected Recipe CreateRecipe(Guid id)
+        protected Guid NewId() => Guid.NewGuid();
+
+        protected Recipe CreateRecipe(Guid? id = null, Guid? authorId = null)
         {
             return new Recipe
             {
-                Id = id,
+                Id = id ?? Guid.NewGuid(),
+                AuthorId = authorId ?? Guid.NewGuid(),
                 Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>(),
                 RecipeUserTags = new List<RecipeUserTag>(),
@@ -70,11 +83,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             };
         }
 
-        protected Label CreateLabel(Guid id)
+        protected Label CreateLabel(Guid? id = null)
         {
             return new Label
             {
-                Id = id
+                Id = id ?? Guid.NewGuid()
             };
         }
     }

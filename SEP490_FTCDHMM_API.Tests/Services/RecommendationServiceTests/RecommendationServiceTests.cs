@@ -11,43 +11,75 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecommendationServiceTests
 {
     public class RecommendationServiceTests
     {
-        private readonly Mock<IUserRepository> _userRepo;
-        private readonly Mock<IRecipeRepository> _recipeRepo;
-        private readonly Mock<IRecipeScoringSystem> _scoring;
-        private readonly Mock<IMapper> _mapper;
-        private readonly RecommendationService _service;
-        private readonly Mock<ICacheService> _cache;
+        private readonly Mock<IUserRepository> _userRepo = new();
+        private readonly Mock<IRecipeRepository> _recipeRepo = new();
+        private readonly Mock<IRecipeScoringSystem> _scoring = new();
+        private readonly Mock<IMapper> _mapper = new();
+        private readonly Mock<ICacheService> _cache = new();
+        private readonly Mock<IRatingRepository> _ratingRepo = new();
+        private readonly Mock<IUserRecipeViewRepository> _viewRepo = new();
+        private readonly Mock<ICommentRepository> _commentRepo = new();
+        private readonly Mock<IUserSaveRecipeRepository> _saveRepo = new();
 
-        public RecommendationServiceTests()
+        private RecommendationService CreateService()
         {
-            _userRepo = new Mock<IUserRepository>();
-            _recipeRepo = new Mock<IRecipeRepository>();
-            _scoring = new Mock<IRecipeScoringSystem>();
-            _mapper = new Mock<IMapper>();
-            _cache = new Mock<ICacheService>();
-
-            _service = new RecommendationService(
+            return new RecommendationService(
                 _userRepo.Object,
                 _recipeRepo.Object,
                 _mapper.Object,
                 _cache.Object,
+                _ratingRepo.Object,
+                _viewRepo.Object,
+                _commentRepo.Object,
+                _saveRepo.Object,
                 _scoring.Object
             );
         }
 
         [Fact]
-        public async Task RecommendRecipesAsync_NoRecipes_ReturnsEmpty()
+        public async Task RecommendRecipesAsync_CacheHit_ReturnsCachedResult()
         {
             var userId = Guid.NewGuid();
+            var cacheKey = $"recommend:user:{userId}:meal:dinner:page:1";
 
-            _userRepo.Setup(x => x.GetByIdAsync(userId, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(new AppUser());
+            var cached = new PagedResult<RecipeRankResponse>
+            {
+                Items = new List<RecipeRankResponse>
+                {
+                    new() { Id = Guid.NewGuid(), Score = 100 }
+                },
+                TotalCount = 1,
+                PageNumber = 1,
+                PageSize = 10
+            };
 
-            _recipeRepo.Setup(x => x.GetActiveRecentRecipesAsync())
-                .ReturnsAsync(new List<Recipe>());
+            _cache.Setup(x => x.GetAsync<PagedResult<RecipeRankResponse>>(It.IsAny<string>()))
+                .ReturnsAsync(cached);
 
-            var result = await _service.RecommendRecipesAsync(
+            var service = CreateService();
+
+            var result = await service.RecommendRecipesAsync(
                 userId,
+                new PaginationParams { PageNumber = 1, PageSize = 10 }
+            );
+
+            Assert.Single(result.Items);
+            Assert.Equal(100, result.Items.First().Score);
+        }
+
+        [Fact]
+        public async Task RecommendRecipesAsync_NoSnapshots_ReturnsEmpty()
+        {
+            _cache.Setup(x => x.GetAsync<PagedResult<RecipeRankResponse>>(It.IsAny<string>()))
+                .ReturnsAsync((PagedResult<RecipeRankResponse>?)null);
+
+            _recipeRepo.Setup(x => x.GetRecipesForScoringAsync())
+                .ReturnsAsync(new List<RecipeScoringSnapshot>());
+
+            var service = CreateService();
+
+            var result = await service.RecommendRecipesAsync(
+                Guid.NewGuid(),
                 new PaginationParams { PageNumber = 1, PageSize = 10 }
             );
 
@@ -56,72 +88,68 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecommendationServiceTests
         }
 
         [Fact]
-        public async Task RecommendRecipesAsync_Sorts_ByScore_Correctly()
+        public async Task RecommendRecipesAsync_SortsByScoreDescending()
         {
-            var user = new AppUser { Id = Guid.NewGuid() };
+            var userId = Guid.NewGuid();
 
-            _userRepo.Setup(x => x.GetByIdAsync(user.Id, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(user);
+            _cache.Setup(x => x.GetAsync<PagedResult<RecipeRankResponse>>(It.IsAny<string>()))
+                .ReturnsAsync((PagedResult<RecipeRankResponse>?)null);
 
-            var r1 = new Recipe { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-1) };
-            var r2 = new Recipe { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-2) };
-            var r3 = new Recipe { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-3) };
+            var snapshots = new List<RecipeScoringSnapshot>
+            {
+                new() { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-1), LabelIds = new() },
+                new() { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-2), LabelIds = new() },
+                new() { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow.AddDays(-3), LabelIds = new() }
+            };
 
-            var list = new List<Recipe> { r1, r2, r3 };
+            _recipeRepo.Setup(x => x.GetRecipesForScoringAsync())
+                .ReturnsAsync(snapshots);
 
-            _recipeRepo.Setup(x => x.GetActiveRecentRecipesAsync())
-                .ReturnsAsync(list);
+            _userRepo.Setup(x => x.Query())
+                .Returns(new List<AppUser>
+                {
+                    new()
+                    {
+                        Id = userId,
+                        HealthMetrics = new List<UserHealthMetric>()
+                    }
+                }.AsQueryable());
 
-            _scoring.Setup(x => x.CalculateFinalScore(user, r1)).Returns(30);
-            _scoring.Setup(x => x.CalculateFinalScore(user, r2)).Returns(50);
-            _scoring.Setup(x => x.CalculateFinalScore(user, r3)).Returns(10);
+            _ratingRepo.Setup(x => x.Query()).Returns(Enumerable.Empty<Rating>().AsQueryable());
+            _commentRepo.Setup(x => x.Query()).Returns(Enumerable.Empty<Comment>().AsQueryable());
+            _viewRepo.Setup(x => x.Query()).Returns(Enumerable.Empty<RecipeUserView>().AsQueryable());
+            _saveRepo.Setup(x => x.Query()).Returns(Enumerable.Empty<RecipeUserSave>().AsQueryable());
+
+            _scoring.Setup(x => x.CalculateFinalScore(It.IsAny<RecommendationUserContext>(), snapshots[0]))
+                .Returns(10);
+            _scoring.Setup(x => x.CalculateFinalScore(It.IsAny<RecommendationUserContext>(), snapshots[1]))
+                .Returns(50);
+            _scoring.Setup(x => x.CalculateFinalScore(It.IsAny<RecommendationUserContext>(), snapshots[2]))
+                .Returns(30);
+
+            var recipes = snapshots.Select(s => new Recipe { Id = s.Id }).ToList();
+
+            _recipeRepo.Setup(x => x.Query())
+                .Returns(recipes.AsQueryable());
 
             _mapper.Setup(x => x.Map<List<RecipeRankResponse>>(It.IsAny<List<Recipe>>()))
                 .Returns((List<Recipe> src) =>
                     src.Select(r => new RecipeRankResponse { Id = r.Id }).ToList()
                 );
 
-            var result = await _service.RecommendRecipesAsync(
-                user.Id,
+            var service = CreateService();
+
+            var result = await service.RecommendRecipesAsync(
+                userId,
                 new PaginationParams { PageNumber = 1, PageSize = 10 }
             );
 
             var items = result.Items.ToList();
 
+            Assert.Equal(3, items.Count);
             Assert.Equal(50, items[0].Score);
             Assert.Equal(30, items[1].Score);
             Assert.Equal(10, items[2].Score);
         }
-
-        [Fact]
-        public async Task RecommendRecipesAsync_Pagination_Works()
-        {
-            var user = new AppUser { Id = Guid.NewGuid() };
-
-            _userRepo.Setup(x => x.GetByIdAsync(user.Id, It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
-                .ReturnsAsync(user);
-
-            var r1 = new Recipe { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow };
-            var r2 = new Recipe { Id = Guid.NewGuid(), UpdatedAtUtc = DateTime.UtcNow };
-
-            _recipeRepo.Setup(x => x.GetActiveRecentRecipesAsync())
-                .ReturnsAsync(new List<Recipe> { r1, r2 });
-
-            _scoring.Setup(x => x.CalculateFinalScore(user, It.IsAny<Recipe>())).Returns(10);
-
-            _mapper.Setup(x => x.Map<List<RecipeRankResponse>>(It.IsAny<List<Recipe>>()))
-                .Returns((List<Recipe> src) =>
-                    src.Select(r => new RecipeRankResponse { Id = r.Id }).ToList()
-                );
-
-            var result = await _service.RecommendRecipesAsync(
-                user.Id,
-                new PaginationParams { PageNumber = 1, PageSize = 1 }
-            );
-
-            Assert.Single(result.Items);
-            Assert.Equal(2, result.TotalCount);
-        }
     }
-
 }

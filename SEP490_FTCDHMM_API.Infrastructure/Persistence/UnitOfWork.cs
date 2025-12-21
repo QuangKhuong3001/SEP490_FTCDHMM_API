@@ -18,12 +18,12 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence
             _logger = logger;
         }
 
-        public async Task BeginTransactionAsync(CancellationToken ct = default)
+        public async Task BeginTransactionAsync()
         {
             if (_currentTransaction != null)
                 return;
 
-            _currentTransaction = await _context.Database.BeginTransactionAsync(ct);
+            _currentTransaction = await _context.Database.BeginTransactionAsync();
         }
 
         public async Task CommitTransactionAsync()
@@ -62,15 +62,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Persistence
             _afterCommitActions.Clear();
         }
 
-        public async Task ExecuteInTransactionAsync(Func<CancellationToken, Task> operation, CancellationToken ct = default)
+        public async Task ExecuteInTransactionAsync(Func<Task> operation)
         {
-            await BeginTransactionAsync(ct);
+            await BeginTransactionAsync();
 
             try
             {
-                await operation(ct);
+                await operation();
 
-                await _context.SaveChangesAsync(ct);
+                await _context.SaveChangesAsync();
 
                 await CommitTransactionAsync();
             }
