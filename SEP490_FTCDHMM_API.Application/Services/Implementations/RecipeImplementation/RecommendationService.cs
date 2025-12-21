@@ -73,7 +73,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             {
                 Items = new List<RecipeRankResponse>(),
                 TotalCount = 0,
-                PageNumber = 0,
+                PageNumber = 1,
                 PageSize = 0
             };
         }
@@ -86,9 +86,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var cachedPage = await _cacheService.GetAsync<PagedResult<RecipeRankResponse>>(cacheKey);
             if (cachedPage != null)
             {
-                foreach (var item in cachedPage.Items)
-                    item.Score = null;
-
                 return cachedPage;
             }
 

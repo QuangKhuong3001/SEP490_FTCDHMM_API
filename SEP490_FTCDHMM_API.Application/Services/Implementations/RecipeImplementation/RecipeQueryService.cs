@@ -90,8 +90,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var recipes = await _recipeRepository.GetAllAsync(
                 r => pageIds.Contains(r.Id),
                 include: q => q
+                    .AsNoTracking()
+                    .AsSplitQuery()
                     .Include(r => r.Image)
-                    .Include(r => r.Author).ThenInclude(u => u.Avatar)
+                    .Include(r => r.Author)
+                        .ThenInclude(u => u.Avatar)
+                    .Include(r => r.Labels)
+                    .Include(r => r.RecipeIngredients)
+                        .ThenInclude(ri => ri.Ingredient)
+                            .ThenInclude(i => i.Categories)
             );
 
             var orderedRecipes = pageIds
