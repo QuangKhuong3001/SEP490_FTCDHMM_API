@@ -451,7 +451,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             var ingredient = new Ingredient
             {
                 Id = Guid.NewGuid(),
-                Name = vietName,
+                Name = vietName.ToSentenceCase(),
                 NormalizedName = vietName.NormalizeVi(),
                 UpperName = upperName,
                 Description = descriptionViet,
@@ -492,17 +492,80 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var list = new List<IngredientNutrient>();
 
+            var nutrientMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Vitamin A, RAE", "Vitamin A" },
+                { "Vitamin A, IU", "Vitamin A" },
+                { "Vitamin D (D2 + D3)", "Vitamin D" },
+                { "Vitamin D", "Vitamin D" },
+                { "Vitamin E (alpha-tocopherol)", "Vitamin E" },
+                { "Vitamin E", "Vitamin E" },
+                { "Vitamin K (phylloquinone)", "Vitamin K" },
+                { "Vitamin K", "Vitamin K" },
+                { "Vitamin C, total ascorbic acid", "Vitamin C" },
+                { "Vitamin C", "Vitamin C" },
+                { "Thiamin", "Vitamin B1 (Thiamin)" },
+                { "Vitamin B-1", "Vitamin B1 (Thiamin)" },
+                { "Riboflavin", "Vitamin B2 (Riboflavin)" },
+                { "Vitamin B-2", "Vitamin B2 (Riboflavin)" },
+                { "Niacin", "Vitamin B3 (Niacin)" },
+                { "Vitamin B-3", "Vitamin B3 (Niacin)" },
+                { "Vitamin B-6", "Vitamin B6" },
+                { "Pyridoxine", "Vitamin B6" },
+                { "Vitamin B-12", "Vitamin B12" },
+                { "Cobalamin", "Vitamin B12" },
+                { "Folate, total", "Folate (Folic Acid)" },
+                { "Folic acid", "Folate (Folic Acid)" },
+                { "Folate, food", "Folate (Folic Acid)" },
+                { "Folate, DFE", "Folate (Folic Acid)" },
+
+                { "Calcium, Ca", "Calcium" },
+                { "Iron, Fe", "Iron" },
+                { "Magnesium, Mg", "Magnesium" },
+                { "Phosphorus, P", "Phosphorus" },
+                { "Potassium, K", "Potassium" },
+                { "Sodium, Na", "Sodium" },
+                { "Zinc, Zn", "Zinc" },
+                { "Copper, Cu", "Copper" },
+                { "Manganese, Mn", "Manganese" },
+                { "Selenium, Se", "Selenium" },
+
+                { "Protein", "Protein" },
+                { "Total lipid (fat)", "Fat" },
+                { "Carbohydrate, by difference", "Carbohydrate" },
+                { "Fiber, total dietary", "Dietary Fiber" },
+                { "Sugars, total including NLEA", "Sugars" },
+                { "Total Sugars", "Sugars" },
+                { "Cholesterol", "Cholesterol" }
+            };
+
+            var addedNutrientIds = new HashSet<Guid>();
+
             foreach (var usda in detail.FoodNutrients)
             {
-                var usdaNameNorm =
-                    ViStringExtensions.RemoveDiacritics(usda.Nutrient.Name.ToLower());
+                var usdaName = usda.Nutrient.Name;
+
+                string? targetName = null;
+                if (nutrientMapping.TryGetValue(usdaName, out var mappedName))
+                {
+                    targetName = mappedName;
+                }
+                else
+                {
+                    targetName = usdaName;
+                }
 
                 var sys = systemNutrients.FirstOrDefault(n =>
-                    ViStringExtensions.RemoveDiacritics(n.Name.ToLower())
-                        .Equals(usdaNameNorm, StringComparison.OrdinalIgnoreCase));
+                    n.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+
 
                 if (sys == null)
                     continue;
+
+                if (addedNutrientIds.Contains(sys.Id))
+                    continue;
+
+                addedNutrientIds.Add(sys.Id);
 
                 list.Add(new IngredientNutrient
                 {
