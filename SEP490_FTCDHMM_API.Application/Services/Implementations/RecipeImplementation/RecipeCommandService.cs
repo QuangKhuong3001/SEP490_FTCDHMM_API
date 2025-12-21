@@ -78,6 +78,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 ? DefaultValues.DEFAULT_RECIPE_DESCRIPTION
                 : request.Description.Trim();
 
+            if (request.ExistingMainImageUrl != null && request.Image != null)
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Chưa có ảnh chính của công thức.");
+
             await _validator.ValidateLabelsAsync(request.LabelIds);
             await _validator.ValidateIngredientsAsync(request.Ingredients.Select(i => i.IngredientId));
             await _validator.ValidateCookingStepsAsync(request.CookingSteps);
