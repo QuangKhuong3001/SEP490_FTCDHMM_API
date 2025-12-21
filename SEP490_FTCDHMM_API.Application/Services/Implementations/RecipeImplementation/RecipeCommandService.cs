@@ -78,17 +78,27 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var draftExist = await _draftRecipeRepository.GetByIdAsync(request.DraftId ?? new Guid(),
                 include: i => i.Include(d => d.DraftRecipeIngredients)
                                 .Include(d => d.DraftCookingSteps)
+                                    .ThenInclude(dcs => dcs.DraftCookingStepImages)
                                 .Include(d => d.Labels)
-                                .Include(d => d.DraftRecipeUserTags));
+                                .Include(d => d.DraftRecipeUserTags)
+                                .Include(d => d.Image));
+
+            // Store draft image references before deleting draft (to reuse them instead of trying to mirror/download)
+            Guid? draftMainImageId = null;
+            var draftStepImageMap = new Dictionary<(int stepOrder, int imageOrder), Guid>();
+
             if (draftExist != null)
             {
-                await _imageService.DeleteImageAsync(draftExist.ImageId);
+                draftMainImageId = draftExist.ImageId;
 
-                draftExist.Labels.Clear();
-                draftExist.DraftRecipeIngredients.Clear();
-                draftExist.DraftCookingSteps.Clear();
-                draftExist.DraftRecipeUserTags.Clear();
-                await _draftRecipeRepository.DeleteAsync(draftExist);
+                // Build a map of step images by their order for easy lookup
+                foreach (var draftStep in draftExist.DraftCookingSteps)
+                {
+                    foreach (var draftStepImg in draftStep.DraftCookingStepImages)
+                    {
+                        draftStepImageMap[(draftStep.StepOrder, draftStepImg.ImageOrder)] = draftStepImg.ImageId;
+                    }
+                }
             }
 
             var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
@@ -128,10 +138,64 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 }
             }
 
-            await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageUrl);
+            // If publishing from draft and no new image provided, reuse draft's image
+            if (draftMainImageId.HasValue && request.Image == null && request.ExistingMainImageUrl == null)
+            {
+                recipe.ImageId = draftMainImageId;
+            }
+            else
+            {
+                await _imageService.SetRecipeImageAsync(recipe, request.Image, request.ExistingMainImageUrl);
+            }
 
-            var steps = await _imageService.CreateCookingStepsAsync(request.CookingSteps, recipe);
+            // Create cooking steps, reusing draft image IDs where applicable
+            var steps = await _imageService.CreateCookingStepsWithDraftImagesAsync(
+                request.CookingSteps,
+                recipe,
+                draftStepImageMap);
             recipe.CookingSteps = steps;
+
+            // Delete draft after transferring images to avoid 404 when mirroring
+            if (draftExist != null)
+            {
+                // Collect all image IDs being reused so we don't delete them
+                var reusedImageIds = new HashSet<Guid>();
+                if (recipe.ImageId.HasValue)
+                {
+                    reusedImageIds.Add(recipe.ImageId.Value);
+                }
+                foreach (var step in recipe.CookingSteps)
+                {
+                    foreach (var stepImg in step.CookingStepImages)
+                    {
+                        reusedImageIds.Add(stepImg.ImageId);
+                    }
+                }
+
+                // Only delete the draft images if we didn't reuse them
+                if (draftMainImageId.HasValue && !reusedImageIds.Contains(draftMainImageId.Value))
+                {
+                    await _imageService.DeleteImageAsync(draftMainImageId.Value);
+                }
+
+                // Delete unused draft step images
+                foreach (var draftStep in draftExist.DraftCookingSteps)
+                {
+                    foreach (var draftStepImg in draftStep.DraftCookingStepImages)
+                    {
+                        if (!reusedImageIds.Contains(draftStepImg.ImageId))
+                        {
+                            await _imageService.DeleteImageAsync(draftStepImg.ImageId);
+                        }
+                    }
+                }
+
+                draftExist.Labels.Clear();
+                draftExist.DraftRecipeIngredients.Clear();
+                draftExist.DraftCookingSteps.Clear();
+                draftExist.DraftRecipeUserTags.Clear();
+                await _draftRecipeRepository.DeleteAsync(draftExist);
+            }
 
             await _recipeRepository.AddAsync(recipe);
 

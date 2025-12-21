@@ -111,6 +111,75 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             return result;
         }
 
+        public async Task<List<CookingStep>> CreateCookingStepsWithDraftImagesAsync(
+            IEnumerable<CookingStepRequest> steps,
+            Recipe recipe,
+            Dictionary<(int stepOrder, int imageOrder), Guid> draftStepImageMap)
+        {
+            var result = new List<CookingStep>();
+
+            foreach (var step in steps.OrderBy(s => s.StepOrder))
+            {
+                var newStep = new CookingStep
+                {
+                    Id = Guid.NewGuid(),
+                    Instruction = step.Instruction.Trim(),
+                    StepOrder = step.StepOrder,
+                    RecipeId = recipe.Id
+                };
+
+                var imageRequests = step.Images?.ToList() ?? new List<CookingStepImageRequest>();
+                if (imageRequests.Any())
+                {
+                    newStep.CookingStepImages = new List<CookingStepImage>();
+
+                    foreach (var img in imageRequests)
+                    {
+                        Guid imageId;
+
+                        if (img.Image != null)
+                        {
+                            // New image uploaded - use it
+                            var uploaded = await _imageService.UploadImageAsync(img.Image, StorageFolder.COOKING_STEPS);
+                            imageId = uploaded.Id;
+                        }
+                        else if (img.ExistingImageUrl != null)
+                        {
+                            // Check if we have a draft image to reuse for this step/image order
+                            var key = (step.StepOrder, img.ImageOrder);
+                            if (draftStepImageMap.TryGetValue(key, out var draftImageId))
+                            {
+                                // Reuse the draft image ID directly
+                                imageId = draftImageId;
+                            }
+                            else
+                            {
+                                // Not from draft, mirror the external URL
+                                var mirrored = await _imageService.MirrorExternalImageAsync(StorageFolder.COOKING_STEPS, img.ExistingImageUrl);
+                                imageId = mirrored.Id;
+                            }
+                        }
+                        else
+                        {
+                            continue; // No image for this slot
+                        }
+
+                        newStep.CookingStepImages.Add(new CookingStepImage
+                        {
+                            Id = Guid.NewGuid(),
+                            CookingStepId = newStep.Id,
+                            ImageOrder = img.ImageOrder,
+                            ImageId = imageId
+                        });
+                    }
+                }
+
+                result.Add(newStep);
+            }
+
+            return result;
+        }
+
         public async Task ReplaceCookingStepsAsync(Guid recipeId, IEnumerable<CookingStepRequest> newSteps)
         {
             var oldSteps = await _cookingStepRepository.GetAllAsync(r => r.RecipeId == recipeId,
