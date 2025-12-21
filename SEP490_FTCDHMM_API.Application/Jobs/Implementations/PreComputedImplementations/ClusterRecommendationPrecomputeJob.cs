@@ -85,7 +85,7 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
                     ranked[i].Score = scored[i].Score;
 
                 await _cache.SetAsync(
-                    $"recommend:cluster:{cluster.ClusterId}:meal:{mealKey}:page:0",
+                    $"recommend:cluster:{cluster.ClusterId}:meal:{mealKey}",
                     ranked,
                     TimeSpan.FromHours(24));
             }

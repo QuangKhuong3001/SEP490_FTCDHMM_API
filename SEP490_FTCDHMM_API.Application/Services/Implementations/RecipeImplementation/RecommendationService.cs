@@ -55,29 +55,41 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             return MealType.Dinner;
         }
 
+        public async Task<PagedResult<RecipeRankResponse>> ComputedCommendRecipesAsync(Guid userId)
+        {
+            var meal = GetCurrentMeal().ToString().ToLower();
+            var cacheKey = $"recommend:user:{userId}:meal:{meal}";
+
+            var cachedPage = await _cacheService.GetAsync<PagedResult<RecipeRankResponse>>(cacheKey);
+            if (cachedPage != null)
+            {
+                foreach (var item in cachedPage.Items)
+                    item.Score = null;
+
+                return cachedPage;
+            }
+
+            return new PagedResult<RecipeRankResponse>
+            {
+                Items = new List<RecipeRankResponse>(),
+                TotalCount = 0,
+                PageNumber = 0,
+                PageSize = 0
+            };
+        }
+
         public async Task<PagedResult<RecipeRankResponse>> RecommendRecipesAsync(Guid userId, PaginationParams request)
         {
-            if (request.PageNumber == 0)
+            var meal = GetCurrentMeal().ToString().ToLower();
+            var cacheKey = $"recommend:user:{userId}:meal:{meal}:page:{request.PageNumber}";
+
+            var cachedPage = await _cacheService.GetAsync<PagedResult<RecipeRankResponse>>(cacheKey);
+            if (cachedPage != null)
             {
-                var clusterId = await _cacheService.GetAsync<int>($"cluster:user:{userId}");
-                var meal = GetCurrentMeal().ToString().ToLower();
-                var key = $"recommend:cluster:{clusterId}:meal:{meal}:page:0";
+                foreach (var item in cachedPage.Items)
+                    item.Score = null;
 
-                var cached = await _cacheService.GetAsync<List<RecipeRankResponse>>(key);
-
-                if (cached != null)
-                {
-                    foreach (var r in cached)
-                        r.Score = null;
-
-                    return new PagedResult<RecipeRankResponse>
-                    {
-                        Items = cached,
-                        TotalCount = cached.Count,
-                        PageNumber = 0,
-                        PageSize = request.PageSize
-                    };
-                }
+                return cachedPage;
             }
 
             var snapshots = await _recipeRepository.GetRecipesForScoringAsync();
@@ -270,13 +282,21 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             for (int i = 0; i < mapped.Count; i++)
                 mapped[i].Score = pageItems[i].Score;
 
-            return new PagedResult<RecipeRankResponse>
+            var result = new PagedResult<RecipeRankResponse>
             {
                 Items = mapped,
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
+
+            await _cacheService.SetAsync(
+                cacheKey,
+                result,
+                TimeSpan.FromHours(1)
+            );
+
+            return result;
         }
 
     }

@@ -34,5 +34,17 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             var result = await _recommentdationService.RecommendRecipesAsync(userId, appRequest);
             return Ok(result);
         }
+
+        [HttpGet("pre-computed")]
+        public async Task<IActionResult> GetListComputedAsync()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+
+            var result = await _recommentdationService.ComputedCommendRecipesAsync(userId);
+            return Ok(result);
+        }
     }
 }
