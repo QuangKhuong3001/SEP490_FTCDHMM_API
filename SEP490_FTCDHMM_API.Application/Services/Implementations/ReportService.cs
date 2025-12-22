@@ -208,7 +208,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             Expression<Func<Report, bool>> filter = r =>
                 (r.Status == ReportStatus.Approved || r.Status == ReportStatus.Rejected) &&
                 (string.IsNullOrEmpty(request.Type) ||
-                    r.TargetType == type);
+                    r.TargetType == type) &&
+                (string.IsNullOrEmpty(request.Status) ||
+                    r.Status == ReportStatus.From(request.Status));
 
             Func<IQueryable<Report>, IQueryable<Report>> include = q => q.Include(r => r.Reporter);
 

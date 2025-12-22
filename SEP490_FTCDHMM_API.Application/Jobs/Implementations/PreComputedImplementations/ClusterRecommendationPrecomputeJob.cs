@@ -72,6 +72,14 @@ namespace SEP490_FTCDHMM_API.Application.Jobs.Implementations.PreComputedImpleme
                 var recipeIds = scored.Select(x => x.Id).ToList();
 
                 var fullRecipes = await _recipeRepository.Query()
+                    .AsNoTracking()
+                    .Where(r => recipeIds.Contains(r.Id))
+                    .Include(r => r.Author)
+                        .ThenInclude(a => a.Avatar)
+                    .Include(r => r.Image)
+                    .Include(r => r.Labels)
+                    .Include(r => r.NutritionAggregates)
+                        .ThenInclude(na => na.Nutrient)
                     .Where(r => recipeIds.Contains(r.Id))
                     .ToListAsync();
 
