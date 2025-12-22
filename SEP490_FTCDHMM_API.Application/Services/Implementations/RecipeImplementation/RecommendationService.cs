@@ -88,15 +88,34 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 };
             }
 
-            foreach (var item in cached)
-                item.Score = null;
+            var recipeIds = cached.Select(x => x.Id).ToList();
+
+            var fullRecipes = await _recipeRepository.Query()
+                .AsNoTracking()
+                .Where(r => recipeIds.Contains(r.Id))
+                .Include(r => r.Author).ThenInclude(a => a.Avatar)
+                .Include(r => r.Image)
+                .Include(r => r.Labels)
+                .Include(r => r.NutritionAggregates).ThenInclude(na => na.Nutrient)
+                .ToListAsync();
+
+            var recipeMap = fullRecipes.ToDictionary(r => r.Id);
+
+            var result = cached
+                .Where(x => recipeMap.ContainsKey(x.Id))
+                .Select(x => {
+                    var mapped = _mapper.Map<RecipeRankResponse>(recipeMap[x.Id]);
+                    mapped.Score = null;
+                    return mapped;
+                })
+                .ToList();
 
             return new PagedResult<RecipeRankResponse>
             {
-                Items = cached,
-                TotalCount = cached.Count,
+                Items = result,
+                TotalCount = result.Count,
                 PageNumber = 1,
-                PageSize = cached.Count
+                PageSize = result.Count
             };
         }
 
@@ -360,4 +379,3 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
     }
 }
-
