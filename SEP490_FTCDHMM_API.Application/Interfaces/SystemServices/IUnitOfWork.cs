@@ -2,10 +2,10 @@
 {
     public interface IUnitOfWork
     {
-        Task BeginTransactionAsync(CancellationToken ct = default);
+        Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
-        Task ExecuteInTransactionAsync(Func<CancellationToken, Task> operation, CancellationToken ct = default);
+        Task ExecuteInTransactionAsync(Func<Task> operation);
         void RegisterAfterCommit(Func<Task> action);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Moq;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImplementations;
 
 namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
@@ -11,6 +12,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
         protected readonly Mock<IHealthGoalRepository> HealthGoalRepositoryMock;
         protected readonly Mock<ICustomHealthGoalRepository> CustomHealthGoalRepositoryMock;
         protected readonly Mock<IMapper> MapperMock;
+        protected readonly Mock<ICacheService> CacheServiceMock;
         protected readonly UserHealthGoalService Sut;
 
         protected UserHealthGoalServiceTestBase()
@@ -19,11 +21,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
             HealthGoalRepositoryMock = new(MockBehavior.Strict);
             CustomHealthGoalRepositoryMock = new(MockBehavior.Strict);
             MapperMock = new(MockBehavior.Strict);
+            CacheServiceMock = new(MockBehavior.Strict);
 
             Sut = new UserHealthGoalService(
                 UserHealthGoalRepositoryMock.Object,
                 HealthGoalRepositoryMock.Object,
                 MapperMock.Object,
+                CacheServiceMock.Object,
                 CustomHealthGoalRepositoryMock.Object
             );
         }

@@ -51,6 +51,12 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         {
             var normalizeKeyword = request.Keyword?.NormalizeVi();
 
+            var cacheKey = $"label:paged:{normalizeKeyword}";
+
+            var cached = await _cache.GetAsync<PagedResult<LabelResponse>>(cacheKey);
+            if (cached != null)
+                return cached;
+
             var (labels, totalCount) = await _labelRepository.GetPagedAsync(
                 request.PaginationParams.PageNumber, request.PaginationParams.PageSize,
                 l => string.IsNullOrEmpty(request.Keyword) || l.NormalizedName.Contains(normalizeKeyword!),
@@ -58,13 +64,17 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var result = _mapper.Map<List<LabelResponse>>(labels);
 
-            return new PagedResult<LabelResponse>
+            var resultPaged = new PagedResult<LabelResponse>
             {
                 Items = result,
                 TotalCount = totalCount,
                 PageNumber = request.PaginationParams.PageNumber,
                 PageSize = request.PaginationParams.PageSize
             };
+
+            await _cache.SetAsync(cacheKey, resultPaged, TimeSpan.FromMinutes(30));
+
+            return resultPaged;
         }
         public async Task<IEnumerable<LabelResponse>> GetLabelsAsync(LabelSearchDropboxRequest request)
         {

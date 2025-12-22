@@ -31,10 +31,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
         [Fact]
         public async Task Update_ShouldSucceed()
         {
+            var now = DateTime.UtcNow;
+
             var old = new HealthGoal
             {
                 Id = NewId(),
                 Description = "Old",
+                LastUpdatedUtc = now,
                 Targets = new List<HealthGoalTarget>
                 {
                     new() { Id = NewId(), NutrientId = NewId() }
@@ -52,16 +55,21 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 .ReturnsAsync(true);
 
             HealthGoalTargetRepositoryMock
-                .Setup(r => r.DeleteRangeAsync(It.IsAny<IEnumerable<HealthGoalTarget>>()))
+                .Setup(r => r.DeleteRangeAsync(old.Targets))
                 .Returns(Task.CompletedTask);
 
             HealthGoalRepositoryMock
                 .Setup(r => r.UpdateAsync(It.IsAny<HealthGoal>()))
                 .Returns(Task.CompletedTask);
 
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync("health-goal"))
+                .Returns(Task.CompletedTask);
+
             var req = new UpdateHealthGoalRequest
             {
                 Description = "New",
+                LastUpdatedUtc = now,
                 Targets = new List<NutrientTargetRequest>
                 {
                     new()
@@ -79,6 +87,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
             HealthGoalRepositoryMock.VerifyAll();
             HealthGoalTargetRepositoryMock.VerifyAll();
             NutrientRepositoryMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
+
     }
 }

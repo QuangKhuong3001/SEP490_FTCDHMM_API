@@ -41,6 +41,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
                 .Setup(r => r.AddAsync(It.IsAny<UserHealthGoal>()))
                 .ReturnsAsync((UserHealthGoal g) => g);
 
+            CacheServiceMock
+                .Setup(x => x.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
             var req = new UserHealthGoalRequest
             {
                 Type = HealthGoalType.SYSTEM.Value,
@@ -97,6 +101,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
                 .Setup(r => r.AddAsync(It.IsAny<UserHealthGoal>()))
                 .ReturnsAsync((UserHealthGoal g) => g);
 
+            CacheServiceMock
+                .Setup(x => x.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
             var req = new UserHealthGoalRequest
             {
                 Type = HealthGoalType.SYSTEM.Value,
@@ -152,6 +160,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
             UserHealthGoalRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<UserHealthGoal>()))
                 .ReturnsAsync((UserHealthGoal g) => g);
+
+            CacheServiceMock
+                .Setup(x => x.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
 
             var req = new UserHealthGoalRequest
             {

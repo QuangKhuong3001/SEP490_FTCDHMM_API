@@ -30,6 +30,14 @@ namespace SEP490_FTCDHMM_API.Shared.Utils
             return noDiacritics;
         }
 
+        public static string ToSentenceCase(this string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+            text = text.Trim().CleanDuplicateSpace();
+            if (text.Length > 0) return char.ToUpper(text[0]) + text.Substring(1);
+            return text;
+        }
+
         public static string CleanDuplicateSpace(this string name)
         {
             return Regex.Replace(name.Trim(), @"\s+", " ");

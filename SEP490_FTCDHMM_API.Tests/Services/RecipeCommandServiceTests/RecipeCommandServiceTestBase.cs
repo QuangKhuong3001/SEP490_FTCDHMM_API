@@ -23,6 +23,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
         protected Mock<IUserFollowRepository> UserFollowRepositoryMock { get; }
         protected Mock<INotificationCommandService> NotificationCommandServiceMock { get; }
         protected Mock<IRecipeNutritionService> RecipeNutritionServiceMock { get; }
+        protected Mock<IUnitOfWork> UnitOfWorkMock { get; }
 
         protected RecipeCommandService Sut { get; }
 
@@ -40,6 +41,53 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             UserFollowRepositoryMock = new(MockBehavior.Strict);
             NotificationCommandServiceMock = new(MockBehavior.Strict);
             RecipeNutritionServiceMock = new(MockBehavior.Strict);
+            UnitOfWorkMock = new(MockBehavior.Strict);
+
+            UnitOfWorkMock
+                .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<Task>>()))
+                .Returns<Func<Task>>(f => f());
+
+            UnitOfWorkMock
+                .Setup(u => u.RegisterAfterCommit(It.IsAny<Func<Task>>()));
+
+            DraftRecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Func<IQueryable<DraftRecipe>, IQueryable<DraftRecipe>>>()
+                ))
+                .ReturnsAsync((DraftRecipe)null!);
+
+            DraftRecipeRepositoryMock
+                .Setup(r => r.DeleteAsync(It.IsAny<DraftRecipe>()))
+                .Returns(Task.CompletedTask);
+
+            RecipeRepositoryMock
+                .Setup(r => r.AddAsync(It.IsAny<Recipe>()))
+                .ReturnsAsync((Recipe r) => r);
+
+            RecipeRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()
+                ))
+                .ReturnsAsync(CreateRecipe());
+
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            RecipeNutritionServiceMock
+                .Setup(n => n.AggregateRecipeAsync(It.IsAny<Recipe>()))
+                .Returns(Task.CompletedTask);
+
+            NotificationCommandServiceMock
+                .Setup(n => n.CreateAndSendNotificationAsync(
+                    It.IsAny<Guid?>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<NotificationType>(),
+                    It.IsAny<Guid?>()
+                ))
+                .Returns(Task.CompletedTask);
 
             Sut = new RecipeCommandService(
                 RecipeRepositoryMock.Object,
@@ -53,15 +101,19 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
                 RecipeImageServiceMock.Object,
                 UserFollowRepositoryMock.Object,
                 NotificationCommandServiceMock.Object,
-                RecipeNutritionServiceMock.Object
+                RecipeNutritionServiceMock.Object,
+                UnitOfWorkMock.Object
             );
         }
 
-        protected Recipe CreateRecipe(Guid id)
+        protected Guid NewId() => Guid.NewGuid();
+
+        protected Recipe CreateRecipe(Guid? id = null, Guid? authorId = null)
         {
             return new Recipe
             {
-                Id = id,
+                Id = id ?? Guid.NewGuid(),
+                AuthorId = authorId ?? Guid.NewGuid(),
                 Status = RecipeStatus.Posted,
                 RecipeIngredients = new List<RecipeIngredient>(),
                 RecipeUserTags = new List<RecipeUserTag>(),
@@ -70,11 +122,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeCommandServiceTests
             };
         }
 
-        protected Label CreateLabel(Guid id)
+        protected Label CreateLabel(Guid? id = null)
         {
             return new Label
             {
-                Id = id
+                Id = id ?? Guid.NewGuid()
             };
         }
     }

@@ -36,6 +36,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserHealthGoalServiceTests
                     x.ExpiredAtUtc != null)))
                 .Returns(Task.CompletedTask);
 
+            CacheServiceMock
+                .Setup(x => x.RemoveByPrefixAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
             await Sut.RemoveGoalFromCurrentAsync(userId);
 
             UserHealthGoalRepositoryMock.VerifyAll();

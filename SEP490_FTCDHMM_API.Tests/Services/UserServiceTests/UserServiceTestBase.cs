@@ -48,7 +48,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
 
         protected static AppUser CreateUser(
             Guid? id = null,
-            ActivityLevel? activityLevel = null)
+            ActivityLevel? activityLevel = null,
+            DateTime? lastUpdatedUtc = null)
         {
             return new AppUser
             {
@@ -59,8 +60,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
                 Email = "user@example.com",
                 Gender = Gender.Male,
                 DateOfBirth = DateTime.UtcNow.AddYears(-20),
-                ActivityLevel = activityLevel ?? ActivityLevel.From("SEDENTARY")
+                ActivityLevel = activityLevel ?? ActivityLevel.From("SEDENTARY"),
+                LastUpdatedUtc = lastUpdatedUtc ?? DateTime.UtcNow
             };
         }
+
     }
 }

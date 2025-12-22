@@ -44,10 +44,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 .Setup(r => r.DeleteAsync(goal))
                 .Returns(Task.CompletedTask);
 
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync("health-goal"))
+                .Returns(Task.CompletedTask);
+
             await Sut.DeleteHealthGoalAsync(goal.Id);
 
             HealthGoalRepositoryMock.VerifyAll();
             HealthGoalTargetRepositoryMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
+
     }
 }

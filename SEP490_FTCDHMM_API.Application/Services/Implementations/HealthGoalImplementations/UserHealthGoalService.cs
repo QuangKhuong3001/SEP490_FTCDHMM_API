@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SEP490_FTCDHMM_API.Application.Dtos.UserHealthGoalDtos;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
+using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.HealthGoalInterfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
@@ -14,15 +15,18 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
         private readonly IHealthGoalRepository _healthGoalRepopository;
         private readonly ICustomHealthGoalRepository _customHealthGoalRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
         public UserHealthGoalService(IUserHealthGoalRepository userHealthGoalRepository,
             IHealthGoalRepository healthGoalRepopository,
             IMapper mapper,
+            ICacheService cacheService,
             ICustomHealthGoalRepository customHealthGoalRepository)
         {
             _userHealthGoalRepository = userHealthGoalRepository;
             _healthGoalRepopository = healthGoalRepopository;
             _mapper = mapper;
+            _cacheService = cacheService;
             _customHealthGoalRepository = customHealthGoalRepository;
         }
 
@@ -77,6 +81,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
                 await _userHealthGoalRepository.AddAsync(newCustomGoal);
             }
+
+            await _cacheService.RemoveByPrefixAsync($"recommend:user:{userId}");
         }
 
         public async Task<UserHealthGoalResponse> GetCurrentGoalAsync(Guid userId)
@@ -95,6 +101,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
 
             current.ExpiredAtUtc = DateTime.UtcNow;
             await _userHealthGoalRepository.UpdateAsync(current);
+            await _cacheService.RemoveByPrefixAsync($"recommend:user:{userId}");
         }
 
         public async Task<IEnumerable<UserHealthGoalResponse>> GetHistoryGoalAsync(Guid userId)

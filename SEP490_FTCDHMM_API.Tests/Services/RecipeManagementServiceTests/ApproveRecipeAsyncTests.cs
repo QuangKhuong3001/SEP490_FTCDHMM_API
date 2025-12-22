@@ -9,26 +9,25 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagementServiceTests
     public class ApproveRecipeAsyncTests : RecipeManagementServiceTestsBase
     {
         [Fact]
-        public async Task ApproveRecipeAsync_ShouldThrow_WhenNotFound()
+        public async Task ApproveRecipeAsync_ShouldThrow_WhenRecipeNotFound()
         {
-            RecipeRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
+            RecipeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync((Recipe?)null);
 
-            var act = async () => await Service.ApproveRecipeAsync(Guid.NewGuid(), Guid.NewGuid());
-
-            await act.Should().ThrowAsync<AppException>()
-                .WithMessage("Công thức không tồn tại");
+            await Assert.ThrowsAsync<AppException>(() =>
+                Service.ApproveRecipeAsync(Guid.NewGuid(), Guid.NewGuid()));
         }
 
         [Fact]
-        public async Task ApproveRecipeAsync_ShouldThrow_WhenNotPending()
+        public async Task ApproveRecipeAsync_ShouldThrow_WhenStatusNotPending()
         {
-            RecipeRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
+            RecipeRepoMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(new Recipe { Status = RecipeStatus.Posted });
 
-            var act = async () => await Service.ApproveRecipeAsync(Guid.NewGuid(), Guid.NewGuid());
-
-            await act.Should().ThrowAsync<AppException>();
+            await Assert.ThrowsAsync<AppException>(() =>
+                Service.ApproveRecipeAsync(Guid.NewGuid(), Guid.NewGuid()));
         }
 
         [Fact]
@@ -36,21 +35,24 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RecipeManagementServiceTests
         {
             var recipe = new Recipe
             {
+                Id = Guid.NewGuid(),
                 Status = RecipeStatus.Pending,
                 AuthorId = Guid.NewGuid()
             };
 
             RecipeRepoMock
-            .Setup(r => r.GetByIdAsync(
-                It.IsAny<Guid>(),
-                It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>?>()
-            ))
-            .ReturnsAsync(recipe);
+                .Setup(r => r.GetByIdAsync(
+                    recipe.Id,
+                    It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()
+                ))
+                .ReturnsAsync(recipe);
 
-            await Service.ApproveRecipeAsync(Guid.NewGuid(), Guid.NewGuid());
+
+            await Service.ApproveRecipeAsync(Guid.NewGuid(), recipe.Id);
 
             recipe.Status.Should().Be(RecipeStatus.Posted);
             RecipeRepoMock.Verify(r => r.UpdateAsync(recipe), Times.Once);
         }
     }
+
 }

@@ -21,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IRatingRepository _ratingRepository;
         private readonly IUserRecipeViewRepository _userRecipeViewRepository;
         private readonly ICommentRepository _commentRepository;
+        private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
 
         public RecommendationService(
             IUserRepository userRepository,
@@ -30,6 +31,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             IRatingRepository ratingRepository,
             IUserRecipeViewRepository userRecipeViewRepository,
             ICommentRepository commentRepository,
+            IUserSaveRecipeRepository userSaveRecipeRepository,
             IRecipeScoringSystem recipeScoringSystem)
         {
             _userRepository = userRepository;
@@ -39,6 +41,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _userRecipeViewRepository = userRecipeViewRepository;
             _commentRepository = commentRepository;
             _cacheService = cacheService;
+            _userSaveRecipeRepository = userSaveRecipeRepository;
             _recipeScoringSystem = recipeScoringSystem;
         }
 
@@ -58,35 +61,96 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         public async Task<PagedResult<RecipeRankResponse>> ComputedCommendRecipesAsync(Guid userId)
         {
             var meal = GetCurrentMeal().ToString().ToLower();
-            var cacheKey = $"recommend:user:{userId}:meal:{meal}";
+            var clusterId = await _cacheService.GetAsync<int?>($"cluster:user:{userId}");
 
-            var cachedPage = await _cacheService.GetAsync<PagedResult<RecipeRankResponse>>(cacheKey);
-            if (cachedPage != null)
+            if (!clusterId.HasValue)
             {
-                foreach (var item in cachedPage.Items)
-                    item.Score = null;
-
-                return cachedPage;
+                return new PagedResult<RecipeRankResponse>
+                {
+                    Items = new List<RecipeRankResponse>(),
+                    TotalCount = 0,
+                    PageNumber = 1,
+                    PageSize = 0
+                };
             }
+
+            var cacheKey = $"recommend:cluster:{clusterId.Value}:meal:{meal}";
+            var cached = await _cacheService.GetAsync<List<RecipeRankResponse>>(cacheKey);
+
+            if (cached == null || cached.Count == 0)
+            {
+                return new PagedResult<RecipeRankResponse>
+                {
+                    Items = new List<RecipeRankResponse>(),
+                    TotalCount = 0,
+                    PageNumber = 1,
+                    PageSize = 0
+                };
+            }
+
+            foreach (var item in cached)
+                item.Score = null;
 
             return new PagedResult<RecipeRankResponse>
             {
-                Items = new List<RecipeRankResponse>(),
-                TotalCount = 0,
+                Items = cached,
+                TotalCount = cached.Count,
                 PageNumber = 1,
-                PageSize = 0
+                PageSize = cached.Count
             };
         }
 
         public async Task<PagedResult<RecipeRankResponse>> RecommendRecipesAsync(Guid userId, PaginationParams request)
         {
             var meal = GetCurrentMeal().ToString().ToLower();
-            var cacheKey = $"recommend:user:{userId}:meal:{meal}:page:{request.PageNumber}";
+            var cacheKey = $"recommend:user:{userId}:meal:{meal}";
 
-            var cachedPage = await _cacheService.GetAsync<PagedResult<RecipeRankResponse>>(cacheKey);
-            if (cachedPage != null)
+            var cacheScored = await _cacheService.GetAsync<List<RankedRecipe>>(cacheKey);
+            if (cacheScored != null)
             {
-                return cachedPage;
+                var cacheRecipeIds = cacheScored.Select(x => x.Id).ToList();
+
+                var fullCacheRecipes = await _recipeRepository.Query()
+                    .AsNoTracking()
+                    .Where(r => cacheRecipeIds.Contains(r.Id))
+                    .Include(r => r.Author).ThenInclude(a => a.Avatar)
+                    .Include(r => r.Image)
+                    .Include(r => r.Labels)
+                    .Include(r => r.NutritionAggregates).ThenInclude(na => na.Nutrient)
+                    .ToListAsync();
+
+                var recipeCacheMap = fullCacheRecipes.ToDictionary(r => r.Id);
+
+                var cacheOrdered = cacheScored
+                    .Where(x => recipeCacheMap.ContainsKey(x.Id))
+                    .Select(x => new
+                    {
+                        Recipe = recipeCacheMap[x.Id],
+                        x.Score,
+                        x.UpdatedAtUtc
+                    })
+                    .ToList();
+
+                var totalCacheCount = cacheOrdered.Count;
+
+                var pagedCacheItems = cacheOrdered
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToList();
+
+                var cacheMapped = _mapper.Map<List<RecipeRankResponse>>(
+                    pagedCacheItems.Select(x => x.Recipe).ToList());
+
+                for (int i = 0; i < cacheMapped.Count; i++)
+                    cacheMapped[i].Score = pagedCacheItems[i].Score;
+
+                return new PagedResult<RecipeRankResponse>
+                {
+                    Items = cacheMapped,
+                    TotalCount = totalCacheCount,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
             }
 
             var snapshots = await _recipeRepository.GetRecipesForScoringAsync();
@@ -203,9 +267,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 .ToDictionaryAsync(x => x.RecipeId, x => x.Count);
 
 
-            var savedRecipeIds = await _userRepository.Query()
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.SaveRecipes)
+            var savedRecipeIds = await _userSaveRecipeRepository.Query()
+                .Where(u => u.UserId == userId)
                 .Select(s => s.RecipeId)
                 .ToListAsync();
 
@@ -231,15 +294,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             };
 
             var scored = snapshots
-                .Select(r => new
+                .Select(r => new RankedRecipe
                 {
-                    r.Id,
-                    r.UpdatedAtUtc,
+                    Id = r.Id,
+                    UpdatedAtUtc = r.UpdatedAtUtc,
                     Score = _recipeScoringSystem.CalculateFinalScore(userCtx, r)
                 })
+                .Where(x => x.Score > 0)
                 .OrderByDescending(x => x.Score)
-                .Take(request.PageSize * 5)
+                    .ThenByDescending(x => x.UpdatedAtUtc)
                 .ToList();
+
+            await _cacheService.SetAsync(
+                cacheKey,
+                scored,
+                TimeSpan.FromHours(1)
+            );
 
             var recipeIds = scored.Select(x => x.Id).ToList();
 
@@ -262,11 +332,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     x.Score,
                     x.UpdatedAtUtc
                 })
-                .OrderByDescending(x => x.Score)
-                    .ThenByDescending(x => x.UpdatedAtUtc)
                 .ToList();
 
-            var totalCount = snapshots.Count;
+            var totalCount = ordered.Count;
 
             var pageItems = ordered
                 .Skip((request.PageNumber - 1) * request.PageSize)
@@ -286,12 +354,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
-
-            await _cacheService.SetAsync(
-                cacheKey,
-                result,
-                TimeSpan.FromHours(1)
-            );
 
             return result;
         }

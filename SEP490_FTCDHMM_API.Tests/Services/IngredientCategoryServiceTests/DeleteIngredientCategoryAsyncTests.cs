@@ -20,41 +20,12 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
         }
 
         [Fact]
-        public async Task Delete_ShouldThrow_WhenCategoryIsDeleted()
-        {
-            var cat = new IngredientCategory { Name = "Test" };
-
-            IngredientCateRepositoryMock
-                .Setup(r => r.GetByIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<Func<IQueryable<IngredientCategory>, IQueryable<IngredientCategory>>>()))
-                .ReturnsAsync(cat);
-
-            await Assert.ThrowsAsync<AppException>(() => Sut.DeleteIngredientCategoryAsync(NewId()));
-            IngredientCateRepositoryMock.VerifyAll();
-        }
-
-        [Fact]
-        public async Task Delete_ShouldSoftDelete_WhenCategoryHasIngredients()
+        public async Task Delete_ShouldThrow_WhenCategoryHasIngredients()
         {
             var cat = new IngredientCategory
             {
-                Name = "Category 1",
                 Id = NewId(),
-                Ingredients = new List<Ingredient>
-                { new Ingredient
-                    {
-                        Id = NewId(),
-                        Name = "Test",
-                        Image = new Image
-                        {
-                            Id = NewId(),
-                            Key = "x",
-                            ContentType = "image/png",
-                            CreatedAtUTC = DateTime.UtcNow
-                        }
-                    }
-                }
+                Ingredients = new List<Ingredient> { new Ingredient() }
             };
 
             IngredientCateRepositoryMock
@@ -63,7 +34,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
                     It.IsAny<Func<IQueryable<IngredientCategory>, IQueryable<IngredientCategory>>>()))
                 .ReturnsAsync(cat);
 
-            await Sut.DeleteIngredientCategoryAsync(cat.Id);
+            await Assert.ThrowsAsync<AppException>(() =>
+                Sut.DeleteIngredientCategoryAsync(cat.Id));
 
             IngredientCateRepositoryMock.VerifyAll();
         }
@@ -73,7 +45,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
         {
             var cat = new IngredientCategory
             {
-                Name = "Category 1",
                 Id = NewId(),
                 Ingredients = new List<Ingredient>()
             };
@@ -88,9 +59,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
                 .Setup(r => r.DeleteAsync(cat))
                 .Returns(Task.CompletedTask);
 
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync("ingredient-category"))
+                .Returns(Task.CompletedTask);
+
             await Sut.DeleteIngredientCategoryAsync(cat.Id);
 
             IngredientCateRepositoryMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
     }
 }

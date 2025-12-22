@@ -35,6 +35,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 .Setup(m => m.Map<HealthGoalResponse>(goal))
                 .Returns(new HealthGoalResponse { Id = id });
 
+            CacheServiceMock
+                .Setup(c => c.SetAsync(
+                    $"health-goal:system:detail:{id}",
+                    It.IsAny<HealthGoalResponse>(),
+                    It.IsAny<TimeSpan>()))
+                .Returns(Task.CompletedTask);
+
             var result = await Sut.GetHealthGoalByIdAsync(id);
 
             Assert.NotNull(result);
@@ -42,6 +49,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
 
             HealthGoalRepositoryMock.VerifyAll();
             MapperMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
     }
 }

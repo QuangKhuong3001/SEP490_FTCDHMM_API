@@ -24,24 +24,38 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
         [Fact]
         public async Task UpdateRolePermissionsAsync_ShouldThrow_WhenAdminRole()
         {
+            var lastUpdated = DateTime.UtcNow;
+
             var role = new AppRole
             {
                 Id = Guid.NewGuid(),
                 Name = RoleConstants.Admin,
+                LastUpdatedUtc = lastUpdated,
                 RolePermissions = new List<AppRolePermission>()
             };
 
             RoleRepoMock
-                .Setup(r => r.GetByIdAsync(role.Id, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
+                .Setup(r => r.GetByIdAsync(
+                    role.Id,
+                    It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()
+                ))
                 .ReturnsAsync(role);
 
-            var dto = new RolePermissionSettingRequest();
+            var dto = new RolePermissionSettingRequest
+            {
+                LastUpdatedUtc = lastUpdated,
+                Permissions = new List<PermissionToggleRequest>()
+            };
 
             var ex = await Assert.ThrowsAsync<AppException>(() =>
                 Sut.UpdateRolePermissionsAsync(role.Id, dto));
 
-            Assert.Equal("Không được quyền chỉnh sửa tài khoàn admin", ex.Message);
+            Assert.Equal(
+                "Không được quyền chỉnh sửa tài khoàn admin",
+                ex.Message
+            );
         }
+
 
         [Fact]
         public async Task UpdateRolePermissionsAsync_ShouldThrow_WhenPermissionNotExist()
@@ -64,7 +78,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
                 .Setup(r => r.GetByIdAsync(role.Id, It.IsAny<Func<IQueryable<AppRole>, IQueryable<AppRole>>>()))
                 .ReturnsAsync(role);
 
-            // gửi permissionActionId không tồn tại trong role
             var dto = new RolePermissionSettingRequest
             {
                 Permissions =
@@ -103,7 +116,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
                         PermissionActionId = perm2,
                         IsActive = false
                     }
-                }
+                },
+                LastUpdatedUtc = DateTime.UtcNow
             };
 
             RoleRepoMock
@@ -124,7 +138,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.RoleServiceTests
                         PermissionActionId = perm2,
                         IsActive = false
                     }
-                }
+                },
+                LastUpdatedUtc = role.LastUpdatedUtc
             };
 
             RoleRepoMock.Setup(r => r.UpdateAsync(role)).Returns(Task.CompletedTask);

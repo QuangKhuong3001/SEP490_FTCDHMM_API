@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SEP490_FTCDHMM_API.Application.Configurations;
 using SEP490_FTCDHMM_API.Application.Dtos.KMeans;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -10,14 +11,17 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
     private readonly IKMeansAppService _kMeansAppService;
     private readonly ICacheService _cache;
     private readonly KMeansSettings _settings;
+    private readonly ILogger<ClusterAssignmentJob> _logger;
 
     public ClusterAssignmentJob(
         IKMeansAppService kMeansAppService,
         ICacheService cache,
+        ILogger<ClusterAssignmentJob> logger,
         IOptions<KMeansSettings> settings)
     {
         _kMeansAppService = kMeansAppService;
         _cache = cache;
+        _logger = logger;
         _settings = settings.Value;
     }
 
@@ -26,11 +30,15 @@ public class ClusterAssignmentJob : IClusterAssignmentJob
         await _cache.RemoveByPrefixAsync("cluster");
         await _cache.DeleteKeyAsync("cluster:profiles");
 
+        _logger.LogInformation($"Starting K-Means evaluation and computation with {_settings.MinK} to {_settings.MaxK}");
+
         var evaluation = await _kMeansAppService.EvaluateKAsync(
             _settings.MinK,
             _settings.MaxK);
 
         var k = evaluation.BestK;
+
+        _logger.LogInformation($"Best K found: {k}. Starting computation...");
 
         var result = await _kMeansAppService.ComputeAsync(k);
 

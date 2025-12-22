@@ -33,11 +33,16 @@ namespace SEP490_FTCDHMM_API.Tests.Services.IngredientCategoryServiceTests
                 .Setup(r => r.AddAsync(It.IsAny<IngredientCategory>()))
                 .ReturnsAsync(new IngredientCategory { Name = "New" });
 
+            CacheServiceMock
+                .Setup(c => c.RemoveByPrefixAsync("ingredient-category"))
+                .Returns(Task.CompletedTask);
+
             var req = new CreateIngredientCategoryRequest { Name = "Fruit" };
 
             await Sut.CreateIngredientCategoryAsync(req);
 
             IngredientCateRepositoryMock.VerifyAll();
+            CacheServiceMock.VerifyAll();
         }
     }
 }

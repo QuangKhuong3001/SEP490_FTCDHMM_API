@@ -34,15 +34,40 @@ namespace SEP490_FTCDHMM_API.Tests.Services.CommentServiceTests
         public async Task DeleteAsync_ShouldDelete_WhenValidSelf()
         {
             var userId = Guid.NewGuid();
-            var comment = CreateComment(userId: userId);
-            CommentRepositoryMock.Setup(r =>
-                r.GetByIdAsync(comment.Id, It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+            var recipeId = Guid.NewGuid();
+
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                RecipeId = recipeId,
+                Recipe = new Recipe
+                {
+                    Id = recipeId,
+                    AuthorId = Guid.NewGuid()
+                },
+                Replies = new List<Comment>()
+            };
+
+            CommentRepositoryMock
+                .Setup(r => r.GetByIdAsync(
+                    comment.Id,
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
                 .ReturnsAsync(comment);
+
+            CommentRepositoryMock
+                .Setup(r => r.DeleteAsync(comment))
+                .Returns(Task.CompletedTask);
+
+            NotifierMock
+                .Setup(n => n.SendCommentDeletedAsync(recipeId, comment.Id))
+                .Returns(Task.CompletedTask);
 
             await Sut.DeleteCommentAsync(userId, comment.Id, DeleteMode.Self);
 
             CommentRepositoryMock.Verify(r => r.DeleteAsync(comment), Times.Once);
-            NotifierMock.Verify(n => n.SendCommentDeletedAsync(comment.RecipeId, comment.Id), Times.Once);
+            NotifierMock.Verify(n => n.SendCommentDeletedAsync(recipeId, comment.Id), Times.Once);
         }
+
     }
 }
