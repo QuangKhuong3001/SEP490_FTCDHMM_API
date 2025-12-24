@@ -3,7 +3,7 @@ using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests.UserServiceTests
 {
     public class ChangeActivityLevelAsyncTests : UserServiceTestBase
     {

@@ -8,7 +8,7 @@ using SEP490_FTCDHMM_API.Application.Services.Interfaces;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
-namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests.UserServiceTests
 {
     public abstract class UserServiceTestBase
     {

@@ -2,7 +2,7 @@
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
 using SEP490_FTCDHMM_API.Application.Dtos.UserDtos;
 using SEP490_FTCDHMM_API.Domain.Entities;
-namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests.UserServiceTests
 {
 
     public class GetUserListAsyncTests : UserServiceTestBase

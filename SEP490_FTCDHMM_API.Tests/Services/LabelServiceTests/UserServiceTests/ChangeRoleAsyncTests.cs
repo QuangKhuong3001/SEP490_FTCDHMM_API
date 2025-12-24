@@ -4,7 +4,7 @@ using SEP490_FTCDHMM_API.Domain.Constants;
 using SEP490_FTCDHMM_API.Domain.Entities;
 using SEP490_FTCDHMM_API.Shared.Exceptions;
 
-namespace SEP490_FTCDHMM_API.Tests.Services.UserServiceTests
+namespace SEP490_FTCDHMM_API.Tests.Services.LabelServiceTests.UserServiceTests
 {
     public class ChangeRoleAsyncTests : UserServiceTestBase
     {
