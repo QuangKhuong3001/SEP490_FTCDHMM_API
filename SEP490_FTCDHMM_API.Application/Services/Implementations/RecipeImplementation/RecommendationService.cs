@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SEP490_FTCDHMM_API.Application.Configurations;
 using SEP490_FTCDHMM_API.Application.Dtos.Common;
-using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
+using SEP490_FTCDHMM_API.Application.Dtos.MealDtos;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
@@ -22,6 +23,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IUserRecipeViewRepository _userRecipeViewRepository;
         private readonly ICommentRepository _commentRepository;
         private readonly IUserSaveRecipeRepository _userSaveRecipeRepository;
+        private readonly IMealTargetProvider _mealTargetProvider;
+        private readonly IMealNutritionCalculator _mealNutritionCalculator;
+        private readonly IMealGapCalculator _mealGapCalculator;
+        private readonly IMealCompletionRecommender _mealCompletionRecommender;
 
         public RecommendationService(
             IUserRepository userRepository,
@@ -32,16 +37,24 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             IUserRecipeViewRepository userRecipeViewRepository,
             ICommentRepository commentRepository,
             IUserSaveRecipeRepository userSaveRecipeRepository,
+            IMealTargetProvider mealTargetProvider,
+            IMealNutritionCalculator mealNutritionCalculator,
+            IMealGapCalculator mealGapCalculator,
+            IMealCompletionRecommender mealCompletionRecommender,
             IRecipeScoringSystem recipeScoringSystem)
         {
             _userRepository = userRepository;
             _recipeRepository = recipeRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
             _ratingRepository = ratingRepository;
             _userRecipeViewRepository = userRecipeViewRepository;
             _commentRepository = commentRepository;
-            _cacheService = cacheService;
             _userSaveRecipeRepository = userSaveRecipeRepository;
+            _mealTargetProvider = mealTargetProvider;
+            _mealNutritionCalculator = mealNutritionCalculator;
+            _mealGapCalculator = mealGapCalculator;
+            _mealCompletionRecommender = mealCompletionRecommender;
             _recipeScoringSystem = recipeScoringSystem;
         }
 
@@ -58,7 +71,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             return MealType.Dinner;
         }
 
-        public async Task<PagedResult<RecipeRankResponse>> ComputedCommendRecipesAsync(Guid userId)
+        public async Task<PagedResult<RecipeRankResponse>> ComputedRecommendRecipesAsync(Guid userId)
         {
             var meal = GetCurrentMeal().ToString().ToLower();
             var clusterId = await _cacheService.GetAsync<int?>($"cluster:user:{userId}");
@@ -90,20 +103,23 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             var recipeIds = cached.Select(x => x.Id).ToList();
 
-            var fullRecipes = await _recipeRepository.Query()
-                .AsNoTracking()
-                .Where(r => recipeIds.Contains(r.Id))
-                .Include(r => r.Author).ThenInclude(a => a.Avatar)
-                .Include(r => r.Image)
-                .Include(r => r.Labels)
-                .Include(r => r.NutritionAggregates).ThenInclude(na => na.Nutrient)
-                .ToListAsync();
+            var fullRecipes = await _recipeRepository.GetAllAsync(
+                r => recipeIds.Contains(r.Id),
+                q => q
+                    .Include(r => r.Author)
+                        .ThenInclude(a => a.Avatar)
+                    .Include(r => r.Image)
+                    .Include(r => r.Labels)
+                    .Include(r => r.NutritionAggregates)
+                        .ThenInclude(n => n.Nutrient)
+            );
 
             var recipeMap = fullRecipes.ToDictionary(r => r.Id);
 
             var result = cached
                 .Where(x => recipeMap.ContainsKey(x.Id))
-                .Select(x => {
+                .Select(x =>
+                {
                     var mapped = _mapper.Map<RecipeRankResponse>(recipeMap[x.Id]);
                     mapped.Score = null;
                     return mapped;
@@ -129,44 +145,36 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             {
                 var cacheRecipeIds = cacheScored.Select(x => x.Id).ToList();
 
-                var fullCacheRecipes = await _recipeRepository.Query()
-                    .AsNoTracking()
-                    .Where(r => cacheRecipeIds.Contains(r.Id))
-                    .Include(r => r.Author).ThenInclude(a => a.Avatar)
-                    .Include(r => r.Image)
-                    .Include(r => r.Labels)
-                    .Include(r => r.NutritionAggregates).ThenInclude(na => na.Nutrient)
-                    .ToListAsync();
+                var fullCacheRecipes = await _recipeRepository.GetAllAsync(
+                    r => cacheRecipeIds.Contains(r.Id),
+                    q => q
+                        .Include(r => r.Author).ThenInclude(a => a.Avatar)
+                        .Include(r => r.Image)
+                        .Include(r => r.Labels)
+                        .Include(r => r.NutritionAggregates).ThenInclude(n => n.Nutrient)
+                );
 
                 var recipeCacheMap = fullCacheRecipes.ToDictionary(r => r.Id);
 
                 var cacheOrdered = cacheScored
                     .Where(x => recipeCacheMap.ContainsKey(x.Id))
-                    .Select(x => new
-                    {
-                        Recipe = recipeCacheMap[x.Id],
-                        x.Score,
-                        x.UpdatedAtUtc
-                    })
+                    .Select(x => new { Recipe = recipeCacheMap[x.Id], x.Score })
                     .ToList();
 
-                var totalCacheCount = cacheOrdered.Count;
-
-                var pagedCacheItems = cacheOrdered
+                var cachePageItems = cacheOrdered
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToList();
 
-                var cacheMapped = _mapper.Map<List<RecipeRankResponse>>(
-                    pagedCacheItems.Select(x => x.Recipe).ToList());
+                var mapped = _mapper.Map<List<RecipeRankResponse>>(cachePageItems.Select(x => x.Recipe).ToList());
 
-                for (int i = 0; i < cacheMapped.Count; i++)
-                    cacheMapped[i].Score = pagedCacheItems[i].Score;
+                for (int i = 0; i < mapped.Count; i++)
+                    mapped[i].Score = cachePageItems[i].Score;
 
                 return new PagedResult<RecipeRankResponse>
                 {
-                    Items = cacheMapped,
-                    TotalCount = totalCacheCount,
+                    Items = mapped,
+                    TotalCount = cacheOrdered.Count,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize
                 };
@@ -184,120 +192,85 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 };
             }
 
-            var recipeLabelsMap = snapshots.ToDictionary(
-                r => r.Id,
-                r => r.LabelIds
-            );
+            var user = await _userRepository.GetByIdAsync(userId,
+                include: i => i.Include(u => u.HealthMetrics));
 
-            var userBase = await _userRepository.Query()
-                .AsNoTracking()
-                .Where(u => u.Id == userId)
-                .Select(u => new
+            var tdee = user?.HealthMetrics
+                .OrderByDescending(h => h.RecordedAt)
+                .Select(h => (double?)h.TDEE)
+                .FirstOrDefault();
+
+            if (tdee == null || tdee <= 0)
+            {
+                return new PagedResult<RecipeRankResponse>
                 {
-                    u.Id,
-                    Tdee = u.HealthMetrics
-                        .OrderByDescending(h => h.RecordedAt)
-                        .Select(h => (double?)h.TDEE)
-                        .FirstOrDefault()
-                })
-                .FirstOrDefaultAsync();
+                    Items = new List<RecipeRankResponse>(),
+                    TotalCount = 0,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
+            }
 
+            var userWithGoals = (await _userRepository.GetAllAsync(
+                u => u.Id == userId,
+                q => q
+                    .Include(u => u.UserHealthGoals)
+                        .ThenInclude(g => g.HealthGoal)
+                            .ThenInclude(h => h!.Targets)
+                    .Include(u => u.UserHealthGoals)
+                        .ThenInclude(g => g.CustomHealthGoal)
+                            .ThenInclude(h => h!.Targets)
+                    .Include(u => u.DietRestrictions)
+            )).First();
 
-            var systemTargets = await _userRepository.Query()
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.UserHealthGoals)
-                .Where(hg =>
-                    hg.Type == HealthGoalType.SYSTEM &&
-                    hg.StartedAtUtc <= DateTime.UtcNow &&
-                    (hg.ExpiredAtUtc == null || hg.ExpiredAtUtc > DateTime.UtcNow))
-                .SelectMany(hg => hg.HealthGoal!.Targets)
-                .Select(t => new NutrientTargetDto
-                {
-                    NutrientId = t.NutrientId,
-                    MinValue = t.MinValue,
-                    MaxValue = t.MaxValue,
-                    MinEnergyPct = t.MinEnergyPct,
-                    MaxEnergyPct = t.MaxEnergyPct,
-                    TargetType = t.TargetType,
-                    Weight = t.Weight
-                })
-                .ToListAsync();
+            var now = DateTime.UtcNow;
 
-            var customTargets = await _userRepository.Query()
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.UserHealthGoals)
-                .Where(hg =>
-                    hg.Type == HealthGoalType.CUSTOM &&
-                    hg.StartedAtUtc <= DateTime.UtcNow &&
-                    (hg.ExpiredAtUtc == null || hg.ExpiredAtUtc > DateTime.UtcNow))
-                .SelectMany(hg => hg.CustomHealthGoal!.Targets)
-                .Select(t => new NutrientTargetDto
-                {
-                    NutrientId = t.NutrientId,
-                    MinValue = t.MinValue,
-                    MaxValue = t.MaxValue,
-                    MinEnergyPct = t.MinEnergyPct,
-                    MaxEnergyPct = t.MaxEnergyPct,
-                    TargetType = t.TargetType,
-                    Weight = t.Weight
-                })
-                .ToListAsync();
+            var domainTargets = userWithGoals.UserHealthGoals
+                .Where(g =>
+                    g.StartedAtUtc <= now &&
+                    (g.ExpiredAtUtc == null || g.ExpiredAtUtc > now))
+                .SelectMany(g => g.Type == HealthGoalType.SYSTEM
+                    ? g.HealthGoal!.Targets
+                    : g.CustomHealthGoal!.Targets)
+                .Select(t => new NutrientTarget(
+                    t.NutrientId,
+                    t.TargetType,
+                    t.MinValue ?? 0,
+                    t.MaxValue ?? 0,
+                    t.MinEnergyPct,
+                    t.MaxEnergyPct,
+                    t.Weight))
+                .ToList();
 
-            var restrictions = await _userRepository.Query()
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.DietRestrictions)
-                .Where(r => r.ExpiredAtUtc == null || r.ExpiredAtUtc > DateTime.UtcNow)
-                .ToListAsync();
+            var restrictions = userWithGoals.DietRestrictions
+                .Where(r => r.ExpiredAtUtc == null || r.ExpiredAtUtc > now)
+                .ToList();
 
-            var ratings = await _ratingRepository.Query()
-                .AsNoTracking()
-                .Where(r => r.UserId == userId)
+            var recipeLabelsMap = snapshots.ToDictionary(r => r.Id, r => r.LabelIds);
+
+            var ratings = (await _ratingRepository.GetAllAsync(r => r.UserId == userId))
                 .GroupBy(r => r.RecipeId)
-                .Select(g => g
-                    .OrderByDescending(x => x.CreatedAtUtc)
-                    .Select(x => new { x.RecipeId, x.Score })
-                    .First())
-                .ToDictionaryAsync(x => x.RecipeId, x => x.Score);
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.CreatedAtUtc).First().Score);
 
-            var commentCounts = await _commentRepository.Query()
-                .AsNoTracking()
-                .Where(c =>
-                    c.UserId == userId &&
-                    c.CreatedAtUtc >= DateTime.UtcNow.AddDays(-30))
+            var comments = (await _commentRepository.GetAllAsync(c =>
+                c.UserId == userId && c.CreatedAtUtc >= now.AddDays(-30)))
                 .GroupBy(c => c.RecipeId)
-                .Select(g => new
-                {
-                    RecipeId = g.Key,
-                    Count = g.Count()
-                })
-                .ToDictionaryAsync(x => x.RecipeId, x => x.Count);
+                .ToDictionary(g => g.Key, g => g.Count());
 
-            var viewCounts = await _userRecipeViewRepository.Query()
-                .AsNoTracking()
-                .Where(v =>
-                    v.UserId == userId &&
-                    v.ViewedAtUtc >= DateTime.UtcNow.AddDays(-14))
+            var views = (await _userRecipeViewRepository.GetAllAsync(v =>
+                v.UserId == userId && v.ViewedAtUtc >= now.AddDays(-14)))
                 .GroupBy(v => v.RecipeId)
-                .Select(g => new
-                {
-                    RecipeId = g.Key,
-                    Count = g.Count()
-                })
-                .ToDictionaryAsync(x => x.RecipeId, x => x.Count);
+                .ToDictionary(g => g.Key, g => g.Count());
 
-
-            var savedRecipeIds = await _userSaveRecipeRepository.Query()
-                .Where(u => u.UserId == userId)
+            var savedIds = (await _userSaveRecipeRepository.GetAllAsync(s => s.UserId == userId))
                 .Select(s => s.RecipeId)
-                .ToListAsync();
-
-            var savedRecipeIdSet = savedRecipeIds.ToHashSet();
+                .ToHashSet();
 
             var userCtx = new RecommendationUserContext
             {
-                UserId = userBase!.Id,
-                Tdee = userBase.Tdee ?? 0,
-                Targets = systemTargets.Concat(customTargets).ToList(),
+                UserId = userId,
+                Tdee = tdee.Value,
+                Targets = domainTargets,
                 RestrictedIngredientIds = restrictions
                     .Where(r => r.IngredientId.HasValue)
                     .Select(r => r.IngredientId!.Value)
@@ -307,9 +280,9 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                     .Select(r => r.IngredientCategoryId!.Value)
                     .ToHashSet(),
                 RatingByLabel = RecommendationBehaviorBuilder.BuildRatingByLabel(ratings, recipeLabelsMap),
-                ViewByLabel = RecommendationBehaviorBuilder.BuildViewByLabel(viewCounts, recipeLabelsMap),
-                CommentByLabel = RecommendationBehaviorBuilder.BuildCommentByLabel(commentCounts, recipeLabelsMap),
-                SaveByLabel = RecommendationBehaviorBuilder.BuildSaveByLabel(savedRecipeIdSet, recipeLabelsMap)
+                ViewByLabel = RecommendationBehaviorBuilder.BuildViewByLabel(views, recipeLabelsMap),
+                CommentByLabel = RecommendationBehaviorBuilder.BuildCommentByLabel(comments, recipeLabelsMap),
+                SaveByLabel = RecommendationBehaviorBuilder.BuildSaveByLabel(savedIds, recipeLabelsMap)
             };
 
             var scored = snapshots
@@ -321,61 +294,207 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 })
                 .Where(x => x.Score > 0)
                 .OrderByDescending(x => x.Score)
-                    .ThenByDescending(x => x.UpdatedAtUtc)
+                .ThenByDescending(x => x.UpdatedAtUtc)
                 .ToList();
 
-            await _cacheService.SetAsync(
-                cacheKey,
-                scored,
-                TimeSpan.FromHours(1)
-            );
+            await _cacheService.SetAsync(cacheKey, scored, TimeSpan.FromHours(1));
 
             var recipeIds = scored.Select(x => x.Id).ToList();
 
-            var fullRecipes = await _recipeRepository.Query()
-                .AsNoTracking()
-                .Where(r => recipeIds.Contains(r.Id))
-                .Include(r => r.Author).ThenInclude(a => a.Avatar)
-                .Include(r => r.Image)
-                .Include(r => r.Labels)
-                .Include(r => r.NutritionAggregates).ThenInclude(na => na.Nutrient)
-                .ToListAsync();
+            var fullRecipes = await _recipeRepository.GetAllAsync(
+                r => recipeIds.Contains(r.Id),
+                q => q
+                    .Include(r => r.Author).ThenInclude(a => a.Avatar)
+                    .Include(r => r.Image)
+                    .Include(r => r.Labels)
+                    .Include(r => r.NutritionAggregates).ThenInclude(n => n.Nutrient)
+            );
 
             var recipeMap = fullRecipes.ToDictionary(r => r.Id);
 
             var ordered = scored
                 .Where(x => recipeMap.ContainsKey(x.Id))
-                .Select(x => new
-                {
-                    Recipe = recipeMap[x.Id],
-                    x.Score,
-                    x.UpdatedAtUtc
-                })
+                .Select(x => new { Recipe = recipeMap[x.Id], x.Score })
                 .ToList();
-
-            var totalCount = ordered.Count;
 
             var pageItems = ordered
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToList();
 
-            var mapped = _mapper.Map<List<RecipeRankResponse>>(
-                pageItems.Select(x => x.Recipe).ToList());
+            var mappedResult = _mapper.Map<List<RecipeRankResponse>>(pageItems.Select(x => x.Recipe).ToList());
 
-            for (int i = 0; i < mapped.Count; i++)
-                mapped[i].Score = pageItems[i].Score;
+            for (int i = 0; i < mappedResult.Count; i++)
+                mappedResult[i].Score = pageItems[i].Score;
 
-            var result = new PagedResult<RecipeRankResponse>
+            return new PagedResult<RecipeRankResponse>
             {
-                Items = mapped,
-                TotalCount = totalCount,
+                Items = mappedResult,
+                TotalCount = ordered.Count,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
-
-            return result;
         }
 
+        public async Task<MealAnalyzeResponse> AnalyzeMealAsync(Guid userId, MealAnalyzeRequest request)
+        {
+            var mealType = GetCurrentMeal();
+            var currentIds = request.CurrentRecipeIds?.Distinct().ToHashSet() ?? new HashSet<Guid>();
+
+            var users = await _userRepository.GetAllAsync(u => u.Id == userId,
+                include: i => i.Include(u => u.HealthMetrics));
+            var user = users.FirstOrDefault();
+
+            var tdee = user?.HealthMetrics
+                .OrderByDescending(h => h.RecordedAt)
+                .Select(h => (double?)h.TDEE)
+                .FirstOrDefault();
+
+            if (tdee == null || tdee <= 0)
+            {
+                return new MealAnalyzeResponse
+                {
+                    MealType = mealType,
+                    TargetCalories = 0,
+                    CurrentCalories = 0,
+                    RemainingCalories = 0,
+                    EnergyCoveragePercent = 0
+                };
+            }
+
+            var userWithGoals = (await _userRepository.GetAllAsync(
+                u => u.Id == userId,
+                q => q
+                    .Include(u => u.UserHealthGoals)
+                        .ThenInclude(g => g.HealthGoal)
+                            .ThenInclude(h => h!.Targets)
+                    .Include(u => u.UserHealthGoals)
+                        .ThenInclude(g => g.CustomHealthGoal)
+                            .ThenInclude(h => h!.Targets)
+                    .Include(u => u.DietRestrictions)
+            )).First();
+
+            var now = DateTime.UtcNow;
+
+            var domainTargets = userWithGoals.UserHealthGoals
+                .Where(g =>
+                    g.StartedAtUtc <= now &&
+                    (g.ExpiredAtUtc == null || g.ExpiredAtUtc > now))
+                .SelectMany(g => g.Type == HealthGoalType.SYSTEM
+                    ? g.HealthGoal!.Targets
+                    : g.CustomHealthGoal!.Targets)
+                .Select(t => new NutrientTarget(
+                    t.NutrientId,
+                    t.TargetType,
+                    t.MinValue ?? 0,
+                    t.MaxValue ?? 0,
+                    t.MinEnergyPct,
+                    t.MaxEnergyPct,
+                    t.Weight))
+                .ToList();
+
+            var restrictions = userWithGoals.DietRestrictions
+                .Where(r => r.ExpiredAtUtc == null || r.ExpiredAtUtc > now)
+                .ToList();
+
+            var snapshots = await _recipeRepository.GetRecipesForScoringAsync();
+            var recipeLabelsMap = snapshots.ToDictionary(r => r.Id, r => r.LabelIds);
+
+            var ratings = (await _ratingRepository.GetAllAsync(r => r.UserId == userId))
+                .GroupBy(r => r.RecipeId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.CreatedAtUtc).First().Score);
+
+            var comments = (await _commentRepository.GetAllAsync(c =>
+                c.UserId == userId && c.CreatedAtUtc >= now.AddDays(-30)))
+                .GroupBy(c => c.RecipeId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var views = (await _userRecipeViewRepository.GetAllAsync(v =>
+                v.UserId == userId && v.ViewedAtUtc >= now.AddDays(-14)))
+                .GroupBy(v => v.RecipeId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var savedIds = (await _userSaveRecipeRepository.GetAllAsync(s => s.UserId == userId))
+                .Select(s => s.RecipeId)
+                .ToHashSet();
+
+            var userCtx = new RecommendationUserContext
+            {
+                UserId = userId,
+                Tdee = tdee.Value,
+                Targets = domainTargets,
+                RestrictedIngredientIds = restrictions
+                    .Where(r => r.IngredientId.HasValue)
+                    .Select(r => r.IngredientId!.Value)
+                    .ToHashSet(),
+                RestrictedCategoryIds = restrictions
+                    .Where(r => r.IngredientCategoryId.HasValue)
+                    .Select(r => r.IngredientCategoryId!.Value)
+                    .ToHashSet(),
+                RatingByLabel = RecommendationBehaviorBuilder.BuildRatingByLabel(ratings, recipeLabelsMap),
+                ViewByLabel = RecommendationBehaviorBuilder.BuildViewByLabel(views, recipeLabelsMap),
+                CommentByLabel = RecommendationBehaviorBuilder.BuildCommentByLabel(comments, recipeLabelsMap),
+                SaveByLabel = RecommendationBehaviorBuilder.BuildSaveByLabel(savedIds, recipeLabelsMap)
+            };
+
+            var mealTarget = _mealTargetProvider.BuildMealTarget(tdee.Value, mealType, domainTargets);
+
+            var currentSnapshots = snapshots.Where(r => currentIds.Contains(r.Id)).ToList();
+            var currentState = _mealNutritionCalculator.Calculate(currentSnapshots);
+            var gap = _mealGapCalculator.Calculate(mealTarget, currentState);
+
+            var candidates = snapshots.Where(r => !currentIds.Contains(r.Id));
+
+            var suggested = _mealCompletionRecommender.Recommend(
+                userCtx,
+                mealTarget,
+                currentState,
+                gap,
+                candidates,
+                currentIds,
+                Math.Max(1, request.SuggestionLimit))
+                .ToList();
+
+            var suggestedIds = suggested.Select(x => x.Recipe.Id).ToList();
+
+            var fullRecipes = await _recipeRepository.GetAllAsync(
+                r => suggestedIds.Contains(r.Id),
+                q => q
+                    .Include(r => r.Author).ThenInclude(a => a.Avatar)
+                    .Include(r => r.Image)
+                    .Include(r => r.Labels)
+                    .Include(r => r.NutritionAggregates).ThenInclude(n => n.Nutrient)
+            );
+
+            var map = fullRecipes.ToDictionary(r => r.Id);
+            var ordered = suggestedIds.Where(map.ContainsKey).Select(id => map[id]).ToList();
+            var mapped = _mapper.Map<List<RecipeRankResponse>>(ordered);
+
+            for (int i = 0; i < mapped.Count; i++)
+                mapped[i].Score = suggested.First(x => x.Recipe.Id == ordered[i].Id).Score;
+
+            var coverage = mealTarget.TargetCalories == 0
+                ? 0
+                : (double)(currentState.Calories / mealTarget.TargetCalories * 100);
+
+            return new MealAnalyzeResponse
+            {
+                MealType = mealType,
+                TargetCalories = mealTarget.TargetCalories,
+                CurrentCalories = currentState.Calories,
+                RemainingCalories = gap.RemainingCalories,
+                EnergyCoveragePercent = coverage,
+                TargetNutrients = mealTarget.NutrientTargets.ToDictionary(x => x.NutrientId, x => x.MinValue),
+                CurrentNutrients = currentState.Nutrients.ToDictionary(x => x.Key, x => x.Value),
+                RemainingNutrients = gap.RemainingNutrients.ToDictionary(
+                    x => x.Key,
+                    x => new NutrientRangeResponse
+                    {
+                        Min = x.Value.Min,
+                        Max = x.Value.Max
+                    }),
+                Suggestions = mapped
+            };
+        }
     }
 }

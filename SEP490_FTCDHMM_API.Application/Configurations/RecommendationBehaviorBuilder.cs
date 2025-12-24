@@ -1,4 +1,4 @@
-﻿namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
+﻿namespace SEP490_FTCDHMM_API.Application.Configurations
 {
     public static class RecommendationBehaviorBuilder
     {

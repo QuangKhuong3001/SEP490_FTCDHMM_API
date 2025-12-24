@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SEP490_FTCDHMM_API.Api.Dtos.Common;
+using SEP490_FTCDHMM_API.Api.Dtos.MealDtos;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using ApplicationDtos = SEP490_FTCDHMM_API.Application.Dtos;
 
@@ -43,7 +44,20 @@ namespace SEP490_FTCDHMM_API.Api.Controllers.RecipeControllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            var result = await _recommentdationService.ComputedCommendRecipesAsync(userId);
+            var result = await _recommentdationService.ComputedRecommendRecipesAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("meal-planner")]
+        public async Task<IActionResult> AnalyzeMealAsync([FromQuery] MealAnalyzeRequest request)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appRequest = _mapper.Map<ApplicationDtos.MealDtos.MealAnalyzeRequest>(request);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return BadRequest();
+
+            var result = await _recommentdationService.AnalyzeMealAsync(userId, appRequest);
             return Ok(result);
         }
     }

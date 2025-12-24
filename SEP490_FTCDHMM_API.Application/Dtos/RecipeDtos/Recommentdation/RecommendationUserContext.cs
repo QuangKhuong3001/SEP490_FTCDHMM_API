@@ -1,4 +1,4 @@
-﻿using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
+﻿using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation
 {
@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation
         public Guid UserId { get; set; }
         public double Tdee { get; set; }
 
-        public List<NutrientTargetDto> Targets { get; set; } = new();
+        public List<NutrientTarget> Targets { get; set; } = new();
 
         public HashSet<Guid> RestrictedIngredientIds { get; set; } = new();
         public HashSet<Guid> RestrictedCategoryIds { get; set; } = new();

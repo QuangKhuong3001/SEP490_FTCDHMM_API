@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using SEP490_FTCDHMM_API.Application.Dtos.NutrientDtos.NutrientTarget;
 using SEP490_FTCDHMM_API.Application.Dtos.RecipeDtos.Recommentdation;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Domain.Interfaces;
@@ -66,7 +65,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
         private double CalculateNutrientFit(
             RecipeScoringSnapshot recipe,
-            List<NutrientTargetDto> targets)
+            List<NutrientTarget> targets)
         {
             if (!targets.Any())
                 return 0;
@@ -95,20 +94,23 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return count == 0 ? 0 : total / count;
         }
 
-        private double ScoreAbsolute(decimal value, NutrientTargetDto t)
+        private double ScoreAbsolute(decimal value, NutrientTarget t)
         {
-            if (value < t.MinValue)
-                return 1 - (double)((t.MinValue - value) / t.MinValue);
+            var min = t.MinValue <= 0 ? 0.0001m : t.MinValue;
+            var max = t.MaxValue <= 0 ? decimal.MaxValue : t.MaxValue;
 
-            if (value > t.MaxValue)
-                return 1 - (double)((value - t.MaxValue) / t.MaxValue);
+            if (value < min)
+                return 1 - (double)((min - value) / min);
+
+            if (value > max)
+                return 1 - (double)((value - max) / max);
 
             return 1;
         }
 
         private double ScorePercentage(
             decimal amount,
-            NutrientTargetDto t,
+            NutrientTarget t,
             decimal calories)
         {
             if (calories <= 0)
@@ -120,24 +122,19 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             var pct = ((double)amount * kcalPerGram) / (double)calories * 100;
 
-            var minPct = t.MinEnergyPct.HasValue
-                ? (double)t.MinEnergyPct.Value
-                : 0;
-
-            var maxPct = t.MaxEnergyPct.HasValue
-                ? (double)t.MaxEnergyPct.Value
-                : 100;
+            var minPct = t.MinEnergyPct.HasValue ? (double)t.MinEnergyPct.Value : 0;
+            var maxPct = t.MaxEnergyPct.HasValue ? (double)t.MaxEnergyPct.Value : 100;
 
             if (pct < minPct)
             {
                 var diff = minPct - pct;
-                return Math.Clamp(1 - diff / minPct, 0, 1);
+                return minPct == 0 ? 0 : Math.Clamp(1 - diff / minPct, 0, 1);
             }
 
             if (pct > maxPct)
             {
                 var diff = pct - maxPct;
-                return Math.Clamp(1 - diff / maxPct, 0, 1);
+                return maxPct == 0 ? 0 : Math.Clamp(1 - diff / maxPct, 0, 1);
             }
 
             return 1;
@@ -161,25 +158,10 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             if (recipe.LabelIds.Count == 0)
                 return 0;
 
-            double viewRatio = CalculateLabelRatio(
-                recipe.LabelIds,
-                user.ViewByLabel
-            );
-
-            double commentRatio = CalculateLabelRatio(
-                recipe.LabelIds,
-                user.CommentByLabel
-            );
-
-            double ratingRatio = CalculateLabelRatio(
-                recipe.LabelIds,
-                user.RatingByLabel
-            );
-
-            double saveRatio = CalculateLabelRatio(
-                recipe.LabelIds,
-                user.SaveByLabel
-            );
+            double viewRatio = CalculateLabelRatio(recipe.LabelIds, user.ViewByLabel);
+            double commentRatio = CalculateLabelRatio(recipe.LabelIds, user.CommentByLabel);
+            double ratingRatio = CalculateLabelRatio(recipe.LabelIds, user.RatingByLabel);
+            double saveRatio = CalculateLabelRatio(recipe.LabelIds, user.SaveByLabel);
 
             return
                 0.3 * ratingRatio +

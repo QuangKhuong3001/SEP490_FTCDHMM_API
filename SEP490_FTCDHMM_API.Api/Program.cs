@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Microsoft.EntityFrameworkCore;
 using SEP490_FTCDHMM_API.Api.Configurations;
 using SEP490_FTCDHMM_API.Api.Middleware;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
@@ -89,7 +88,7 @@ using (var scope = app.Services.CreateScope())
 
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    dbContext.Database.Migrate();
+    //dbContext.Database.Migrate();
 
     var config = services.GetRequiredService<IConfiguration>();
     await DataSeeder.SeedAdminAsync(services, config);
