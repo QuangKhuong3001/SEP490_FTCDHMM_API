@@ -43,11 +43,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 var kcalPerGram = GetMacroCaloriesPerGram(t.NutrientId);
 
                 var min = t.MinEnergyPct.HasValue
-                    ? targetCalories * (decimal)t.MinEnergyPct.Value / kcalPerGram
+                    ? targetCalories * ((decimal)t.MinEnergyPct.Value / 100m) / kcalPerGram
                     : 0;
 
                 var max = t.MaxEnergyPct.HasValue
-                    ? targetCalories * (decimal)t.MaxEnergyPct.Value / kcalPerGram
+                    ? targetCalories * ((decimal)t.MaxEnergyPct.Value / 100m) / kcalPerGram
                     : decimal.MaxValue;
 
                 return new NutrientTarget(
