@@ -179,29 +179,32 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.HealthGoalImpl
             await _customHealthGoalRepository.DeleteAsync(goal);
         }
 
-        private Task ValidateInput(NutrientTargetRequest nutrient)
+        private async Task ValidateInput(NutrientTargetRequest nutrientRequest)
         {
-            var type = NutrientTargetType.From(nutrient.TargetType);
+            var nutrient = await _nutrientRepository.GetByIdAsync(nutrientRequest.NutrientId);
 
-            if (type == NutrientTargetType.Absolute)
+            if (nutrientRequest.TargetType == NutrientTargetType.Absolute.Value)
             {
-                if (!(nutrient.MinValue.HasValue && nutrient.MaxValue.HasValue))
+                if (nutrient!.IsMacroNutrient)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể đặt mục tiêu chính xác cho dinh dưỡng đa lượng");
+
+                if (!(nutrientRequest.MinValue.HasValue && nutrientRequest.MaxValue.HasValue))
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
-                if (nutrient.MaxValue < nutrient.MinValue)
+                if (nutrientRequest.MaxValue < nutrientRequest.MinValue)
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
             }
-            else if (type == NutrientTargetType.EnergyPercent)
+            else if (nutrientRequest.TargetType == NutrientTargetType.EnergyPercent.Value)
             {
-                if (!(nutrient.MinEnergyPct.HasValue && nutrient.MaxEnergyPct.HasValue))
+                if (!nutrient!.IsMacroNutrient)
+                    throw new AppException(AppResponseCode.INVALID_ACTION, "Không thể đặt mục tiêu phần trăm năng lượng cho dinh dưỡng vi lượng");
+
+                if (!(nutrientRequest.MinEnergyPct.HasValue && nutrientRequest.MaxEnergyPct.HasValue))
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Bạn phải nhập giá trị giới hạn cho dinh dưỡng");
 
-                if (nutrient.MaxEnergyPct < nutrient.MinEnergyPct)
+                if (nutrientRequest.MaxEnergyPct < nutrientRequest.MinEnergyPct)
                     throw new AppException(AppResponseCode.INVALID_ACTION, "Giá trị tối đa phải lớn hơn giá trị tối thiểu");
             }
-
-            return Task.CompletedTask;
         }
     }
-
 }
