@@ -56,6 +56,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 .ReturnsAsync(false);
 
             NutrientRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
+                .ReturnsAsync(new Nutrient
+                {
+                    IsMacroNutrient = false
+                });
+
+            NutrientRepositoryMock
                 .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
                 .ReturnsAsync(true);
 

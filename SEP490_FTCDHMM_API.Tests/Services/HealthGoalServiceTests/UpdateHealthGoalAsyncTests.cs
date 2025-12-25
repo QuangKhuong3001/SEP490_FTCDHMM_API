@@ -40,7 +40,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                 LastUpdatedUtc = now,
                 Targets = new List<HealthGoalTarget>
                 {
-                    new() { Id = NewId(), NutrientId = NewId() }
+                    new()
+                    {
+                        Id = NewId(),
+                        NutrientId = NewId()
+                    }
                 }
             };
 
@@ -49,6 +53,13 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                     old.Id,
                     It.IsAny<Func<IQueryable<HealthGoal>, IQueryable<HealthGoal>>>()))
                 .ReturnsAsync(old);
+
+            NutrientRepositoryMock
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), null))
+                .ReturnsAsync(new Nutrient
+                {
+                    IsMacroNutrient = false
+                });
 
             NutrientRepositoryMock
                 .Setup(r => r.IdsExistAsync(It.IsAny<List<Guid>>()))
@@ -77,7 +88,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
                         NutrientId = NewId(),
                         TargetType = NutrientTargetType.Absolute.Value,
                         MinValue = 1,
-                        MaxValue = 5
+                        MaxValue = 5,
+                        Weight = 1
                     }
                 }
             };
@@ -85,10 +97,11 @@ namespace SEP490_FTCDHMM_API.Tests.Services.HealthGoalServiceTests
             await Sut.UpdateHealthGoalAsync(old.Id, req);
 
             HealthGoalRepositoryMock.VerifyAll();
-            HealthGoalTargetRepositoryMock.VerifyAll();
             NutrientRepositoryMock.VerifyAll();
+            HealthGoalTargetRepositoryMock.VerifyAll();
             CacheServiceMock.VerifyAll();
         }
+
 
     }
 }
