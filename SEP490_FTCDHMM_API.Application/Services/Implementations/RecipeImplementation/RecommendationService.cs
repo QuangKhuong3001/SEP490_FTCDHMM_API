@@ -355,7 +355,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var tdee = user?.HealthMetrics
                 .OrderByDescending(h => h.RecordedAt)
                 .Select(h => (double?)h.TDEE)
-                .FirstOrDefault();
+                .FirstOrDefault() * (double)slot.EnergyPercent;
 
             if (tdee == null || tdee <= 0)
             {
@@ -427,7 +427,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var userCtx = new RecommendationUserContext
             {
                 UserId = userId,
-                Tdee = tdee.Value * (double)slot.EnergyPercent / 100,
+                Tdee = tdee.Value,
                 Targets = domainTargets,
                 RestrictedIngredientIds = restrictions
                     .Where(r => r.IngredientId.HasValue)
