@@ -62,7 +62,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.NOT_FOUND);
 
             var all = await _mealSlotRepository.GetByUserAsync(userId);
-            if (all.Any(x => x.OrderIndex == request.OrderIndex))
+            if (all.Any(x => x.Id != slotId && x.OrderIndex == request.OrderIndex))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var sum = all.Where(x => x.Id != slotId).Sum(x => x.EnergyPercent) + request.EnergyPercent;
