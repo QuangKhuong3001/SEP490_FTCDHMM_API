@@ -49,7 +49,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                         mealCompletionScore += ratio * normalizedWeight;
                     }
 
-                    var finalScore = baseScore * (1 + 0.5 * mealCompletionScore);
+                    var finalScore = (baseScore * (1 + 0.5 * mealCompletionScore)) / 1.5;
 
                     return (Recipe: r, Score: finalScore);
                 })
