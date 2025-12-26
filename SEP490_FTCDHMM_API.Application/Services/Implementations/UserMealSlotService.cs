@@ -25,7 +25,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var sum = existing.Sum(x => x.EnergyPercent) + request.EnergyPercent;
-            if (sum > 1)
+            if (sum > 100)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Tổng năng lượng không vượt quá 100%");
 
             var slot = new UserMealSlot
@@ -66,7 +66,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var sum = all.Where(x => x.Id != slotId).Sum(x => x.EnergyPercent) + request.EnergyPercent;
-            if (sum > 1)
+            if (sum > 100)
                 throw new AppException(AppResponseCode.INVALID_ACTION, "Tổng năng lượng không vượt quá 100%");
 
             slot.Name = request.Name.Trim();

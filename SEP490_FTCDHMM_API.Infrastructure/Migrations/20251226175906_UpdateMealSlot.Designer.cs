@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251226175906_UpdateMealSlot")]
+    partial class UpdateMealSlot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,7 +199,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(923),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(7383),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
@@ -204,7 +207,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(973),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(7423),
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
@@ -212,7 +215,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(984),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(7431),
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -1333,7 +1336,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(553),
+                            CreatedAtUTC = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(7027),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1554,7 +1557,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("edae6e4e-e3a4-ccd4-a2d4-81edf652d3f4"),
                             ColorCode = "#4CAF50",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2760),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9181),
                             Name = "Lành mạnh",
                             NormalizedName = "",
                             UpperName = ""
@@ -1563,7 +1566,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("133554ee-b8bf-0518-a055-4097baea7b64"),
                             ColorCode = "#2196F3",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2772),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9191),
                             Name = "Giàu đạm",
                             NormalizedName = "",
                             UpperName = ""
@@ -1572,7 +1575,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("d5caeabc-0ca2-b778-f234-d5c084dd23cb"),
                             ColorCode = "#9C27B0",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2778),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9197),
                             Name = "Ít tinh bột",
                             NormalizedName = "",
                             UpperName = ""
@@ -1581,7 +1584,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("16a7239f-04ef-4ae8-3c3d-f7c91f625ade"),
                             ColorCode = "#8BC34A",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2783),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9202),
                             Name = "Thuần chay",
                             NormalizedName = "",
                             UpperName = ""
@@ -1590,7 +1593,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("8443f632-4d26-96c3-6c99-cdb180c761f3"),
                             ColorCode = "#CDDC39",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2789),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9207),
                             Name = "Chay",
                             NormalizedName = "",
                             UpperName = ""
@@ -1599,7 +1602,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("19f3c506-46ad-f9be-3a10-63dc2ed6a57e"),
                             ColorCode = "#FF9800",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2794),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9213),
                             Name = "Không gluten",
                             NormalizedName = "",
                             UpperName = ""
@@ -1608,7 +1611,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("b6cb3448-5f59-44b8-e69e-5a2e408ccd97"),
                             ColorCode = "#FFC107",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2803),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9218),
                             Name = "Món nhanh",
                             NormalizedName = "",
                             UpperName = ""
@@ -1617,7 +1620,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("c8f90ed8-cc93-7d51-8477-534ff99d0fd0"),
                             ColorCode = "#00BCD4",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2809),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9223),
                             Name = "Ít béo",
                             NormalizedName = "",
                             UpperName = ""
@@ -1626,7 +1629,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("d238ef58-09be-5176-f430-16cdbfc0032a"),
                             ColorCode = "#795548",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2814),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9229),
                             Name = "Keto",
                             NormalizedName = "",
                             UpperName = ""
@@ -1635,7 +1638,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("f4a0ea3a-98b1-3443-4739-f63803a841c8"),
                             ColorCode = "#FF5722",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 18, 5, 42, 267, DateTimeKind.Utc).AddTicks(2820),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 17, 59, 5, 944, DateTimeKind.Utc).AddTicks(9234),
                             Name = "Phù hợp cho người tiểu đường",
                             NormalizedName = "",
                             UpperName = ""
@@ -2745,7 +2748,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("EnergyPercent")
-                        .HasColumnType("decimal(5,2)");
+                        .HasColumnType("decimal(5,4)");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -83,11 +83,11 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 if (!nutrientMap.TryGetValue(t.NutrientId, out var amount))
                     continue;
 
-                double score = t.TargetType == NutrientTargetType.Absolute
+                double rawScore = t.TargetType == NutrientTargetType.Absolute
                     ? ScoreAbsolute(amount, t)
                     : ScorePercentage(amount, t, perServingCalories);
 
-                score = Math.Clamp(score, 0, 1);
+                var score = 0.2 + 0.8 * Math.Clamp(rawScore, 0, 1);
 
                 weightedTotal += score * t.Weight;
                 weightSum += t.Weight;
@@ -95,6 +95,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             return weightSum == 0 ? 0 : weightedTotal / weightSum;
         }
+
 
         private double ScoreAbsolute(decimal value, NutrientTarget t)
         {
@@ -151,11 +152,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             var targetCalories = tdee * (double)mealPct;
             var perServing = (double)recipe.Calories / recipe.Ration;
 
-            var diff = Math.Abs(perServing - targetCalories);
-            return Math.Clamp(1 - diff / targetCalories, 0, 1);
+            var diffRatio = Math.Abs(perServing - targetCalories) / targetCalories;
+
+            return Math.Exp(-diffRatio * diffRatio * 4);
         }
 
-        private double CalculateBehaviorFit(RecipeScoringSnapshot recipe, RecommendationUserContext user)
+
+        private double CalculateBehaviorFit(
+    RecipeScoringSnapshot recipe,
+    RecommendationUserContext user)
         {
             if (recipe.LabelIds.Count == 0)
                 return 0;
@@ -165,11 +170,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             double ratingRatio = CalculateLabelRatio(recipe.LabelIds, user.RatingByLabel);
             double saveRatio = CalculateLabelRatio(recipe.LabelIds, user.SaveByLabel);
 
-            return
-                0.3 * ratingRatio +
+            var raw =
                 0.4 * saveRatio +
+                0.3 * ratingRatio +
                 0.2 * commentRatio +
                 0.1 * viewRatio;
+
+            return Math.Log(1 + raw * 9) / Math.Log(10);
         }
 
         private double CalculateLabelRatio(List<Guid> recipeLabels, Dictionary<Guid, int> userLabelStats)

@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             UserMealSlot slot,
             IReadOnlyList<NutrientTarget> nutrientTargets)
         {
-            var targetCalories = (decimal)tdee * slot.EnergyPercent;
+            var targetCalories = (decimal)tdee * slot.EnergyPercent / 100;
 
             var normalizedTargets = nutrientTargets.Select(t =>
             {
@@ -47,8 +47,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                 if (!IsMacro(t.NutrientId))
                 {
-                    var min = t.MinValue * slot.EnergyPercent;
-                    var max = t.MaxValue * slot.EnergyPercent;
+                    var min = t.MinValue * slot.EnergyPercent / 100;
+                    var max = t.MaxValue * slot.EnergyPercent / 100;
 
                     return new NutrientTarget(
                         t.NutrientId,
