@@ -395,6 +395,7 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
 
             services.AddScoped<IUserMealSlotService, UserMealSlotService>();
             services.AddScoped<IMealSlotRepository, MealSlotRepository>();
+            services.AddScoped<IUserMealSlotInitializer, UserMealSlotInitializer>();
         }
     }
 }
