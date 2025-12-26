@@ -19,7 +19,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             UserMealSlot slot,
             IReadOnlyList<NutrientTarget> nutrientTargets)
         {
-            var targetCalories = (decimal)tdee * slot.EnergyPercent;
+            var targetCalories = (decimal)tdee;
 
             var normalizedTargets = nutrientTargets.Select(t =>
             {
