@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEP490_FTCDHMM_API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SEP490_FTCDHMM_API.Infrastructure.Data;
 namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251226145058_AddMeal")]
+    partial class AddMeal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("DraftRecipeLabels", b =>
-                {
-                    b.Property<Guid>("DraftRecipeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("LabelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DraftRecipeId", "LabelId");
-
-                    b.HasIndex("LabelId");
-
-                    b.ToTable("DraftRecipeLabels", (string)null);
-                });
 
             modelBuilder.Entity("IngredientIngredientCategory", b =>
                 {
@@ -196,7 +184,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("00edafe3-b047-5980-d0fa-da10f400c1e5"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(4622),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(4490),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
@@ -204,7 +192,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("8ea665ca-b310-5ac6-c897-ff8b89f9f728"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(4665),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(4542),
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
@@ -212,7 +200,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("1d6026ce-0dac-13ea-8b72-95f02b7620a7"),
                             IsActive = true,
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(4673),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(4550),
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -1333,7 +1321,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("58c77fe0-a3ba-f1c2-0518-3e8a6cc02696"),
                             ContentType = "image/png",
-                            CreatedAtUTC = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(4353),
+                            CreatedAtUTC = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(4148),
                             IsDeleted = false,
                             Key = "images/default/no-image.png"
                         });
@@ -1529,6 +1517,9 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid?>("DraftRecipeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("LastUpdatedUtc")
                         .HasColumnType("datetime2");
 
@@ -1547,6 +1538,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DraftRecipeId");
+
                     b.ToTable("Labels", (string)null);
 
                     b.HasData(
@@ -1554,7 +1547,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("edae6e4e-e3a4-ccd4-a2d4-81edf652d3f4"),
                             ColorCode = "#4CAF50",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6424),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6550),
                             Name = "Lành mạnh",
                             NormalizedName = "",
                             UpperName = ""
@@ -1563,7 +1556,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("133554ee-b8bf-0518-a055-4097baea7b64"),
                             ColorCode = "#2196F3",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6432),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6563),
                             Name = "Giàu đạm",
                             NormalizedName = "",
                             UpperName = ""
@@ -1572,7 +1565,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("d5caeabc-0ca2-b778-f234-d5c084dd23cb"),
                             ColorCode = "#9C27B0",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6438),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6569),
                             Name = "Ít tinh bột",
                             NormalizedName = "",
                             UpperName = ""
@@ -1581,7 +1574,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("16a7239f-04ef-4ae8-3c3d-f7c91f625ade"),
                             ColorCode = "#8BC34A",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6471),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6574),
                             Name = "Thuần chay",
                             NormalizedName = "",
                             UpperName = ""
@@ -1590,7 +1583,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("8443f632-4d26-96c3-6c99-cdb180c761f3"),
                             ColorCode = "#CDDC39",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6477),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6578),
                             Name = "Chay",
                             NormalizedName = "",
                             UpperName = ""
@@ -1599,7 +1592,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("19f3c506-46ad-f9be-3a10-63dc2ed6a57e"),
                             ColorCode = "#FF9800",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6483),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6584),
                             Name = "Không gluten",
                             NormalizedName = "",
                             UpperName = ""
@@ -1608,7 +1601,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("b6cb3448-5f59-44b8-e69e-5a2e408ccd97"),
                             ColorCode = "#FFC107",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6488),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6589),
                             Name = "Món nhanh",
                             NormalizedName = "",
                             UpperName = ""
@@ -1617,7 +1610,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("c8f90ed8-cc93-7d51-8477-534ff99d0fd0"),
                             ColorCode = "#00BCD4",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6493),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6594),
                             Name = "Ít béo",
                             NormalizedName = "",
                             UpperName = ""
@@ -1626,7 +1619,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("d238ef58-09be-5176-f430-16cdbfc0032a"),
                             ColorCode = "#795548",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6498),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6599),
                             Name = "Keto",
                             NormalizedName = "",
                             UpperName = ""
@@ -1635,7 +1628,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                         {
                             Id = new Guid("f4a0ea3a-98b1-3443-4739-f63803a841c8"),
                             ColorCode = "#FF5722",
-                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 54, 56, 34, DateTimeKind.Utc).AddTicks(6504),
+                            LastUpdatedUtc = new DateTime(2025, 12, 26, 14, 50, 57, 999, DateTimeKind.Utc).AddTicks(6605),
                             Name = "Phù hợp cho người tiểu đường",
                             NormalizedName = "",
                             UpperName = ""
@@ -2738,21 +2731,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.ToTable("UserHealthMetrics");
                 });
 
-            modelBuilder.Entity("DraftRecipeLabels", b =>
-                {
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", null)
-                        .WithMany()
-                        .HasForeignKey("DraftRecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.Label", null)
-                        .WithMany()
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("IngredientIngredientCategory", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.IngredientCategory", null)
@@ -3094,6 +3072,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("Nutrient");
                 });
 
+            modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Label", b =>
+                {
+                    b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.DraftRecipe", null)
+                        .WithMany("Labels")
+                        .HasForeignKey("DraftRecipeId");
+                });
+
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("SEP490_FTCDHMM_API.Domain.Entities.AppUser", "Receiver")
@@ -3427,6 +3412,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Migrations
                     b.Navigation("DraftRecipeIngredients");
 
                     b.Navigation("DraftRecipeUserTags");
+
+                    b.Navigation("Labels");
                 });
 
             modelBuilder.Entity("SEP490_FTCDHMM_API.Domain.Entities.HealthGoal", b =>

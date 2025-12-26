@@ -38,5 +38,26 @@ public class DraftRecipeConfiguration : IEntityTypeConfiguration<DraftRecipe>
             .WithMany()
             .HasForeignKey(x => x.ImageId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder
+            .HasMany(d => d.Labels)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "DraftRecipeLabels",
+                j => j
+                    .HasOne<Label>()
+                    .WithMany()
+                    .HasForeignKey("LabelId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<DraftRecipe>()
+                    .WithMany()
+                    .HasForeignKey("DraftRecipeId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.HasKey("DraftRecipeId", "LabelId");
+                    j.ToTable("DraftRecipeLabels");
+                });
     }
 }

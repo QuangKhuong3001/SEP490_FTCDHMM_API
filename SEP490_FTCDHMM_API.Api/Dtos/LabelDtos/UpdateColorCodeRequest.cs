@@ -7,7 +7,7 @@ namespace SEP490_FTCDHMM_API.Api.Dtos.LabelDtos
         [Required(ErrorMessage = "Cần xác định thời gian cuối cùng chỉnh sửa mục tiêu.")]
         public DateTime? LastUpdatedUtc { get; set; }
 
-        [Required(ErrorMessage = "Missing color code")]
-        public string ColorCode { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Mã màu phải là hex format hợp lệ")]
+        public string? ColorCode { get; set; }
     }
 }

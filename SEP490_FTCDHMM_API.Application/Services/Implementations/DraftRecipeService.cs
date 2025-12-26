@@ -172,21 +172,22 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 var ingredientIds = request.Ingredients.Select(i => i.IngredientId).ToList();
                 var ingredientExists = await _ingredientRepository.IdsExistAsync(ingredientIds);
 
-                if (!ingredientExists)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
-
                 if (request.Ingredients.Select(i => i.IngredientId).HasDuplicate())
                     throw new AppException(AppResponseCode.DUPLICATE, "Nguyên liệu bị trùng.");
+
+                if (!ingredientExists)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Nguyên liệu không tồn tại");
             }
 
             if (request.LabelIds.Count > 0)
             {
-                var labelExists = await _labelRepository.IdsExistAsync(request.LabelIds);
-                if (!labelExists)
-                    throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
 
                 if (request.LabelIds.HasDuplicate())
                     throw new AppException(AppResponseCode.DUPLICATE, "Danh sách nhãn dán bị trùng.");
+
+                var labelExists = await _labelRepository.IdsExistAsync(request.LabelIds);
+                if (!labelExists)
+                    throw new AppException(AppResponseCode.NOT_FOUND, "Nhãn dán không tồn tại");
             }
 
             foreach (var uid in request.TaggedUserIds.Distinct())
@@ -211,9 +212,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
+                var oldLabels = await _labelRepository
+                    .GetAllAsync(l => l.Id == draft.Id);
+
+                if (oldLabels.Count > 0)
+                    await _labelRepository.DeleteRangeAsync(oldLabels);
 
                 await _draftRecipeRepository.DeleteAsync(draft);
+
+                var labels = await _labelRepository.GetAllAsync(l => request.LabelIds.Contains(l.Id));
 
                 var newDraft = new DraftRecipe
                 {
