@@ -3,9 +3,9 @@
     public class MealGap
     {
         public decimal RemainingCalories { get; }
-        public IReadOnlyDictionary<Guid, (decimal Min, decimal Max)> RemainingNutrients { get; }
+        public IReadOnlyList<NutrientGap> RemainingNutrients { get; }
 
-        public MealGap(decimal remainingCalories, IReadOnlyDictionary<Guid, (decimal Min, decimal Max)> remainingNutrients)
+        public MealGap(decimal remainingCalories, IReadOnlyList<NutrientGap> remainingNutrients)
         {
             RemainingCalories = remainingCalories;
             RemainingNutrients = remainingNutrients;

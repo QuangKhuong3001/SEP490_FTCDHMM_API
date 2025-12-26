@@ -26,7 +26,35 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
             return candidates
                 .Where(r => !excludedRecipeIds.Contains(r.Id))
-                .Select(r => (Recipe: r, Score: _recipeScoringSystem.CalculateFinalScore(user, r)))
+                .Select(r =>
+                {
+                    var baseScore = _recipeScoringSystem.CalculateFinalScore(user, r);
+
+                    if (baseScore <= 0)
+                        return (Recipe: r, Score: 0d);
+
+                    double mealCompletionScore = 0;
+
+                    foreach (var nt in r.NutritionAggregates)
+                    {
+                        var remain = gap.RemainingNutrients
+                            .FirstOrDefault(x => x.NutrientId == nt.NutrientId);
+
+                        if (remain == null || remain.Min <= 0)
+                            continue;
+
+                        var contributionRatio = Math.Min(
+                            (double)(nt.AmountPerServing / remain.Min),
+                            1.0
+                        );
+
+                        mealCompletionScore += contributionRatio * remain.Weight;
+                    }
+
+                    var finalScore = baseScore * (1 + mealCompletionScore);
+
+                    return (Recipe: r, Score: finalScore);
+                })
                 .Where(x => x.Score > 0)
                 .Where(x =>
                 {
@@ -38,10 +66,15 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                     foreach (var nt in x.Recipe.NutritionAggregates)
                     {
-                        if (!gap.RemainingNutrients.TryGetValue(nt.NutrientId, out var remain))
+                        var remain = gap.RemainingNutrients
+                            .FirstOrDefault(x => x.NutrientId == nt.NutrientId);
+
+                        if (remain == null)
                             continue;
 
-                        if (remain.Max > 0 && nt.AmountPerServing > remain.Max && remain.Max != decimal.MaxValue)
+                        if (remain.Max > 0 &&
+                            nt.AmountPerServing > remain.Max &&
+                            remain.Max != decimal.MaxValue)
                             return false;
                     }
 

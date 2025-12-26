@@ -9,6 +9,7 @@ using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Interfaces.RecipeInterfaces;
 using SEP490_FTCDHMM_API.Domain.Enum;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
+using SEP490_FTCDHMM_API.Shared.Exceptions;
 
 namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation
 {
@@ -27,6 +28,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
         private readonly IMealNutritionCalculator _mealNutritionCalculator;
         private readonly IMealGapCalculator _mealGapCalculator;
         private readonly IMealCompletionRecommender _mealCompletionRecommender;
+        private readonly IMealSlotRepository _mealSlotRepository;
 
         public RecommendationService(
             IUserRepository userRepository,
@@ -41,6 +43,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             IMealNutritionCalculator mealNutritionCalculator,
             IMealGapCalculator mealGapCalculator,
             IMealCompletionRecommender mealCompletionRecommender,
+            IMealSlotRepository mealSlotRepository,
             IRecipeScoringSystem recipeScoringSystem)
         {
             _userRepository = userRepository;
@@ -55,6 +58,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             _mealNutritionCalculator = mealNutritionCalculator;
             _mealGapCalculator = mealGapCalculator;
             _mealCompletionRecommender = mealCompletionRecommender;
+            _mealSlotRepository = mealSlotRepository;
             _recipeScoringSystem = recipeScoringSystem;
         }
 
@@ -338,7 +342,10 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
         public async Task<MealAnalyzeResponse> AnalyzeMealAsync(Guid userId, MealAnalyzeRequest request)
         {
-            var mealType = GetCurrentMeal();
+            var slot = await _mealSlotRepository.GetByIdAsync(request.MealSlotId);
+            if (slot == null || slot.UserId != userId)
+                throw new AppException(AppResponseCode.NOT_FOUND);
+
             var currentIds = request.CurrentRecipeIds?.Distinct().ToHashSet() ?? new HashSet<Guid>();
 
             var users = await _userRepository.GetAllAsync(u => u.Id == userId,
@@ -354,7 +361,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             {
                 return new MealAnalyzeResponse
                 {
-                    MealType = mealType,
                     TargetCalories = 0,
                     CurrentCalories = 0,
                     RemainingCalories = 0,
@@ -437,7 +443,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 SaveByLabel = RecommendationBehaviorBuilder.BuildSaveByLabel(savedIds, recipeLabelsMap)
             };
 
-            var mealTarget = _mealTargetProvider.BuildMealTarget(tdee.Value, mealType, domainTargets);
+            var mealTarget = _mealTargetProvider.BuildMealTarget(tdee.Value, slot, domainTargets);
 
             var currentSnapshots = snapshots.Where(r => currentIds.Contains(r.Id)).ToList();
             var currentState = _mealNutritionCalculator.Calculate(currentSnapshots);
@@ -479,7 +485,6 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
 
             return new MealAnalyzeResponse
             {
-                MealType = mealType,
                 TargetCalories = mealTarget.TargetCalories,
                 CurrentCalories = currentState.Calories,
                 RemainingCalories = gap.RemainingCalories,
@@ -487,11 +492,11 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
                 TargetNutrients = mealTarget.NutrientTargets.ToDictionary(x => x.NutrientId, x => x.MinValue),
                 CurrentNutrients = currentState.Nutrients.ToDictionary(x => x.Key, x => x.Value),
                 RemainingNutrients = gap.RemainingNutrients.ToDictionary(
-                    x => x.Key,
+                    x => x.NutrientId,
                     x => new NutrientRangeResponse
                     {
-                        Min = x.Value.Min,
-                        Max = x.Value.Max
+                        Min = x.Min,
+                        Max = x.Max
                     }),
                 Suggestions = mapped
             };

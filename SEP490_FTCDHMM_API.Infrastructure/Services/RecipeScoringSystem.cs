@@ -74,8 +74,8 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 .GroupBy(n => n.NutrientId)
                 .ToDictionary(g => g.Key, g => g.First().AmountPerServing);
 
-            double total = 0;
-            int count = 0;
+            double weightedTotal = 0;
+            double weightSum = 0;
             var perServingCalories = recipe.Calories / recipe.Ration;
 
             foreach (var t in targets)
@@ -87,11 +87,13 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                     ? ScoreAbsolute(amount, t)
                     : ScorePercentage(amount, t, perServingCalories);
 
-                total += Math.Clamp(score, 0, 1);
-                count++;
+                score = Math.Clamp(score, 0, 1);
+
+                weightedTotal += score * t.Weight;
+                weightSum += t.Weight;
             }
 
-            return count == 0 ? 0 : total / count;
+            return weightSum == 0 ? 0 : weightedTotal / weightSum;
         }
 
         private double ScoreAbsolute(decimal value, NutrientTarget t)

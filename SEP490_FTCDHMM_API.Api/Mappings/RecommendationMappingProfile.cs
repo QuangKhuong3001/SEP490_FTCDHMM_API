@@ -9,6 +9,7 @@ namespace SEP490_FTCDHMM_API.Api.Mappings
         public RecommendationMappingProfile()
         {
             CreateMap<APIDtos.MealDtos.MealAnalyzeRequest, ApplicationDtos.MealDtos.MealAnalyzeRequest>();
+            CreateMap<APIDtos.MealDtos.MealSlotRequest, ApplicationDtos.MealDtos.MealSlotRequest>();
 
         }
     }

@@ -392,6 +392,9 @@ namespace SEP490_FTCDHMM_API.Api.Configurations
             services.AddScoped<IMealNutritionCalculator, MealNutritionCalculator>();
             services.AddScoped<IMealGapCalculator, MealGapCalculator>();
             services.AddScoped<IMealCompletionRecommender, MealCompletionRecommender>();
+
+            services.AddScoped<IUserMealSlotService, UserMealSlotService>();
+            services.AddScoped<IMealSlotRepository, MealSlotRepository>();
         }
     }
 }

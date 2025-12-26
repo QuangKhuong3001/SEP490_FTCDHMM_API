@@ -8,7 +8,6 @@ using SEP490_FTCDHMM_API.Application.Interfaces.Persistence;
 using SEP490_FTCDHMM_API.Application.Interfaces.SystemServices;
 using SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplementation;
 using SEP490_FTCDHMM_API.Domain.Entities;
-using SEP490_FTCDHMM_API.Domain.Enum;
 using SEP490_FTCDHMM_API.Domain.ValueObjects;
 
 namespace SEP490_FTCDHMM_API.Tests.Services
@@ -24,7 +23,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services
         private readonly Mock<IUserRecipeViewRepository> _viewRepo = new();
         private readonly Mock<ICommentRepository> _commentRepo = new();
         private readonly Mock<IUserSaveRecipeRepository> _saveRepo = new();
-
+        private readonly Mock<IMealSlotRepository> _mealSlotRepo = new();
         private readonly Mock<IMealTargetProvider> _mealTargetProvider = new();
         private readonly Mock<IMealNutritionCalculator> _mealNutritionCalculator = new();
         private readonly Mock<IMealGapCalculator> _mealGapCalculator = new();
@@ -44,8 +43,21 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                 _mealNutritionCalculator.Object,
                 _mealGapCalculator.Object,
                 _mealCompletionRecommender.Object,
+                _mealSlotRepo.Object,
                 _scoring.Object
             );
+
+        private static UserMealSlot CreateMealSlot(Guid userId)
+        {
+            return new UserMealSlot
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Name = "Lunch",
+                EnergyPercent = 0.3m,
+                OrderIndex = 2
+            };
+        }
 
         [Fact]
         public async Task ComputedRecommendRecipesAsync_ReturnsEmpty_WhenClusterMissing()
@@ -95,7 +107,6 @@ namespace SEP490_FTCDHMM_API.Tests.Services
             Assert.Null(result.Items.First().Score);
         }
 
-
         [Fact]
         public async Task RecommendRecipesAsync_ReturnsEmpty_WhenNoSnapshots()
         {
@@ -121,6 +132,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services
         public async Task AnalyzeMealAsync_ReturnsZero_WhenUserHasNoTdee()
         {
             var userId = Guid.NewGuid();
+            var slot = CreateMealSlot(userId);
+
+            _mealSlotRepo.Setup(x => x.GetByIdAsync(slot.Id, null))
+                .ReturnsAsync(slot);
 
             _userRepo.Setup(x => x.GetAllAsync(
                     It.IsAny<Expression<Func<AppUser, bool>>>(),
@@ -135,12 +150,17 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                 });
 
             var service = CreateService();
-            var result = await service.AnalyzeMealAsync(userId, new MealAnalyzeRequest());
+
+            var result = await service.AnalyzeMealAsync(
+                userId,
+                new MealAnalyzeRequest
+                {
+                    MealSlotId = slot.Id
+                });
 
             Assert.Equal(0, result.TargetCalories);
             Assert.Equal(0, result.CurrentCalories);
             Assert.Equal(0, result.RemainingCalories);
-            Assert.Equal(0, result.EnergyCoveragePercent);
         }
 
         [Fact]
@@ -148,22 +168,10 @@ namespace SEP490_FTCDHMM_API.Tests.Services
         {
             var userId = Guid.NewGuid();
             var recipeId = Guid.NewGuid();
+            var slot = CreateMealSlot(userId);
 
-            _ratingRepo
-                .Setup(x => x.GetAllAsync(It.IsAny<Expression<Func<Rating, bool>>>(), null))
-                .ReturnsAsync(new List<Rating>());
-
-            _commentRepo
-                .Setup(x => x.GetAllAsync(It.IsAny<Expression<Func<Comment, bool>>>(), null))
-                .ReturnsAsync(new List<Comment>());
-
-            _viewRepo
-                .Setup(x => x.GetAllAsync(It.IsAny<Expression<Func<RecipeUserView, bool>>>(), null))
-                .ReturnsAsync(new List<RecipeUserView>());
-
-            _saveRepo
-                .Setup(x => x.GetAllAsync(It.IsAny<Expression<Func<RecipeUserSave, bool>>>(), null))
-                .ReturnsAsync(new List<RecipeUserSave>());
+            _mealSlotRepo.Setup(x => x.GetByIdAsync(slot.Id, null))
+                .ReturnsAsync(slot);
 
             _userRepo.Setup(x => x.GetAllAsync(
                     It.IsAny<Expression<Func<AppUser, bool>>>(),
@@ -191,7 +199,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services
             _mealTargetProvider
                 .Setup(x => x.BuildMealTarget(
                     It.IsAny<double>(),
-                    It.IsAny<MealType>(),
+                    It.IsAny<UserMealSlot>(),
                     It.IsAny<IReadOnlyList<NutrientTarget>>()))
                 .Returns(new MealTarget(
                     600,
@@ -211,7 +219,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                     It.IsAny<MealNutritionState>()))
                 .Returns(new MealGap(
                     400,
-                    new Dictionary<Guid, (decimal Min, decimal Max)>()
+                    new List<NutrientGap>()
                 ));
 
             _mealCompletionRecommender
@@ -246,7 +254,14 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                 });
 
             var service = CreateService();
-            var result = await service.AnalyzeMealAsync(userId, new MealAnalyzeRequest());
+
+            var result = await service.AnalyzeMealAsync(
+                userId,
+                new MealAnalyzeRequest
+                {
+                    MealSlotId = slot.Id,
+                    SuggestionLimit = 5
+                });
 
             Assert.Single(result.Suggestions);
             Assert.Equal(600, result.TargetCalories);
