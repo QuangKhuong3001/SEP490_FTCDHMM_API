@@ -21,6 +21,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
         protected readonly Mock<IGoogleAuthService> GoogleAuthServiceMock;
         protected readonly Mock<IGoogleProvisioningService> GoogleProvisioningServiceMock;
         protected readonly Mock<IEmailTemplateService> EmailTemplateServiceMock;
+        protected readonly Mock<IUserMealSlotInitializer> UserMealSlotInitializerMock;
 
         protected readonly AuthService Sut;
 
@@ -36,6 +37,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
             GoogleAuthServiceMock = new Mock<IGoogleAuthService>();
             GoogleProvisioningServiceMock = new Mock<IGoogleProvisioningService>();
             EmailTemplateServiceMock = new Mock<IEmailTemplateService>();
+            UserMealSlotInitializerMock = new Mock<IUserMealSlotInitializer>();
 
             Sut = new AuthService(
                 UserManagerMock.Object,
@@ -46,6 +48,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 JwtServiceMock.Object,
                 GoogleProvisioningServiceMock.Object,
                 GoogleAuthServiceMock.Object,
+                UserMealSlotInitializerMock.Object,
                 EmailTemplateServiceMock.Object
             );
         }
@@ -62,7 +65,7 @@ namespace SEP490_FTCDHMM_API.Tests.Services.AuthServiceTests
                 EmailConfirmed = emailConfirmed,
                 Gender = Gender.Male,
                 DateOfBirth = DateTime.UtcNow.AddYears(-20),
-                RoleId = roleId ?? Guid.NewGuid(),
+                RoleId = roleId ?? Guid.NewGuid()
             };
         }
 

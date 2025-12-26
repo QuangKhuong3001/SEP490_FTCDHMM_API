@@ -5,8 +5,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Interfaces
     public interface IUserMealSlotService
     {
         Task<List<MealSlotResponse>> GetMyMealsAsync(Guid userId);
-        Task CreateAsync(Guid userId, MealSlotRequest request);
-        Task UpdateAsync(Guid userId, Guid slotId, MealSlotRequest request);
-        Task DeleteAsync(Guid userId, Guid slotId);
+        Task CreateMealSlotAsync(Guid userId, MealSlotRequest request);
+        Task UpdateMealSlotAsync(Guid userId, Guid slotId, MealSlotRequest request);
+        Task DeleteMealSlotAsync(Guid userId, Guid slotId);
     }
 }

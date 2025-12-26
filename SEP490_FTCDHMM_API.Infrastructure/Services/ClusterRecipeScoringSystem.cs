@@ -58,7 +58,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 return 0;
 
             var mealPct = GetMealDistribution(time);
-            var targetCalories = avgTdee * mealPct;
+            var targetCalories = avgTdee * (double)mealPct;
             var perServing = (double)recipe.Calories / recipe.Ration;
 
             var diff = Math.Abs(perServing - targetCalories);
@@ -79,7 +79,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             return kcal / (double)recipe.Calories;
         }
 
-        private double GetMealDistribution(TimeSpan time)
+        private decimal GetMealDistribution(TimeSpan time)
         {
             if (time < new TimeSpan(11, 0, 0))
                 return _mealDistribution.Breakfast;

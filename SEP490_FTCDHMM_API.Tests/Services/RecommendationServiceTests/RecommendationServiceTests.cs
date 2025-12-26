@@ -170,10 +170,37 @@ namespace SEP490_FTCDHMM_API.Tests.Services
             var recipeId = Guid.NewGuid();
             var slot = CreateMealSlot(userId);
 
-            _mealSlotRepo.Setup(x => x.GetByIdAsync(slot.Id, null))
+            _ratingRepo
+                .Setup(x => x.GetAllAsync(
+                    It.IsAny<Expression<Func<Rating, bool>>>(),
+                    It.IsAny<Func<IQueryable<Rating>, IQueryable<Rating>>>()))
+                .ReturnsAsync(new List<Rating>());
+
+            _commentRepo
+                .Setup(x => x.GetAllAsync(
+                    It.IsAny<Expression<Func<Comment, bool>>>(),
+                    It.IsAny<Func<IQueryable<Comment>, IQueryable<Comment>>>()))
+                .ReturnsAsync(new List<Comment>());
+
+            _viewRepo
+                .Setup(x => x.GetAllAsync(
+                    It.IsAny<Expression<Func<RecipeUserView, bool>>>(),
+                    It.IsAny<Func<IQueryable<RecipeUserView>, IQueryable<RecipeUserView>>>()))
+                .ReturnsAsync(new List<RecipeUserView>());
+
+            _saveRepo
+                .Setup(x => x.GetAllAsync(
+                    It.IsAny<Expression<Func<RecipeUserSave, bool>>>(),
+                    It.IsAny<Func<IQueryable<RecipeUserSave>, IQueryable<RecipeUserSave>>>()))
+                .ReturnsAsync(new List<RecipeUserSave>());
+
+
+            _mealSlotRepo
+                .Setup(x => x.GetByIdAsync(slot.Id, It.IsAny<Func<IQueryable<UserMealSlot>, IQueryable<UserMealSlot>>>()))
                 .ReturnsAsync(slot);
 
-            _userRepo.Setup(x => x.GetAllAsync(
+            _userRepo
+                .Setup(x => x.GetAllAsync(
                     It.IsAny<Expression<Func<AppUser, bool>>>(),
                     It.IsAny<Func<IQueryable<AppUser>, IQueryable<AppUser>>>()))
                 .ReturnsAsync(new List<AppUser>
@@ -183,17 +210,27 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                         Id = userId,
                         HealthMetrics = new List<UserHealthMetric>
                         {
-                            new UserHealthMetric { TDEE = 2000, RecordedAt = DateTime.UtcNow }
+                            new UserHealthMetric
+                            {
+                                TDEE = 2000,
+                                RecordedAt = DateTime.UtcNow
+                            }
                         },
                         UserHealthGoals = new List<UserHealthGoal>(),
                         DietRestrictions = new List<UserDietRestriction>()
                     }
                 });
 
-            _recipeRepo.Setup(x => x.GetRecipesForScoringAsync())
+            _recipeRepo
+                .Setup(x => x.GetRecipesForScoringAsync())
                 .ReturnsAsync(new List<RecipeScoringSnapshot>
                 {
-                    new RecipeScoringSnapshot { Id = recipeId }
+                    new RecipeScoringSnapshot
+                    {
+                        Id = recipeId,
+                        NutritionAggregates = new List<NutrientSnapshot>(),
+                        LabelIds = new List<Guid>()
+                    }
                 });
 
             _mealTargetProvider
@@ -229,17 +266,15 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                     It.IsAny<MealNutritionState>(),
                     It.IsAny<MealGap>(),
                     It.IsAny<IEnumerable<RecipeScoringSnapshot>>(),
-                    It.IsAny<HashSet<Guid>>(),
+                    It.IsAny<ISet<Guid>>(),
                     It.IsAny<int>()))
-                .Returns(new[]
+                .Returns(new List<(RecipeScoringSnapshot, double)>
                 {
-                    (
-                        new RecipeScoringSnapshot { Id = recipeId },
-                        0.9
-                    )
+                    (new RecipeScoringSnapshot { Id = recipeId }, 0.9)
                 });
 
-            _recipeRepo.Setup(x => x.GetAllAsync(
+            _recipeRepo
+                .Setup(x => x.GetAllAsync(
                     It.IsAny<Expression<Func<Recipe, bool>>>(),
                     It.IsAny<Func<IQueryable<Recipe>, IQueryable<Recipe>>>()))
                 .ReturnsAsync(new List<Recipe>
@@ -247,7 +282,8 @@ namespace SEP490_FTCDHMM_API.Tests.Services
                     new Recipe { Id = recipeId }
                 });
 
-            _mapper.Setup(x => x.Map<List<RecipeRankResponse>>(It.IsAny<List<Recipe>>()))
+            _mapper
+                .Setup(x => x.Map<List<RecipeRankResponse>>(It.IsAny<List<Recipe>>()))
                 .Returns(new List<RecipeRankResponse>
                 {
                     new RecipeRankResponse { Id = recipeId }

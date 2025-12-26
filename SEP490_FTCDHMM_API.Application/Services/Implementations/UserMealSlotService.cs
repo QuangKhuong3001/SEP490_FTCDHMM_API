@@ -18,17 +18,15 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mealSlotRepository = mealSlotRepository;
         }
 
-        public async Task CreateAsync(Guid userId, MealSlotRequest request)
+        public async Task CreateMealSlotAsync(Guid userId, MealSlotRequest request)
         {
-            ValidateEnergyPercent(request.EnergyPercent);
-
             var existing = await _mealSlotRepository.GetByUserAsync(userId);
             if (existing.Any(x => x.OrderIndex == request.OrderIndex))
                 throw new AppException(AppResponseCode.INVALID_ACTION);
 
             var sum = existing.Sum(x => x.EnergyPercent) + request.EnergyPercent;
             if (sum > 1)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Tổng năng lượng không vượt quá 100%");
 
             var slot = new UserMealSlot
             {
@@ -42,7 +40,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             await _mealSlotRepository.AddAsync(slot);
         }
 
-        public async Task DeleteAsync(Guid userId, Guid slotId)
+        public async Task DeleteMealSlotAsync(Guid userId, Guid slotId)
         {
             var slot = await _mealSlotRepository.GetByIdAsync(slotId);
             if (slot == null || slot.UserId != userId)
@@ -57,10 +55,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             return _mapper.Map<List<MealSlotResponse>>(slots.OrderBy(x => x.OrderIndex));
         }
 
-        public async Task UpdateAsync(Guid userId, Guid slotId, MealSlotRequest request)
+        public async Task UpdateMealSlotAsync(Guid userId, Guid slotId, MealSlotRequest request)
         {
-            ValidateEnergyPercent(request.EnergyPercent);
-
             var slot = await _mealSlotRepository.GetByIdAsync(slotId);
             if (slot == null || slot.UserId != userId)
                 throw new AppException(AppResponseCode.NOT_FOUND);
@@ -71,19 +67,13 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
 
             var sum = all.Where(x => x.Id != slotId).Sum(x => x.EnergyPercent) + request.EnergyPercent;
             if (sum > 1)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
+                throw new AppException(AppResponseCode.INVALID_ACTION, "Tổng năng lượng không vượt quá 100%");
 
             slot.Name = request.Name.Trim();
             slot.EnergyPercent = request.EnergyPercent;
             slot.OrderIndex = request.OrderIndex;
 
             await _mealSlotRepository.UpdateAsync(slot);
-        }
-
-        private static void ValidateEnergyPercent(decimal value)
-        {
-            if (value <= 0 || value > 1)
-                throw new AppException(AppResponseCode.INVALID_ACTION);
         }
     }
 }

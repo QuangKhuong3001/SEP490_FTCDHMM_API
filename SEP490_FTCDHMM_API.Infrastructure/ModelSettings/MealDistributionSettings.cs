@@ -2,9 +2,9 @@
 {
     public class MealDistributionSettings
     {
-        public double Breakfast { get; set; } = 0.25;
-        public double Lunch { get; set; } = 0.35;
-        public double Dinner { get; set; } = 0.40;
+        public decimal Breakfast { get; set; } = 0.25m;
+        public decimal Lunch { get; set; } = 0.35m;
+        public decimal Dinner { get; set; } = 0.40m;
     }
 
 }

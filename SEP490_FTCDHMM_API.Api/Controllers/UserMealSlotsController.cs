@@ -43,7 +43,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
 
             var appRequest = _mapper.Map<ApplicationDtos.MealDtos.MealSlotRequest>(request);
 
-            await _service.CreateAsync(userId, appRequest);
+            await _service.CreateMealSlotAsync(userId, appRequest);
             return Ok();
         }
 
@@ -56,7 +56,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
                 return BadRequest();
 
             var appRequest = _mapper.Map<ApplicationDtos.MealDtos.MealSlotRequest>(request);
-            await _service.UpdateAsync(userId, slotId, appRequest);
+            await _service.UpdateMealSlotAsync(userId, slotId, appRequest);
             return Ok();
         }
 
@@ -68,7 +68,7 @@ namespace SEP490_FTCDHMM_API.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return BadRequest();
 
-            await _service.DeleteAsync(userId, slotId);
+            await _service.DeleteMealSlotAsync(userId, slotId);
             return Ok();
         }
     }

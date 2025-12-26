@@ -27,6 +27,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IGoogleProvisioningService _googleProvisioningService;
+        private readonly IUserMealSlotInitializer _userMealSlotInitializer;
 
         public AuthService(UserManager<AppUser> userManager,
             IRoleRepository roleRepository,
@@ -36,6 +37,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             IJwtAuthService jwtService,
             IGoogleProvisioningService googleProvisioningService,
             IGoogleAuthService googleAuthService,
+            IUserMealSlotInitializer userMealSlotInitializer,
             IEmailTemplateService emailTemplateService)
         {
             _userManager = userManager;
@@ -45,6 +47,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
             _mailService = mailService;
             _jwtService = jwtService;
             _googleAuthService = googleAuthService;
+            _userMealSlotInitializer = userMealSlotInitializer;
             _googleProvisioningService = googleProvisioningService;
             _emailTemplateService = emailTemplateService;
         }
@@ -107,6 +110,8 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                     throw;
                 }
             }
+
+            await _userMealSlotInitializer.InitializeDefaultAsync(user.Id);
 
             string otpCode = Generate.GenerateRandomNumberic(OtpConstants.Length);
             string hashedCode = HashHelper.ComputeSha256Hash(otpCode);
@@ -368,6 +373,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 GoogleRefreshToken = tokens.RefreshToken
             });
 
+            await _userMealSlotInitializer.InitializeDefaultAsync(user.Id);
             return _jwtService.GenerateToken(user, user.Role);
         }
 
@@ -382,6 +388,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations
                 GoogleRefreshToken = null
             });
 
+            await _userMealSlotInitializer.InitializeDefaultAsync(user.Id);
             return _jwtService.GenerateToken(user, user.Role);
         }
     }
