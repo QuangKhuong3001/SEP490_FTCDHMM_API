@@ -148,8 +148,7 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
             if (tdee <= 0)
                 return 0;
 
-            var mealPct = GetMealDistribution();
-            var targetCalories = tdee * (double)mealPct;
+            var targetCalories = tdee;
             var perServing = (double)recipe.Calories / recipe.Ration;
 
             var diffRatio = Math.Abs(perServing - targetCalories) / targetCalories;
@@ -193,18 +192,6 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
                 .Sum(l => userLabelStats[l]);
 
             return Math.Clamp((double)matched / total, 0, 1);
-        }
-
-        private decimal GetMealDistribution()
-        {
-            var now = DateTime.Now.TimeOfDay;
-
-            if (now < new TimeSpan(11, 0, 0))
-                return _mealDistribution.Breakfast;
-            if (now < new TimeSpan(16, 0, 0))
-                return _mealDistribution.Lunch;
-
-            return _mealDistribution.Dinner;
         }
 
         private double GetMacroCaloriesPerGram(Guid nutrientId)

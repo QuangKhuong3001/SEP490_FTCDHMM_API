@@ -35,23 +35,21 @@ namespace SEP490_FTCDHMM_API.Infrastructure.Services
 
                     double mealCompletionScore = 0;
 
+                    var totalWeight = gap.RemainingNutrients.Sum(x => x.Weight);
+
                     foreach (var nt in r.NutritionAggregates)
                     {
-                        var remain = gap.RemainingNutrients
-                            .FirstOrDefault(x => x.NutrientId == nt.NutrientId);
-
-                        if (remain == null || remain.Min <= 0)
+                        var remain = gap.RemainingNutrients.FirstOrDefault(x => x.NutrientId == nt.NutrientId);
+                        if (remain == null || remain.Min <= 0 || remain.Weight <= 0)
                             continue;
 
-                        var contributionRatio = Math.Min(
-                            (double)(nt.AmountPerServing / remain.Min),
-                            1.0
-                        );
+                        var ratio = Math.Min((double)(nt.AmountPerServing / remain.Min), 1.0);
+                        var normalizedWeight = remain.Weight / totalWeight;
 
-                        mealCompletionScore += contributionRatio * remain.Weight;
+                        mealCompletionScore += ratio * normalizedWeight;
                     }
 
-                    var finalScore = baseScore * (1 + mealCompletionScore);
+                    var finalScore = baseScore * (1 + 0.5 * mealCompletionScore);
 
                     return (Recipe: r, Score: finalScore);
                 })

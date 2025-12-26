@@ -427,7 +427,7 @@ namespace SEP490_FTCDHMM_API.Application.Services.Implementations.RecipeImplemen
             var userCtx = new RecommendationUserContext
             {
                 UserId = userId,
-                Tdee = tdee.Value,
+                Tdee = tdee.Value * (double)slot.EnergyPercent / 100,
                 Targets = domainTargets,
                 RestrictedIngredientIds = restrictions
                     .Where(r => r.IngredientId.HasValue)
